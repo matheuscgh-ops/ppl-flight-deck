@@ -2178,7 +2178,7 @@ function calSVG(C,w,h){
   return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(t('calTitle'))}"${hv({mode:'pts',l:L,t:T,pw,ph})}>${g}</svg>`;
 }
 
-/* ===== chart hover: dashed crosshair to the axes, a dot on every line and the values at that point =====
+/* ===== chart hover: a dashed vertical line, a dot on every line and the values at that point =====
    line: x is snapped to whole days (or to the data point), values read off the drawn lines; bars / pts: the bar or point under the cursor */
 const HOVER_OK=matchMedia('(hover:hover) and (pointer:fine)');
 const ctip=(()=>{const d=document.createElement('div');d.className='ctip';d.hidden=true;document.body.appendChild(d);return d})();
@@ -2196,7 +2196,7 @@ function hoverShow(svg,e){
     svg.querySelectorAll('[data-hl]').forEach(el=>{if(mode==='bars'){const x=+el.getAttribute('x'),w=+el.getAttribute('width');if(P.x>=x-1&&P.x<=x+w+1){best=el;bd=0}}else{const dx=+el.getAttribute('cx')-P.x,dy=+el.getAttribute('cy')-P.y,dd=Math.hypot(dx,dy);if(dd<bd&&dd<24){bd=dd;best=el}}});
     if(!best){ctip.hidden=true;return}
     best.classList.add('hovon');
-    if(mode==='pts'){const cx=+best.getAttribute('cx'),cy=+best.getAttribute('cy');add('line',{x1:cx,x2:cx,y1:cy,y2:T+ph,class:'hx'});add('line',{x1:L,x2:cx,y1:cy,y2:cy,class:'hx'})}
+    if(mode==='pts'){const cx=+best.getAttribute('cx'),cy=+best.getAttribute('cy');add('line',{x1:cx,x2:cx,y1:cy,y2:T+ph,class:'hx'})}
     html=`<b>${esc(best.dataset.hl)}</b>`;
   }else{
     if(P.x<L-2||P.x>L+pw+2){ctip.hidden=true;return}
@@ -2220,7 +2220,6 @@ function hoverShow(svg,e){
       const col=getComputedStyle(pa).stroke||'#e8ecf1';if(firstY==null)firstY=py;
       add('circle',{cx:px,cy:py,r:4.5,fill:col,class:'hdot'});rows.push(`<span><i style="background:${col}"></i>${esc(pa.dataset.hs)} <b>${hoverFmt(val(py),d.hfmt)}</b></span>`)});
     add('line',{x1:px,x2:px,y1:T,y2:T+ph,class:'hx'});
-    if(firstY!=null)add('line',{x1:L,x2:px,y1:firstY,y2:firstY,class:'hx'});
     html=`<div class="ctd">${esc(label)}</div>${rows.join('')||`<span class="muted">—</span>`}`;
   }
   if(!g.parentNode)svg.appendChild(g);
