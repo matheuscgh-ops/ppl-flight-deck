@@ -356,6 +356,89 @@ body.dragging,body.dragging *{cursor:grabbing!important;user-select:none!importa
 .syncmsg{min-height:18px;margin-top:10px;font-size:13px;font-weight:700;color:#ffb3ab}
 .syncnote{font-size:12px;color:var(--muted);line-height:1.5;margin:10px 0 0}
 .syncrow{display:flex;gap:10px;align-items:baseline;margin-top:14px;font-size:15px}
+
+/* ===== PHONE (≤ 640 px): Trello-style swipeable lists, Strava-style calendar, nothing wider than the screen ===== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+.lanedots{display:none}
+@media (max-width:640px){
+  html,body{overflow-x:hidden}
+  input,select,textarea{font-size:16px!important}
+  .app{padding:10px 10px 28px;gap:10px}
+  .top{flex-direction:column;align-items:stretch;gap:10px}
+  .brandrow{justify-content:space-between;gap:10px}
+  .brand{font-size:20px}
+  .tabs button{padding:6px 10px;font-size:12.5px}
+  .tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .tools #syncChip{grid-column:1/-1;justify-content:center}
+  .tools button{padding:7px 4px;font-size:12px;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .tools .sep,.tools .demo{display:none}
+  .tools .flags{grid-column:1/-1;justify-content:center}
+  .flags .flag{flex:1;font-size:18px}
+  .progress{padding:12px 12px 10px}
+  .phead{flex-wrap:wrap}.section{font-size:12px}
+  .track{height:38px;margin:10px 0 8px}.chunk b{font-size:12.5px}
+  .legend{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 10px}
+  .lg{padding:2px 0;gap:7px}.lg strong{font-size:12.5px}.lg small{font-size:11.5px}
+  .toprow{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+  .toprow .countdown{padding:12px}.toprow .big{font-size:36px}.toprow .countdown input{font-size:13px;padding:6px}
+  .toprow .stats{padding:10px 12px!important}
+  .toprow .stat{min-width:0}.toprow .stat .sv{font-size:16px;min-width:48px}
+  .toprow .stat .sl{flex:1;min-width:0;font-size:11.5px}
+  .addpt{display:none!important}
+  /* Kanban: one list per screen, swipe sideways, neighbours peek in */
+  .board{padding:12px 0 10px;border-radius:14px}
+  .boardhead{padding:0 14px;margin-bottom:10px}
+  .lanes{display:flex!important;align-items:flex-start;gap:10px;overflow-x:auto;overflow-y:visible;scroll-snap-type:x mandatory;padding:0 7%;scroll-padding:0 7%;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior-x:contain}
+  .lanes::-webkit-scrollbar{display:none}
+  .lane{flex:0 0 86%;max-width:none;scroll-snap-align:center;scroll-snap-stop:always}
+  .lanehead{padding:12px 14px 8px;font-size:15px}
+  .lanecards{padding:2px 10px 12px;gap:8px}
+  .task{display:flex;align-items:center;gap:10px;padding:12px 12px;border-radius:10px}
+  .tname{flex:1;min-width:0;font-size:14.5px;line-height:1.3}
+  .tmeta{margin:0;flex:none}
+  .tmeta>span:first-child,.tmeta .last{display:none}
+  .lanedots{display:flex;justify-content:center;gap:8px;margin-top:12px}
+  .lanedots button{width:8px;height:8px;padding:0;border:0;border-radius:50%;background:#ffffff59}
+  .lanedots button.on{background:#fff;transform:scale(1.15)}
+  /* calendar: Strava-style circles; names live in the tooltip / card history */
+  .center{grid-template-columns:1fr!important;height:auto!important}
+  .cal{padding:12px 10px}
+  .calhead{flex-wrap:wrap;gap:8px}.callegend{display:none!important}
+  .calgrid{grid-template-columns:repeat(7,minmax(0,1fr)) 40px!important;grid-template-rows:auto repeat(var(--weeks,6),auto)!important;gap:6px 4px!important}
+  .day{aspect-ratio:1;border-radius:50%!important;padding:0!important;display:flex;align-items:center;justify-content:center;border:0;background:#1f2328}
+  .day .tags,.day .dcheck,.day .examtag{display:none}
+  .dhead{justify-content:center}.dnum{font-size:14px!important;padding:0!important}
+  .day.active{background:#e2f8eb}
+  .day.today .dnum{text-decoration:underline;text-underline-offset:3px}
+  .day.exam{box-shadow:inset 0 0 0 2px var(--exam)}
+  .day.out{opacity:.3}
+  .wcheck{width:26px!important;height:26px!important;font-size:14px!important}
+  .bubble{width:36px!important;height:36px!important;font-size:17px!important}
+  .sr{padding:14px}
+  .chartlegend{font-size:11px}
+  .duechip{min-width:0}
+  .modal{padding:16px}
+  .srhero{padding:14px}.srkpis{gap:14px}.srkpis b{font-size:24px}
+  .kpirow b{font-size:15px}
+}
+
+/* ===== TABLET portrait (iPad mini etc., 641–1099 px): two lists per screen, swipe; taller calendar with names ===== */
+@media (min-width:641px) and (max-width:1099px){
+  html,body{overflow-x:hidden}
+  input,select,textarea{font-size:16px!important}
+  .board{padding:14px 0 12px}
+  .boardhead{padding:0 16px}
+  .lanes{display:flex!important;align-items:flex-start;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 16px;scroll-padding:0 16px;scrollbar-width:none;overscroll-behavior-x:contain}
+  .lanes::-webkit-scrollbar{display:none}
+  .lane{flex:0 0 calc(50% - 22px);scroll-snap-align:start}
+  .task{padding:10px 12px}.tname{font-size:14px}
+  .lanedots{display:flex;justify-content:center;gap:8px;margin-top:12px}
+  .lanedots button{width:8px;height:8px;padding:0;border:0;border-radius:50%;background:#ffffff59}
+  .lanedots button.on{background:#fff}
+  .calgrid{grid-template-rows:auto repeat(var(--weeks,6),minmax(104px,auto))!important}
+  .daytag{font-size:10.5px!important}
+  .callegend{display:flex!important}
+}
 </style>
 </head>
 <body>
@@ -405,6 +488,7 @@ body.dragging,body.dragging *{cursor:grabbing!important;user-select:none!importa
   <section class="panel board">
     <div class="boardhead"><h2 class="section"><span data-t="board"></span> <span class="muted" id="cardCount"></span></h2><div class="hint"><span data-t="drag"></span></div></div>
     <div class="lanes" id="lanes"></div>
+    <div class="lanedots" id="laneDots"></div>
   </section>
 
   <section class="center">
@@ -523,6 +607,9 @@ Object.assign(I18N.ja,{"practiceTest": "FAA模擬試験", "practiceTests": "模�
 Object.assign(I18N.en,{"syncTitle": "Sync across devices", "syncSub": "Your progress is kept in a private GitHub Gist, so your phone and other browsers see the same data.", "syncStep1": "Create a GitHub token with only the “gist” permission:", "syncTokenLink": "open GitHub ↗", "syncStep2": "Paste it below and press Connect (do this once on each device).", "syncStep3": "Done — every change syncs by itself.", "syncTokenLabel": "GitHub token", "syncConnect": "Connect", "syncPrivacy": "The token stays only in this browser; it is never included in backups or in Save HTML. It can only read and write your Gists.", "syncNow": "Sync now", "syncDisconnect": "Disconnect this device", "syncHow": "Changes are sent about a second after you make them. When you open the app or come back to it, the newest copy is loaded. If you edit on two devices while offline, the last one saved wins.", "syncWho": "Gist owner {u}", "syncLast": "Last sync: {d}", "syncOff": "Sync off", "syncIdle": "Sync", "syncOk": "Synced", "syncBusy": "Syncing…", "syncOffline": "Offline — will retry", "syncAuth": "Token invalid or expired", "syncMissing": "Gist not found — reconnect", "syncError": "Sync error — will retry", "syncPulled": "Loaded the latest progress from the cloud", "syncCreated": "Connected — private Gist created", "syncNeedToken": "Paste your token first.", "syncOffConfirm": "Stop syncing on this device? Your data stays here and in the Gist."});
 Object.assign(I18N.pt,{"syncTitle": "Sincronizar entre aparelhos", "syncSub": "Seu progresso fica num Gist privado do GitHub, então o celular e outros navegadores veem os mesmos dados.", "syncStep1": "Crie um token do GitHub só com a permissão “gist”:", "syncTokenLink": "abrir o GitHub ↗", "syncStep2": "Cole abaixo e clique em Conectar (uma vez em cada aparelho).", "syncStep3": "Pronto — cada alteração sincroniza sozinha.", "syncTokenLabel": "Token do GitHub", "syncConnect": "Conectar", "syncPrivacy": "O token fica só neste navegador; nunca vai no backup nem no Salvar HTML. Ele só consegue ler e gravar seus Gists.", "syncNow": "Sincronizar agora", "syncDisconnect": "Desconectar este aparelho", "syncHow": "As alterações são enviadas cerca de 1 segundo depois. Ao abrir ou voltar para o app, a cópia mais recente é carregada. Se editar em dois aparelhos sem internet, vale a última salva.", "syncWho": "Dono do Gist {u}", "syncLast": "Última sincronização: {d}", "syncOff": "Sync desligado", "syncIdle": "Sync", "syncOk": "Sincronizado", "syncBusy": "Sincronizando…", "syncOffline": "Offline — tentará de novo", "syncAuth": "Token inválido ou expirado", "syncMissing": "Gist não encontrado — reconecte", "syncError": "Erro de sync — tentará de novo", "syncPulled": "Progresso mais recente carregado da nuvem", "syncCreated": "Conectado — Gist privado criado", "syncNeedToken": "Cole o token primeiro.", "syncOffConfirm": "Parar de sincronizar neste aparelho? Seus dados continuam aqui e no Gist."});
 Object.assign(I18N.ja,{"syncTitle": "デバイス間で同期", "syncSub": "進捗は非公開のGitHub Gistに保存され、スマホや他のブラウザでも同じデータを表示できます。", "syncStep1": "「gist」権限だけのGitHubトークンを作成：", "syncTokenLink": "GitHubを開く ↗", "syncStep2": "下に貼り付けて「接続」を押す（各デバイスで1回）。", "syncStep3": "完了 — 変更は自動で同期されます。", "syncTokenLabel": "GitHubトークン", "syncConnect": "接続", "syncPrivacy": "トークンはこのブラウザだけに保存され、バックアップやHTML保存には含まれません。Gistの読み書きのみ可能です。", "syncNow": "今すぐ同期", "syncDisconnect": "このデバイスの接続を解除", "syncHow": "変更は約1秒後に送信されます。アプリを開く・戻ると最新のデータを読み込みます。オフラインで2台同時に編集した場合は最後の保存が優先されます。", "syncWho": "Gistの所有者 {u}", "syncLast": "最終同期: {d}", "syncOff": "同期オフ", "syncIdle": "同期", "syncOk": "同期済み", "syncBusy": "同期中…", "syncOffline": "オフライン — 再試行します", "syncAuth": "トークンが無効または期限切れ", "syncMissing": "Gistが見つかりません — 再接続", "syncError": "同期エラー — 再試行します", "syncPulled": "クラウドから最新の進捗を読み込みました", "syncCreated": "接続しました — 非公開Gistを作成", "syncNeedToken": "先にトークンを貼り付けてください。", "syncOffConfirm": "このデバイスの同期を停止しますか？データはここにもGistにも残ります。"});
+Object.assign(I18N.en,{"tapHint": "tap a suggestion to see its curve"});
+Object.assign(I18N.pt,{"tapHint": "toque numa sugestão para ver a curva"});
+Object.assign(I18N.ja,{"tapHint": "おすすめをタップで曲線を表示"});
 const $=s=>document.querySelector(s);
 const pad=n=>String(n).padStart(2,'0');
 const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -617,7 +704,7 @@ function counts(){return STATUS.map(s=>TOPICS.reduce((a,x,i)=>a+(state.statuses[
 function renderProgress(){
   const c=counts();
   $('#total').textContent=tf('total',fmt(TOTAL));
-  $('#track').innerHTML=c.map((q,i)=>{const p=q/TOTAL*100;return `<div class="chunk" data-i="${i}" style="background:${COLORS[i]};width:${p}%" title="${esc(label(STATUS[i]))}: ${q} (${fmt(p,1)}%)">${p>=6?`<b>${fmt(p,1)}%</b>`:''}</div>`}).join('');
+  $('#track').innerHTML=c.map((q,i)=>{const p=q/TOTAL*100;return `<div class="chunk" data-i="${i}" style="background:${COLORS[i]};width:${p}%" title="${esc(label(STATUS[i]))}: ${q} (${fmt(p,1)}%)">${p>=(phoneMQ.matches?13:6)?`<b>${fmt(p,1)}%</b>`:''}</div>`}).join('');
   $('#legend').innerHTML=c.map((q,i)=>`<div class="lg" data-i="${i}"><span class="dot" style="background:${COLORS[i]}"></span><div><strong>${esc(label(STATUS[i]))}</strong><small>${tf('qn',fmt(q))} · ${fmt(q/TOTAL*100,1)}%</small></div></div>`).join('');
 }
 function streakInfo(){
@@ -689,6 +776,7 @@ function renderSide(){
 }
 function lastSeen(){const m={};state.events.forEach(e=>{if(!m[e.topic]||e.date>m[e.topic])m[e.topic]=e.date});return m}
 function renderBoard(){
+  const keepLane=phoneMQ.matches&&lanesEl.children.length?laneInView():null;
   const seen=lastSeen(),today=todayISO();
   const fit=fitMQ.matches,colsOf=()=>1;
   const laneCols=STATUS.map(s=>colsOf(state.statuses.filter(x=>x===s).length));
@@ -703,7 +791,15 @@ function renderBoard(){
       return `<div class="task" tabindex="0" role="button" data-topic="${i}" aria-label="${esc(x.name)}" title="${esc(x.name)}"><div class="tname">${esc(x.name)}</div><div class="tmeta"><span>${tf('qn',x.q)}</span><span class="score sc-${sc}" title="${esc(t('editScore'))}">${v==null?'—':v+'%'}</span><span class="last">${esc(last)}</span></div></div>`}).join('')}</div></div>`;
   }).join('');
   $('#cardCount').textContent=`(${TOPICS.length})`;
+  $('#laneDots').innerHTML=STATUS.map((s,j)=>`<button type="button" data-go="${j}" aria-label="${esc(label(s))}"></button>`).join('');
+  if(keepLane!=null)goLane(keepLane,false);
+  updateDots();
 }
+/* phone: which list is in view → dots */
+const phoneMQ=matchMedia('(max-width:640px)');
+function laneInView(){const lanes=[...lanesEl.children];if(!lanes.length)return 0;const mid=lanesEl.getBoundingClientRect().left+lanesEl.clientWidth/2;let best=0,dist=1e9;lanes.forEach((l,k)=>{const r=l.getBoundingClientRect(),d=Math.abs(r.left+r.width/2-mid);if(d<dist){dist=d;best=k}});return best}
+function updateDots(){const k=laneInView();document.querySelectorAll('#laneDots button').forEach((b,j)=>b.classList.toggle('on',j===k))}
+function goLane(k,smooth=true){const l=lanesEl.children[k];if(!l)return;lanesEl.scrollTo({left:l.offsetLeft-(lanesEl.clientWidth-l.offsetWidth)/2,behavior:smooth?'smooth':'auto'})}
 function render(){updateTexts();renderProgress();renderCalendar();renderSide();renderBoard();renderSRPanel();if(!$('#viewSR').hidden)renderSRPage();if(typeof renderSyncChip==='function')renderSyncChip()}
 
 /* ---------- actions ---------- */
@@ -735,13 +831,14 @@ document.addEventListener('touchmove',e=>{if(drag&&drag.active)e.preventDefault(
 function startDrag(x,y){
   const r=drag.card.getBoundingClientRect();
   const g=drag.card.cloneNode(true);g.classList.add('ghost');g.style.width=r.width+'px';
-  drag.ox=x-r.left;drag.oy=y-r.top;drag.ghost=g;drag.active=true;
+  drag.ox=x-r.left;drag.oy=y-r.top;drag.ghost=g;drag.active=true;lanesEl.style.scrollSnapType='none';
   document.body.appendChild(g);drag.card.classList.add('dragging');document.body.classList.add('dragging');
   moveGhost(x,y);
 }
 function moveGhost(x,y){
   drag.ghost.style.transform=`translate(${x-drag.ox}px,${y-drag.oy}px) rotate(2deg)`;
   if(y<70)window.scrollBy(0,-14);else if(y>innerHeight-70)window.scrollBy(0,14);
+  if(lanesEl.scrollWidth>lanesEl.clientWidth+2){const lb=lanesEl.getBoundingClientRect();if(x<lb.left+44)lanesEl.scrollLeft-=16;else if(x>lb.right-44)lanesEl.scrollLeft+=16}
   let lane=document.elementFromPoint(x,y)?.closest('.lane')||null;
   if(!lane){const b=lanesEl.getBoundingClientRect();if(y>=b.top-20&&y<=b.bottom+40)lane=[...lanesEl.children].find(l=>{const r=l.getBoundingClientRect();return x>=r.left&&x<=r.right})||null}
   if(lane!==drag.lane){drag.lane?.classList.remove('over');lane?.classList.add('over');drag.lane=lane}
@@ -750,12 +847,15 @@ function endDrag(e,cancel){
   if(!drag||(e&&e.pointerId!==drag.pid))return;
   clearTimeout(drag.timer);const d=drag;drag=null;
   if(d.active){
-    d.ghost.remove();d.card.classList.remove('dragging');document.body.classList.remove('dragging');d.lane?.classList.remove('over');
+    lanesEl.style.scrollSnapType='';d.ghost.remove();d.card.classList.remove('dragging');document.body.classList.remove('dragging');d.lane?.classList.remove('over');
     if(!cancel&&d.lane){const to=STATUS[+d.lane.dataset.lane];if(to!==state.statuses[d.id])moveCard(d.id,to)}
   }else if(!cancel)openModal(d.id);
 }
 window.addEventListener('pointerup',e=>endDrag(e,false));
 window.addEventListener('pointercancel',e=>endDrag(e,true));
+lanesEl.addEventListener('scroll',()=>{cancelAnimationFrame(lanesEl._raf);lanesEl._raf=requestAnimationFrame(updateDots)},{passive:true});
+$('#laneDots').onclick=e=>{const b=e.target.closest('[data-go]');if(b)goLane(+b.dataset.go)};
+phoneMQ.addEventListener?.('change',()=>render());
 lanesEl.addEventListener('keydown',e=>{
   const card=e.target.closest('.task');if(!card)return;const i=+card.dataset.topic;
   if(e.key==='Enter'||e.key===' '){e.preventDefault();openModal(i)}
@@ -864,7 +964,7 @@ function drawPreview(){
   }else{
     const ms=srAll(),avg=wavg(ms),due=ms.filter(m=>!m.reps.length||m.over>=0).length;
     $('#prevTitle').textContent=t('avgCurve');
-    $('#prevStats').innerHTML=`${esc(t('retention'))} <b>${pct(avg)}</b> · <b>${due}</b> ${esc(t('dueCount'))} · <span>${esc(t('hoverHint'))}</span>`;
+    $('#prevStats').innerHTML=`${esc(t('retention'))} <b>${pct(avg)}</b> · <b>${due}</b> ${esc(t('dueCount'))} · <span>${esc(t(matchMedia('(hover:none)').matches?'tapHint':'hoverHint'))}</span>`;
     $('#prevChart').innerHTML=avgChart(ms,380,fitH());
     $('#srLegend2').innerHTML=legendHTML(false);
   }
