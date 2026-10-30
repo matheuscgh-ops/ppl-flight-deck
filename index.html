@@ -439,6 +439,39 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   .daytag{font-size:10.5px!important}
   .callegend{display:flex!important}
 }
+.prevpick{display:none}
+@media (hover:none),(max-width:1099px){
+  .prevpick{display:block;margin:4px 0 2px}
+  .prevpick select{width:100%;font-size:16px!important;padding:9px 10px;border-radius:10px;background:#20252b;border:1px solid var(--line2);font-weight:700;-webkit-appearance:none;appearance:none;background-image:linear-gradient(45deg,transparent 50%,#8f99a6 50%),linear-gradient(135deg,#8f99a6 50%,transparent 50%);background-position:calc(100% - 18px) 55%,calc(100% - 12px) 55%;background-size:6px 6px;background-repeat:no-repeat;padding-right:32px}
+  .prevpick .flabel{margin-bottom:5px}
+}
+
+/* ===== PHONE header: slim. Flags top-right, thin tabs, one row of small buttons ===== */
+@media (max-width:640px){
+  .top{position:relative;gap:8px!important}
+  .brandrow{display:block!important}
+  .brand{font-size:19px!important;line-height:30px;padding-right:112px}
+  .tabs{display:flex!important;margin-top:8px;padding:2px;border-radius:9px}
+  .tabs button{flex:1;padding:5px 6px!important;font-size:12.5px!important}
+  .tools{display:flex!important;gap:6px!important;flex-wrap:nowrap}
+  .tools>button{flex:1 1 0;min-width:0;padding:5px 6px!important;font-size:11.5px!important;font-weight:650;border-radius:7px;height:28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;justify-content:center}
+  .tools #syncChip{grid-column:auto!important;flex:1.25 1 0;gap:5px}
+  .tools .flags{position:absolute;top:0;right:0;grid-column:auto!important;padding:2px;gap:0;border-radius:8px}
+  .flags .flag{flex:none!important;font-size:15px!important;padding:2px 5px!important;line-height:1.3}
+  .demotag{font-size:.5em!important}
+}
+@media (max-width:360px){.tools{gap:4px!important}.tools>button{font-size:10.5px!important;padding:4px 3px!important}.syncchip i{width:6px;height:6px}}
+@media (hover:none){input,select,textarea{font-size:16px!important}}
+.day[data-date]{cursor:pointer}
+.daysheet h3{margin:0}
+.dsgroup{margin-top:14px}
+.dsrow{display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px solid #262b31;font-size:14px}
+.dsrow .k{width:9px;height:9px;border-radius:50%;flex:none}
+.dsrow .n{flex:1;min-width:0;font-weight:700}
+.dsrow .v{font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap}
+.dssum{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:12.5px;color:var(--muted);font-weight:650}
+.dssum b{color:var(--ink);font-size:16px;margin-right:4px}
+@media (max-width:640px){#daybg{align-items:flex-end;padding:0}#daybg .modal{width:100%;border-radius:18px 18px 0 0;max-height:80dvh}}
 </style>
 </head>
 <body>
@@ -503,6 +536,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
     <div class="side">
       <div class="panel sr" id="srPanel">
         <div class="srtop"><span class="label" data-t="tabSR"></span><button class="linkbtn" id="openSR" data-t="openAnalysis"></button></div>
+        <label class="prevpick"><span class="flabel" data-t="pickLabel"></span><select id="prevPick"></select></label>
         <div class="prevtitle" id="prevTitle"></div>
         <div class="prevstats" id="prevStats"></div>
         <div class="chart" id="prevChart"></div>
@@ -575,6 +609,12 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
     </div>
   </div>
 </div>
+<div class="modalbg" id="daybg" hidden>
+  <div class="modal daysheet" role="dialog" aria-modal="true" aria-labelledby="dayTitle">
+    <div class="mhead"><div><h3 id="dayTitle"></h3><div class="muted" id="daySub"></div></div><button class="x" id="dayClose" aria-label="Close">×</button></div>
+    <div id="dayBody"></div>
+  </div>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script id="embedded" type="application/json">null</script>
@@ -605,11 +645,20 @@ Object.assign(I18N.en,{"practiceTest": "FAA practice test", "practiceTests": "Pr
 Object.assign(I18N.pt,{"practiceTest": "Simulado FAA", "practiceTests": "Simulado (melhor)", "ptTip": "Último: {last} · {n} simulados registrados — clique para adicionar", "ptDesc": "Simulado FAA de 60 questões. Deixe a nota em branco se ainda estiver em andamento.", "inProgress": "em andamento", "blankInProgress": "vazio = em andamento"});
 Object.assign(I18N.ja,{"practiceTest": "FAA模擬試験", "practiceTests": "模擬試験（最高）", "ptTip": "最新: {last} · 記録 {n} 回 — クリックで追加", "ptDesc": "60問のFAA模擬試験。途中の場合は正答率を空欄に。", "inProgress": "進行中", "blankInProgress": "空欄 = 進行中"});
 Object.assign(I18N.en,{"syncTitle": "Sync across devices", "syncSub": "Your progress is kept in a private GitHub Gist, so your phone and other browsers see the same data.", "syncStep1": "Create a GitHub token with only the “gist” permission:", "syncTokenLink": "open GitHub ↗", "syncStep2": "Paste it below and press Connect (do this once on each device).", "syncStep3": "Done — every change syncs by itself.", "syncTokenLabel": "GitHub token", "syncConnect": "Connect", "syncPrivacy": "The token stays only in this browser; it is never included in backups or in Save HTML. It can only read and write your Gists.", "syncNow": "Sync now", "syncDisconnect": "Disconnect this device", "syncHow": "Changes are sent about a second after you make them. When you open the app or come back to it, the newest copy is loaded. If you edit on two devices while offline, the last one saved wins.", "syncWho": "Gist owner {u}", "syncLast": "Last sync: {d}", "syncOff": "Sync off", "syncIdle": "Sync", "syncOk": "Synced", "syncBusy": "Syncing…", "syncOffline": "Offline — will retry", "syncAuth": "Token invalid or expired", "syncMissing": "Gist not found — reconnect", "syncError": "Sync error — will retry", "syncPulled": "Loaded the latest progress from the cloud", "syncCreated": "Connected — private Gist created", "syncNeedToken": "Paste your token first.", "syncOffConfirm": "Stop syncing on this device? Your data stays here and in the Gist."});
-Object.assign(I18N.pt,{"syncTitle": "Sincronizar entre aparelhos", "syncSub": "Seu progresso fica num Gist privado do GitHub, então o celular e outros navegadores veem os mesmos dados.", "syncStep1": "Crie um token do GitHub só com a permissão “gist”:", "syncTokenLink": "abrir o GitHub ↗", "syncStep2": "Cole abaixo e clique em Conectar (uma vez em cada aparelho).", "syncStep3": "Pronto — cada alteração sincroniza sozinha.", "syncTokenLabel": "Token do GitHub", "syncConnect": "Conectar", "syncPrivacy": "O token fica só neste navegador; nunca vai no backup nem no Salvar HTML. Ele só consegue ler e gravar seus Gists.", "syncNow": "Sincronizar agora", "syncDisconnect": "Desconectar este aparelho", "syncHow": "As alterações são enviadas cerca de 1 segundo depois. Ao abrir ou voltar para o app, a cópia mais recente é carregada. Se editar em dois aparelhos sem internet, vale a última salva.", "syncWho": "Dono do Gist {u}", "syncLast": "Última sincronização: {d}", "syncOff": "Sync desligado", "syncIdle": "Sync", "syncOk": "Sincronizado", "syncBusy": "Sincronizando…", "syncOffline": "Offline — tentará de novo", "syncAuth": "Token inválido ou expirado", "syncMissing": "Gist não encontrado — reconecte", "syncError": "Erro de sync — tentará de novo", "syncPulled": "Progresso mais recente carregado da nuvem", "syncCreated": "Conectado — Gist privado criado", "syncNeedToken": "Cole o token primeiro.", "syncOffConfirm": "Parar de sincronizar neste aparelho? Seus dados continuam aqui e no Gist."});
+Object.assign(I18N.pt,{"syncTitle": "Sincronizar entre aparelhos", "syncSub": "Seu progresso fica num Gist privado do GitHub, então o celular e outros navegadores veem os mesmos dados.", "syncStep1": "Crie um token do GitHub só com a permissão “gist”:", "syncTokenLink": "abrir o GitHub ↗", "syncStep2": "Cole abaixo e clique em Conectar (uma vez em cada aparelho).", "syncStep3": "Pronto — cada alteração sincroniza sozinha.", "syncTokenLabel": "Token do GitHub", "syncConnect": "Conectar", "syncPrivacy": "O token fica só neste navegador; nunca vai no backup nem no Salvar HTML. Ele só consegue ler e gravar seus Gists.", "syncNow": "Sincronizar agora", "syncDisconnect": "Desconectar este aparelho", "syncHow": "As alterações são enviadas cerca de 1 segundo depois. Ao abrir ou voltar para o app, a cópia mais recente é carregada. Se editar em dois aparelhos sem internet, vale a última salva.", "syncWho": "Dono do Gist {u}", "syncLast": "Última sincronização: {d}", "syncOff": "Sem sync", "syncIdle": "Sync", "syncOk": "Sincronizado", "syncBusy": "Sincronizando…", "syncOffline": "Offline — tentará de novo", "syncAuth": "Token inválido ou expirado", "syncMissing": "Gist não encontrado — reconecte", "syncError": "Erro de sync — tentará de novo", "syncPulled": "Progresso mais recente carregado da nuvem", "syncCreated": "Conectado — Gist privado criado", "syncNeedToken": "Cole o token primeiro.", "syncOffConfirm": "Parar de sincronizar neste aparelho? Seus dados continuam aqui e no Gist."});
 Object.assign(I18N.ja,{"syncTitle": "デバイス間で同期", "syncSub": "進捗は非公開のGitHub Gistに保存され、スマホや他のブラウザでも同じデータを表示できます。", "syncStep1": "「gist」権限だけのGitHubトークンを作成：", "syncTokenLink": "GitHubを開く ↗", "syncStep2": "下に貼り付けて「接続」を押す（各デバイスで1回）。", "syncStep3": "完了 — 変更は自動で同期されます。", "syncTokenLabel": "GitHubトークン", "syncConnect": "接続", "syncPrivacy": "トークンはこのブラウザだけに保存され、バックアップやHTML保存には含まれません。Gistの読み書きのみ可能です。", "syncNow": "今すぐ同期", "syncDisconnect": "このデバイスの接続を解除", "syncHow": "変更は約1秒後に送信されます。アプリを開く・戻ると最新のデータを読み込みます。オフラインで2台同時に編集した場合は最後の保存が優先されます。", "syncWho": "Gistの所有者 {u}", "syncLast": "最終同期: {d}", "syncOff": "同期オフ", "syncIdle": "同期", "syncOk": "同期済み", "syncBusy": "同期中…", "syncOffline": "オフライン — 再試行します", "syncAuth": "トークンが無効または期限切れ", "syncMissing": "Gistが見つかりません — 再接続", "syncError": "同期エラー — 再試行します", "syncPulled": "クラウドから最新の進捗を読み込みました", "syncCreated": "接続しました — 非公開Gistを作成", "syncNeedToken": "先にトークンを貼り付けてください。", "syncOffConfirm": "このデバイスの同期を停止しますか？データはここにもGistにも残ります。"});
 Object.assign(I18N.en,{"tapHint": "tap a suggestion to see its curve"});
 Object.assign(I18N.pt,{"tapHint": "toque numa sugestão para ver a curva"});
 Object.assign(I18N.ja,{"tapHint": "おすすめをタップで曲線を表示"});
+Object.assign(I18N.en,{"pickLabel": "Show curve for", "pickHint": "pick a topic above · Full analysis shows every chart"});
+Object.assign(I18N.pt,{"pickLabel": "Mostrar curva de", "pickHint": "escolha um tópico acima · Análise completa mostra todos os gráficos"});
+Object.assign(I18N.ja,{"pickLabel": "表示する曲線", "pickHint": "上でトピックを選択 · 詳細分析で全グラフを表示"});
+Object.assign(I18N.en,{"backupShort": "Backup", "clearShort": "Clear demo", "saveShort": "Save HTML"});
+Object.assign(I18N.pt,{"backupShort": "Backup", "clearShort": "Limpar", "saveShort": "Salvar"});
+Object.assign(I18N.ja,{"backupShort": "JSON", "clearShort": "削除", "saveShort": "HTML保存"});
+Object.assign(I18N.en,{"dayActive": "Active day", "dayEmpty": "No activity", "dayNone": "Nothing logged on this day.", "daySessions": "Study sessions", "dayVC": "to Very Comfortable", "dayMoves": "Other moves"});
+Object.assign(I18N.pt,{"dayActive": "Dia ativo", "dayEmpty": "Sem atividade", "dayNone": "Nada registrado neste dia.", "daySessions": "Sessões de estudo", "dayVC": "para Muito confortável", "dayMoves": "Outras movimentações"});
+Object.assign(I18N.ja,{"dayActive": "学習した日", "dayEmpty": "活動なし", "dayNone": "この日の記録はありません。", "daySessions": "学習セッション", "dayVC": "「十分理解」へ", "dayMoves": "その他の移動"});
 const $=s=>document.querySelector(s);
 const pad=n=>String(n).padStart(2,'0');
 const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -695,6 +744,7 @@ function commit(mut,msg){
 function updateTexts(){
   document.documentElement.lang=lang==='pt'?'pt-BR':lang;
   document.querySelectorAll('[data-t]').forEach(el=>el.textContent=t(el.dataset.t));
+  if(matchMedia('(max-width:640px)').matches){$('#backup').textContent=t('backupShort');$('#clearDemo').textContent=t('clearShort');$('#saveHtml').textContent=t('saveShort')}
   document.querySelectorAll('.flag').forEach(b=>{const on=b.dataset.lang===lang;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});
   document.querySelectorAll('#seg button').forEach(b=>b.textContent=t(b.dataset.kind));
   const hasDemo=state.events.some(e=>e.demo);
@@ -732,7 +782,7 @@ function renderCalendar(){
       const done=[...new Set(list.filter(e=>e.kind==='move'&&e.to==='Very Comfortable').map(e=>e.topic))];
       const tags=done.slice(0,5).map(i=>`<span class="daytag" style="--k:${ONLIGHT.study}">${esc(TOPICS[i].name)}</span>`).join('')+(done.length>5?`<span class="daytag more">+${done.length-5}</span>`:'');
       const tip=list.map(e=>e.kind==='test'?`${t('practiceTest')} (${e.q}) — ${e.score!=null?e.score+'%':t('inProgress')}`:`${TOPICS[e.topic].name} — ${t(e.kind)}${e.kind==='move'&&e.to?' → '+label(e.to):''}${e.partial?' ('+t('inProgress')+')':e.score!=null?' · '+e.score+'%':''}`).join('\n');
-      h+=`<div class="day${out?' out':''}${list.length?' active':''}${key===today?' today':''}${key===state.deadline?' exam':''}" style="grid-column:${c+1};grid-row:${r+2}" title="${esc(tip)}"><div class="dhead"><span class="dnum">${d.getDate()}</span>${key===state.deadline?`<span class="examtag">${esc(t('examShort'))}</span>`:''}${list.length?'<span class="dcheck">✓</span>':''}</div>${out?'':`<div class="tags">${tags}<span class="daytag more fit" hidden></span></div>`}</div>`;
+      h+=`<div class="day${out?' out':''}${list.length?' active':''}${key===today?' today':''}${key===state.deadline?' exam':''}" style="grid-column:${c+1};grid-row:${r+2}" data-date="${key}" title="${esc(tip)}"><div class="dhead"><span class="dnum">${d.getDate()}</span>${key===state.deadline?`<span class="examtag">${esc(t('examShort'))}</span>`:''}${list.length?'<span class="dcheck">✓</span>':''}</div>${out?'':`<div class="tags">${tags}<span class="daytag more fit" hidden></span></div>`}</div>`;
     }
     if(cur)curRow=r;
     h+=`<div class="wcheck${hit?' on':''}${cur?' cur':''}" data-row="${r+2}" style="grid-column:8;grid-row:${r+2}">${hit?'✓':''}</div>`;
@@ -950,25 +1000,34 @@ function avgChart(ms,w,h){
 function legendHTML(withGhost){return `<span><i style="border-color:#579dff"></i>${esc(t('lgRecall'))}</span><span><i style="border-color:#579dff;border-top-style:dashed"></i>${esc(t('lgProj'))}</span>${withGhost?`<span><i style="border-color:#4bce97;border-top-style:dashed"></i>${esc(t('lgGhost'))}</span>`:''}<span><i style="border-color:#eef1f4;border-top-width:3px"></i>${esc(t('lgExam'))}</span><span><i style="border-color:#f5a524;border-top-style:dotted"></i>${esc(t('lgThresh'))}</span>`}
 
 /* side panel: average by default, a card's own curve while hovering it */
-let preview=null,prevTimer=null;
+let preview=null,prevTimer=null,pinned=null;
 fitMQ.addEventListener?.('change',()=>render());
 let rzFit;window.addEventListener('resize',()=>{clearTimeout(rzFit);rzFit=setTimeout(()=>{if(fitMQ.matches)drawPreview()},150)});
 function setPreview(i){clearTimeout(prevTimer);if(i==null){prevTimer=setTimeout(()=>{if(preview!=null){preview=null;drawPreview()}},140);return}if(i!==preview){preview=i;drawPreview()}}
 function drawPreview(){
-  if(preview!=null){
-    const m=srModel(preview),[dt,cl]=dueText(m);
-    $('#prevTitle').textContent=TOPICS[preview].name;
+  const cur=preview!=null?preview:pinned;
+  syncPick();
+  if(cur!=null){
+    const m=srModel(cur),[dt,cl]=dueText(m);
+    $('#prevTitle').textContent=TOPICS[cur].name;
     $('#prevStats').innerHTML=m.reps.length?`${esc(t('retention'))} <b>${pct(m.R)}</b> · S <b>${fmt(m.S,1)}d</b> · <span class="duechip ${cl}" style="min-width:0">${esc(dt)}</span>`:esc(t('noHist'));
     $('#prevChart').innerHTML=m.reps.length?topicChart(m,380,fitH()):`<div class="empty">${esc(t('noHistLong'))}</div>`;
     $('#srLegend2').innerHTML=legendHTML(true);
   }else{
     const ms=srAll(),avg=wavg(ms),due=ms.filter(m=>!m.reps.length||m.over>=0).length;
     $('#prevTitle').textContent=t('avgCurve');
-    $('#prevStats').innerHTML=`${esc(t('retention'))} <b>${pct(avg)}</b> · <b>${due}</b> ${esc(t('dueCount'))} · <span>${esc(t(matchMedia('(hover:none)').matches?'tapHint':'hoverHint'))}</span>`;
+    $('#prevStats').innerHTML=`${esc(t('retention'))} <b>${pct(avg)}</b> · <b>${due}</b> ${esc(t('dueCount'))} · <span>${esc(t(matchMedia('(hover:none),(max-width:1099px)').matches?'pickHint':'hoverHint'))}</span>`;
     $('#prevChart').innerHTML=avgChart(ms,380,fitH());
     $('#srLegend2').innerHTML=legendHTML(false);
   }
 }
+/* picker: "All topics · average" + every tracked topic, most urgent first */
+function syncPick(){const sel=$('#prevPick');if(!sel)return;const ms=srAll();
+  if(pinned!=null&&!ms.some(m=>m.i===pinned))pinned=null;
+  const html=`<option value="">${esc(t('avgCurve'))}</option>`+ms.map(m=>`<option value="${m.i}">${esc(TOPICS[m.i].name)} · ${pct(m.R)}</option>`).join('');
+  if(sel._h!==html){sel.innerHTML=html;sel._h=html}sel.value=pinned==null?'':String(pinned)}
+$('#prevPick').addEventListener('change',e=>{const v=e.target.value;pinned=v===''?null:+v;try{localStorage.setItem(STORE+'-pick',v)}catch(x){}drawPreview()});
+try{const v=localStorage.getItem(STORE+'-pick');if(v)pinned=+v}catch(x){}
 function renderSRPanel(){
   const ms=srAll().slice(0,5);
   $('#sugg').innerHTML=ms.length?ms.map(m=>{const [dt,cl]=dueText(m);return `<div class="qrow" data-q="${m.i}" title="${esc(t('openTopic'))}"><span class="qt">${esc(TOPICS[m.i].name)}</span><span class="rpill ${rcls(m.R)}">${pct(m.R)}</span><span class="duechip ${cl}">${esc(dt)}</span></div>`}).join(''):`<div class="muted">${esc(t('allClear'))}</div>`;
@@ -981,7 +1040,7 @@ lanesEl.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse'||drag)retu
 lanesEl.addEventListener('pointerleave',()=>setPreview(null));
 $('#sugg').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const r=e.target.closest('.qrow');setPreview(r?+r.dataset.q:null)});
 $('#sugg').addEventListener('pointerleave',()=>setPreview(null));
-$('#sugg').onclick=e=>{const r=e.target.closest('.qrow');if(r)goView('sr',+r.dataset.q)};
+$('#sugg').onclick=e=>{const r=e.target.closest('.qrow');if(!r)return;if(matchMedia('(hover:none),(max-width:1099px)').matches){pinned=+r.dataset.q;try{localStorage.setItem(STORE+'-pick',r.dataset.q)}catch(x){}drawPreview();$('#prevPick').scrollIntoView({block:'nearest',behavior:'smooth'})}else goView('sr',+r.dataset.q)};
 $('#openSR').onclick=()=>goView('sr');
 
 /* inline score edit on the card: updates the latest study/review session */
@@ -1120,6 +1179,30 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#ptbg').hidden)
 $('#ptSave').onclick=()=>{const d=$('#ptDate').value;if(!d)return;const v=$('#ptScore').value.trim(),sc=v===''?null:Math.max(0,Math.min(100,Math.round(+v)));
   commit(()=>{(state.tests??=[]).push({id:uid(),date:d,q:60,score:sc})},t('saved'));closePt()};
 $('#ptHist').onclick=e=>{const b=e.target.closest('[data-delpt]');if(!b)return;const id=b.dataset.delpt;commit(()=>{state.tests=state.tests.filter(x=>x.id!==id)},t('deleted'));renderPtHist()};
+
+/* day summary: tap/click any day of the calendar */
+function openDay(d){
+  const df=new Intl.DateTimeFormat(LOCALE[lang],{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const ev=state.events.filter(e=>e.date===d),tests=(state.tests||[]).filter(x=>x.date===d);
+  const vc=ev.filter(e=>e.kind==='move'&&e.to==='Very Comfortable'),ses=ev.filter(e=>e.kind==='study'||e.kind==='review'),mv=ev.filter(e=>e.kind==='move'&&e.to!=='Very Comfortable');
+  $('#dayTitle').textContent=df.format(parse(d));
+  $('#daySub').textContent=d===state.deadline?t('examLegend'):(ev.length||tests.length)?t('dayActive'):t('dayEmpty');
+  const row=(k,n,v)=>`<div class="dsrow"><span class="k" style="background:${k}"></span><span class="n">${esc(n)}</span><span class="v">${esc(v)}</span></div>`;
+  const grp=(title,rows)=>rows.length?`<div class="dsgroup"><span class="flabel">${esc(title)}</span>${rows.join('')}</div>`:'';
+  const q=ses.reduce((a,e)=>a+TOPICS[e.topic].q,0);
+  $('#dayBody').innerHTML=(ev.length||tests.length?`<div class="dssum"><span><b>${ses.length}</b>${esc(t('daySessions'))}</span><span><b>${vc.length}</b>${esc(t('dayVC'))}</span><span><b>${tests.length}</b>${esc(t('practiceTests').replace(/ \(.*\)/,''))}</span></div>`:'')+
+    grp(t('vcLegend').replace(/ \(.*\)/,''),vc.map(e=>row(COLORS[3],TOPICS[e.topic].name,e.from?label(e.from)+' →':'')))+
+    grp(t('daySessions'),ses.map(e=>row(e.kind==='study'?COLORS[1]:COLORS[4],TOPICS[e.topic].name,`${t(e.kind)} · ${e.partial?t('inProgress'):e.score!=null?e.score+'%':'—'}`)))+
+    grp(t('dayMoves'),mv.map(e=>row(COLORS[Math.max(0,STATUS.indexOf(e.to))],TOPICS[e.topic].name,`→ ${label(e.to)}`)))+
+    grp(t('practiceTests').replace(/ \(.*\)/,''),tests.map(x=>row(x.score==null?'#8590a2':x.score>=80?COLORS[3]:COLORS[2],`${t('practiceTest')} · ${x.q} q`,x.score!=null?x.score+'%':t('inProgress'))))+
+    (ev.length||tests.length?'':`<p class="muted" style="margin:16px 0 4px">${esc(t('dayNone'))}</p>`);
+  $('#daybg').hidden=false;$('#dayClose').focus();
+}
+const closeDay=()=>{$('#daybg').hidden=true};
+$('#calgrid').addEventListener('click',e=>{const d=e.target.closest('.day[data-date]');if(d)openDay(d.dataset.date)});
+$('#dayClose').onclick=closeDay;
+$('#daybg').addEventListener('pointerdown',e=>{if(e.target.id==='daybg')closeDay()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#daybg').hidden)closeDay()});
 
 /* header & calendar controls */
 document.querySelectorAll('.flag').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;state.lang=lang;save(false);render()});
@@ -1280,8 +1363,9 @@ async function syncConnect(token){
   for(let page=1;page<=5&&!found;page++){const list=await gh(`/gists?per_page=100&page=${page}`);found=list.find(g=>g.files&&g.files[GIST_FILE]);if(list.length<100)break}
   if(found){
     sync.gistId=found.id;syncStore();
+    /* connecting a device to an existing Gist always DOWNLOADS — a new phone can never overwrite the cloud copy */
     const remote=await gistState(await gh('/gists/'+found.id));
-    if(remote&&remote.updatedAt>=state.updatedAt){adopt(remote);setSync('ok');return 'pulled'}
+    if(remote){adopt(remote);sync.at=Date.now();syncStore();setSync('ok');return 'pulled'}
     await syncPush();return 'pushed';
   }
   const g=await gh('/gists',{method:'POST',body:JSON.stringify({description:'PPL Flight Deck — study progress (private)',public:false,files:{[GIST_FILE]:{content:JSON.stringify(state)}}})});
