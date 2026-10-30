@@ -579,11 +579,36 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .pitem2 .pn{flex:1;min-width:0;font-weight:750;font-size:14.5px}
 .pitem2 .pn small{display:block;color:var(--muted);font-size:12px;font-weight:650;margin-top:2px}
 .pitem2 .pq{font-weight:900;font-size:15px;white-space:nowrap}
-.planinputs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.planinputs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.pitem2 .pq small{display:block;font-size:11px;color:var(--muted);font-weight:700;text-align:right}
+.planweights{margin-top:12px;font-size:12px;color:var(--muted);line-height:1.6}
 .planinputs input{width:100%}
 #planCap{margin-top:10px;font-size:13px}
 @media (max-width:640px){.fckpis{grid-template-columns:repeat(2,minmax(0,1fr))}.fckpis b{font-size:24px}.planinputs{grid-template-columns:1fr}.lostrow{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 54px 40px;font-size:12px}.fchero,.planhero,.planset{padding:14px}}
 .sr.tight #srLegend2,.sr.tight .prevstats{display:none}.sr.tight .fcmini{padding:5px 10px;margin-bottom:3px}.sr.tight .fcsub{display:none}
+.planact{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
+#planCalc{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;font-size:14px}
+#planCap{margin-top:0!important}
+#planCap.changed{color:#f8c96a}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid #04170e55;border-top-color:#04170e;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.planlist{position:relative;transition:opacity .2s}
+.planlist.loading{opacity:.35;pointer-events:none}
+.planlist.fresh .pitem2{animation:fadein .45s ease both}
+.planlist.fresh .pitem2:nth-child(2){animation-delay:.04s}.planlist.fresh .pitem2:nth-child(3){animation-delay:.08s}.planlist.fresh .pitem2:nth-child(4){animation-delay:.12s}.planlist.fresh .pitem2:nth-child(5){animation-delay:.16s}.planlist.fresh .pitem2:nth-child(n+6){animation-delay:.2s}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.energy{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:4px 0 14px}
+.energy button{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:10px 12px;border-radius:12px;background:#1b2027;border:1px solid var(--line2)}
+.energy button.on{border-color:#4bce97;box-shadow:inset 0 0 0 1px #4bce97;background:#18241f}
+.energy .en{font-size:14px;font-weight:850}
+.energy .es{font-size:12px;color:var(--muted);font-weight:700}
+.energy .ew{width:100%;height:5px;border-radius:3px;background:#2a3038;position:relative}
+.energy .ew i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,#4bce97,#f5a524,#ff6b5e)}
+.enpill{font-size:10px;font-weight:850;letter-spacing:.04em;text-transform:uppercase;padding:1px 7px;border-radius:999px;background:#262b31;color:var(--ink2)}
+.enpill.low{background:#1d4835;color:#7ee2b3}.enpill.high{background:#4d2222;color:#ff9c95}
+.rchip.light{background:#1d4835;color:#7ee2b3}
+@media (max-width:640px){.energy{gap:6px}.energy button{padding:8px}.energy .en{font-size:12.5px}.energy .es{font-size:10.5px}}
+@media (max-width:640px){#planKpis{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 12px!important;width:100%}#planKpis b{font-size:20px!important}#planKpis span{font-size:11px}.planhero .srhead{flex-direction:column;align-items:stretch}}
 </style>
 </head>
 <body>
@@ -655,7 +680,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
         <div class="seg srrange" data-srr><button data-sr="3d">3D</button><button data-sr="7d">7D</button><button data-sr="2w">2W</button><button data-sr="1m">1M</button><button data-sr="3m">3M</button><button data-sr="6m">6M</button><button data-sr="1y">1Y</button><button data-sr="all" data-t="rAll"></button></div>
         <div class="chart" id="prevChart"></div>
         <div class="chartlegend small" id="srLegend2"></div>
-        <div class="nthen"><div class="qh planhead"><span data-t="planToday"></span><span id="planMiniTot"></span><button type="button" class="linkbtn" id="openPlan" data-t="planOpen"></button></div><div id="sugg"></div></div>
+        <div class="nthen"><div class="qh planhead"><span data-t="planToday"></span><span id="planMiniTot"></span><span class="enpill" id="planMiniMode"></span><button type="button" class="linkbtn" id="openPlan" data-t="planOpen"></button></div><div id="sugg"></div></div>
       </div>
     </div>
   </section>
@@ -665,7 +690,8 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   <div class="view" id="viewPlan" hidden>
     <section class="panel planhero">
       <div class="srhead"><div><h2 class="section" data-t="planTitle"></h2><div class="muted" id="planSub"></div></div><div class="srkpis" id="planKpis"></div></div>
-      <div id="planList"></div>
+      <div class="energy" id="energyPick" role="tablist"></div>
+      <div id="planList" class="planlist"></div>
       <p class="volnote" data-t="planNote"></p>
     </section>
     <section class="panel planset">
@@ -673,9 +699,11 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
       <div class="planinputs">
         <label class="field"><span class="flabel" data-t="setMinutes"></span><input type="number" id="setMinutes" min="15" max="600" step="15" inputmode="numeric"></label>
         <label class="field"><span class="flabel" data-t="setQph"></span><input type="number" id="setQph" min="5" max="200" step="5" inputmode="numeric"></label>
+        <label class="field"><span class="flabel" data-t="setReview"></span><input type="number" id="setReviewMin" min="0" max="10" step="0.5" inputmode="decimal"></label>
         <label class="field"><span class="flabel" data-t="setTests"></span><input type="number" id="setTests" min="0" max="7" step="1" inputmode="numeric"></label>
       </div>
-      <div class="muted" id="planCap"></div>
+      <div class="planact"><button type="button" class="primary" id="planCalc"><span class="spin" hidden></span><span data-t="planCalc"></span></button><div class="muted" id="planCap"></div></div>
+      <p class="planweights" data-t="planWeights"></p>
     </section>
   </div>
   <div class="view" id="viewSR" hidden>
@@ -782,7 +810,7 @@ const COLORS=['#8590a2','#579dff','#f5a524','#4bce97','#9f8fef'];
 /* darker variants for tags drawn on the light "active day" background */
 const ONLIGHT={study:'#16935e',review:'#7158dc',move:['#5f6b7e','#2f7de1','#c98200','#16935e','#7158dc']};
 const GOAL=85;
-const DEF_SET0={minutes:180,qph:40,tests:2};
+const DEF_SET0={minutes:180,qph:40,tests:2,reviewMin:1.5};
 const LOCALE={en:'en-US',pt:'pt-BR',ja:'ja-JP'};
 const I18N={
 en:{activeLegend:'Active day',vcLegend:'Moved to Very Comfortable (names)',mDays:'active days this month',mTopics:'moved to Very Comfortable',mActs:'actions',sub:'FAA Private Pilot Knowledge Test · Study tracker',demo:'EXAMPLE DATA',clear:'Clear examples',backup:'Backup JSON',import:'Import',save:'Save HTML',progress:'Question bank progress',total:'{n} questions',today:'Today',wk:'WK',wkTitle:'Weeks with study',streak:'day streak',keep:'Study today to keep the streak',exam:'Exam countdown',toGo:'days to go',since:'days since exam date',examToday:'Exam day — good luck!',examShort:'EXAM',avg:'Avg score',avgTip:'Weighted average of your Sporty’s scores (goal ≥ 85%). Moving cards does not change it.',avgSub:'goal ≥ 85%',pace:'Pace / day',paceTip:'Questions per day to get every topic into Very Comfortable before the exam',paceVal:'{n}/day',active:'Active days',activities:'Logged actions',board:'Your cards',drag:'Drag between lists · Click or Enter to log',activity:'Activity',status:'Status',date:'Date',record:'Save',cancel:'Cancel',history:'History',study:'Studied',review:'Reviewed',move:'Moved',none:'Status only',labels:['To Do','Doing','Not Comfortable','Very Comfortable','To Review'],days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],qn:'{n} q',ago:'{n}d',todayShort:'today',examLegend:'Exam date',demoConfirm:'Remove all example activity? Your card positions and your own records stay.',cleared:'Examples removed',saved:'Recorded',undo:'Undo',undone:'Undone',exported:'File downloaded',imported:'Backup imported',invalid:'This is not a valid PPL Flight Deck backup.',inactive:'No records yet.',already:'Already in this list',nothing:'Nothing to save — choose an activity or a new status',example:'example',del:'Delete',deleted:'Record deleted',fromFile:'Loaded the newer data saved inside this file',nextLabel:'Cleared next',nextWhy:'{q} q · score {s} · {last}',never:'never logged',then:'Then, in order',quick:'quick log',openCard:'open card',palPh:'Log study — type a topic…',metarTitle:'Your study state, METAR-style: time · days to exam · Very Comfortable share · avg/goal · streak · pace',logged:'{t} — {k}'},
@@ -823,6 +851,15 @@ Object.assign(I18N.ja,{"lgDone": "十分理解"});
 Object.assign(I18N.en,{"tabSR": "Statistics", "tabPlan": "Plan", "srLabel": "Spaced repetition", "fcTitle": "Exam forecast", "fcSub": "If the exam were today · 60 questions, weighted like the question bank", "fcMiniSub": "pass chance {p} · 85% chance {g}", "fcToday": "Expected score today", "fcPass": "Chance to pass (≥ 70%)", "fcGoal": "Chance of ≥ 85% (your goal)", "fcExamDay": "On exam day if you stop reviewing", "fcLine": "Forecast", "fcProj": "If you stop reviewing", "fcPassLine": "Pass 70%", "fcGoalLine": "Goal 85%", "fcLostTitle": "Where you lose the most questions", "fcFormula": "p(topic) = last score × recall now      (no score yet → 50%)\nweight(topic) = topic questions / 1,058\nexpected score μ = Σ weight × p\nright answers X ~ Binomial(60, μ)\nchance to pass = P(X ≥ 42)   ·   chance of 85% = P(X ≥ 51)\nLost questions (topic) = 60 × weight × (1 − p)", "planToday": "Today's plan", "planOpen": "Plan →", "planTitle": "Today's plan", "planQToday": "questions planned", "planDone": "done", "planPace": "new questions / day needed", "planFinal": "final week: reviews and practice tests only", "planNote": "Tap an item to log it. The plan is rebuilt from your history every day: overdue reviews first, then topics without data and weak topics, then new material.", "planSettings": "Your study time", "setMinutes": "Minutes per night", "setQph": "Questions per hour", "setTests": "Practice tests per week", "planCapTxt": "≈ {c} questions per night", "rs_due": "review", "rs_weak": "weak", "rs_new": "new", "rs_test": "test", "rs_nodata": "no data", "rs_extra": "extra", "reason_due": "Review due (spaced repetition)", "reason_weak": "Weak topic (< 70%)", "reason_new": "New material", "reason_test": "Practice test due", "reason_nodata": "No scored session yet", "reason_extra": "Studied today (not in plan)"});
 Object.assign(I18N.pt,{"tabSR": "Estatísticas", "tabPlan": "Plano", "srLabel": "Repetição espaçada", "fcTitle": "Previsão da prova", "fcSub": "Se a prova fosse hoje · 60 questões, com o mesmo peso do banco", "fcMiniSub": "chance de passar {p} · chance de 85% {g}", "fcToday": "Nota esperada hoje", "fcPass": "Chance de passar (≥ 70%)", "fcGoal": "Chance de ≥ 85% (sua meta)", "fcExamDay": "No dia da prova se parar de revisar", "fcLine": "Previsão", "fcProj": "Se parar de revisar", "fcPassLine": "Aprovação 70%", "fcGoalLine": "Meta 85%", "fcLostTitle": "Onde você perde mais questões", "fcFormula": "p(tópico) = última nota × retenção hoje      (sem nota → 50%)\npeso(tópico) = questões do tópico / 1.058\nnota esperada μ = Σ peso × p\nacertos X ~ Binomial(60, μ)\nchance de passar = P(X ≥ 42)   ·   chance de 85% = P(X ≥ 51)\nQuestões perdidas (tópico) = 60 × peso × (1 − p)", "planToday": "Plano de hoje", "planOpen": "Plano →", "planTitle": "Plano de hoje", "planQToday": "questões planejadas", "planDone": "feitas", "planPace": "questões novas / dia necessárias", "planFinal": "última semana: só revisões e simulados", "planNote": "Toque num item para registrar. O plano é refeito todo dia a partir do seu histórico: revisões vencidas primeiro, depois tópicos sem dados e fracos, depois matéria nova.", "planSettings": "Seu tempo de estudo", "setMinutes": "Minutos por noite", "setQph": "Questões por hora", "setTests": "Simulados por semana", "planCapTxt": "≈ {c} questões por noite", "rs_due": "revisão", "rs_weak": "fraco", "rs_new": "novo", "rs_test": "simulado", "rs_nodata": "sem dados", "rs_extra": "extra", "reason_due": "Revisão vencida (repetição espaçada)", "reason_weak": "Tópico fraco (< 70%)", "reason_new": "Matéria nova", "reason_test": "Simulado programado", "reason_nodata": "Ainda sem sessão com nota", "reason_extra": "Estudado hoje (fora do plano)"});
 Object.assign(I18N.ja,{"tabSR": "統計", "tabPlan": "プラン", "srLabel": "間隔反復", "fcTitle": "試験予測", "fcSub": "今日が試験なら · 問題バンクと同じ比率で60問", "fcMiniSub": "合格確率 {p} · 85%以上の確率 {g}", "fcToday": "今日の予想正答率", "fcPass": "合格確率（70%以上）", "fcGoal": "85%以上の確率（目標）", "fcExamDay": "復習をやめた場合の試験日", "fcLine": "予測", "fcProj": "復習をやめた場合", "fcPassLine": "合格 70%", "fcGoalLine": "目標 85%", "fcLostTitle": "失点が多いトピック", "fcFormula": "p(トピック) = 最新の正答率 × 現在の保持率   （正答率なし → 50%）\n重み = トピックの問題数 / 1,058\n予想正答率 μ = Σ 重み × p\n正解数 X ~ 二項分布(60, μ)\n合格確率 = P(X ≥ 42) · 85%以上 = P(X ≥ 51)\n失点（トピック）= 60 × 重み × (1 − p)", "planToday": "今日のプラン", "planOpen": "プラン →", "planTitle": "今日のプラン", "planQToday": "予定の問題数", "planDone": "完了", "planPace": "必要な新規問題/日", "planFinal": "最終週：復習と模擬試験のみ", "planNote": "項目をタップして記録。プランは毎日履歴から再計算されます：期限切れの復習、データなし・弱いトピック、新しい内容の順。", "planSettings": "学習時間", "setMinutes": "1晩の学習時間（分）", "setQph": "1時間あたりの問題数", "setTests": "週あたりの模擬試験", "planCapTxt": "1晩あたり約{c}問", "rs_due": "復習", "rs_weak": "弱点", "rs_new": "新規", "rs_test": "模試", "rs_nodata": "データなし", "rs_extra": "追加", "reason_due": "復習期限（間隔反復）", "reason_weak": "弱いトピック（70%未満）", "reason_new": "新しい内容", "reason_test": "模擬試験の予定", "reason_nodata": "正答率付きのセッションなし", "reason_extra": "今日学習（プラン外）"});
+Object.assign(I18N.en,{"planCalc": "Calculate plan", "planCapNew": "≈ {c} questions per night — press Calculate to update the plan", "planUpdated": "Plan updated"});
+Object.assign(I18N.pt,{"planCalc": "Calcular plano", "planCapNew": "≈ {c} questões por noite — clique em Calcular para atualizar o plano", "planUpdated": "Plano atualizado"});
+Object.assign(I18N.ja,{"planCalc": "プランを計算", "planCapNew": "1晩あたり約{c}問 — 「計算」でプランを更新", "planUpdated": "プランを更新しました"});
+Object.assign(I18N.en,{"planMinOf": "planned of {b}", "planCapTxt": "≈ {c} questions fit in {m} (answering + reviewing misses)", "planCapNew": "≈ {c} questions fit in {m} — press Calculate to update the plan", "setReview": "Review min per wrong answer", "diffCalc": "calculations ×2", "diffNav": "charts & nav ×1.6", "diffChart": "chart reading ×1.3", "planChance": "~{p}% right now", "planWeights": "Time per question = answering (60 ÷ questions per hour, × topic difficulty, faster for topics you know well) + reviewing what you miss (chance of missing × review minutes × topic difficulty). Calculation topics (E6B, cross-country, performance) count ×2, navigation and weather ×1.6, chart reading ×1.3."});
+Object.assign(I18N.pt,{"planMinOf": "planejados de {b}", "planCapTxt": "≈ {c} questões cabem em {m} (respondendo + revisando os erros)", "planCapNew": "≈ {c} questões cabem em {m} — clique em Calcular para atualizar o plano", "setReview": "Min de revisão por erro", "diffCalc": "cálculos ×2", "diffNav": "cartas e navegação ×1,6", "diffChart": "leitura de cartas ×1,3", "planChance": "~{p}% de acerto hoje", "planWeights": "Tempo por questão = responder (60 ÷ questões por hora, × dificuldade do tópico, mais rápido nos tópicos que você domina) + revisar os erros (chance de errar × minutos de revisão × dificuldade). Tópicos de cálculo (E6B, cross-country, performance) contam ×2, navegação e meteorologia ×1,6, leitura de cartas ×1,3."});
+Object.assign(I18N.ja,{"planMinOf": "予定 / {b}", "planCapTxt": "{m}で約{c}問（解答＋間違いの見直し）", "planCapNew": "{m}で約{c}問 — 「計算」でプランを更新", "setReview": "間違い1問の見直し時間（分）", "diffCalc": "計算 ×2", "diffNav": "チャート・航法 ×1.6", "diffChart": "チャート読解 ×1.3", "planChance": "現在の正答見込み 約{p}%", "planWeights": "1問の時間 = 解答（60 ÷ 1時間の問題数 × トピック難易度、得意なトピックは速い）＋間違いの見直し（間違える確率 × 見直し時間 × 難易度）。計算系（E6B・クロスカントリー・性能）は×2、航法と気象は×1.6、チャート読解は×1.3。"});
+Object.assign(I18N.en,{"en_low": "Low energy", "en_medium": "Medium", "en_high": "High energy", "workload": "Workload", "rs_light": "light", "reason_light": "Light review of a topic you know"});
+Object.assign(I18N.pt,{"en_low": "Pouca energia", "en_medium": "Média", "en_high": "Muita energia", "workload": "Carga", "rs_light": "leve", "reason_light": "Revisão leve de um tópico que você domina"});
+Object.assign(I18N.ja,{"en_low": "低エネルギー", "en_medium": "普通", "en_high": "高エネルギー", "workload": "負荷", "rs_light": "軽め", "reason_light": "得意なトピックの軽い復習"});
 const $=s=>document.querySelector(s);
 const pad=n=>String(n).padStart(2,'0');
 const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -923,7 +960,7 @@ function normalize(o){
     scores:Array.isArray(o.scores)&&o.scores.length===TOPICS.length?o.scores.map(cl):TOPICS.map(x=>x.score),
     events:o.events.filter(e=>e&&ok(e.date)&&Number.isInteger(e.topic)&&TOPICS[e.topic]&&['study','review','move'].includes(e.kind))
       .map(e=>({id:e.id||uid(),date:e.date,topic:e.topic,kind:e.kind,from:e.from||null,to:e.kind==='move'?(e.to||e.status||null):null,score:cl(e.score),partial:!!e.partial,demo:!!e.demo})),
-    settings:o.settings&&typeof o.settings==='object'?{minutes:+o.settings.minutes||DEF_SET0.minutes,qph:+o.settings.qph||DEF_SET0.qph,tests:Number.isFinite(+o.settings.tests)?+o.settings.tests:DEF_SET0.tests}:{...DEF_SET0},
+    settings:o.settings&&typeof o.settings==='object'?{minutes:+o.settings.minutes||DEF_SET0.minutes,qph:+o.settings.qph||DEF_SET0.qph,tests:Number.isFinite(+o.settings.tests)?+o.settings.tests:DEF_SET0.tests,reviewMin:Number.isFinite(+o.settings.reviewMin)&&o.settings.reviewMin!==''&&o.settings.reviewMin!=null?+o.settings.reviewMin:DEF_SET0.reviewMin}:{...DEF_SET0},
     tests:Array.isArray(o.tests)?o.tests.filter(x=>x&&ok(x.date)).map(x=>({id:x.id||uid(),date:x.date,q:+x.q||60,score:cl(x.score)})):[],
     deadline:ok(o.deadline)?o.deadline:'2026-11-30',
     lang:I18N[o.lang]?o.lang:'en',
@@ -1229,51 +1266,109 @@ function renderForecast(){
   $('#fcFormula').innerHTML=`<pre>${esc(t('fcFormula'))}</pre>`;
 }
 
-/* ================= DAILY PLAN (mechanical) =================
-   budget  = minutes per night × questions per hour / 60
-   order   1) practice test when one is due (every 7 / tests-per-week days)
-           2) reviews due today (spaced repetition, highest priority first): n = clamp(q × (1 − recall), 10, 40)
-           3) tracked topics never scored yet, then weak topics (< 70%) in Not Comfortable / To review: up to 40
-           4) new material (To Do / Doing, biggest first): up to 40 — skipped in the last 7 days before the exam
-   The plan is computed from the state at the start of the day, so what you log today shows as "done". */
-const DEF_SET={minutes:180,qph:40,tests:2};
+/* ================= DAILY PLAN (mechanical, time-based) =================
+   Budget = your minutes per night.
+   Minutes for one question of topic i:
+       answer  = (60 / questions-per-hour) × difficulty_i × ease_i
+       review  = (1 − p_i) × review-minutes-per-wrong-answer × difficulty_i      (you study every miss)
+       minutes = answer + review
+   p_i          = chance you get it right now = last score × recall (as in the exam forecast; unknown → 50%)
+   difficulty_i = 2.0 calculation topics (E6B, cross-country, performance charts), 1.6 navigation / weather charts,
+                  1.3 chart-reading topics, 1.0 everything else
+   ease_i       = from spaced-repetition stability S: 1.15 (no data) … 0.75 (S ≥ 30 days) — well-known topics go faster
+   Order: 1) practice test when due  2) reviews due today  3) topics never scored, weak topics (< 70%)
+          4) new material (skipped in the last 7 days). Each item is cut to what still fits in the remaining minutes. */
+const DEF_SET={minutes:180,qph:40,tests:2,reviewMin:1.5};
 const settings=()=>({...DEF_SET,...(state.settings||{})});
-function buildPlan(asOf){
-  asOf=asOf||todayISO();const st=settings(),cap=Math.max(10,Math.round(st.minutes*st.qph/60)),daysLeft=Math.max(1,diffDays(asOf,state.deadline)),final=daysLeft<=7;
+const DIFF={7:2,12:2,16:2,6:1.6,18:1.6,14:1.3,0:1.3,8:1.3};          /* Pilotage, Cross-Country, Performance · Navigation, Weather · Airspace, Comms/Lights, Night */
+const diffOf=i=>DIFF[i]||1;
+const easeOf=m=>!m||!m.reps.length?1.15:Math.max(.75,Math.min(1.15,1.15-.12*Math.log2(1+m.S)));
+function minutesPerQ(i,st,m,p){return (60/st.qph)*diffOf(i)*easeOf(m)+(1-p)*st.reviewMin*diffOf(i)}
+function topicPNow(i,m){const sc=m&&m.reps.length?m.reps[m.reps.length-1].p:state.scores[i];return sc==null?.5:Math.max(0,Math.min(1,sc/100*(m&&m.reps.length?m.R:1)))}
+/* ENERGY MODES (v1)
+   low   : skips the practice test, picks the easiest/fastest items first (high chance of being right, known topics),
+           and assumes you go 15% slower.
+   medium: the standard order (test → reviews due → no data → weak → new).
+   high  : practice test first, then the hardest work (most expected misses × difficulty), assumes you go 10% faster
+           and stretches the evening 10%.
+   Workload (1–10) = average of (chance of missing × difficulty) over the planned questions, scaled.            */
+const ENERGY={low:{speed:1.15,stretch:1,test:false,order:'easy'},medium:{speed:1,stretch:1,test:true,order:'standard'},high:{speed:.9,stretch:1.1,test:true,order:'hard'}};
+function buildPlan(asOf,over,mode){
+  asOf=asOf||todayISO();const st0=over||settings(),E=ENERGY[mode||'medium'],st={...st0,minutes:st0.minutes*E.stretch},daysLeft=Math.max(1,diffDays(asOf,state.deadline)),final=daysLeft<=7;
+  const cap=Math.max(10,Math.round(st.minutes*st.qph/60));               /* questions/night with no review (reference) */
   const doneT=new Set(state.events.filter(e=>e.date===asOf&&(e.kind==='study'||e.kind==='review')).map(e=>e.topic));
-  const testsToday=(state.tests||[]).filter(x=>x.date===asOf).length,items=[],used=new Set();let budget=cap;
-  const planned=new Set();const push=(it)=>{if(budget<10&&!it.done)return false;it.n=Math.min(it.n,Math.max(budget,it.done?it.n:0));budget-=it.n;items.push(it);if(it.kind==='topic')planned.add(it.i);return true};
+  const testsToday=(state.tests||[]).filter(x=>x.date===asOf).length,items=[],used=new Set(),planned=new Set();let left=st.minutes;
+  const models={};const M=i=>models[i]??=srModel(i,asOf,true);
+  const push=it=>{
+    const per=it.per,want=it.n;
+    if(!it.done){if(left<per*Math.min(5,want)-1e-9)return false;it.n=Math.max(1,Math.min(want,Math.floor((left+1e-9)/per)))}
+    it.min=Math.round(it.n*per);left-=it.n*per;items.push(it);if(it.kind==='topic')planned.add(it.i);return true};
+  const topicItem=(i,n,reason)=>{const m=M(i),p=topicPNow(i,m);return {kind:'topic',i,n,reason,done:doneT.has(i),per:minutesPerQ(i,st,m,p)*E.speed,diff:diffOf(i),p}};
+  const cands=[];const add=it=>cands.push(it);
   const prevTests=(state.tests||[]).filter(x=>x.date<asOf).map(x=>x.date).sort(),lastT=prevTests[prevTests.length-1];
-  if(st.tests>0&&(testsToday||!lastT||diffDays(lastT,asOf)>=Math.floor(7/st.tests)))push({kind:'test',n:60,reason:'test',done:!!testsToday});
+  if(st.tests>0&&(testsToday||!lastT||diffDays(lastT,asOf)>=Math.floor(7/st.tests))){
+    const mu=forecast(asOf).mu;if(E.test||testsToday)add({kind:'test',n:60,reason:'test',done:!!testsToday,per:((60/st.qph)*1.1+(1-mu)*st.reviewMin)*E.speed,diff:1.1,p:mu})}
   const ms=srAll(asOf,true);
-  ms.filter(m=>m.reps.length&&m.over>=0).forEach(m=>{const q=TOPICS[m.i].q;used.add(m.i);push({kind:'topic',i:m.i,n:Math.min(q,Math.max(10,Math.min(40,Math.round(q*(1-m.R))))),reason:'due',done:doneT.has(m.i)})});
-  ms.filter(m=>!m.reps.length&&!used.has(m.i)).forEach(m=>{used.add(m.i);push({kind:'topic',i:m.i,n:Math.min(TOPICS[m.i].q,40),reason:'nodata',done:doneT.has(m.i)})});
+  ms.filter(m=>m.reps.length&&m.over>=0).forEach(m=>{const q=TOPICS[m.i].q;used.add(m.i);add(topicItem(m.i,Math.min(q,Math.max(10,Math.min(40,Math.round(q*(1-m.R))))),'due'))});
+  ms.filter(m=>!m.reps.length&&!used.has(m.i)).forEach(m=>{used.add(m.i);add(topicItem(m.i,Math.min(TOPICS[m.i].q,40),'nodata'))});
   TOPICS.map((x,i)=>i).filter(i=>!used.has(i)&&['Not Comfortable','To review'].includes(state.statuses[i])&&(state.scores[i]??0)<70).sort((a,b)=>TOPICS[b].q-TOPICS[a].q)
-    .forEach(i=>{used.add(i);push({kind:'topic',i,n:Math.min(TOPICS[i].q,40),reason:'weak',done:doneT.has(i)})});
-  if(!final)TOPICS.map((x,i)=>i).filter(i=>!used.has(i)&&['Todo','Doing'].includes(state.statuses[i])).sort((a,b)=>(state.statuses[b]==='Doing')-(state.statuses[a]==='Doing')||TOPICS[b].q-TOPICS[a].q)
-    .forEach(i=>{used.add(i);push({kind:'topic',i,n:Math.min(TOPICS[i].q,40),reason:'new',done:doneT.has(i)})});
-  doneT.forEach(i=>{if(!planned.has(i)){items.push({kind:'topic',i,n:0,reason:'extra',done:true})}});
+    .forEach(i=>{used.add(i);add(topicItem(i,Math.min(TOPICS[i].q,40),'weak'))});
+  const newOnes=[];if(!final)TOPICS.map((x,i)=>i).filter(i=>!used.has(i)&&['Todo','Doing'].includes(state.statuses[i])).sort((a,b)=>(state.statuses[b]==='Doing')-(state.statuses[a]==='Doing')||TOPICS[b].q-TOPICS[a].q)
+    .forEach(i=>{used.add(i);newOnes.push(topicItem(i,Math.min(TOPICS[i].q,40),'new'))});
+  /* low energy: easiest first — also topics you already know (Very Comfortable, recently reviewed) as light reviews */
+  if(E.order==='easy')TOPICS.map((x,i)=>i).filter(i=>!used.has(i)&&state.statuses[i]==='Very Comfortable').forEach(i=>{used.add(i);const it=topicItem(i,Math.min(TOPICS[i].q,20),'light');if(it.p>=.6)add(it)});
+  cands.push(...newOnes);
+  const done=cands.filter(x=>x.done),todo=cands.filter(x=>!x.done);
+  if(E.order==='easy')todo.sort((a,b)=>(a.kind==='test')-(b.kind==='test')||a.per-b.per||b.p-a.p);
+  if(E.order==='hard')todo.sort((a,b)=>(b.kind==='test')-(a.kind==='test')||(1-b.p)*b.diff-(1-a.p)*a.diff);
+  [...done,...todo].forEach(push);
+  doneT.forEach(i=>{if(!planned.has(i))items.push({kind:'topic',i,n:0,min:0,reason:'extra',done:true,diff:diffOf(i)})});
   const remaining=TOPICS.reduce((a,x,i)=>a+(state.statuses[i]==='Very Comfortable'?0:x.q),0);
-  return {items,cap,total:items.reduce((a,x)=>a+x.n,0),done:items.filter(x=>x.done).reduce((a,x)=>a+x.n,0),daysLeft,final,pace:Math.ceil(remaining/daysLeft)};
+  const sum=(arr,k)=>arr.reduce((a,x)=>a+(x[k]||0),0);
+  const qs=items.filter(x=>x.n&&x.p!=null),wq=qs.reduce((a,x)=>a+x.n,0),inten=wq?qs.reduce((a,x)=>a+x.n*(1-x.p)*(x.diff||1),0)/wq:0;
+  const workload=Math.max(1,Math.min(10,Math.round(inten/1.1*10)));
+  return {items,cap,mode:mode||'medium',workload,budget:Math.round(st.minutes),total:sum(items,'n'),minutes:sum(items,'min'),done:sum(items.filter(x=>x.done),'n'),doneMin:sum(items.filter(x=>x.done),'min'),daysLeft,final,pace:Math.ceil(remaining/daysLeft)};
 }
+let energyMode=(()=>{try{const v=JSON.parse(localStorage.getItem(STORE+'-energy')||'null');return v&&v.d===todayISO()?v.m:'medium'}catch(e){return 'medium'}})();
+function setEnergy(m){energyMode=m;try{localStorage.setItem(STORE+'-energy',JSON.stringify({d:todayISO(),m}))}catch(e){}renderPlanMini();if(!$('#viewPlan').hidden)renderPlanPage();requestAnimationFrame(clipSugg)}
+const fmtMin=m=>m>=60?`${Math.floor(m/60)}h ${String(Math.round(m%60)).padStart(2,'0')}m`:`${Math.round(m)} min`;
 function planRowName(it){return it.kind==='test'?t('practiceTest'):TOPICS[it.i].name}
 function renderPlanMini(){
-  const P=buildPlan();$('#planMiniTot').textContent=`· ${P.total} q`;
+  const P=buildPlan(null,null,energyMode);$('#planMiniMode').textContent=t('en_'+energyMode);$('#planMiniMode').className='enpill '+energyMode;$('#planMiniTot').textContent=`· ${P.total} q · ${fmtMin(P.minutes)}`;
   $('#sugg').innerHTML=P.items.length?P.items.map(it=>`<div class="qrow${it.done?' done':''}" ${it.kind==='test'?'data-pt="1"':`data-q="${it.i}"`} title="${esc(t('reason_'+it.reason))}"><span class="pck">${it.done?'✓':''}</span><span class="qt">${esc(planRowName(it))}</span><span class="pq">${it.n?it.n+' q':''}</span><span class="rchip ${it.reason}">${esc(t('rs_'+it.reason))}</span></div>`).join(''):`<div class="muted">${esc(t('allClear'))}</div>`;
 }
 function renderPlanPage(){
-  const P=buildPlan(),st=settings(),df=new Intl.DateTimeFormat(LOCALE[lang],{weekday:'long',day:'numeric',month:'long'});
+  const P=buildPlan(null,null,energyMode),st=settings(),df=new Intl.DateTimeFormat(LOCALE[lang],{weekday:'long',day:'numeric',month:'long'});
+  $('#energyPick').innerHTML=['low','medium','high'].map(m=>{const Q=buildPlan(null,null,m);return `<button type="button" role="tab" data-energy="${m}" class="${m===energyMode?'on':''}" aria-selected="${m===energyMode}"><span class="en">${['low','medium','high'].indexOf(m)===0?'🔋':m==='medium'?'⚡':'🚀'} ${esc(t('en_'+m))}</span><span class="es">${Q.total} q · ${fmtMin(Q.minutes)}</span><span class="ew"><i style="width:${Q.workload*10}%"></i></span><span class="es">${esc(t('workload'))} ${Q.workload}/10</span></button>`}).join('');
   $('#planSub').textContent=df.format(parse(todayISO()))+(P.final?' · '+t('planFinal'):'');
-  $('#planKpis').innerHTML=`<div><b>${P.total}</b><span>${esc(t('planQToday'))}</span></div><div><b>${P.done}</b><span>${esc(t('planDone'))}</span></div><div><b>${P.pace}</b><span>${esc(t('planPace'))}</span></div><div><b>${P.daysLeft}</b><span>${esc(t('toGo'))}</span></div>`;
-  $('#planList').innerHTML=P.items.length?P.items.map(it=>`<div class="pitem2${it.done?' done':''}" ${it.kind==='test'?'data-pt="1"':`data-q="${it.i}"`}><span class="pck">${it.done?'✓':''}</span><span class="pn">${esc(planRowName(it))}<small>${esc(t('reason_'+it.reason))}</small></span><span class="rchip ${it.reason}">${esc(t('rs_'+it.reason))}</span><span class="pq">${it.n?it.n+' q':''}</span></div>`).join(''):`<div class="muted">${esc(t('allClear'))}</div>`;
-  ['minutes','qph','tests'].forEach(k=>{const el=$('#set'+k[0].toUpperCase()+k.slice(1));if(document.activeElement!==el)el.value=st[k]});
-  $('#planCap').textContent=t('planCapTxt').replace('{c}',P.cap);
+  $('#planKpis').innerHTML=`<div><b>${fmtMin(P.minutes)}</b><span>${esc(t('planMinOf').replace('{b}',fmtMin(P.budget)))}</span></div><div><b>${P.total}</b><span>${esc(t('planQToday'))}</span></div><div><b>${P.done}</b><span>${esc(t('planDone'))}</span></div><div><b>${P.pace}</b><span>${esc(t('planPace'))}</span></div><div><b>${P.daysLeft}</b><span>${esc(t('toGo'))}</span></div>`;
+  $('#planList').innerHTML=P.items.length?P.items.map(it=>`<div class="pitem2${it.done?' done':''}" ${it.kind==='test'?'data-pt="1"':`data-q="${it.i}"`}><span class="pck">${it.done?'✓':''}</span><span class="pn">${esc(planRowName(it))}<small>${esc(t('reason_'+it.reason))}${it.diff>1.05?' · '+esc(t(it.diff>=2?'diffCalc':it.diff>=1.5?'diffNav':'diffChart')):''}${it.p!=null&&it.kind==='topic'?' · '+esc(t('planChance').replace('{p}',Math.round(it.p*100))):''}</small></span><span class="rchip ${it.reason}">${esc(t('rs_'+it.reason))}</span><span class="pq">${it.n?it.n+' q':''}<small>${it.min?'~'+fmtMin(it.min):''}</small></span></div>`).join(''):`<div class="muted">${esc(t('allClear'))}</div>`;
+  ['minutes','qph','tests','reviewMin'].forEach(k=>{const el=$('#set'+k[0].toUpperCase()+k.slice(1));if(document.activeElement!==el)el.value=st[k]});
+  updateDraft();
 }
 function startPlanItem(el){if(!el)return;if(el.dataset.pt){openPt();return}const i=+el.dataset.q;openModal(i,srModel(i).reps.length?'review':'study')}
+$('#energyPick').addEventListener('click',e=>{const b=e.target.closest('[data-energy]');if(!b)return;const l=$('#planList');l.classList.add('loading');setTimeout(()=>{setEnergy(b.dataset.energy);l.classList.remove('loading');void l.offsetWidth;l.classList.add('fresh')},250)});
 $('#planList').addEventListener('click',e=>startPlanItem(e.target.closest('[data-q],[data-pt]')));
 $('#openPlan').onclick=()=>goView('plan');
 $('#fcMini').onclick=()=>goView('sr','fc');
-['Minutes','Qph','Tests'].forEach(k=>{$('#set'+k).addEventListener('change',e=>{const v=Math.round(+e.target.value);if(!isFinite(v)||e.target.value==='')return;const key=k.toLowerCase();const lim={minutes:[15,600],qph:[5,200],tests:[0,7]}[key];const val=Math.max(lim[0],Math.min(lim[1],v));commit(()=>{state.settings={...settings(),[key]:val}},t('saved'))})});
+const SET_LIM={minutes:[15,600],qph:[5,200],tests:[0,7],reviewMin:[0,10]};
+function draftSettings(){const d={...settings()};['minutes','qph','tests','reviewMin'].forEach(k=>{const el=$('#set'+k[0].toUpperCase()+k.slice(1));const raw=+el.value,v=k==='reviewMin'?Math.round(raw*2)/2:Math.round(raw);if(el.value!==''&&isFinite(v))d[k]=Math.max(SET_LIM[k][0],Math.min(SET_LIM[k][1],v))});return d}
+function updateDraft(){const d=draftSettings(),P=buildPlan(null,d,energyMode),ch=JSON.stringify(d)!==JSON.stringify(settings());
+  $('#planCap').textContent=t(ch?'planCapNew':'planCapTxt').replace('{c}',P.total).replace('{m}',fmtMin(d.minutes));$('#planCap').classList.toggle('changed',ch)}
+['Minutes','Qph','Tests','ReviewMin'].forEach(k=>{const el=$('#set'+k);el.addEventListener('input',updateDraft);el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();calcPlan()}})});
+let calcBusy=false;
+function calcPlan(){
+  if(calcBusy)return;calcBusy=true;const d=draftSettings(),btn=$('#planCalc'),list=$('#planList');
+  btn.disabled=true;btn.querySelector('.spin').hidden=false;list.classList.add('loading');list.classList.remove('fresh');
+  setTimeout(()=>{
+    const changed=JSON.stringify(d)!==JSON.stringify(settings());
+    if(changed)commit(()=>{state.settings=d},t('planUpdated'));else renderPlanPage();
+    list.classList.remove('loading');void list.offsetWidth;list.classList.add('fresh');
+    btn.disabled=false;btn.querySelector('.spin').hidden=true;calcBusy=false;
+    $('#viewPlan').scrollIntoView({behavior:'smooth',block:'start'});
+  },450);
+}
+$('#planCalc').onclick=calcPlan;
 
 function dueText(m){if(!m.reps.length)return [t('noHist'),'over'];if(m.over>0)return [tf('dueAgo',m.over),'over'];if(m.over===0)return [t('dueToday'),'now'];return [tf('dueIn',-m.over),'']}
 const rcls=R=>R==null?'sc-none':R>=.9?'sc-good':R>=.8?'sc-mid':'sc-low';
@@ -1723,8 +1818,16 @@ function selfTest(){
     fixture([{date:D(3),topic:18,kind:'study',score:40}]);state.scores[18]=40;
     ok('Forecast','forecast history uses the score known at that date',scoreAt(18,D(5))===TOPICS[18].score&&scoreAt(18,D(1))===40);
     /* --- daily plan --- */
-    fixture([],{settings:{minutes:180,qph:40,tests:0}});{const P=buildPlan();ok('Plan','capacity = minutes × questions/hour ÷ 60 (180 min × 40 = 120)',P.cap===120);ok('Plan','plan never exceeds capacity',P.total<=P.cap,P.total)}
-    fixture([{date:D(3),topic:18,kind:'study',score:90}],{settings:{minutes:180,qph:40,tests:0}});
+    fixture([],{settings:{minutes:180,qph:40,tests:0,reviewMin:1.5}});{const P=buildPlan();ok('Plan','reference pace = minutes × questions/hour ÷ 60 (180 min × 40 = 120)',P.cap===120);ok('Plan','planned time never exceeds your minutes',P.minutes<=180,P.minutes);ok('Plan','with review time, fewer questions fit than the no-review pace',P.total<P.cap,P.total)}
+    fixture([],{settings:{minutes:180,qph:40,tests:0,reviewMin:1.5}});
+    {const st=settings();ok('Plan time','calculation topic (Cross-Country) costs more per question than a plain one (Taxiing) at the same score',minutesPerQ(12,st,null,.7)>minutesPerQ(22,st,null,.7));
+     ok('Plan time','difficulty ×2 doubles answer and review time',near(minutesPerQ(12,st,null,.7),2*minutesPerQ(22,st,null,.7)));
+     ok('Plan time','higher chance of being right → less review time',minutesPerQ(22,st,null,.95)<minutesPerQ(22,st,null,.5));
+     ok('Plan time','exact formula: 60/qph × diff × ease + (1−p) × review × diff',near(minutesPerQ(22,st,null,.6),1.5*1*1.15+.4*1.5*1));
+     ok('Plan time','well-known topic (stability 30 d) answers faster than a new one',easeOf({reps:[1],S:30})<easeOf(null)&&near(easeOf({reps:[1],S:30}),.75,.06));
+     ok('Plan time','review minutes = 0 → only answering time',near(minutesPerQ(22,{...st,reviewMin:0},null,.3),1.5*1.15))}
+    fixture([],{settings:{minutes:60,qph:40,tests:0,reviewMin:3}});{const a=buildPlan().total;state.settings={minutes:60,qph:40,tests:0,reviewMin:.5};ok('Plan time','more review time per miss → fewer questions planned',buildPlan().total>a,`${a} vs ${buildPlan().total}`)}
+    fixture([{date:D(3),topic:18,kind:'study',score:90}],{settings:{minutes:600,qph:40,tests:0,reviewMin:1.5}});
     {const P=buildPlan();ok('Plan','overdue review is first, with reason "due"',P.items[0].i===18&&P.items[0].reason==='due',JSON.stringify(P.items[0]))}
     {const P=buildPlan(),it=P.items[0],m=srModel(18,T,true),exp=Math.min(158,Math.max(10,Math.min(40,Math.round(158*(1-m.R)))));ok('Plan','review size = clamp(q × (1 − recall), 10, 40)',it.n===exp,`${it.n} vs ${exp}`)}
     fixture([],{settings:{minutes:180,qph:40,tests:2}});{const P=buildPlan();ok('Plan','no practice test yet → a test is planned (60 q)',P.items[0].kind==='test'&&P.items[0].n===60)}
@@ -1736,9 +1839,22 @@ function selfTest(){
     {const it=buildPlan().items.find(x=>x.i===18);ok('Plan','a review logged today is shown as done (not removed)',it&&it.done&&it.reason==='due',JSON.stringify(it))}
     fixture([{date:D(1),topic:12,kind:'study',score:95},{date:D(0),topic:12,kind:'review',score:96}],{settings:{minutes:180,qph:40,tests:0}});ok('Plan','reviewing a topic that was not due shows as "extra", done',buildPlan().items.some(x=>x.i===12&&x.reason==='extra'&&x.done));
     fixture([{date:D(0),topic:9,kind:'study',score:90}],{settings:{minutes:180,qph:40,tests:0}});ok('Plan','anything studied today appears in the plan as done',buildPlan().items.some(x=>x.i===9&&x.done));
-    fixture([],{settings:{minutes:30,qph:20,tests:0}});ok('Plan','tiny budget (10 q) still plans at least one item',buildPlan().items.length>=1&&buildPlan().total<=10);
-    {const n=normalize({statuses:TOPICS.map(t=>t.status),events:[],settings:{minutes:90,qph:30,tests:1}});ok('Plan','settings survive save / import',n.settings.minutes===90&&n.settings.qph===30&&n.settings.tests===1)}
-    {const n=normalize({statuses:TOPICS.map(t=>t.status),events:[]});ok('Plan','old backups get default settings (180 min, 40 q/h, 2 tests)',n.settings.minutes===180&&n.settings.qph===40&&n.settings.tests===2)}
+    fixture([],{settings:{minutes:30,qph:20,tests:0,reviewMin:1.5}});ok('Plan','tiny budget (30 min) still plans at least one item, within 30 min',buildPlan().items.length>=1&&buildPlan().minutes<=30,buildPlan().minutes);
+    {const n=normalize({statuses:TOPICS.map(t=>t.status),events:[],settings:{minutes:90,qph:30,tests:1,reviewMin:2.5}});ok('Plan','settings survive save / import (incl. review minutes)',n.settings.minutes===90&&n.settings.qph===30&&n.settings.tests===1&&n.settings.reviewMin===2.5)}
+    {const n=normalize({statuses:TOPICS.map(t=>t.status),events:[]});ok('Plan','old backups get default settings (180 min, 40 q/h, 2 tests, 1.5 min review)',n.settings.minutes===180&&n.settings.qph===40&&n.settings.tests===2&&n.settings.reviewMin===1.5)}
+    /* --- energy modes --- */
+    fixture([{date:D(6),topic:18,kind:'study',score:30},{date:D(5),topic:13,kind:'study',score:95},{date:D(5),topic:12,kind:'study',score:92}],{settings:{minutes:120,qph:40,tests:2,reviewMin:1.5}});
+    {const L=buildPlan(T,null,'low'),Mm=buildPlan(T,null,'medium'),H=buildPlan(T,null,'high');
+     ok('Energy','three plans are built (low / medium / high)',L.mode==='low'&&Mm.mode==='medium'&&H.mode==='high');
+     ok('Energy','low energy skips the practice test',!L.items.some(x=>x.kind==='test')&&Mm.items.some(x=>x.kind==='test'));
+     ok('Energy','high energy starts with the practice test',H.items[0].kind==='test');
+     ok('Energy','workload: low < medium ≤ high',L.workload<Mm.workload&&Mm.workload<=H.workload,`${L.workload} ${Mm.workload} ${H.workload}`);
+     const firstTopic=P=>P.items.find(x=>x.kind==='topic'&&!x.done);
+     ok('Energy','low energy starts with an easy item (higher chance of being right than high energy)',firstTopic(L).p>firstTopic(H).p,`${firstTopic(L).p} vs ${firstTopic(H).p}`);
+     ok('Energy','high energy plans more time (stretch 10%) and goes faster',H.budget>Mm.budget);
+     ok('Energy','every plan fits its minutes',L.minutes<=L.budget&&Mm.minutes<=Mm.budget&&H.minutes<=H.budget,`${L.minutes}/${L.budget} ${Mm.minutes}/${Mm.budget} ${H.minutes}/${H.budget}`);
+     ok('Energy','low energy may include light reviews of topics you know',L.items.every(x=>x.reason!=='light'||state.statuses[x.i]==='Very Comfortable'));
+     ok('Energy','medium = the standard plan (default)',JSON.stringify(buildPlan(T).items.map(x=>x.i))===JSON.stringify(Mm.items.map(x=>x.i)))}
     /* --- translations --- */
     const keys=Object.keys(I18N.en);
     ['pt','ja'].forEach(L=>{const miss=keys.filter(k=>I18N[L][k]==null);ok('Languages',`${L}: every English label has a translation`,!miss.length,miss.join(', '))});
