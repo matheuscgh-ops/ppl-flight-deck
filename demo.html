@@ -5,13 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PPL Flight Deck — Demo</title>
 <style>
-:root{
-  --bg:#0d0f12;--panel:#16191d;--panel2:#1e2227;--lane:#0f1114;--card:#22272b;--cardh:#2c333a;
-  --line:#2a2f36;--line2:#3a414a;--ink:#eef1f4;--ink2:#c5ccd5;--muted:#8f99a6;
-  --s0:#8590a2;--s1:#579dff;--s2:#f5a524;--s3:#4bce97;--s4:#9f8fef;
-  --fire:#ff6a1f;--fireLine:#5e2a12;--exam:#ffb43a;
-  color-scheme:dark;
-}
+:root{--bg:#0d0f12;--panel:#16191d;--panel2:#1e2227;--lane:#0f1114;--card:#22272b;--cardh:#2c333a;--line:#2a2f36;--line2:#3a414a;--ink:#eef1f4;--ink2:#c5ccd5;--muted:#8f99a6;--s0:#8590a2;--s1:#579dff;--s2:#f5a524;--s3:#4bce97;--s4:#9f8fef;--fire:#ff6a1f;--fireLine:#5e2a12;--exam:#ffb43a;color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{min-height:100%}
@@ -69,7 +63,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.8)}
 .calnav{display:flex;gap:4px}.calnav button{padding:4px 11px}
 .calgrid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr)) 64px;grid-template-rows:auto repeat(var(--weeks,6),minmax(140px,auto));gap:6px}
 .wd{text-align:center;font-size:11px;font-weight:850;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:1px 0 3px}
-.wd.wk{color:#ff9e70;z-index:1;padding-top:7px}
+.wd.wk{z-index:1;padding-top:7px}
 .day{display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden;padding:6px 8px;border-radius:8px;background:#1b1f24;border:1px solid #282e35}
 .day.out{opacity:.33}
 .day.active{background:#e2f8eb;border-color:#7fd8aa;color:#0b3321}
@@ -83,13 +77,12 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.8)}
 .daytag{flex:none;font-size:11.5px;font-weight:800;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:3px solid var(--k);padding-left:6px;color:#0f3a25}
 .daytag.more{border-left-color:transparent;color:#2c5a43;font-weight:850;padding-left:2px}
 .day.out .daytag{display:none}
-.strip{background:linear-gradient(180deg,#2c150a,#3a1a0b);border:1px solid var(--fireLine);border-radius:32px}
-.wcheck{z-index:1;align-self:center;justify-self:center;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;border:2px solid #7a3716;color:#2a1206;font-weight:900;font-size:16px;line-height:1}
-.wcheck.on{background:var(--fire);border-color:var(--fire)}
-.wcheck.cur{box-shadow:0 0 0 3px #ff6a1f38}
+
+.wcheck{z-index:1;align-self:center;justify-self:center;border-radius:50%;display:grid;place-items:center;line-height:1}
+
 .bubblewrap{z-index:1;display:flex;align-items:center;justify-content:center}
-.bubble{width:50px;height:50px;border-radius:50%;background:var(--fire);color:#241006;font-size:24px;font-weight:900;display:grid;place-items:center;box-shadow:0 0 0 4px #ff6a1f22}
-.bubblewrap small{font-size:9px;font-weight:850;color:#ffb08a;text-transform:uppercase;letter-spacing:.04em;text-align:center;line-height:1.1;max-width:60px}
+.bubble{border-radius:50%;display:grid;place-items:center}
+.bubblewrap small{font-size:9px;font-weight:850;text-transform:uppercase;letter-spacing:.04em;text-align:center;line-height:1.1;max-width:60px}
 .callegend{display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted);font-weight:650;padding:2px}
 .callegend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 .callegend .hint{color:#ff9e70}
@@ -111,10 +104,9 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.8)}
 .nwhy{font-size:12px;color:var(--muted);font-weight:650}
 .nthen{margin-top:14px;border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:2px}
 .nthen .qh{font-size:11px;font-weight:850;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
-.qrow{display:flex;align-items:center;gap:8px;padding:6px 6px;border-radius:7px;font-size:12.5px;font-weight:700;cursor:pointer}
-.qrow:hover{background:#20252b}
+
 .qrow .qn{color:var(--muted);font-size:11px;width:14px;flex:none}
-.qrow .qt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
 .qrow .score{font-size:10.5px}
 .stats{flex:none;padding:12px 14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .stat{min-width:0;cursor:help}
@@ -177,17 +169,17 @@ body.dragging,body.dragging *{cursor:grabbing!important;user-select:none!importa
 .hrow button{margin-left:auto;padding:1px 8px;font-size:12px}
 
 /* top row: progress + countdown + stats */
-.toprow{display:grid;grid-template-columns:minmax(0,1fr) 194px 194px;gap:12px}
+.toprow{display:grid;gap:12px}
 .toprow .countdown{display:flex;flex-direction:column;justify-content:center}
-.toprow .stats{display:flex;flex-direction:column;justify-content:center;gap:6px;padding:12px 14px}
+.toprow .stats{display:flex;flex-direction:column;justify-content:center}
 .toprow .stat{display:flex;align-items:baseline;gap:8px;border:0!important;padding:0!important}
 .toprow .stat .sv{font-size:17px;min-width:56px}
 .toprow .stats{gap:3px!important;padding:8px 14px!important}
 .toprow .stat .sl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.toprow{grid-template-columns:minmax(0,1fr) 194px 300px}
+
 .toprow .meter{display:none}
-@media (max-width:1180px){.toprow{grid-template-columns:minmax(0,1fr) 170px 240px}}
-@media (max-width:860px){.toprow{grid-template-columns:1fr 1fr}.toprow .progress{grid-column:1/-1}}
+
+@media (max-width:860px){.toprow .progress{grid-column:1/-1}}
 
 /* FIT MODE: on large screens the dashboard fits in one window (all cards still visible, no scroll inside lists) */
 @media (min-width:1100px) and (min-height:1050px){
@@ -211,11 +203,11 @@ body.dragging,body.dragging *{cursor:grabbing!important;user-select:none!importa
   .calhead{margin-bottom:4px}
   .calgrid{grid-template-rows:auto repeat(var(--weeks,6),minmax(0,1fr));gap:4px}
   .day{padding:3px 7px}.dnum{font-size:14px}.daytag{font-size:10px;line-height:1.25}.tags{margin-top:2px;gap:1px}
-  .wcheck{width:22px;height:22px;font-size:12px}
-  .sr{padding:10px 14px;overflow:hidden;gap:4px}
+  
+  .sr{overflow:hidden}
   .sr .chart,.sr .chartlegend,.sr .prevtitle,.sr .prevstats{flex:none}
-  .sr .nthen{flex:0 1 auto;min-height:0;overflow:hidden;padding-top:6px}
-  .qrow{padding:4px 6px}
+  .sr .nthen{flex:0 1 auto;min-height:0;overflow:hidden}
+  
 }
 
 .ptest{cursor:pointer}.ptest:hover .sl{color:var(--ink)}.addpt{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:4px;background:#2c333b;color:var(--ink);font-size:12px;line-height:1;margin-left:2px}
@@ -317,7 +309,7 @@ body.dragging,body.dragging *{cursor:grabbing!important;user-select:none!importa
   .center{grid-template-columns:1fr}
   .calgrid{grid-template-columns:repeat(7,minmax(0,1fr)) 44px;grid-template-rows:auto repeat(var(--weeks,6),minmax(58px,auto))}.callegend{display:none}.top{flex-wrap:wrap}
   .day{padding:4px}.dnum{font-size:13px}.daytag{font-size:9px}
-  .wcheck{width:24px;height:24px;font-size:13px}.bubble{width:38px;height:38px;font-size:18px}
+  
   .side{display:grid;grid-template-columns:1fr}.srgrid{grid-template-columns:1fr}.kpirow{grid-template-columns:repeat(3,1fr)}.srkpis{gap:16px}
   .stats{grid-template-rows:none}
   .big{font-size:42px}
@@ -364,22 +356,22 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   html,body{overflow-x:hidden}
   input,select,textarea{font-size:16px!important}
   .app{padding:10px 10px 28px;gap:10px}
-  .top{flex-direction:column;align-items:stretch;gap:10px}
+  .top{flex-direction:column;align-items:stretch}
   .brandrow{justify-content:space-between;gap:10px}
-  .brand{font-size:20px}
-  .tabs button{padding:6px 10px;font-size:12.5px}
-  .tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
-  .tools #syncChip{grid-column:1/-1;justify-content:center}
+  
+  
+  .tools{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .tools #syncChip{justify-content:center}
   .tools button{padding:7px 4px;font-size:12px;min-width:0;overflow:hidden;text-overflow:ellipsis}
   .tools .sep,.tools .demo{display:none}
-  .tools .flags{grid-column:1/-1;justify-content:center}
-  .flags .flag{flex:1;font-size:18px}
+  .tools .flags{justify-content:center}
+  
   .progress{padding:12px 12px 10px}
   .phead{flex-wrap:wrap}.section{font-size:12px}
   .track{height:38px;margin:10px 0 8px}.chunk b{font-size:12.5px}
   .legend{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 10px}
   .lg{padding:2px 0;gap:7px}.lg strong{font-size:12.5px}.lg small{font-size:11.5px}
-  .toprow{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+  .toprow{gap:10px}
   .toprow .countdown{padding:12px}.toprow .big{font-size:36px}.toprow .countdown input{font-size:13px;padding:6px}
   .toprow .stats{padding:10px 12px!important}
   .toprow .stat{min-width:0}.toprow .stat .sv{font-size:16px;min-width:48px}
@@ -439,8 +431,6 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   .daytag{font-size:10.5px!important}
   .callegend{display:flex!important}
 }
-.demotag{font-style:normal;font-size:.45em;vertical-align:middle;letter-spacing:.08em;color:#ffd08a;background:#3d2b14;border:1px solid #6b4a1c;border-radius:6px;padding:2px 7px;margin-left:6px}
-#syncChip{display:none!important}
 .prevpick{display:none}
 @media (hover:none),(max-width:1099px){
   .prevpick{display:block;margin:4px 0 2px}
@@ -476,12 +466,12 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 @media (max-width:640px){#daybg{align-items:center;padding:16px}#daybg .modal{width:100%;border-radius:16px;max-height:80dvh}}
 
 /* weekly volume card (Strava-style) */
-.vol{padding:10px 14px 9px;display:flex;flex-direction:column;cursor:pointer;min-width:0;transition:border-color .15s}
+.vol{padding:10px 14px 9px;display:flex;flex-direction:column;min-width:0;transition:border-color .15s}
 .vol:hover{border-color:#5a3a26}
 .volhead{display:flex;justify-content:space-between;align-items:flex-start}
 .volnum{font-size:12px;color:var(--muted);font-weight:700;margin-top:2px}
 .volnum b{font-size:22px;color:var(--ink);font-weight:900;letter-spacing:-.5px}
-.volmore{color:var(--muted);font-size:20px;line-height:1;font-weight:700}
+.volmore{font-weight:700}
 .volchart{flex:1;min-height:38px;margin:4px 0 2px}
 .volchart svg,.volbig svg{display:block;width:100%;height:100%}
 .volfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap}
@@ -500,8 +490,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .actchip{font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap;background:#20252b;border:1px solid var(--line2);border-radius:999px;padding:3px 10px}
 .actchip b{color:var(--ink);font-size:13px}
 .volmodal{width:min(760px,100%)}
-.volrange{margin-top:14px;max-width:320px}
-.volbig{height:260px;margin-top:12px}
+
 .volkpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 18px;margin-top:14px}
 .volkpis b{display:block;font-size:22px;font-weight:900;letter-spacing:-.4px}
 .volkpis span{font-size:12px;color:var(--muted);font-weight:650}
@@ -509,7 +498,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .volkpis .meter i{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
 .volkpis .meter .goal{left:85%;width:2px;background:var(--ink);top:-3px;bottom:-3px}
 .volnote{font-size:12px;color:var(--muted);line-height:1.5;margin:14px 0 0}
-@media (max-width:640px){.volbig{height:200px}.volkpis{grid-template-columns:repeat(2,minmax(0,1fr))}.volfoot>span:first-child{display:none}.vol{padding:10px 12px}.actchip{font-size:11px;padding:2px 8px}#volbg{align-items:flex-end;padding:0}#volbg .modal{width:100%;border-radius:18px 18px 0 0;max-height:88dvh}}
+@media (max-width:640px){.volkpis{grid-template-columns:repeat(2,minmax(0,1fr))}.volfoot>span:first-child{display:none}.vol{padding:10px 12px}.actchip{font-size:11px;padding:2px 8px}#volbg{align-items:flex-end;padding:0}#volbg .modal{width:100%;border-radius:18px 18px 0 0;max-height:88dvh}}
 
 .volmore{background:transparent;border:1px solid transparent;color:var(--muted);font-size:15px;line-height:1;padding:3px 6px;border-radius:7px;cursor:pointer}
 .volmore:hover{color:var(--ink);border-color:var(--line2);background:#20252b}
@@ -583,7 +572,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .pitem2 .pq small{display:block;font-size:11px;color:var(--muted);font-weight:700;text-align:right}
 .planweights{margin-top:12px;font-size:12px;color:var(--muted);line-height:1.6}
 .planinputs input{width:100%}
-#planCap{margin-top:10px;font-size:13px}
+#planCap{font-size:13px}
 @media (max-width:640px){.fckpis{grid-template-columns:repeat(2,minmax(0,1fr))}.fckpis b{font-size:24px}.planinputs{grid-template-columns:1fr}.lostrow{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 54px 40px;font-size:12px}.fchero,.planhero,.planset{padding:14px}}
 .sr.tight #srLegend2,.sr.tight .prevstats{display:none}.sr.tight .fcmini{padding:5px 10px;margin-bottom:3px}.sr.tight .fcsub{display:none}
 .planact{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
@@ -610,6 +599,13 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 @media (max-width:640px){.energy{gap:6px}.energy button{padding:8px}.energy .en{font-size:12.5px}.energy .es{font-size:10.5px}}
 @media (max-width:640px){#planKpis{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 12px!important;width:100%}#planKpis b{font-size:20px!important}#planKpis span{font-size:11px}.planhero .srhead{flex-direction:column;align-items:stretch}}
 
+/* period selectors never stretch across a whole desktop panel */
+.srrange{max-width:420px}
+/* phone: tabs size to their label so “Practice tests” fits next to the short “Plan” */
+@media (max-width:640px){.tabs button{flex:1 1 auto;padding:5px 4px!important;font-size:12px!important}}
+.tsrow .stale{font-size:11.5px;font-weight:800;color:#ffd08a;background:#3d2b14;border-radius:6px;padding:2px 7px;white-space:nowrap}
+.stalebar{font-size:12.5px;font-weight:800;color:#ffd08a;background:#3d2b14;border:1px solid #6b4a1c;border-radius:8px;padding:6px 10px;margin:4px 0 8px}
+@media (max-width:640px){.tsrow{flex-wrap:wrap}.tsrow .stale{order:9;margin-left:22px}}
 /* practice tests */
 .toprow{grid-template-columns:minmax(0,1fr) 194px 250px 300px}
 @media (min-width:1351px) and (max-width:1700px){.toprow{grid-template-columns:minmax(0,1fr) 194px 214px 270px}.progress .legend{grid-template-columns:repeat(5,auto);justify-content:space-between}.progress .legend .lg strong{display:block;font-size:12px;overflow:visible}.progress .legend .lg small{display:block;margin-left:0;font-size:11.5px}}
@@ -659,7 +655,6 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 @media (max-width:640px){.fcfull .ffk.four{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .fcfull .ffk b{display:block;font-size:20px;font-weight:900}.fcfull .ffk span{font-size:11.5px;color:var(--muted);font-weight:700}
 @media (min-width:1100px){.statduo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch}.statduo.top{align-items:start}
-  .statduo .srrange{max-width:none}
   #fcLostPanel #fcLost{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:40px}}
 .modal.wide{width:min(660px,100%)}
 .callink{font-size:12.5px;margin:0 0 6px;align-self:flex-start}
@@ -674,6 +669,8 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .regf{font:600 12.5px/1.6 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;background:#0f1114;border:1px solid var(--line);border-radius:10px;padding:12px;margin:10px 0 0}
 .rchip.testIdle,.rchip.testRecall,.rchip.testFinal,.rchip.testManual{background:#3d2b14;color:#ffd08a}
 @media (max-width:640px){.tskpis{grid-template-columns:repeat(3,minmax(0,1fr))}.tshero,.tslistp{padding:14px}.tabs button{min-width:0;overflow:hidden;text-overflow:ellipsis}}
+.demotag{font-style:normal;font-size:.45em;vertical-align:middle;letter-spacing:.08em;color:#ffd08a;background:#3d2b14;border:1px solid #6b4a1c;border-radius:6px;padding:2px 7px;margin-left:6px}
+#syncChip{display:none!important}
 </style>
 </head>
 <body>
@@ -686,6 +683,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
     <div class="tools">
       <span class="demo" id="demoBadge" data-t="demo"></span>
       <button id="clearDemo" data-t="clear"></button>
+      <button id="tourBtn" type="button">? Tour</button>
       <span class="sep" id="demoSep"></span>
       <button id="syncChip" class="syncchip" type="button"><i></i><span></span></button>
       <button id="backup" data-t="backup"></button>
@@ -765,6 +763,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
       <div class="tstrend" id="tsTrendTxt"></div>
       <button type="button" class="linkbtn callink" data-t="calLink"></button>
       <div class="tsnext tsnextbig" id="tsNext"></div>
+      <div class="stalebar" id="tsStale" hidden></div>
       <div class="seg srrange" data-tsrr><button data-tsr="3d">3D</button><button data-tsr="7d">7D</button><button data-tsr="2w">2W</button><button data-tsr="1m">1M</button><button data-tsr="3m">3M</button><button data-tsr="6m">6M</button><button data-tsr="1y">1Y</button><button data-tsr="all" data-t="rAll"></button></div>
       <div class="chart" id="tsChart"></div>
       <div class="chartlegend" id="tsLegend"></div>
@@ -801,7 +800,8 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
     <div id="statBank">
     <div class="statduo">
     <section class="panel fchero" id="fcSection">
-      <div class="srhead"><div><h2 class="section" data-t="fcTitle"></h2><div class="muted" data-t="fcSub"></div></div></div>
+      <div class="srhead"><div><h2 class="section" data-t="bankTitle"></h2><div class="muted" data-t="bankSub"></div></div></div>
+      <div class="tstrend" id="fcOverall"></div>
       <div class="fckpis" id="fcKpis"></div>
       <div class="seg srrange" data-srr><button data-sr="3d">3D</button><button data-sr="7d">7D</button><button data-sr="2w">2W</button><button data-sr="1m">1M</button><button data-sr="3m">3M</button><button data-sr="6m">6M</button><button data-sr="1y">1Y</button><button data-sr="all" data-t="rAll"></button></div>
       <div class="chart" id="fcChart"></div>
@@ -959,13 +959,13 @@ const GOAL=85;
 const DEF_SET0={minutes:180,qph:40,testEvery:3,reviewMin:1.5};
 const LOCALE={en:'en-US',pt:'pt-BR',ja:'ja-JP'};
 const I18N={
-en:{activeLegend:'Active day',vcLegend:'Moved to Very Comfortable (names)',mDays:'active days this month',mTopics:'moved to Very Comfortable',mActs:'actions',sub:'FAA Private Pilot Knowledge Test · Study tracker',demo:'EXAMPLE DATA',clear:'Clear examples',backup:'Backup JSON',import:'Import',save:'Save HTML',progress:'Question bank progress',total:'{n} questions',today:'Today',wk:'WK',wkTitle:'Weeks with study',streak:'day streak',keep:'Study today to keep the streak',exam:'Exam countdown',toGo:'days to go',since:'days since exam date',examToday:'Exam day — good luck!',examShort:'EXAM',avg:'Avg score',avgTip:'Weighted average of your Sporty’s scores (goal ≥ 85%). Moving cards does not change it.',avgSub:'goal ≥ 85%',pace:'Pace / day',paceTip:'Questions per day to get every topic into Very Comfortable before the exam',paceVal:'{n}/day',active:'Active days',activities:'Logged actions',board:'Your cards',drag:'Drag between lists · Click or Enter to log',activity:'Activity',status:'Status',date:'Date',record:'Save',cancel:'Cancel',history:'History',study:'Studied',review:'Reviewed',move:'Moved',none:'Status only',labels:['To Do','Doing','Not Comfortable','Very Comfortable','To Review'],days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],qn:'{n} q',ago:'{n}d',todayShort:'today',examLegend:'Exam date',demoConfirm:'Remove all example activity? Your card positions and your own records stay.',cleared:'Examples removed',saved:'Recorded',undo:'Undo',undone:'Undone',exported:'File downloaded',imported:'Backup imported',invalid:'This is not a valid PPL Flight Deck backup.',inactive:'No records yet.',already:'Already in this list',nothing:'Nothing to save — choose an activity or a new status',example:'example',del:'Delete',deleted:'Record deleted',fromFile:'Loaded the newer data saved inside this file',nextLabel:'Cleared next',nextWhy:'{q} q · score {s} · {last}',never:'never logged',then:'Then, in order',quick:'quick log',openCard:'open card',palPh:'Log study — type a topic…',metarTitle:'Your study state, METAR-style: time · days to exam · Very Comfortable share · avg/goal · streak · pace',logged:'{t} — {k}'},
-pt:{activeLegend:'Dia ativo',vcLegend:'Movido para Muito confortável (nomes)',mDays:'dias ativos no mês',mTopics:'movidos para Muito confortável',mActs:'ações',sub:'Prova teórica FAA Private Pilot · Painel de estudos',demo:'DADOS DE EXEMPLO',clear:'Limpar exemplos',backup:'Backup JSON',import:'Importar',save:'Salvar HTML',progress:'Progresso do banco de questões',total:'{n} questões',today:'Hoje',wk:'SEM',wkTitle:'Semanas com estudo',streak:'dias seguidos',keep:'Estude hoje para manter a sequência',exam:'Contagem para a prova',toGo:'dias restantes',since:'dias desde a data da prova',examToday:'Dia da prova — boa sorte!',examShort:'PROVA',avg:'Média',avgTip:'Média ponderada das notas do Sporty’s (meta ≥ 85%). Mover cards não a altera.',avgSub:'meta ≥ 85%',pace:'Ritmo / dia',paceTip:'Questões por dia para deixar todos os tópicos em Muito confortável antes da prova',paceVal:'{n}/dia',active:'Dias ativos',activities:'Ações registradas',board:'Seus cards',drag:'Arraste entre listas · Clique ou Enter para registrar',activity:'Atividade',status:'Status',date:'Data',record:'Salvar',cancel:'Cancelar',history:'Histórico',study:'Estudou',review:'Revisou',move:'Moveu',none:'Só status',labels:['A fazer','Fazendo','Pouco confortável','Muito confortável','Para revisar'],days:['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],qn:'{n} q',ago:'{n}d',todayShort:'hoje',examLegend:'Data da prova',demoConfirm:'Remover todas as atividades de exemplo? A posição dos cards e seus registros reais permanecem.',cleared:'Exemplos removidos',saved:'Registrado',undo:'Desfazer',undone:'Desfeito',exported:'Arquivo baixado',imported:'Backup importado',invalid:'Este arquivo não é um backup válido do PPL Flight Deck.',inactive:'Nenhum registro ainda.',already:'Já está nesta lista',nothing:'Nada a salvar — escolha uma atividade ou um novo status',example:'exemplo',del:'Apagar',deleted:'Registro apagado',fromFile:'Carregados os dados mais recentes salvos neste arquivo',nextLabel:'Próximo autorizado',nextWhy:'{q} q · nota {s} · {last}',never:'nunca registrado',then:'Depois, em ordem',quick:'registro rápido',openCard:'abrir card',palPh:'Registrar estudo — digite um tópico…',metarTitle:'Seu estado de estudo no estilo METAR: hora · dias até a prova · % Muito confortável · média/meta · sequência · ritmo',logged:'{t} — {k}'},
-ja:{activeLegend:'学習した日',vcLegend:'「十分理解」へ移動（名前）',mDays:'今月の学習日',mTopics:'件「十分理解」へ移動',mActs:'件の活動',sub:'FAA自家用操縦士 筆記試験 · 学習トラッカー',demo:'サンプルデータ',clear:'サンプルを削除',backup:'JSONバックアップ',import:'読み込み',save:'HTML保存',progress:'問題バンクの進捗',total:'全{n}問',today:'今日',wk:'週',wkTitle:'学習した週',streak:'日連続',keep:'今日学習して連続記録を延ばそう',exam:'試験までの日数',toGo:'日',since:'日経過（試験日から）',examToday:'試験当日 — 頑張って！',examShort:'試験',avg:'平均正答率',avgTip:'Sporty’sの加重平均正答率（目標85%以上）。カード移動では変わりません。',avgSub:'目標 85%以上',pace:'必要ペース',paceTip:'試験までに全トピックを「十分理解」にするための1日あたりの問題数',paceVal:'{n}問/日',active:'学習した日',activities:'記録した活動',board:'カード一覧',drag:'ドラッグで移動 · クリック／Enterで記録',activity:'活動',status:'状態',date:'日付',record:'保存',cancel:'キャンセル',history:'履歴',study:'学習',review:'復習',move:'移動',none:'状態のみ',labels:['未着手','学習中','要強化','十分理解','要復習'],days:['月','火','水','木','金','土','日'],qn:'{n}問',ago:'{n}日前',todayShort:'今日',examLegend:'試験日',demoConfirm:'サンプルの活動をすべて削除しますか？カードの位置と実際の記録は残ります。',cleared:'サンプルを削除しました',saved:'記録しました',undo:'元に戻す',undone:'元に戻しました',exported:'ダウンロードしました',imported:'読み込みました',invalid:'有効なバックアップファイルではありません。',inactive:'記録はまだありません。',already:'すでにこのリストにあります',nothing:'保存する内容がありません — 活動か新しい状態を選んでください',example:'サンプル',del:'削除',deleted:'記録を削除しました',fromFile:'このファイルに保存された新しいデータを読み込みました',nextLabel:'次の推奨トピック',nextWhy:'{q}問 · 正答率 {s} · {last}',never:'未記録',then:'その次の候補',quick:'クイック記録',openCard:'カードを開く',palPh:'学習を記録 — トピック名を入力…',metarTitle:'学習状況をMETAR風に表示：時刻 · 試験まで · 十分理解の割合 · 平均/目標 · 連続 · ペース',logged:'{t} — {k}'}};
+en:{activeLegend:'Active day',vcLegend:'Moved to Very Comfortable (names)',sub:'FAA Private Pilot Knowledge Test · Study tracker',demo:'EXAMPLE DATA',clear:'Clear examples',backup:'Backup JSON',import:'Import',save:'Save HTML',progress:'Question bank progress',total:'{n} questions',today:'Today',wk:'WK',wkTitle:'Weeks with study',streak:'day streak',exam:'Exam countdown',toGo:'days to go',since:'days since exam date',examToday:'Exam day — good luck!',examShort:'EXAM',avg:'Avg score',avgTip:'Weighted average of your Sporty’s scores (goal ≥ 85%). Moving cards does not change it.',pace:'Pace / day',paceTip:'Questions per day to get every topic into Very Comfortable before the exam',active:'Active days',board:'Your cards',drag:'Drag between lists · Click or Enter to log',activity:'Activity',status:'Status',date:'Date',record:'Save',cancel:'Cancel',history:'History',study:'Studied',review:'Reviewed',move:'Moved',none:'Status only',labels:['To Do','Doing','Not Comfortable','Very Comfortable','To Review'],days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],qn:'{n} q',ago:'{n}d',todayShort:'today',examLegend:'Exam date',demoConfirm:'Remove all example activity? Your card positions and your own records stay.',cleared:'Examples removed',saved:'Recorded',undo:'Undo',undone:'Undone',exported:'File downloaded',imported:'Backup imported',invalid:'This is not a valid PPL Flight Deck backup.',inactive:'No records yet.',already:'Already in this list',nothing:'Nothing to save — choose an activity or a new status',example:'example',del:'Delete',deleted:'Record deleted',fromFile:'Loaded the newer data saved inside this file',never:'never logged',openCard:'open card',palPh:'Log study — type a topic…',logged:'{t} — {k}'},
+pt:{activeLegend:'Dia ativo',vcLegend:'Movido para Muito confortável (nomes)',sub:'Prova teórica FAA Private Pilot · Painel de estudos',demo:'DADOS DE EXEMPLO',clear:'Limpar exemplos',backup:'Backup JSON',import:'Importar',save:'Salvar HTML',progress:'Progresso do banco de questões',total:'{n} questões',today:'Hoje',wk:'SEM',wkTitle:'Semanas com estudo',streak:'dias seguidos',exam:'Contagem para a prova',toGo:'dias restantes',since:'dias desde a data da prova',examToday:'Dia da prova — boa sorte!',examShort:'PROVA',avg:'Média',avgTip:'Média ponderada das notas do Sporty’s (meta ≥ 85%). Mover cards não a altera.',pace:'Ritmo / dia',paceTip:'Questões por dia para deixar todos os tópicos em Muito confortável antes da prova',active:'Dias ativos',board:'Seus cards',drag:'Arraste entre listas · Clique ou Enter para registrar',activity:'Atividade',status:'Status',date:'Data',record:'Salvar',cancel:'Cancelar',history:'Histórico',study:'Estudou',review:'Revisou',move:'Moveu',none:'Só status',labels:['A fazer','Fazendo','Pouco confortável','Muito confortável','Para revisar'],days:['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],qn:'{n} q',ago:'{n}d',todayShort:'hoje',examLegend:'Data da prova',demoConfirm:'Remover todas as atividades de exemplo? A posição dos cards e seus registros reais permanecem.',cleared:'Exemplos removidos',saved:'Registrado',undo:'Desfazer',undone:'Desfeito',exported:'Arquivo baixado',imported:'Backup importado',invalid:'Este arquivo não é um backup válido do PPL Flight Deck.',inactive:'Nenhum registro ainda.',already:'Já está nesta lista',nothing:'Nada a salvar — escolha uma atividade ou um novo status',example:'exemplo',del:'Apagar',deleted:'Registro apagado',fromFile:'Carregados os dados mais recentes salvos neste arquivo',never:'nunca registrado',openCard:'abrir card',palPh:'Registrar estudo — digite um tópico…',logged:'{t} — {k}'},
+ja:{activeLegend:'学習した日',vcLegend:'「十分理解」へ移動（名前）',sub:'FAA自家用操縦士 筆記試験 · 学習トラッカー',demo:'サンプルデータ',clear:'サンプルを削除',backup:'JSONバックアップ',import:'読み込み',save:'HTML保存',progress:'問題バンクの進捗',total:'全{n}問',today:'今日',wk:'週',wkTitle:'学習した週',streak:'日連続',exam:'試験までの日数',toGo:'日',since:'日経過（試験日から）',examToday:'試験当日 — 頑張って！',examShort:'試験',avg:'平均正答率',avgTip:'Sporty’sの加重平均正答率（目標85%以上）。カード移動では変わりません。',pace:'必要ペース',paceTip:'試験までに全トピックを「十分理解」にするための1日あたりの問題数',active:'学習した日',board:'カード一覧',drag:'ドラッグで移動 · クリック／Enterで記録',activity:'活動',status:'状態',date:'日付',record:'保存',cancel:'キャンセル',history:'履歴',study:'学習',review:'復習',move:'移動',none:'状態のみ',labels:['未着手','学習中','要強化','十分理解','要復習'],days:['月','火','水','木','金','土','日'],qn:'{n}問',ago:'{n}日前',todayShort:'今日',examLegend:'試験日',demoConfirm:'サンプルの活動をすべて削除しますか？カードの位置と実際の記録は残ります。',cleared:'サンプルを削除しました',saved:'記録しました',undo:'元に戻す',undone:'元に戻しました',exported:'ダウンロードしました',imported:'読み込みました',invalid:'有効なバックアップファイルではありません。',inactive:'記録はまだありません。',already:'すでにこのリストにあります',nothing:'保存する内容がありません — 活動か新しい状態を選んでください',example:'サンプル',del:'削除',deleted:'記録を削除しました',fromFile:'このファイルに保存された新しいデータを読み込みました',never:'未記録',openCard:'カードを開く',palPh:'学習を記録 — トピック名を入力…',logged:'{t} — {k}'}};
 
-Object.assign(I18N.en,{"tabDash": "Dashboard", "tabSR": "Spaced repetition", "srSub": "DEMO model · one forgetting curve per topic that reached Not Comfortable or Very Comfortable", "openAnalysis": "Full analysis →", "suggest": "Today's suggestions", "avgCurve": "All tracked topics · average", "hoverHint": "hover a card to preview it", "retention": "Recall now", "stability": "Stability", "sessions": "Sessions", "lastScore": "Last score", "dueAgo": "{n}d overdue", "dueToday": "due today", "dueIn": "in {n}d", "noHist": "no sessions yet", "noHistLong": "No scored sessions yet — log a study or review to start this curve.", "dueCount": "due", "avgRet": "average recall now", "trackedN": "topics tracked", "todayMark": "today", "dayN": "Day {n}", "lgRecall": "Recall", "lgProj": "Projection", "lgGhost": "If you stop reviewing", "lgExam": "Recall on exam day", "lgThresh": "Review at 90%", "howCalc": "How it is calculated", "fAll": "All", "fDue": "Due", "logReview": "Log a review", "openTopic": "Open its curve", "allClear": "Nothing tracked yet.", "scoreField": "Score this session (%)", "editScore": "Click to edit your latest score", "scoreSaved": "{t} — score {n}%", "formula": "<p>A simplified model inspired by FSRS / SM-2, built for this <b>demo</b>. It uses the score you log for each study or review session (or edit on the card). Moving a card is not a session.</p><pre>Recall after t days:     R(t) = 1 / (1 + t / (9·S))\nS (stability) = days until recall falls to 90%\n\nFirst session:           S = 1 day (score &lt; 70%) · 1.5 (70–84%) · 2 (≥ 85%)\nEach later session, score p, recall R at that moment:\n  p ≥ 70%   →  S ← S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  S ← S × 1.2\n  p &lt; 60%   →  S ← max(1, 0.4 × S)      (lapse)\n\nNext review  = last session + S days   (when R reaches 90%)\nPriority     = (1 − R_now + 0.05 × min(days overdue, 10))\n               × √questions × list weight × (1 + max(0, 85 − score)/100)\nList weight: Not Comfortable 1.4 · To review 1.3 · Very Comfortable 1.0</pre><p>Reviewing a little later, once recall has dropped, grows S more than reviewing right away — that is the spacing effect in the chart. The white line is the recall you would still have on exam day if you stopped reviewing at that point.</p>"});
-Object.assign(I18N.pt,{"tabDash": "Painel", "tabSR": "Repetição espaçada", "srSub": "Modelo DEMO · uma curva de esquecimento por tópico que chegou a Pouco ou Muito confortável", "openAnalysis": "Análise completa →", "suggest": "Sugestões do dia", "avgCurve": "Todos os tópicos acompanhados · média", "hoverHint": "passe o mouse num card para ver", "retention": "Retenção hoje", "stability": "Estabilidade", "sessions": "Sessões", "lastScore": "Última nota", "dueAgo": "{n}d atrasado", "dueToday": "revisar hoje", "dueIn": "em {n}d", "noHist": "sem sessões ainda", "noHistLong": "Nenhuma sessão com nota ainda — registre um estudo ou revisão para iniciar esta curva.", "dueCount": "para revisar", "avgRet": "retenção média hoje", "trackedN": "tópicos acompanhados", "todayMark": "hoje", "dayN": "Dia {n}", "lgRecall": "Retenção", "lgProj": "Projeção", "lgGhost": "Se parar de revisar", "lgExam": "Retenção no dia da prova", "lgThresh": "Revisar em 90%", "howCalc": "Como é calculado", "fAll": "Todos", "fDue": "Vencidos", "logReview": "Registrar revisão", "openTopic": "Abrir a curva", "allClear": "Nada acompanhado ainda.", "scoreField": "Nota desta sessão (%)", "editScore": "Clique para editar sua última nota", "scoreSaved": "{t} — nota {n}%", "formula": "<p>Modelo simplificado inspirado em FSRS / SM-2, feito para esta <b>demo</b>. Usa a nota registrada em cada sessão de estudo ou revisão (ou editada no card). Mover um card não conta como sessão.</p><pre>Retenção após t dias:    R(t) = 1 / (1 + t / (9·S))\nS (estabilidade) = dias até a retenção cair para 90%\n\nPrimeira sessão:         S = 1 dia (nota &lt; 70%) · 1,5 (70–84%) · 2 (≥ 85%)\nCada sessão seguinte, nota p, retenção R naquele momento:\n  p ≥ 70%   →  S ← S × (1 + 1,2 × p/100 × (1,5 − R))\n  60–69%    →  S ← S × 1,2\n  p &lt; 60%   →  S ← max(1; 0,4 × S)      (esquecimento)\n\nPróxima revisão = última sessão + S dias   (quando R chega a 90%)\nPrioridade      = (1 − R_hoje + 0,05 × min(dias de atraso; 10))\n                  × √questões × peso da lista × (1 + max(0; 85 − nota)/100)\nPeso: Pouco confortável 1,4 · Para revisar 1,3 · Muito confortável 1,0</pre><p>Revisar um pouco depois, quando a retenção já caiu, aumenta mais o S do que revisar logo em seguida — é o efeito de espaçamento no gráfico. A linha branca é a retenção que você ainda teria no dia da prova se parasse de revisar naquele ponto.</p>"});
-Object.assign(I18N.ja,{"tabDash": "ダッシュボード", "tabSR": "間隔反復", "srSub": "デモモデル · 「要強化」または「十分理解」に入ったトピックごとの忘却曲線", "openAnalysis": "詳細分析 →", "suggest": "今日のおすすめ", "avgCurve": "追跡中の全トピック · 平均", "hoverHint": "カードにマウスを乗せると表示", "retention": "現在の保持率", "stability": "安定度", "sessions": "セッション", "lastScore": "最新の正答率", "dueAgo": "{n}日超過", "dueToday": "今日が復習日", "dueIn": "{n}日後", "noHist": "セッションなし", "noHistLong": "正答率付きのセッションがまだありません — 学習か復習を記録すると曲線が始まります。", "dueCount": "件 要復習", "avgRet": "現在の平均保持率", "trackedN": "追跡中のトピック", "todayMark": "今日", "dayN": "{n}日目", "lgRecall": "保持率", "lgProj": "予測", "lgGhost": "復習をやめた場合", "lgExam": "試験当日の保持率", "lgThresh": "90%で復習", "howCalc": "計算方法", "fAll": "すべて", "fDue": "期限切れ・今日", "logReview": "復習を記録", "openTopic": "曲線を開く", "allClear": "まだ追跡中のトピックはありません。", "scoreField": "このセッションの正答率（%）", "editScore": "クリックして最新の正答率を編集", "scoreSaved": "{t} — 正答率 {n}%", "formula": "<p>このデモ用に作った、FSRS／SM-2を参考にした簡易モデルです。学習・復習ごとに記録した正答率（またはカード上で編集した値）を使います。カードの移動はセッションに数えません。</p><pre>t日後の記憶保持率:   R(t) = 1 / (1 + t / (9·S))\nS（安定度）= 保持率が90%まで下がるまでの日数\n\n初回:                S = 1日（70%未満）· 1.5（70–84%）· 2（85%以上）\n2回目以降（正答率p、その時点の保持率R）:\n  p ≥ 70%   →  S ← S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  S ← S × 1.2\n  p &lt; 60%   →  S ← max(1, 0.4 × S)     （忘却）\n\n次の復習 = 最終セッション + S日（Rが90%になる時点）\n優先度   = (1 − 今日のR + 0.05 × min(超過日数, 10))\n           × √問題数 × リスト重み × (1 + max(0, 85 − 正答率)/100)\n重み: 要強化 1.4 · 要復習 1.3 · 十分理解 1.0</pre><p>少し忘れかけた頃に復習すると、すぐに復習するよりSが大きく伸びます（間隔効果）。白い線は、その時点で復習をやめた場合の試験当日の保持率です。</p>"});
+Object.assign(I18N.en,{"tabDash": "Dashboard", "tabSR": "Spaced repetition", "srSub": "DEMO model · one forgetting curve per topic that reached Not Comfortable or Very Comfortable", "openAnalysis": "Full analysis →", "avgCurve": "All tracked topics · average", "hoverHint": "hover a card to preview it", "retention": "Recall now", "stability": "Stability", "sessions": "Sessions", "lastScore": "Last score", "dueAgo": "{n}d overdue", "dueToday": "due today", "dueIn": "in {n}d", "noHist": "no sessions yet", "noHistLong": "No scored sessions yet — log a study or review to start this curve.", "dueCount": "due", "avgRet": "average recall now", "trackedN": "topics tracked", "todayMark": "today", "dayN": "Day {n}", "lgRecall": "Recall", "lgProj": "Projection", "lgGhost": "If you stop reviewing", "lgExam": "Recall on exam day", "lgThresh": "Review at 90%", "howCalc": "How it is calculated", "fAll": "All", "fDue": "Due", "logReview": "Log a review", "allClear": "Nothing tracked yet.", "scoreField": "Score this session (%)", "editScore": "Click to edit your latest score", "scoreSaved": "{t} — score {n}%", "formula": "<p>A simplified model inspired by FSRS / SM-2, built for this <b>demo</b>. It uses the score you log for each study or review session (or edit on the card). Moving a card is not a session.</p><pre>Recall after t days:     R(t) = 1 / (1 + t / (9·S))\nS (stability) = days until recall falls to 90%\n\nFirst session:           S = 1 day (score &lt; 70%) · 1.5 (70–84%) · 2 (≥ 85%)\nEach later session, score p, recall R at that moment:\n  p ≥ 70%   →  S ← S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  S ← S × 1.2\n  p &lt; 60%   →  S ← max(1, 0.4 × S)      (lapse)\n\nNext review  = last session + S days   (when R reaches 90%)\nPriority     = (1 − R_now + 0.05 × min(days overdue, 10))\n               × √questions × list weight × (1 + max(0, 85 − score)/100)\nList weight: Not Comfortable 1.4 · To review 1.3 · Very Comfortable 1.0</pre><p>Reviewing a little later, once recall has dropped, grows S more than reviewing right away — that is the spacing effect in the chart. The white line is the recall you would still have on exam day if you stopped reviewing at that point.</p>"});
+Object.assign(I18N.pt,{"tabDash": "Painel", "tabSR": "Repetição espaçada", "srSub": "Modelo DEMO · uma curva de esquecimento por tópico que chegou a Pouco ou Muito confortável", "openAnalysis": "Análise completa →", "avgCurve": "Todos os tópicos acompanhados · média", "hoverHint": "passe o mouse num card para ver", "retention": "Retenção hoje", "stability": "Estabilidade", "sessions": "Sessões", "lastScore": "Última nota", "dueAgo": "{n}d atrasado", "dueToday": "revisar hoje", "dueIn": "em {n}d", "noHist": "sem sessões ainda", "noHistLong": "Nenhuma sessão com nota ainda — registre um estudo ou revisão para iniciar esta curva.", "dueCount": "para revisar", "avgRet": "retenção média hoje", "trackedN": "tópicos acompanhados", "todayMark": "hoje", "dayN": "Dia {n}", "lgRecall": "Retenção", "lgProj": "Projeção", "lgGhost": "Se parar de revisar", "lgExam": "Retenção no dia da prova", "lgThresh": "Revisar em 90%", "howCalc": "Como é calculado", "fAll": "Todos", "fDue": "Vencidos", "logReview": "Registrar revisão", "allClear": "Nada acompanhado ainda.", "scoreField": "Nota desta sessão (%)", "editScore": "Clique para editar sua última nota", "scoreSaved": "{t} — nota {n}%", "formula": "<p>Modelo simplificado inspirado em FSRS / SM-2, feito para esta <b>demo</b>. Usa a nota registrada em cada sessão de estudo ou revisão (ou editada no card). Mover um card não conta como sessão.</p><pre>Retenção após t dias:    R(t) = 1 / (1 + t / (9·S))\nS (estabilidade) = dias até a retenção cair para 90%\n\nPrimeira sessão:         S = 1 dia (nota &lt; 70%) · 1,5 (70–84%) · 2 (≥ 85%)\nCada sessão seguinte, nota p, retenção R naquele momento:\n  p ≥ 70%   →  S ← S × (1 + 1,2 × p/100 × (1,5 − R))\n  60–69%    →  S ← S × 1,2\n  p &lt; 60%   →  S ← max(1; 0,4 × S)      (esquecimento)\n\nPróxima revisão = última sessão + S dias   (quando R chega a 90%)\nPrioridade      = (1 − R_hoje + 0,05 × min(dias de atraso; 10))\n                  × √questões × peso da lista × (1 + max(0; 85 − nota)/100)\nPeso: Pouco confortável 1,4 · Para revisar 1,3 · Muito confortável 1,0</pre><p>Revisar um pouco depois, quando a retenção já caiu, aumenta mais o S do que revisar logo em seguida — é o efeito de espaçamento no gráfico. A linha branca é a retenção que você ainda teria no dia da prova se parasse de revisar naquele ponto.</p>"});
+Object.assign(I18N.ja,{"tabDash": "ダッシュボード", "tabSR": "間隔反復", "srSub": "デモモデル · 「要強化」または「十分理解」に入ったトピックごとの忘却曲線", "openAnalysis": "詳細分析 →", "avgCurve": "追跡中の全トピック · 平均", "hoverHint": "カードにマウスを乗せると表示", "retention": "現在の保持率", "stability": "安定度", "sessions": "セッション", "lastScore": "最新の正答率", "dueAgo": "{n}日超過", "dueToday": "今日が復習日", "dueIn": "{n}日後", "noHist": "セッションなし", "noHistLong": "正答率付きのセッションがまだありません — 学習か復習を記録すると曲線が始まります。", "dueCount": "件 要復習", "avgRet": "現在の平均保持率", "trackedN": "追跡中のトピック", "todayMark": "今日", "dayN": "{n}日目", "lgRecall": "保持率", "lgProj": "予測", "lgGhost": "復習をやめた場合", "lgExam": "試験当日の保持率", "lgThresh": "90%で復習", "howCalc": "計算方法", "fAll": "すべて", "fDue": "期限切れ・今日", "logReview": "復習を記録", "allClear": "まだ追跡中のトピックはありません。", "scoreField": "このセッションの正答率（%）", "editScore": "クリックして最新の正答率を編集", "scoreSaved": "{t} — 正答率 {n}%", "formula": "<p>このデモ用に作った、FSRS／SM-2を参考にした簡易モデルです。学習・復習ごとに記録した正答率（またはカード上で編集した値）を使います。カードの移動はセッションに数えません。</p><pre>t日後の記憶保持率:   R(t) = 1 / (1 + t / (9·S))\nS（安定度）= 保持率が90%まで下がるまでの日数\n\n初回:                S = 1日（70%未満）· 1.5（70–84%）· 2（85%以上）\n2回目以降（正答率p、その時点の保持率R）:\n  p ≥ 70%   →  S ← S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  S ← S × 1.2\n  p &lt; 60%   →  S ← max(1, 0.4 × S)     （忘却）\n\n次の復習 = 最終セッション + S日（Rが90%になる時点）\n優先度   = (1 − 今日のR + 0.05 × min(超過日数, 10))\n           × √問題数 × リスト重み × (1 + max(0, 85 − 正答率)/100)\n重み: 要強化 1.4 · 要復習 1.3 · 十分理解 1.0</pre><p>少し忘れかけた頃に復習すると、すぐに復習するよりSが大きく伸びます（間隔効果）。白い線は、その時点で復習をやめた場合の試験当日の保持率です。</p>"});
 
 Object.assign(I18N.en,{"practiceTest": "FAA practice test", "practiceTests": "Practice test (best)", "ptTip": "Last: {last} · {n} practice tests logged — click to add", "ptDesc": "60-question FAA practice test. Leave the score blank if it is still in progress.", "inProgress": "in progress", "blankInProgress": "blank = in progress"});
 Object.assign(I18N.pt,{"practiceTest": "Simulado FAA", "practiceTests": "Simulado (melhor)", "ptTip": "Último: {last} · {n} simulados registrados — clique para adicionar", "ptDesc": "Simulado FAA de 60 questões. Deixe a nota em branco se ainda estiver em andamento.", "inProgress": "em andamento", "blankInProgress": "vazio = em andamento"});
@@ -985,18 +985,18 @@ Object.assign(I18N.ja,{"backupShort": "JSON", "clearShort": "削除", "saveShort
 Object.assign(I18N.en,{"dayActive": "Active day", "dayEmpty": "No activity", "dayNone": "Nothing logged on this day.", "daySessions": "Study sessions", "dayVC": "to Very Comfortable", "dayMoves": "Other moves"});
 Object.assign(I18N.pt,{"dayActive": "Dia ativo", "dayEmpty": "Sem atividade", "dayNone": "Nada registrado neste dia.", "daySessions": "Sessões de estudo", "dayVC": "para Muito confortável", "dayMoves": "Outras movimentações"});
 Object.assign(I18N.ja,{"dayActive": "学習した日", "dayEmpty": "活動なし", "dayNone": "この日の記録はありません。", "daySessions": "学習セッション", "dayVC": "「十分理解」へ", "dayMoves": "その他の移動"});
-Object.assign(I18N.en,{"thisWeek": "This week", "questionsUnit": "questions", "past12": "Past 12 weeks", "volTitle": "Study volume", "volSub": "Questions answered per week (Monday–Sunday)", "r12": "12 weeks", "r26": "6 months", "rAll": "All", "weekAvg": "Weekly average", "bestWeek": "Best week", "totalQ": "Total questions", "weekOf": "Week of {d}", "volNote": "A finished study or review session counts all questions of that topic; a scored practice test counts its 60 questions. Sessions in progress and card moves count 0.", "avg": "Avg score", "pace": "Pace / day to finish"});
-Object.assign(I18N.pt,{"thisWeek": "Esta semana", "questionsUnit": "questões", "past12": "Últimas 12 semanas", "volTitle": "Volume de estudo", "volSub": "Questões respondidas por semana (segunda a domingo)", "r12": "12 semanas", "r26": "6 meses", "rAll": "Tudo", "weekAvg": "Média semanal", "bestWeek": "Melhor semana", "totalQ": "Total de questões", "weekOf": "Semana de {d}", "volNote": "Uma sessão de estudo ou revisão concluída conta todas as questões do tópico; um simulado com nota conta 60 questões. Sessões em andamento e movimentações contam 0.", "avg": "Média de acertos", "pace": "Ritmo / dia para concluir"});
-Object.assign(I18N.ja,{"thisWeek": "今週", "questionsUnit": "問", "past12": "過去12週間", "volTitle": "学習量", "volSub": "週ごとの解答数（月〜日）", "r12": "12週間", "r26": "6か月", "rAll": "すべて", "weekAvg": "週平均", "bestWeek": "最高の週", "totalQ": "合計問題数", "weekOf": "{d}の週", "volNote": "完了した学習・復習セッションはそのトピックの全問題数、正答率のある模擬試験は60問として数えます。進行中のセッションとカード移動は0です。", "avg": "平均正答率", "pace": "完了に必要な1日のペース"});
+Object.assign(I18N.en,{"thisWeek": "This week", "questionsUnit": "questions", "past12": "Past 12 weeks", "volTitle": "Study volume", "rAll": "All", "totalQ": "Total questions", "weekOf": "Week of {d}", "volNote": "A finished study or review session counts all questions of that topic; a scored practice test counts its 60 questions. Sessions in progress and card moves count 0.", "avg": "Avg score", "pace": "Pace / day to finish"});
+Object.assign(I18N.pt,{"thisWeek": "Esta semana", "questionsUnit": "questões", "past12": "Últimas 12 semanas", "volTitle": "Volume de estudo", "rAll": "Tudo", "totalQ": "Total de questões", "weekOf": "Semana de {d}", "volNote": "Uma sessão de estudo ou revisão concluída conta todas as questões do tópico; um simulado com nota conta 60 questões. Sessões em andamento e movimentações contam 0.", "avg": "Média de acertos", "pace": "Ritmo / dia para concluir"});
+Object.assign(I18N.ja,{"thisWeek": "今週", "questionsUnit": "問", "past12": "過去12週間", "volTitle": "学習量", "rAll": "すべて", "totalQ": "合計問題数", "weekOf": "{d}の週", "volNote": "完了した学習・復習セッションはそのトピックの全問題数、正答率のある模擬試験は60問として数えます。進行中のセッションとカード移動は0です。", "avg": "平均正答率", "pace": "完了に必要な1日のペース"});
 Object.assign(I18N.en,{"totalQ": "Total questions", "vsPrior": "vs. prior period", "volNote": "Counts questions from finished study/review sessions (the topic’s full question count) and scored practice tests (60). Sessions in progress and card moves count 0."});
 Object.assign(I18N.pt,{"totalQ": "Total de questões", "vsPrior": "vs. período anterior", "volNote": "Conta as questões das sessões de estudo/revisão concluídas (todas as questões do tópico) e dos simulados com nota (60). Sessões em andamento e movimentações contam 0."});
 Object.assign(I18N.ja,{"totalQ": "合計問題数", "vsPrior": "前の期間と比較", "volNote": "完了した学習・復習セッション（トピックの全問題数）と正答率のある模擬試験（60問）を数えます。進行中のセッションとカード移動は0です。"});
 Object.assign(I18N.en,{"lgDone": "Very Comfortable"});
 Object.assign(I18N.pt,{"lgDone": "Muito confortável"});
 Object.assign(I18N.ja,{"lgDone": "十分理解"});
-Object.assign(I18N.en,{"tabSR": "Statistics", "tabPlan": "Plan", "srLabel": "Spaced repetition", "fcTitle": "Exam forecast", "fcSub": "If the exam were today · 60 questions, weighted like the question bank", "fcMiniSub": "pass chance {p} · 85% chance {g}", "fcToday": "Expected score today", "fcPass": "Chance to pass (≥ 70%)", "fcGoal": "Chance of ≥ 85% (your goal)", "fcExamDay": "On exam day if you stop reviewing", "fcLine": "Forecast", "fcProj": "If you stop reviewing", "fcPassLine": "Pass 70%", "fcGoalLine": "Goal 85%", "fcLostTitle": "Where you lose the most questions", "fcFormula": "p(topic) = last score × recall now      (no score yet → 50%)\nweight(topic) = topic questions / 1,058\nexpected score μ = Σ weight × p\nright answers X ~ Binomial(60, μ)\nchance to pass = P(X ≥ 42)   ·   chance of 85% = P(X ≥ 51)\nLost questions (topic) = 60 × weight × (1 − p)", "planToday": "Today's plan", "planOpen": "Plan →", "planTitle": "Today's plan", "planQToday": "questions planned", "planDone": "done", "planPace": "new questions / day needed", "planFinal": "final week: reviews and practice tests only", "planNote": "Tap an item to log it. The plan is rebuilt from your history every day: overdue reviews first, then topics without data and weak topics, then new material.", "planSettings": "Your study time", "setMinutes": "Minutes per night", "setQph": "Questions per hour", "setTests": "Practice tests per week", "planCapTxt": "≈ {c} questions per night", "rs_due": "review", "rs_weak": "weak", "rs_new": "new", "rs_test": "test", "rs_nodata": "no data", "rs_extra": "extra", "reason_due": "Review due (spaced repetition)", "reason_weak": "Weak topic (< 70%)", "reason_new": "New material", "reason_test": "Practice test due", "reason_nodata": "No scored session yet", "reason_extra": "Studied today (not in plan)"});
-Object.assign(I18N.pt,{"tabSR": "Estatísticas", "tabPlan": "Plano", "srLabel": "Repetição espaçada", "fcTitle": "Previsão da prova", "fcSub": "Se a prova fosse hoje · 60 questões, com o mesmo peso do banco", "fcMiniSub": "chance de passar {p} · chance de 85% {g}", "fcToday": "Nota esperada hoje", "fcPass": "Chance de passar (≥ 70%)", "fcGoal": "Chance de ≥ 85% (sua meta)", "fcExamDay": "No dia da prova se parar de revisar", "fcLine": "Previsão", "fcProj": "Se parar de revisar", "fcPassLine": "Aprovação 70%", "fcGoalLine": "Meta 85%", "fcLostTitle": "Onde você perde mais questões", "fcFormula": "p(tópico) = última nota × retenção hoje      (sem nota → 50%)\npeso(tópico) = questões do tópico / 1.058\nnota esperada μ = Σ peso × p\nacertos X ~ Binomial(60, μ)\nchance de passar = P(X ≥ 42)   ·   chance de 85% = P(X ≥ 51)\nQuestões perdidas (tópico) = 60 × peso × (1 − p)", "planToday": "Plano de hoje", "planOpen": "Plano →", "planTitle": "Plano de hoje", "planQToday": "questões planejadas", "planDone": "feitas", "planPace": "questões novas / dia necessárias", "planFinal": "última semana: só revisões e simulados", "planNote": "Toque num item para registrar. O plano é refeito todo dia a partir do seu histórico: revisões vencidas primeiro, depois tópicos sem dados e fracos, depois matéria nova.", "planSettings": "Seu tempo de estudo", "setMinutes": "Minutos por noite", "setQph": "Questões por hora", "setTests": "Simulados por semana", "planCapTxt": "≈ {c} questões por noite", "rs_due": "revisão", "rs_weak": "fraco", "rs_new": "novo", "rs_test": "simulado", "rs_nodata": "sem dados", "rs_extra": "extra", "reason_due": "Revisão vencida (repetição espaçada)", "reason_weak": "Tópico fraco (< 70%)", "reason_new": "Matéria nova", "reason_test": "Simulado programado", "reason_nodata": "Ainda sem sessão com nota", "reason_extra": "Estudado hoje (fora do plano)"});
-Object.assign(I18N.ja,{"tabSR": "統計", "tabPlan": "プラン", "srLabel": "間隔反復", "fcTitle": "試験予測", "fcSub": "今日が試験なら · 問題バンクと同じ比率で60問", "fcMiniSub": "合格確率 {p} · 85%以上の確率 {g}", "fcToday": "今日の予想正答率", "fcPass": "合格確率（70%以上）", "fcGoal": "85%以上の確率（目標）", "fcExamDay": "復習をやめた場合の試験日", "fcLine": "予測", "fcProj": "復習をやめた場合", "fcPassLine": "合格 70%", "fcGoalLine": "目標 85%", "fcLostTitle": "失点が多いトピック", "fcFormula": "p(トピック) = 最新の正答率 × 現在の保持率   （正答率なし → 50%）\n重み = トピックの問題数 / 1,058\n予想正答率 μ = Σ 重み × p\n正解数 X ~ 二項分布(60, μ)\n合格確率 = P(X ≥ 42) · 85%以上 = P(X ≥ 51)\n失点（トピック）= 60 × 重み × (1 − p)", "planToday": "今日のプラン", "planOpen": "プラン →", "planTitle": "今日のプラン", "planQToday": "予定の問題数", "planDone": "完了", "planPace": "必要な新規問題/日", "planFinal": "最終週：復習と模擬試験のみ", "planNote": "項目をタップして記録。プランは毎日履歴から再計算されます：期限切れの復習、データなし・弱いトピック、新しい内容の順。", "planSettings": "学習時間", "setMinutes": "1晩の学習時間（分）", "setQph": "1時間あたりの問題数", "setTests": "週あたりの模擬試験", "planCapTxt": "1晩あたり約{c}問", "rs_due": "復習", "rs_weak": "弱点", "rs_new": "新規", "rs_test": "模試", "rs_nodata": "データなし", "rs_extra": "追加", "reason_due": "復習期限（間隔反復）", "reason_weak": "弱いトピック（70%未満）", "reason_new": "新しい内容", "reason_test": "模擬試験の予定", "reason_nodata": "正答率付きのセッションなし", "reason_extra": "今日学習（プラン外）"});
+Object.assign(I18N.en,{"tabSR": "Statistics", "tabPlan": "Plan", "srLabel": "Spaced repetition", "fcTitle": "Exam forecast", "fcMiniSub": "pass chance {p} · 85% chance {g}", "fcToday": "Expected score today", "fcPass": "Chance to pass (≥ 70%)", "fcGoal": "Chance of ≥ 85% (your goal)", "fcExamDay": "On exam day if you stop reviewing", "fcLine": "Forecast", "fcProj": "If you stop reviewing", "fcPassLine": "Pass 70%", "fcGoalLine": "Goal 85%", "fcLostTitle": "Where you lose the most questions", "fcFormula": "p(topic) = last score × recall now      (no score yet → 50%)\nweight(topic) = topic questions / 1,058\nexpected score μ = Σ weight × p\nright answers X ~ Binomial(60, μ)\nchance to pass = P(X ≥ 42)   ·   chance of 85% = P(X ≥ 51)\nLost questions (topic) = 60 × weight × (1 − p)", "planToday": "Today's plan", "planOpen": "Plan →", "planTitle": "Today's plan", "planQToday": "questions planned", "planDone": "done", "planPace": "new questions / day needed", "planFinal": "final week: reviews and practice tests only", "planNote": "Tap an item to log it. The plan is rebuilt from your history every day: overdue reviews first, then topics without data and weak topics, then new material.", "planSettings": "Your study time", "setMinutes": "Minutes per night", "setQph": "Questions per hour", "setTests": "Practice tests per week", "planCapTxt": "≈ {c} questions per night", "rs_due": "review", "rs_weak": "weak", "rs_new": "new", "rs_test": "test", "rs_nodata": "no data", "rs_extra": "extra", "reason_due": "Review due (spaced repetition)", "reason_weak": "Weak topic (< 70%)", "reason_new": "New material", "reason_test": "Practice test due", "reason_nodata": "No scored session yet", "reason_extra": "Studied today (not in plan)"});
+Object.assign(I18N.pt,{"tabSR": "Estatísticas", "tabPlan": "Plano", "srLabel": "Repetição espaçada", "fcTitle": "Previsão da prova", "fcMiniSub": "chance de passar {p} · chance de 85% {g}", "fcToday": "Nota esperada hoje", "fcPass": "Chance de passar (≥ 70%)", "fcGoal": "Chance de ≥ 85% (sua meta)", "fcExamDay": "No dia da prova se parar de revisar", "fcLine": "Previsão", "fcProj": "Se parar de revisar", "fcPassLine": "Aprovação 70%", "fcGoalLine": "Meta 85%", "fcLostTitle": "Onde você perde mais questões", "fcFormula": "p(tópico) = última nota × retenção hoje      (sem nota → 50%)\npeso(tópico) = questões do tópico / 1.058\nnota esperada μ = Σ peso × p\nacertos X ~ Binomial(60, μ)\nchance de passar = P(X ≥ 42)   ·   chance de 85% = P(X ≥ 51)\nQuestões perdidas (tópico) = 60 × peso × (1 − p)", "planToday": "Plano de hoje", "planOpen": "Plano →", "planTitle": "Plano de hoje", "planQToday": "questões planejadas", "planDone": "feitas", "planPace": "questões novas / dia necessárias", "planFinal": "última semana: só revisões e simulados", "planNote": "Toque num item para registrar. O plano é refeito todo dia a partir do seu histórico: revisões vencidas primeiro, depois tópicos sem dados e fracos, depois matéria nova.", "planSettings": "Seu tempo de estudo", "setMinutes": "Minutos por noite", "setQph": "Questões por hora", "setTests": "Simulados por semana", "planCapTxt": "≈ {c} questões por noite", "rs_due": "revisão", "rs_weak": "fraco", "rs_new": "novo", "rs_test": "simulado", "rs_nodata": "sem dados", "rs_extra": "extra", "reason_due": "Revisão vencida (repetição espaçada)", "reason_weak": "Tópico fraco (< 70%)", "reason_new": "Matéria nova", "reason_test": "Simulado programado", "reason_nodata": "Ainda sem sessão com nota", "reason_extra": "Estudado hoje (fora do plano)"});
+Object.assign(I18N.ja,{"tabSR": "統計", "tabPlan": "プラン", "srLabel": "間隔反復", "fcTitle": "試験予測", "fcMiniSub": "合格確率 {p} · 85%以上の確率 {g}", "fcToday": "今日の予想正答率", "fcPass": "合格確率（70%以上）", "fcGoal": "85%以上の確率（目標）", "fcExamDay": "復習をやめた場合の試験日", "fcLine": "予測", "fcProj": "復習をやめた場合", "fcPassLine": "合格 70%", "fcGoalLine": "目標 85%", "fcLostTitle": "失点が多いトピック", "fcFormula": "p(トピック) = 最新の正答率 × 現在の保持率   （正答率なし → 50%）\n重み = トピックの問題数 / 1,058\n予想正答率 μ = Σ 重み × p\n正解数 X ~ 二項分布(60, μ)\n合格確率 = P(X ≥ 42) · 85%以上 = P(X ≥ 51)\n失点（トピック）= 60 × 重み × (1 − p)", "planToday": "今日のプラン", "planOpen": "プラン →", "planTitle": "今日のプラン", "planQToday": "予定の問題数", "planDone": "完了", "planPace": "必要な新規問題/日", "planFinal": "最終週：復習と模擬試験のみ", "planNote": "項目をタップして記録。プランは毎日履歴から再計算されます：期限切れの復習、データなし・弱いトピック、新しい内容の順。", "planSettings": "学習時間", "setMinutes": "1晩の学習時間（分）", "setQph": "1時間あたりの問題数", "setTests": "週あたりの模擬試験", "planCapTxt": "1晩あたり約{c}問", "rs_due": "復習", "rs_weak": "弱点", "rs_new": "新規", "rs_test": "模試", "rs_nodata": "データなし", "rs_extra": "追加", "reason_due": "復習期限（間隔反復）", "reason_weak": "弱いトピック（70%未満）", "reason_new": "新しい内容", "reason_test": "模擬試験の予定", "reason_nodata": "正答率付きのセッションなし", "reason_extra": "今日学習（プラン外）"});
 Object.assign(I18N.en,{"planCalc": "Calculate plan", "planCapNew": "≈ {c} questions per night — press Calculate to update the plan", "planUpdated": "Plan updated"});
 Object.assign(I18N.pt,{"planCalc": "Calcular plano", "planCapNew": "≈ {c} questões por noite — clique em Calcular para atualizar o plano", "planUpdated": "Plano atualizado"});
 Object.assign(I18N.ja,{"planCalc": "プランを計算", "planCapNew": "1晩あたり約{c}問 — 「計算」でプランを更新", "planUpdated": "プランを更新しました"});
@@ -1006,9 +1006,12 @@ Object.assign(I18N.ja,{"planMinOf": "予定 / {b}", "planCapTxt": "{m}で約{c}�
 Object.assign(I18N.en,{"en_low": "Low energy", "en_medium": "Medium", "en_high": "High energy", "workload": "Workload", "rs_light": "light", "reason_light": "Light review of a topic you know"});
 Object.assign(I18N.pt,{"en_low": "Pouca energia", "en_medium": "Média", "en_high": "Muita energia", "workload": "Carga", "rs_light": "leve", "reason_light": "Revisão leve de um tópico que você domina"});
 Object.assign(I18N.ja,{"en_low": "低エネルギー", "en_medium": "普通", "en_high": "高エネルギー", "workload": "負荷", "rs_light": "軽め", "reason_light": "得意なトピックの軽い復習"});
-Object.assign(I18N.en,{"ffTitle":"Exam forecast from practice tests","ffSub":"average of your last 3 tests · 60 questions","ffLast":"Last","ffAvg3":"Avg 3","ffExam":"Exam day","ffPassed":"tests passed (≥ 70%)","ffConsist":"consistency, std dev of last {n} (pp)","ffTrendNote":"Trend {w} pp/week → about {e}% on exam day if it continues.","ppTitle":"Practice test","ppAdd":"+ Add to today’s plan","ppRemove":"Remove from today’s plan","ppInPlan":"Already in today’s plan","ppLog":"Log a practice test","ppLast":"last: {d} · {s}%","reason_testManual":"Added by you","rs_testManual":"test","ffModel":"Bank","ffTests":"Tests","ffBlendNote":"question-bank model + practice tests (tests weight {w}%)","ffRange":"expected correct · 90% range {a}–{b}","tsOffShort":"Next: off","tsNextShortToday":"Next: today","tsNextShortIn":"Next: in {n} d","calLink":"Learn about the model’s accuracy →","calHelp":"Each dot is one practice test: x = what the question-bank model predicted that day, y = what you actually scored. Dots on the dashed diagonal mean the model was exact; above it, you did better than predicted. R² tells how well a straight line explains the dots (1 = perfectly).","distMean":"Mean","distSd":"Std dev","distRange":"Range","fcTopDesc":"Overall {s}% · pass {p}% · 85% {g}% — these 3 topics cost you the most questions on a 60-question exam","calPerfect":"Perfect model (predicted = real)","calFit":"Fitted line","tabTests": "Tests", "tabTestsLong": "Practice tests", "tsSub": "FAA practice tests · always 60 questions", "tsAdd": "+ Log practice test", "tsLastLbl": "last", "tsBest": "Best", "tsAvg3": "Avg last 3", "ts70": "tests ≥ 70%", "ts85": "tests ≥ 85%", "tsFew": "Log {n} more scored practice tests to see the trend", "tsCons": "consistent progress", "tsMod": "moderate", "tsNoisy": "scores jump around", "tsCross": "reaches 85% on {d}", "tsAlready": "already above 85%", "tsNever": "not on track to reach 85% before the exam", "tsExam": "≈ {s}% on exam day", "tsNextToday": "Next practice test: today", "tsNextIn": "Next practice test: in {n} d", "tsOff": "Practice tests not scheduled (every 0 days)", "tsNone": "No scored practice tests yet.", "tsAll": "All practice tests", "tsFull": "Full statistics →", "tsOpen": "Practice tests →", "edit": "Edit", "statBank": "Question bank", "statTests": "Practice tests", "ovTitle": "Overall score", "ovSub": "Question-bank model combined with your recent practice tests", "ovScore": "Overall expected score", "ovModel": "Question-bank model alone", "ovWeights": "Practice tests {t}% (last {n}, weight {w}%) · Question-bank model {m}% (weight {mw}%)", "ovNoTests": "No scored practice tests yet — the overall score is the question-bank model.", "trendTitle": "Practice-test trend", "trendSub": "Linear regression of your scores over time", "calTitle": "Does the model get it right?", "calSub": "Question-bank forecast on each test day vs. the score you got", "calFew": "Calibration needs 5 scored tests (you have {n})", "calBias": "real − predicted: {b} pp on average", "calOk": "calibrated forecast ≈ {c}%", "calBad": "R² below 0.3 — not reliable enough to correct the forecast", "calPredicted": "predicted", "calReal": "real", "calAxis": "x: predicted · y: real", "distTitle": "Score histogram", "gapTxt": "On average one test every {d} days", "lgScore": "Score", "lgTrend": "Trend", "lgTrendP": "Projection", "lgBand": "± 1 standard error", "setTests": "Practice test every N days (0 = off)", "reason_test": "Practice test due (every N days)", "reason_testIdle": "3+ days without studying — a test shows what slipped", "reason_testRecall": "Recall below 85% or many reviews due", "reason_testFinal": "Final 10 days: a test every 2 days", "rs_testIdle": "test", "rs_testRecall": "test", "rs_testFinal": "test", "regFormula": "Overall = (1 − w) × model + w × average of last 3 tests,   w = n ÷ (n + 2)\nTrend: score = a + b × day (least squares)\n  b = Σ(x − x̄)(y − ȳ) ÷ Σ(x − x̄)²,   a = ȳ − b·x̄\n  R² = 1 − Σ(y − ŷ)² ÷ Σ(y − ȳ)²\n  band = ± se·√(1 + 1/n + (x − x̄)² ÷ Σ(x − x̄)²)\nCalibration: real = α + β × model (from 5 tests, R² ≥ 0.3)"});
-Object.assign(I18N.pt,{"ffTitle":"Previsão da prova pelos simulados","ffSub":"média dos seus últimos 3 simulados · 60 questões","ffLast":"Último","ffAvg3":"Média 3","ffExam":"Dia da prova","ffPassed":"simulados aprovados (≥ 70%)","ffConsist":"consistência, desvio padrão dos últimos {n} (pp)","ffTrendNote":"Tendência {w} pp/semana → cerca de {e}% no dia da prova se continuar.","ppTitle":"Simulado","ppAdd":"+ Adicionar ao plano de hoje","ppRemove":"Tirar do plano de hoje","ppInPlan":"Já está no plano de hoje","ppLog":"Registrar simulado","ppLast":"último: {d} · {s}%","reason_testManual":"Adicionado por você","rs_testManual":"simulado","ffModel":"Banco","ffTests":"Simulados","ffBlendNote":"modelo do banco + simulados (peso dos simulados {w}%)","ffRange":"acertos esperados · faixa de 90% {a}–{b}","tsOffShort":"Próximo: desligado","tsNextShortToday":"Próximo: hoje","tsNextShortIn":"Próximo: em {n} d","calLink":"Saiba mais sobre a acurácia do modelo →","calHelp":"Cada ponto é um simulado: x = o que o modelo do banco de questões previu naquele dia, y = a nota que você tirou. Pontos na diagonal tracejada = modelo exato; acima dela, você foi melhor que o previsto. O R² diz o quanto uma reta explica os pontos (1 = perfeitamente).","distMean":"Média","distSd":"Desvio padrão","distRange":"Faixa","fcTopDesc":"Nota geral {s}% · passar {p}% · 85% {g}% — estes 3 tópicos custam mais questões numa prova de 60","calPerfect":"Modelo perfeito (previsto = real)","calFit":"Reta ajustada","tabTests": "Simulados", "tabTestsLong": "Simulados", "tsSub": "Simulados FAA · sempre 60 questões", "tsAdd": "+ Registrar simulado", "tsLastLbl": "último", "tsBest": "Melhor", "tsAvg3": "Média últimos 3", "ts70": "simulados ≥ 70%", "ts85": "simulados ≥ 85%", "tsFew": "Registre mais {n} simulados com nota para ver a tendência", "tsCons": "progresso consistente", "tsMod": "moderado", "tsNoisy": "notas oscilando", "tsCross": "chega a 85% em {d}", "tsAlready": "já acima de 85%", "tsNever": "no ritmo atual não chega a 85% antes da prova", "tsExam": "≈ {s}% no dia da prova", "tsNextToday": "Próximo simulado: hoje", "tsNextIn": "Próximo simulado: em {n} d", "tsOff": "Simulados não agendados (a cada 0 dias)", "tsNone": "Nenhum simulado com nota ainda.", "tsAll": "Todos os simulados", "tsFull": "Estatísticas completas →", "tsOpen": "Simulados →", "edit": "Editar", "statBank": "Banco de questões", "statTests": "Simulados", "ovTitle": "Nota geral", "ovSub": "Modelo do banco de questões combinado com seus simulados recentes", "ovScore": "Nota geral esperada", "ovModel": "Só o modelo do banco", "ovWeights": "Simulados {t}% (últimos {n}, peso {w}%) · Modelo do banco {m}% (peso {mw}%)", "ovNoTests": "Nenhum simulado com nota ainda — a nota geral é o modelo do banco.", "trendTitle": "Tendência dos simulados", "trendSub": "Regressão linear das suas notas ao longo do tempo", "calTitle": "O modelo acerta?", "calSub": "Previsão do banco no dia de cada simulado × a nota que você tirou", "calFew": "A calibração precisa de 5 simulados com nota (você tem {n})", "calBias": "real − previsto: {b} pp em média", "calOk": "previsão calibrada ≈ {c}%", "calBad": "R² abaixo de 0,3 — não confiável para corrigir a previsão", "calPredicted": "previsto", "calReal": "real", "calAxis": "x: previsto · y: real", "distTitle": "Histograma das notas", "gapTxt": "Em média um simulado a cada {d} dias", "lgScore": "Nota", "lgTrend": "Tendência", "lgTrendP": "Projeção", "lgBand": "± 1 erro padrão", "setTests": "Simulado a cada N dias (0 = desligado)", "reason_test": "Simulado na vez (a cada N dias)", "reason_testIdle": "3+ dias sem estudar — um simulado mostra o que caiu", "reason_testRecall": "Retenção abaixo de 85% ou muitas revisões vencidas", "reason_testFinal": "Últimos 10 dias: simulado a cada 2 dias", "rs_testIdle": "simulado", "rs_testRecall": "simulado", "rs_testFinal": "simulado", "regFormula": "Nota geral = (1 − w) × modelo + w × média dos últimos 3 simulados,   w = n ÷ (n + 2)\nTendência: nota = a + b × dia (mínimos quadrados)\n  b = Σ(x − x̄)(y − ȳ) ÷ Σ(x − x̄)²,   a = ȳ − b·x̄\n  R² = 1 − Σ(y − ŷ)² ÷ Σ(y − ȳ)²\n  faixa = ± se·√(1 + 1/n + (x − x̄)² ÷ Σ(x − x̄)²)\nCalibração: real = α + β × modelo (a partir de 5 simulados, R² ≥ 0,3)"});
-Object.assign(I18N.ja,{"ffTitle":"模試からの試験予測","ffSub":"直近3回の模試の平均 · 60問","ffLast":"最新","ffAvg3":"3回平均","ffExam":"試験日","ffPassed":"合格した模試（70%以上）","ffConsist":"安定度：直近{n}回の標準偏差（pp）","ffTrendNote":"傾向 {w} pp/週 → このままなら試験日に約{e}%。","ppTitle":"模擬試験","ppAdd":"＋ 今日の計画に追加","ppRemove":"今日の計画から外す","ppInPlan":"今日の計画に入っています","ppLog":"模試を記録","ppLast":"前回：{d} · {s}%","reason_testManual":"自分で追加","rs_testManual":"模試","ffModel":"バンク","ffTests":"模試","ffBlendNote":"問題バンクのモデル＋模試（模試の重み{w}%）","ffRange":"予想正答数 · 90%範囲 {a}–{b}","tsOffShort":"次回：なし","tsNextShortToday":"次回：今日","tsNextShortIn":"次回：{n}日後","calLink":"モデルの精度について →","calHelp":"各点は1回の模試です。x＝その日の問題バンクモデルの予測、y＝実際の正答率。点線の対角線上ならモデルが正確、上なら予測より良い結果。R²は直線が点をどれだけ説明できるか（1＝完全）。","distMean":"平均","distSd":"標準偏差","distRange":"範囲","fcTopDesc":"総合 {s}% · 合格 {p}% · 85% {g}% — 60問の試験で最も失点が多い3トピック","calPerfect":"完全なモデル（予測＝実際）","calFit":"回帰直線","tabTests": "模試", "tabTestsLong": "模擬試験", "tsSub": "FAA模擬試験 · 常に60問", "tsAdd": "＋ 模擬試験を記録", "tsLastLbl": "最新", "tsBest": "最高", "tsAvg3": "直近3回平均", "ts70": "70%以上の回数", "ts85": "85%以上の回数", "tsFew": "傾向を見るには正答率付きの模試をあと{n}回記録", "tsCons": "安定した伸び", "tsMod": "普通", "tsNoisy": "ばらつき大", "tsCross": "{d}に85%到達", "tsAlready": "すでに85%以上", "tsNever": "このペースでは試験前に85%に届かない", "tsExam": "試験日 約{s}%", "tsNextToday": "次の模試：今日", "tsNextIn": "次の模試：{n}日後", "tsOff": "模試の予定なし（0日ごと）", "tsNone": "正答率付きの模試はまだありません。", "tsAll": "すべての模試", "tsFull": "詳しい統計 →", "tsOpen": "模試 →", "edit": "編集", "statBank": "問題バンク", "statTests": "模擬試験", "ovTitle": "総合スコア", "ovSub": "問題バンクのモデルと最近の模試の組み合わせ", "ovScore": "総合予想正答率", "ovModel": "問題バンクのモデルのみ", "ovWeights": "模試 {t}%（直近{n}回、重み{w}%）· 問題バンク {m}%（重み{mw}%）", "ovNoTests": "正答率付きの模試がまだないため、総合スコア＝問題バンクのモデル。", "trendTitle": "模試の傾向", "trendSub": "正答率の線形回帰", "calTitle": "モデルは当たっている？", "calSub": "各模試の日の予測と実際の正答率", "calFew": "補正には正答率付きの模試が5回必要（現在{n}回）", "calBias": "実際 − 予測：平均 {b} pp", "calOk": "補正後の予測 約{c}%", "calBad": "R²が0.3未満 — 補正には不十分", "calPredicted": "予測", "calReal": "実際", "calAxis": "x：予測 · y：実際", "distTitle": "正答率のヒストグラム", "gapTxt": "平均{d}日ごとに1回", "lgScore": "正答率", "lgTrend": "傾向", "lgTrendP": "予測", "lgBand": "±1標準誤差", "setTests": "模試の間隔（日、0＝オフ）", "reason_test": "模試の予定（N日ごと）", "reason_testIdle": "3日以上学習なし — 模試で弱点を確認", "reason_testRecall": "保持率85%未満または復習が多い", "reason_testFinal": "最後の10日：2日ごとに模試", "rs_testIdle": "模試", "rs_testRecall": "模試", "rs_testFinal": "模試", "regFormula": "総合 = (1 − w) × モデル + w × 直近3回の模試平均,   w = n ÷ (n + 2)\n傾向：正答率 = a + b × 日（最小二乗法）\n  b = Σ(x − x̄)(y − ȳ) ÷ Σ(x − x̄)²,   a = ȳ − b·x̄\n  R² = 1 − Σ(y − ŷ)² ÷ Σ(y − ȳ)²\n  帯 = ± se·√(1 + 1/n + (x − x̄)² ÷ Σ(x − x̄)²)\n補正：実際 = α + β × モデル（5回以上、R² ≥ 0.3）"});
+Object.assign(I18N.en,{"ffTitle":"Exam forecast from practice tests","ffSub":"average of your last 3 tests · 60 questions","ffLast":"Last","ffAvg3":"Avg 3","ffExam":"Exam day","ffPassed":"tests passed (≥ 70%)","ffConsist":"consistency, std dev of last {n} (pp)","ffTrendNote":"Trend {w} pp/week → about {e}% on exam day if it continues.","ppTitle":"Practice test","ppAdd":"+ Add to today’s plan","ppRemove":"Remove from today’s plan","ppInPlan":"Already in today’s plan","ppLog":"Log a practice test","ppLast":"last: {d} · {s}%","reason_testManual":"Added by you","rs_testManual":"test","tsOffShort":"Next: off","tsNextShortToday":"Next: today","tsNextShortIn":"Next: in {n} d","calLink":"Learn about the model’s accuracy →","calHelp":"Each dot is one practice test: x = what the question-bank model predicted that day, y = what you actually scored. Dots on the dashed diagonal mean the model was exact; above it, you did better than predicted. R² tells how well a straight line explains the dots (1 = perfectly).","distMean":"Mean","distSd":"Std dev","distRange":"Range","fcTopDesc":"Overall {s}% · pass {p}% · 85% {g}% — these 3 topics cost you the most questions on a 60-question exam","calPerfect":"Perfect model (predicted = real)","calFit":"Fitted line","tabTests": "Tests", "tabTestsLong": "Practice tests", "tsSub": "FAA practice tests · always 60 questions", "tsAdd": "+ Log practice test", "tsLastLbl": "last", "tsBest": "Best", "tsAvg3": "Avg last 3", "ts70": "tests ≥ 70%", "ts85": "tests ≥ 85%", "tsFew": "Log {n} more scored practice tests to see the trend", "tsCons": "consistent progress", "tsMod": "moderate", "tsNoisy": "scores jump around", "tsCross": "reaches 85% on {d}", "tsAlready": "already above 85%", "tsNever": "not on track to reach 85% before the exam", "tsExam": "≈ {s}% on exam day", "tsNextToday": "Next practice test: today", "tsNextIn": "Next practice test: in {n} d", "tsOff": "Practice tests not scheduled (every 0 days)", "tsNone": "No scored practice tests yet.", "tsAll": "All practice tests", "tsFull": "Full statistics →", "tsOpen": "Practice tests →", "edit": "Edit", "statBank": "Question bank", "statTests": "Practice tests", "ovTitle": "Overall score", "ovSub": "Question-bank model combined with your recent practice tests", "ovScore": "Overall expected score", "ovModel": "Question-bank model alone", "ovWeights": "Practice tests {t}% (last {n}, weight {w}%) · Question-bank model {m}% (weight {mw}%)", "ovNoTests": "No scored practice tests yet — the overall score is the question-bank model.", "trendTitle": "Practice-test trend", "trendSub": "Linear regression of your scores over time", "calTitle": "Does the model get it right?", "calSub": "Question-bank forecast on each test day vs. the score you got", "calFew": "Calibration needs 5 scored tests (you have {n})", "calBias": "real − predicted: {b} pp on average", "calOk": "calibrated forecast ≈ {c}%", "calBad": "R² below 0.3 — not reliable enough to correct the forecast", "calPredicted": "predicted", "calReal": "real", "calAxis": "x: predicted · y: real", "distTitle": "Score histogram", "gapTxt": "On average one test every {d} days", "lgScore": "Score", "lgTrend": "Trend", "lgTrendP": "Projection", "lgBand": "± 1 standard error", "setTests": "Practice test every N days (0 = off)", "reason_test": "Practice test due (every N days)", "reason_testIdle": "3+ days without studying — a test shows what slipped", "reason_testRecall": "Recall below 85% or many reviews due", "reason_testFinal": "Final 10 days: a test every 2 days", "rs_testIdle": "test", "rs_testRecall": "test", "rs_testFinal": "test", "regFormula": "Overall = (1 − w) × model + w × average of last 3 tests,   w = n ÷ (n + 2)\nTrend: score = a + b × day (least squares); after the last test the gain slows: b × 14 × (1 − e^(−days/14))\n  b = Σ(x − x̄)(y − ȳ) ÷ Σ(x − x̄)²,   a = ȳ − b·x̄\n  R² = 1 − Σ(y − ŷ)² ÷ Σ(y − ȳ)²\n  band = ± se·√(1 + 1/n + (x − x̄)² ÷ Σ(x − x̄)²)\nCalibration: real = α + β × model (from 5 tests, R² ≥ 0.3)"});
+Object.assign(I18N.pt,{"ffTitle":"Previsão da prova pelos simulados","ffSub":"média dos seus últimos 3 simulados · 60 questões","ffLast":"Último","ffAvg3":"Média 3","ffExam":"Dia da prova","ffPassed":"simulados aprovados (≥ 70%)","ffConsist":"consistência, desvio padrão dos últimos {n} (pp)","ffTrendNote":"Tendência {w} pp/semana → cerca de {e}% no dia da prova se continuar.","ppTitle":"Simulado","ppAdd":"+ Adicionar ao plano de hoje","ppRemove":"Tirar do plano de hoje","ppInPlan":"Já está no plano de hoje","ppLog":"Registrar simulado","ppLast":"último: {d} · {s}%","reason_testManual":"Adicionado por você","rs_testManual":"simulado","tsOffShort":"Próximo: desligado","tsNextShortToday":"Próximo: hoje","tsNextShortIn":"Próximo: em {n} d","calLink":"Saiba mais sobre a acurácia do modelo →","calHelp":"Cada ponto é um simulado: x = o que o modelo do banco de questões previu naquele dia, y = a nota que você tirou. Pontos na diagonal tracejada = modelo exato; acima dela, você foi melhor que o previsto. O R² diz o quanto uma reta explica os pontos (1 = perfeitamente).","distMean":"Média","distSd":"Desvio padrão","distRange":"Faixa","fcTopDesc":"Nota geral {s}% · passar {p}% · 85% {g}% — estes 3 tópicos custam mais questões numa prova de 60","calPerfect":"Modelo perfeito (previsto = real)","calFit":"Reta ajustada","tabTests": "Simulados", "tabTestsLong": "Simulados", "tsSub": "Simulados FAA · sempre 60 questões", "tsAdd": "+ Registrar simulado", "tsLastLbl": "último", "tsBest": "Melhor", "tsAvg3": "Média últimos 3", "ts70": "simulados ≥ 70%", "ts85": "simulados ≥ 85%", "tsFew": "Registre mais {n} simulados com nota para ver a tendência", "tsCons": "progresso consistente", "tsMod": "moderado", "tsNoisy": "notas oscilando", "tsCross": "chega a 85% em {d}", "tsAlready": "já acima de 85%", "tsNever": "no ritmo atual não chega a 85% antes da prova", "tsExam": "≈ {s}% no dia da prova", "tsNextToday": "Próximo simulado: hoje", "tsNextIn": "Próximo simulado: em {n} d", "tsOff": "Simulados não agendados (a cada 0 dias)", "tsNone": "Nenhum simulado com nota ainda.", "tsAll": "Todos os simulados", "tsFull": "Estatísticas completas →", "tsOpen": "Simulados →", "edit": "Editar", "statBank": "Banco de questões", "statTests": "Simulados", "ovTitle": "Nota geral", "ovSub": "Modelo do banco de questões combinado com seus simulados recentes", "ovScore": "Nota geral esperada", "ovModel": "Só o modelo do banco", "ovWeights": "Simulados {t}% (últimos {n}, peso {w}%) · Modelo do banco {m}% (peso {mw}%)", "ovNoTests": "Nenhum simulado com nota ainda — a nota geral é o modelo do banco.", "trendTitle": "Tendência dos simulados", "trendSub": "Regressão linear das suas notas ao longo do tempo", "calTitle": "O modelo acerta?", "calSub": "Previsão do banco no dia de cada simulado × a nota que você tirou", "calFew": "A calibração precisa de 5 simulados com nota (você tem {n})", "calBias": "real − previsto: {b} pp em média", "calOk": "previsão calibrada ≈ {c}%", "calBad": "R² abaixo de 0,3 — não confiável para corrigir a previsão", "calPredicted": "previsto", "calReal": "real", "calAxis": "x: previsto · y: real", "distTitle": "Histograma das notas", "gapTxt": "Em média um simulado a cada {d} dias", "lgScore": "Nota", "lgTrend": "Tendência", "lgTrendP": "Projeção", "lgBand": "± 1 erro padrão", "setTests": "Simulado a cada N dias (0 = desligado)", "reason_test": "Simulado na vez (a cada N dias)", "reason_testIdle": "3+ dias sem estudar — um simulado mostra o que caiu", "reason_testRecall": "Retenção abaixo de 85% ou muitas revisões vencidas", "reason_testFinal": "Últimos 10 dias: simulado a cada 2 dias", "rs_testIdle": "simulado", "rs_testRecall": "simulado", "rs_testFinal": "simulado", "regFormula": "Nota geral = (1 − w) × modelo + w × média dos últimos 3 simulados,   w = n ÷ (n + 2)\nTendência: nota = a + b × dia (mínimos quadrados)\n  b = Σ(x − x̄)(y − ȳ) ÷ Σ(x − x̄)²,   a = ȳ − b·x̄\n  R² = 1 − Σ(y − ŷ)² ÷ Σ(y − ȳ)²\n  faixa = ± se·√(1 + 1/n + (x − x̄)² ÷ Σ(x − x̄)²)\nCalibração: real = α + β × modelo (a partir de 5 simulados, R² ≥ 0,3)"});
+Object.assign(I18N.ja,{"ffTitle":"模試からの試験予測","ffSub":"直近3回の模試の平均 · 60問","ffLast":"最新","ffAvg3":"3回平均","ffExam":"試験日","ffPassed":"合格した模試（70%以上）","ffConsist":"安定度：直近{n}回の標準偏差（pp）","ffTrendNote":"傾向 {w} pp/週 → このままなら試験日に約{e}%。","ppTitle":"模擬試験","ppAdd":"＋ 今日の計画に追加","ppRemove":"今日の計画から外す","ppInPlan":"今日の計画に入っています","ppLog":"模試を記録","ppLast":"前回：{d} · {s}%","reason_testManual":"自分で追加","rs_testManual":"模試","tsOffShort":"次回：なし","tsNextShortToday":"次回：今日","tsNextShortIn":"次回：{n}日後","calLink":"モデルの精度について →","calHelp":"各点は1回の模試です。x＝その日の問題バンクモデルの予測、y＝実際の正答率。点線の対角線上ならモデルが正確、上なら予測より良い結果。R²は直線が点をどれだけ説明できるか（1＝完全）。","distMean":"平均","distSd":"標準偏差","distRange":"範囲","fcTopDesc":"総合 {s}% · 合格 {p}% · 85% {g}% — 60問の試験で最も失点が多い3トピック","calPerfect":"完全なモデル（予測＝実際）","calFit":"回帰直線","tabTests": "模試", "tabTestsLong": "模擬試験", "tsSub": "FAA模擬試験 · 常に60問", "tsAdd": "＋ 模擬試験を記録", "tsLastLbl": "最新", "tsBest": "最高", "tsAvg3": "直近3回平均", "ts70": "70%以上の回数", "ts85": "85%以上の回数", "tsFew": "傾向を見るには正答率付きの模試をあと{n}回記録", "tsCons": "安定した伸び", "tsMod": "普通", "tsNoisy": "ばらつき大", "tsCross": "{d}に85%到達", "tsAlready": "すでに85%以上", "tsNever": "このペースでは試験前に85%に届かない", "tsExam": "試験日 約{s}%", "tsNextToday": "次の模試：今日", "tsNextIn": "次の模試：{n}日後", "tsOff": "模試の予定なし（0日ごと）", "tsNone": "正答率付きの模試はまだありません。", "tsAll": "すべての模試", "tsFull": "詳しい統計 →", "tsOpen": "模試 →", "edit": "編集", "statBank": "問題バンク", "statTests": "模擬試験", "ovTitle": "総合スコア", "ovSub": "問題バンクのモデルと最近の模試の組み合わせ", "ovScore": "総合予想正答率", "ovModel": "問題バンクのモデルのみ", "ovWeights": "模試 {t}%（直近{n}回、重み{w}%）· 問題バンク {m}%（重み{mw}%）", "ovNoTests": "正答率付きの模試がまだないため、総合スコア＝問題バンクのモデル。", "trendTitle": "模試の傾向", "trendSub": "正答率の線形回帰", "calTitle": "モデルは当たっている？", "calSub": "各模試の日の予測と実際の正答率", "calFew": "補正には正答率付きの模試が5回必要（現在{n}回）", "calBias": "実際 − 予測：平均 {b} pp", "calOk": "補正後の予測 約{c}%", "calBad": "R²が0.3未満 — 補正には不十分", "calPredicted": "予測", "calReal": "実際", "calAxis": "x：予測 · y：実際", "distTitle": "正答率のヒストグラム", "gapTxt": "平均{d}日ごとに1回", "lgScore": "正答率", "lgTrend": "傾向", "lgTrendP": "予測", "lgBand": "±1標準誤差", "setTests": "模試の間隔（日、0＝オフ）", "reason_test": "模試の予定（N日ごと）", "reason_testIdle": "3日以上学習なし — 模試で弱点を確認", "reason_testRecall": "保持率85%未満または復習が多い", "reason_testFinal": "最後の10日：2日ごとに模試", "rs_testIdle": "模試", "rs_testRecall": "模試", "rs_testFinal": "模試", "regFormula": "総合 = (1 − w) × モデル + w × 直近3回の模試平均,   w = n ÷ (n + 2)\n傾向：正答率 = a + b × 日（最小二乗法）\n  b = Σ(x − x̄)(y − ȳ) ÷ Σ(x − x̄)²,   a = ȳ − b·x̄\n  R² = 1 − Σ(y − ŷ)² ÷ Σ(y − ȳ)²\n  帯 = ± se·√(1 + 1/n + (x − x̄)² ÷ Σ(x − x̄)²)\n補正：実際 = α + β × モデル（5回以上、R² ≥ 0.3）"});
+Object.assign(I18N.en,{"bankTitle": "Question-bank model", "bankSub": "From your topic scores and memory only · 60 questions weighted like the question bank", "bankOverall": "includes your last {n} practice tests", "perWeek": "{v} points/week", "r2Tip": "how well a straight line fits your scores (1 = perfectly)", "ptsUnit": "{v} points", "calRecent": "Last {n} tests: real − predicted {b} points on average", "staleTest": "in progress since then — finish or delete", "staleBar": "{n} practice test(s) still “in progress” from earlier days — finish or delete them", "planStake": "{x} exam-day q at stake", "tabTests": "Practice tests", "practiceTest": "Practice test", "openAnalysis": "Statistics →", "tsFull": "Statistics →", "pickHint": "pick a topic above · Statistics shows every chart", "ffConsist": "consistency, std dev of last {n} (points)", "ffTrendNote": "Trend {w} points/week → about {e}% on exam day if it continues.", "calBias": "all tests: {b} points", "tsSub": "Always 60 questions"});
+Object.assign(I18N.pt,{"bankTitle": "Modelo do banco de questões", "bankSub": "Só pelas notas dos tópicos e pela memória · 60 questões com o peso do banco", "bankOverall": "inclui seus últimos {n} simulados", "perWeek": "{v} pontos/semana", "r2Tip": "o quanto uma reta explica suas notas (1 = perfeitamente)", "ptsUnit": "{v} pontos", "calRecent": "Últimos {n} simulados: real − previsto {b} pontos em média", "staleTest": "em andamento desde então — termine ou apague", "staleBar": "{n} simulado(s) ainda “em andamento” de dias anteriores — termine ou apague", "planStake": "{x} q em jogo no dia da prova", "ffConsist": "consistência, desvio padrão dos últimos {n} (pontos)", "ffTrendNote": "Tendência {w} pontos/semana → cerca de {e}% no dia da prova se continuar.", "calBias": "todos: {b} pontos", "tsSub": "Sempre 60 questões"});
+Object.assign(I18N.ja,{"bankTitle": "問題バンクのモデル", "bankSub": "トピックの正答率と記憶のみ · 問題バンクと同じ重みの60問", "bankOverall": "直近{n}回の模試を含む", "perWeek": "{v} ポイント/週", "r2Tip": "直線が正答率をどれだけ説明するか（1＝完全）", "ptsUnit": "{v} ポイント", "calRecent": "直近{n}回：実際 − 予測 平均 {b} ポイント", "staleTest": "進行中のまま — 完了か削除を", "staleBar": "前日から「進行中」の模試が{n}件 — 完了か削除を", "planStake": "試験日に{x}問分", "ffConsist": "安定度：直近{n}回の標準偏差（ポイント）", "ffTrendNote": "傾向 {w} ポイント/週 → このままなら試験日に約{e}%。", "calBias": "全体：{b} ポイント", "tsSub": "常に60問"});
 const $=s=>document.querySelector(s);
 const pad=n=>String(n).padStart(2,'0');
 const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -1113,6 +1116,9 @@ function normalize(o){
     tests:Array.isArray(o.tests)?o.tests.filter(x=>x&&ok(x.date)).map(x=>({id:x.id||uid(),date:x.date,q:+x.q||60,score:cl(x.score)})):[],
     deadline:ok(o.deadline)?o.deadline:'2026-11-30',
     lang:I18N[o.lang]?o.lang:'en',
+    plan:o.plan&&ok(o.plan.date)?{date:o.plan.date,energy:['low','medium','high'].includes(o.plan.energy)?o.plan.energy:'medium',test:!!o.plan.test}:null,
+    /* ids of deleted events / tests (so a sync merge never brings them back); kept 60 days */
+    deleted:o.deleted&&typeof o.deleted==='object'?Object.fromEntries(Object.entries(o.deleted).filter(([k,d])=>typeof k==='string'&&ok(d)&&(Date.now()-Date.parse(d))<60*864e5)):{},
     updatedAt:+o.updatedAt||0};
 }
 function readLocal(){try{return normalize(JSON.parse(localStorage.getItem(STORE)))}catch(e){return null}}
@@ -1123,13 +1129,19 @@ const local=readLocal();
 let state,loadedFromFile=false;
 if(embedded&&(!local||embedded.updatedAt>local.updatedAt)){state=embedded;loadedFromFile=!!local}
 else state=local||embedded||defaultState();
+try{const e=JSON.parse(localStorage.getItem(STORE+'-energy')||'null'),pt=localStorage.getItem(STORE+'-ptday'),d=new Date(),td=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  if(!state.plan&&((e&&e.d===td)||pt===td))state.plan={date:td,energy:e&&e.d===td?e.m:'medium',test:pt===td};localStorage.removeItem(STORE+'-energy');localStorage.removeItem(STORE+'-ptday')}catch(e){}
 let lang=state.lang,shown=new Date(),sel=-1,mKind='study';
 
 const t=k=>(I18N[lang]||I18N.en)[k]??I18N.en[k];
 const tf=(k,n)=>t(k).replace('{n}',n);
 const label=s=>t('labels')[STATUS.indexOf(s)];
 const fmt=(n,d=0)=>new Intl.NumberFormat(LOCALE[lang],{minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
-function save(stamp=true){if(stamp)state.updatedAt=Date.now();try{localStorage.setItem(STORE,JSON.stringify(state))}catch(e){}if(stamp&&typeof schedulePush==='function')schedulePush()}
+/* remember which ids existed; any that disappear (delete, undo of an add, import) become tombstones */
+var prevIds=null;
+function trackDeletes(){const now=new Set([...state.events,...(state.tests||[])].map(x=>x.id));state.deleted??={};
+  if(prevIds)prevIds.forEach(id=>{if(!now.has(id))state.deleted[id]=todayISO()});now.forEach(id=>{if(state.deleted[id])delete state.deleted[id]});prevIds=now}
+function save(stamp=true){trackDeletes();if(stamp)state.updatedAt=Date.now();try{localStorage.setItem(STORE,JSON.stringify(state))}catch(e){}if(stamp&&typeof schedulePush==='function')schedulePush()}
 
 let toastTimer;
 function toast(msg,undoFn){
@@ -1258,7 +1270,10 @@ const phoneMQ=matchMedia('(max-width:640px)');
 function laneInView(){const lanes=[...lanesEl.children];if(!lanes.length)return 0;const mid=lanesEl.getBoundingClientRect().left+lanesEl.clientWidth/2;let best=0,dist=1e9;lanes.forEach((l,k)=>{const r=l.getBoundingClientRect(),d=Math.abs(r.left+r.width/2-mid);if(d<dist){dist=d;best=k}});return best}
 function updateDots(){const k=laneInView();document.querySelectorAll('#laneDots button').forEach((b,j)=>b.classList.toggle('on',j===k))}
 function goLane(k,smooth=true){const l=lanesEl.children[k];if(!l)return;lanesEl.scrollTo({left:l.offsetLeft-(lanesEl.clientWidth-l.offsetWidth)/2,behavior:smooth?'smooth':'auto'})}
-function render(){updateTexts();renderProgress();renderCalendar();renderSide();renderBoard();renderSRPanel();renderTsStrip();if(!$('#viewSR').hidden){if(statMode==='tests')renderStatTests();else renderSRPage()}if(!$('#viewPlan').hidden)renderPlanPage();if(!$('#viewTests').hidden)renderTestsPage();if(typeof renderSyncChip==='function')renderSyncChip()}
+let dashDirty=false;
+function renderDash(){renderProgress();renderCalendar();renderSide();renderBoard();renderSRPanel();renderTsStrip();dashDirty=false}
+/* only the visible tab is redrawn; the dashboard is redrawn when you come back to it */
+function render(){energyMode=planDay().energy;updateTexts();if(!$('#viewDash').hidden)renderDash();else dashDirty=true;if(!$('#viewSR').hidden){if(statMode==='tests')renderStatTests();else renderSRPage()}if(!$('#viewPlan').hidden)renderPlanPage();if(!$('#viewTests').hidden)renderTestsPage();if(typeof renderSyncChip==='function')renderSyncChip()}
 
 /* ---------- actions ---------- */
 function moveCard(i,to,date=todayISO()){
@@ -1363,34 +1378,69 @@ function scoreAt(i,d){let best=null,bd='';state.events.forEach(e=>{if(e.topic===
 
 /* ================= EXAM FORECAST (mechanical) =================
    p_i  = chance of answering a question of topic i right
-        = last score_i × recall_i(at the evaluation date)        (unknown score → 50%)
+        = last score_i × recall_i + 1/3 × (1 − recall_i)         (unknown score → 50%; 1/3 = guessing among 3 options)
    The FAA test draws 60 questions; here each one comes from topic i with probability w_i = q_i / 1,058.
    μ    = Σ w_i · p_i                         expected score
    X    ~ Binomial(60, μ)                     number of right answers
-   P(pass) = P(X ≥ 42) (70%),  P(goal) = P(X ≥ 51) (85%)                                   */
+   P(pass) = P(X ≥ 42) (70%),  P(goal) = P(X ≥ 51) (85%)
+   The chances use a beta-binomial: μ itself is uncertain by ±sd points (the model's error against your practice tests).                                   */
 const EXAM_Q=60,PASS_N=42,GOAL_N=51;
+/* log-gamma (Lanczos) and the beta-binomial tail: P(X ≥ k) when the chance per question is itself uncertain
+   (mean mu, standard deviation sdpp percentage points). With no uncertainty it is the plain binomial. */
+function lgamma(x){const g=7,c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  if(x<.5)return Math.log(Math.PI/Math.abs(Math.sin(Math.PI*x)))-lgamma(1-x);x-=1;let a=c[0];const t=x+g+.5;for(let i=1;i<9;i++)a+=c[i]/(x+i);return .5*Math.log(2*Math.PI)+(x+.5)*Math.log(t)-t+Math.log(a)}
+function betaBinomTail(n,mu,sdpp,k){
+  if(!(sdpp>.05))return binomTail(n,mu,k);
+  const m=Math.min(.999,Math.max(.001,mu)),v=(sdpp/100)**2,kap=Math.max(2,m*(1-m)/v-1),a=m*kap,b=(1-m)*kap,lB=lgamma(a)+lgamma(b)-lgamma(a+b);
+  let sum=0;for(let j=Math.max(0,k);j<=n;j++)sum+=Math.exp(lgamma(n+1)-lgamma(j+1)-lgamma(n-j+1)+lgamma(j+a)+lgamma(n-j+b)-lgamma(n+a+b)-lB);
+  return Math.max(0,Math.min(1,sum));
+}
 function binomTail(n,p,k){if(p<=0)return k<=0?1:0;if(p>=1)return 1;let lc=0,sum=0;for(let j=0;j<=n;j++){if(j>0)lc+=Math.log(n-j+1)-Math.log(j);if(j>=k)sum+=Math.exp(lc+j*Math.log(p)+(n-j)*Math.log(1-p))}return Math.min(1,sum)}
-function forecast(asOf,at){
+/* chance of a right answer on topic i = score × recall + 1/3 × (1 − recall):
+   right after a session it is your score; as you forget it falls toward guessing among 3 options (1/3), not to 0 */
+const GUESS=1/3,MODEL_SD0=6;
+const pRight=(sc,R)=>sc==null?.5:Math.max(0,Math.min(1,R*sc/100+(1-R)*GUESS));
+function forecastMu(asOf,at){
   asOf=asOf||todayISO();at=at||asOf;let mu=0;const parts=[];
   TOPICS.forEach((x,i)=>{const m=srModel(i,asOf),w=x.q/TOTAL;
     const sc=m.reps.length?m.reps[m.reps.length-1].p:(asOf===todayISO()?state.scores[i]:scoreAt(i,asOf));
     const R=m.reps.length?recall(diffDays(m.reps[m.reps.length-1].date,at),m.reps[m.reps.length-1].S):1;
-    const p=sc==null?.5:Math.max(0,Math.min(1,sc/100*R));mu+=w*p;parts.push({i,w,p,known:sc!=null,lost:EXAM_Q*w*(1-p)})});
-  return {mu,pass:binomTail(EXAM_Q,mu,PASS_N),goal:binomTail(EXAM_Q,mu,GOAL_N),parts};
+    const p=pRight(sc,R);mu+=w*p;parts.push({i,w,p,known:sc!=null,lost:EXAM_Q*w*(1-p)})});
+  return {mu,parts};
 }
+/* uncertainty of the model (percentage points): its typical error against your last 5 practice tests
+   (root-mean-square, 4–12), or 6 until there are 3 tests */
+let _msd=null;
+function modelSD(){
+  const tests=scoredTests().slice(-5),key=todayISO()+'|'+JSON.stringify(tests)+'|'+state.events.length+'|'+(state.events.at(-1)||{}).id+'|'+state.scores.join();
+  if(_msd&&_msd.k===key)return _msd.v;
+  const r=tests.map(x=>x.score-forecastMu(x.date).mu*100);
+  const v=r.length>=3?Math.max(4,Math.min(12,Math.sqrt(r.reduce((a,x)=>a+x*x,0)/r.length))):MODEL_SD0;
+  _msd={k:key,v};return v;
+}
+function forecast(asOf,at){const f=forecastMu(asOf,at),sd=modelSD();return {...f,sd,pass:betaBinomTail(EXAM_Q,f.mu,sd,PASS_N),goal:betaBinomTail(EXAM_Q,f.mu,sd,GOAL_N)}}
 /* ===== practice tests: blended score, regression, calibration, cadence =====
-   blended score = (1 − w) × question-bank model + w × average of the last 3 scored practice tests,  w = n / (n + 2)
-   pass / 85% chances use the same Binomial(60, blended score).
+   blended score = (1 − w) × question-bank model + w × age-weighted average of the last 3 scored practice tests
+                   test weight 0.5^(age/10 days),  W = sum of the weights,  w = W / (W + 2)
+   pass / 85% chances: beta-binomial around the blended score (model error and test spread combined).
    trend         = least-squares line  score = a + b × day   (R² = 1 − SSres / SStot), shown from 4 scored tests
+                   after the last test the projection slows: extra = b × 14 × (1 − e^(−days/14))
    band          = ± 1 standard error of the prediction  se·√(1 + 1/n + (x − x̄)² / Sxx)
    calibration   = least-squares  real = α + β × model forecast on that day, used from 5 tests when R² ≥ 0.3 */
 const TEST_Q=60;
 function scoredTests(upTo){return (state.tests||[]).filter(x=>x.score!=null&&(!upTo||x.date<=upTo)).slice().sort((a,b)=>a.date.localeCompare(b.date))}
+const HALF_LIFE=10;
+const stdev=v=>{const n=v.length;if(n<2)return 0;const m=v.reduce((a,x)=>a+x,0)/n;return Math.sqrt(v.reduce((a,x)=>a+(x-m)**2,0)/(n-1))};
+/* uncertainty of an average of practice tests: spread of your last 5 scores (at least 4 points; 8 with one test) ÷ √(effective n) */
+const testsSD=(asOf,nEff)=>{const v=scoredTests(asOf).slice(-5).map(x=>x.score);return (v.length>1?Math.max(4,stdev(v)):8)/Math.sqrt(Math.max(1,nEff))};
 function blended(asOf){
   asOf=asOf||todayISO();const f=forecast(asOf),last=scoredTests(asOf).slice(-3),n=last.length;
-  if(!n)return {...f,model:f.mu,testsAvg:null,n:0,w:0};
-  const avg=last.reduce((a,x)=>a+x.score,0)/n/100,w=n/(n+2),mu=(1-w)*f.mu+w*avg;
-  return {...f,mu,model:f.mu,testsAvg:avg,n,w,pass:binomTail(EXAM_Q,mu,PASS_N),goal:binomTail(EXAM_Q,mu,GOAL_N)};
+  if(!n)return {...f,model:f.mu,testsAvg:null,n:0,w:0,W:0};
+  /* each of the last 3 tests weighs 0.5^(age in days / 10): yesterday ≈ 0.93, three weeks ago ≈ 0.23 */
+  const om=last.map(x=>Math.pow(.5,Math.max(0,diffDays(x.date,asOf))/HALF_LIFE)),W=om.reduce((a,x)=>a+x,0);
+  const avg=last.reduce((a,x,k)=>a+om[k]*x.score,0)/W/100,w=W/(W+2),mu=(1-w)*f.mu+w*avg;
+  const sd=Math.sqrt(((1-w)*f.sd)**2+(w*testsSD(asOf,W*W/om.reduce((a,x)=>a+x*x,0)))**2);
+  return {...f,mu,model:f.mu,testsAvg:avg,n,w,W,sd,pass:betaBinomTail(EXAM_Q,mu,sd,PASS_N),goal:betaBinomTail(EXAM_Q,mu,sd,GOAL_N)};
 }
 function linReg(pts){
   const n=pts.length;if(n<2)return null;
@@ -1407,16 +1457,23 @@ function testTrend(range){
   const from=(range||tsRange)==='all'?all[0].date:addDays(today,-SRDAYS[range||tsRange]+1);
   const base=all[0].date,list=all.filter(x=>x.date>=from),pts=list.map(x=>[diffDays(base,x.date),x.score]);
   const reg=pts.length>=4?linReg(pts):null;let cross=null,exam=null;
-  if(reg){const xE=diffDays(base,state.deadline);exam=Math.max(0,Math.min(100,reg.at(xE)));
-    const lastX=pts[pts.length-1][0];
-    if(reg.at(lastX)>=GOAL)cross='already';else if(reg.b>0){const xc=(GOAL-reg.a)/reg.b;cross=xc<=xE?addDays(base,Math.ceil(xc)):'late'}else cross='never'}
-  return {n:pts.length,pts,reg,base,from,cross,exam,list};
+  /* scores saturate: after the last test the projection slows down — the extra gain tends to (points per day × TAU),
+     i.e. about two more weeks of your current pace — and it never leaves 0–100% */
+  let proj=null;
+  if(reg){const xE=diffDays(base,state.deadline),xb=pts[pts.length-1][0],yb=reg.at(xb),TAU=14;
+    proj=x=>Math.max(0,Math.min(100,x<=xb?reg.at(x):yb+reg.b*TAU*(1-Math.exp(-(x-xb)/TAU))));
+    exam=proj(Math.max(xE,xb));
+    if(yb>=GOAL)cross='already';
+    else if(reg.b>0&&GOAL-yb<reg.b*TAU){const xc=xb-TAU*Math.log(1-(GOAL-yb)/(reg.b*TAU));cross=xc<=xE?addDays(base,Math.ceil(xc)):'late'}
+    else cross='never'}
+  return {n:pts.length,pts,reg,base,from,cross,exam,list,proj};
 }
 function calibration(){
-  const pts=scoredTests().map(x=>[forecast(x.date).mu*100,x.score]);
+  const pts=scoredTests().map(x=>[forecastMu(x.date).mu*100,x.score]);
   const reg=pts.length>=2?linReg(pts):null,bias=pts.length?pts.reduce((a,p)=>a+(p[1]-p[0]),0)/pts.length:null;
+  const l5=pts.slice(-5),biasRecent=l5.length?l5.reduce((a,p)=>a+(p[1]-p[0]),0)/l5.length:null;
   const usable=!!reg&&pts.length>=5&&reg.r2>=.3;
-  return {pts,reg,bias,usable,calibrated:usable?Math.max(0,Math.min(100,reg.at(forecast().mu*100))):null};
+  return {pts,reg,bias,biasRecent,nRecent:l5.length,usable,calibrated:usable?Math.max(0,Math.min(100,reg.at(forecastMu().mu*100))):null};
 }
 function testWhy(asOf,st){
   st=st||settings();asOf=asOf||todayISO();const every=+st.testEvery||0;if(!every)return {due:false,every:0,next:null};
@@ -1428,7 +1485,7 @@ function testWhy(asOf,st){
   let reason=null;
   if(!last||since>=ev)reason=ev<every?'testFinal':'test';
   else if(idle>=3&&since>=2)reason='testIdle';
-  else if(((avgR!=null&&avgR<.85)||nDue>=5)&&since>=2)reason='testRecall';
+  else if(((avgR!=null&&avgR<.75)||nDue>=5)&&since>=2)reason='testRecall';
   return {due:!!reason,reason,every:ev,since,overdue:last?since-ev:0,next:reason?asOf:addDays(last,ev)};
 }
 const fcCls=v=>v>=.85?'good':v>=.7?'mid':'bad';
@@ -1460,6 +1517,7 @@ function fcChartSVG(w,h){
 }
 function renderForecast(){
   const f=forecast(),ex=forecast(todayISO(),state.deadline),pc=v=>Math.round(v*100)+'%';
+  {const B=blended();$('#fcOverall').innerHTML=`${esc(t('fcTitle'))}: <b>${Math.round(B.mu*100)}%</b> · ${esc(B.n?t('bankOverall').replace('{n}',B.n):t('ovNoTests'))} <button type="button" class="linkbtn" id="fcToTests">${esc(t('statTests'))} →</button>`;$('#fcToTests').onclick=()=>setStat('tests')}
   $('#fcKpis').innerHTML=`<div><b class="${fcCls(f.mu)}">${pc(f.mu)}</b><span>${esc(t('fcToday'))}</span></div><div><b class="${f.pass>=.8?'good':f.pass>=.5?'mid':'bad'}">${pc(f.pass)}</b><span>${esc(t('fcPass'))}</span></div><div><b class="${f.goal>=.8?'good':f.goal>=.5?'mid':'bad'}">${pc(f.goal)}</b><span>${esc(t('fcGoal'))}</span></div><div><b class="${fcCls(ex.mu)}">${pc(ex.mu)}</b><span>${esc(t('fcExamDay'))}</span></div>`;
   const box=$('#fcChart');box.innerHTML=fcChartSVG(Math.round(box.clientWidth||1000),phoneMQ.matches?200:250);
   $('#fcLegend').innerHTML=`<span><i style="border-color:#f5a524"></i>${esc(t('fcLine'))}</span><span><i style="border-color:#f5a524;border-top-style:dashed"></i>${esc(t('fcProj'))}</span><span><i style="border-color:#c5ccd5;border-top-style:dashed"></i>${esc(t('fcPassLine'))}</span><span><i style="border-color:#4bce97;border-top-style:dashed"></i>${esc(t('fcGoalLine'))}</span>`;
@@ -1486,7 +1544,7 @@ const DIFF={7:2,12:2,16:2,6:1.6,18:1.6,14:1.3,0:1.3,8:1.3};          /* Pilotage
 const diffOf=i=>DIFF[i]||1;
 const easeOf=m=>!m||!m.reps.length?1.15:Math.max(.75,Math.min(1.15,1.15-.12*Math.log2(1+m.S)));
 function minutesPerQ(i,st,m,p){return (60/st.qph)*diffOf(i)*easeOf(m)+(1-p)*st.reviewMin*diffOf(i)}
-function topicPNow(i,m){const sc=m&&m.reps.length?m.reps[m.reps.length-1].p:state.scores[i];return sc==null?.5:Math.max(0,Math.min(1,sc/100*(m&&m.reps.length?m.R:1)))}
+function topicPNow(i,m){const sc=m&&m.reps.length?m.reps[m.reps.length-1].p:state.scores[i];return pRight(sc,m&&m.reps.length?m.R:1)}
 /* ENERGY MODES (v1)
    low   : skips the practice test, picks the easiest/fastest items first (high chance of being right, known topics),
            and assumes you go 15% slower.
@@ -1504,8 +1562,11 @@ function buildPlan(asOf,over,mode){
   const push=it=>{
     const per=it.per,want=it.n;
     if(!it.done){if(left<per*Math.min(5,want)-1e-9)return false;it.n=Math.max(1,Math.min(want,Math.floor((left+1e-9)/per)))}
-    it.min=Math.round(it.n*per);left-=it.n*per;items.push(it);if(it.kind==='topic')planned.add(it.i);return true};
-  const topicItem=(i,n,reason)=>{const m=M(i),p=topicPNow(i,m);return {kind:'topic',i,n,reason,done:doneT.has(i),per:minutesPerQ(i,st,m,p)*E.speed,diff:diffOf(i),p}};
+    it.min=Math.round(it.n*per);left-=it.n*per;if(it.kind==='topic'&&it.pExam!=null)it.stake=EXAM_Q*it.n/TOTAL*(1-it.pExam);items.push(it);if(it.kind==='topic')planned.add(it.i);return true};
+  const xDay=state.deadline>asOf?state.deadline:asOf;
+  /* pExam = chance of getting a question of the topic right ON EXAM DAY if you do not study it again (memory keeps decaying) */
+  const topicItem=(i,n,reason)=>{const m=M(i),p=topicPNow(i,m),pExam=m.reps.length?pRight(m.reps[m.reps.length-1].p,recall(diffDays(m.reps[m.reps.length-1].date,xDay),m.reps[m.reps.length-1].S)):p;
+    return {kind:'topic',i,n,reason,done:doneT.has(i),per:minutesPerQ(i,st,m,p)*E.speed,diff:diffOf(i),p,pExam}};
   const cands=[];const add=it=>cands.push(it);
   const tw=testWhy(asOf,st0),man=asOf===todayISO()&&manualTest(asOf);
   if(testsToday||tw.due||man){const mu=blended(asOf).mu;if(E.test||testsToday||tw.overdue>=2||man)add({kind:'test',forced:man||(!E.test&&tw.overdue>=2),n:TEST_Q,reason:tw.due?tw.reason:man?'testManual':'test',done:!!testsToday,per:((60/st.qph)*1.1+(1-mu)*st.reviewMin)*E.speed,diff:1.1,p:mu})}
@@ -1522,6 +1583,11 @@ function buildPlan(asOf,over,mode){
   const done=cands.filter(x=>x.done),todo=cands.filter(x=>!x.done);
   const tRank=x=>x.kind!=='test'?1:x.forced?0:2;
   if(E.order==='easy')todo.sort((a,b)=>tRank(a)-tRank(b)||a.per-b.per||b.p-a.p);
+  /* standard: practice test first, then the most exam questions at stake per minute of study:
+     (1 − pExam) × urgency ÷ minutes per question — every bank question is equally likely on the exam, so this is the
+     expected exam-day questions protected per minute (urgency: overdue review 1.3, weak 1.15, no data 1.1, new 1.0) */
+  const URG={due:1.3,weak:1.15,nodata:1.1,new:1,light:.8},val=x=>(1-x.pExam)*(URG[x.reason]||1)/x.per;
+  if(E.order==='standard')todo.sort((a,b)=>(b.kind==='test')-(a.kind==='test')||val(b)-val(a));
   if(E.order==='hard')todo.sort((a,b)=>(b.kind==='test')-(a.kind==='test')||(1-b.p)*b.diff-(1-a.p)*a.diff);
   [...done,...todo].forEach(push);
   doneT.forEach(i=>{if(!planned.has(i))items.push({kind:'topic',i,n:0,min:0,reason:'extra',done:true,diff:diffOf(i)})});
@@ -1531,8 +1597,10 @@ function buildPlan(asOf,over,mode){
   const workload=Math.max(1,Math.min(10,Math.round(inten/1.1*10)));
   return {items,cap,mode:mode||'medium',workload,budget:Math.round(st.minutes),total:sum(items,'n'),minutes:sum(items,'min'),done:sum(items.filter(x=>x.done),'n'),doneMin:sum(items.filter(x=>x.done),'min'),daysLeft,final,pace:Math.ceil(remaining/daysLeft)};
 }
-let energyMode=(()=>{try{const v=JSON.parse(localStorage.getItem(STORE+'-energy')||'null');return v&&v.d===todayISO()?v.m:'medium'}catch(e){return 'medium'}})();
-function setEnergy(m){energyMode=m;try{localStorage.setItem(STORE+'-energy',JSON.stringify({d:todayISO(),m}))}catch(e){}renderPlanMini();if(!$('#viewPlan').hidden)renderPlanPage();requestAnimationFrame(clipSugg)}
+/* today's plan choices (energy mode, a test you added) live in the synced state, so phone and desktop agree */
+const planDay=()=>{const p=state.plan;return p&&p.date===todayISO()?p:{date:todayISO(),energy:'medium',test:false}};
+let energyMode=planDay().energy;
+function setEnergy(m){energyMode=m;state.plan={...planDay(),energy:m};save();renderPlanMini();if(!$('#viewPlan').hidden)renderPlanPage();requestAnimationFrame(clipSugg)}
 const fmtMin=m=>m>=60?`${Math.floor(m/60)}h ${String(Math.round(m%60)).padStart(2,'0')}m`:`${Math.round(m)} min`;
 function planRowName(it){return it.kind==='test'?t('practiceTest'):TOPICS[it.i].name}
 function renderPlanMini(){
@@ -1545,14 +1613,13 @@ function renderPlanPage(){
   $('#energyPick').innerHTML=['low','medium','high'].map(m=>{const Q=buildPlan(null,null,m);return `<button type="button" role="tab" data-energy="${m}" class="${m===energyMode?'on':''}" aria-selected="${m===energyMode}"><span class="en">${['low','medium','high'].indexOf(m)===0?'🔋':m==='medium'?'⚡':'🚀'} ${esc(t('en_'+m))}</span><span class="es">${Q.total} q · ${fmtMin(Q.minutes)}</span><span class="ew"><i style="width:${Q.workload*10}%"></i></span><span class="es">${esc(t('workload'))} ${Q.workload}/10</span></button>`}).join('');
   $('#planSub').textContent=df.format(parse(todayISO()))+(P.final?' · '+t('planFinal'):'');
   $('#planKpis').innerHTML=`<div><b>${fmtMin(P.minutes)}</b><span>${esc(t('planMinOf').replace('{b}',fmtMin(P.budget)))}</span></div><div><b>${P.total}</b><span>${esc(t('planQToday'))}</span></div><div><b>${P.done}</b><span>${esc(t('planDone'))}</span></div><div><b>${P.pace}</b><span>${esc(t('planPace'))}</span></div><div><b>${P.daysLeft}</b><span>${esc(t('toGo'))}</span></div>`;
-  $('#planList').innerHTML=P.items.length?P.items.map(it=>`<div class="pitem2${it.done?' done':''}" ${it.kind==='test'?'data-pt="1"':`data-q="${it.i}"`}><span class="pck">${it.done?'✓':''}</span><span class="pn">${esc(planRowName(it))}<small>${esc(t('reason_'+it.reason))}${it.diff>1.05?' · '+esc(t(it.diff>=2?'diffCalc':it.diff>=1.5?'diffNav':'diffChart')):''}${it.p!=null&&it.kind==='topic'?' · '+esc(t('planChance').replace('{p}',Math.round(it.p*100))):''}</small></span><span class="rchip ${it.reason}">${esc(t('rs_'+it.reason))}</span><span class="pq">${it.n?it.n+' q':''}<small>${it.min?'~'+fmtMin(it.min):''}</small></span></div>`).join(''):`<div class="muted">${esc(t('allClear'))}</div>`;
+  $('#planList').innerHTML=P.items.length?P.items.map(it=>`<div class="pitem2${it.done?' done':''}" ${it.kind==='test'?'data-pt="1"':`data-q="${it.i}"`}><span class="pck">${it.done?'✓':''}</span><span class="pn">${esc(planRowName(it))}<small>${esc(t('reason_'+it.reason))}${it.diff>1.05?' · '+esc(t(it.diff>=2?'diffCalc':it.diff>=1.5?'diffNav':'diffChart')):''}${it.p!=null&&it.kind==='topic'?' · '+esc(t('planChance').replace('{p}',Math.round(it.p*100))):''}${it.stake?' · '+esc(t('planStake').replace('{x}',it.stake.toFixed(1))):''}</small></span><span class="rchip ${it.reason}">${esc(t('rs_'+it.reason))}</span><span class="pq">${it.n?it.n+' q':''}<small>${it.min?'~'+fmtMin(it.min):''}</small></span></div>`).join(''):`<div class="muted">${esc(t('allClear'))}</div>`;
   ['minutes','qph','testEvery','reviewMin'].forEach(k=>{const el=$('#'+SET_ID[k]);if(document.activeElement!==el)el.value=st[k]});
   updateDraft();
 }
 /* a practice test the user added to today's plan by hand (per device, per day) */
-const PT_DAY=STORE+'-ptday';
-const manualTest=d=>{try{return localStorage.getItem(PT_DAY)===(d||todayISO())}catch(e){return false}};
-function setManualTest(on){try{on?localStorage.setItem(PT_DAY,todayISO()):localStorage.removeItem(PT_DAY)}catch(e){}render()}
+const manualTest=d=>(d||todayISO())===todayISO()&&!!planDay().test;
+function setManualTest(on){state.plan={...planDay(),test:!!on};save();render()}
 function renderPlanPt(){
   if(!$('#planPt'))return;const w=testWhy(),k=testKpis(),df=new Intl.DateTimeFormat(LOCALE[lang],{month:'short',day:'numeric'}),last=scoredTests().at(-1);
   const inPlan=buildPlan(null,null,energyMode).items.some(x=>x.kind==='test'),man=manualTest();
@@ -1745,7 +1812,7 @@ function showView(v,focus){
   if(sr){if(focus==='tests'){setStat('tests');window.scrollTo(0,0)}else{setStat('bank');renderSRPage(focus==='fc'?null:focus);if(focus==='fc')$('#fcSection').scrollIntoView({block:'start'});else if(focus==null)window.scrollTo(0,0)}}
   else if(pl){renderPlanPage();window.scrollTo(0,0)}
   else if(ts){renderTestsPage();window.scrollTo(0,0)}
-  else{renderCalendar();renderSRPanel();renderTsStrip();window.scrollTo(0,0)}
+  else{if(dashDirty)renderDash();else{renderCalendar();renderSRPanel();renderTsStrip()}window.scrollTo(0,0)}
 }
 function goView(v,focus){
   showView(v,focus);
@@ -1948,9 +2015,10 @@ function tsSVG(w,h,big){
     if(xE<=x1)g+=`<line class="cexam" x1="${f(X(xE))}" x2="${f(X(xE))}" y1="${T}" y2="${T+ph}"/><text class="cx" x="${f(X(xE)-3)}" y="${T-3}" text-anchor="end" style="fill:var(--exam)">${esc(t('examShort'))}</text>`}
   g+=`<line class="c70" x1="${L}" x2="${w-R}" y1="${f(Y(70))}" y2="${f(Y(70))}"/><line class="c85" x1="${L}" x2="${w-R}" y1="${f(Y(85))}" y2="${f(Y(85))}"/>`;
   if(tr.reg&&big){const r=tr.reg,xa=pts[0][0],xb=pts[pts.length-1][0],up=[],dn=[],cid='tsclip'+(++tsClipN),N=40;
-    for(let k=0;k<=N;k++){const x=xa+(x1-xa)*k/N,v=r.at(x),e=r.band(x);up.push([X(x),Y(v+e)]);dn.push([X(x),Y(v-e)])}
+    const ctr=x=>tr.proj(x);
+    for(let k=0;k<=N;k++){const x=xa+(x1-xa)*k/N,v=ctr(x),e=r.band(x);up.push([X(x),Y(v+e)]);dn.push([X(x),Y(v-e)])}
     g+=`<clipPath id="${cid}"><rect x="${L}" y="${T}" width="${pw}" height="${ph}"/></clipPath><path class="s-band" clip-path="url(#${cid})" d="M${up.map(p=>f(p[0])+' '+f(p[1])).join('L')}L${dn.reverse().map(p=>f(p[0])+' '+f(p[1])).join('L')}Z"/>`;
-    g+=`<path class="s-reg" d="M${f(X(xa))} ${f(Y(r.at(xa)))}L${f(X(xb))} ${f(Y(r.at(xb)))}"/><path class="s-regp" d="M${f(X(xb))} ${f(Y(r.at(xb)))}L${f(X(x1))} ${f(Y(Math.max(lo,Math.min(100,r.at(x1)))))}"/>`}
+    g+=`<path class="s-reg" d="M${f(X(xa))} ${f(Y(r.at(xa)))}L${f(X(xb))} ${f(Y(r.at(xb)))}"/><path class="s-regp" d="M${Array.from({length:21},(_,k)=>{const x=xb+(x1-xb)*k/20;return f(X(x))+' '+f(Y(Math.max(lo,ctr(x))))}).join('L')}"/>`}
   if(pts.length>1)g+=`<path fill="none" stroke="${big?'#8f99a6':'#ffd08a'}" stroke-width="${big?1.4:2}" d="${pts.map((p,k)=>(k?'L':'M')+f(X(p[0]))+' '+f(Y(p[1]))).join('')}"/>`;
   const df2=new Intl.DateTimeFormat(LOCALE[lang],{month:'short',day:'numeric'});
   pts.forEach((p,k)=>{g+=`<circle cx="${f(X(p[0]))}" cy="${f(Y(p[1]))}" r="${big?4.5:3.4}" fill="${scCol(p[1])}" stroke="#16191d" stroke-width="1.5"><title>${esc(df2.format(parse(tr.list[k].date)))}: ${p[1]}%</title></circle>`;
@@ -1961,7 +2029,7 @@ function trendText(){
   const tr=testTrend(),need=4-tr.n;if(tr.n<4)return `<span class="few">${esc(t('tsFew').replace('{n}',Math.max(1,need)))}</span>`;
   const r=tr.reg,wk=r.b*7,cons=r.r2>=.6?'tsCons':r.r2>=.3?'tsMod':'tsNoisy',df=new Intl.DateTimeFormat(LOCALE[lang],{month:'short',day:'numeric'});
   const cross=tr.cross==='already'?t('tsAlready'):tr.cross==='never'||tr.cross==='late'?t('tsNever'):t('tsCross').replace('{d}',df.format(parse(tr.cross)));
-  return `<b>${wk>=0?'+':''}${wk.toFixed(1)} pp/${esc(t('wk').toLowerCase())}</b> · R² <b>${r.r2.toFixed(2)}</b> (${esc(t(cons))}) · ${esc(cross)} · ${esc(t('tsExam').replace('{s}',Math.round(tr.exam)))}`;
+  return `<b>${esc(t('perWeek').replace('{v}',(wk>=0?'+':'')+wk.toFixed(1)))}</b> · <span title="R² ${r.r2.toFixed(2)} — ${esc(t('r2Tip'))}">${esc(t(cons))}</span> · ${esc(cross)} · ${esc(t('tsExam').replace('{s}',Math.round(tr.exam)))}`;
 }
 function nextText(){const w=testWhy();if(!w.every)return t('tsOff');if(w.due)return t('tsNextToday')+' · '+t('reason_'+w.reason);return t('tsNextIn').replace('{n}',diffDays(todayISO(),w.next))}
 function testKpis(){const sc=scoredTests(),last=sc[sc.length-1],l3=sc.slice(-3);
@@ -1989,10 +2057,11 @@ function renderTestsPage(){
   paintTsRange();const k=testKpis();
   $('#tsKpis').innerHTML=[['tsLastLbl',pctOr(k.last),k.last],['tsBest',pctOr(k.best),k.best],['tsAvg3',pctOr(k.avg3),k.avg3],['ts70',k.n70,null],['ts85',k.n85,null]].map(([l,v,c])=>`<div><b class="${c==null?'':c>=85?'good':c>=70?'mid':'bad'}">${v}</b><span>${esc(t(l))}</span></div>`).join('');
   $('#tsTrendTxt').innerHTML=trendText();$('#tsNext').textContent=nextText();
+  {const st=(state.tests||[]).filter(x=>x.score==null&&x.date<todayISO()).length,b=$('#tsStale');b.hidden=!st;b.textContent=st?t('staleBar').replace('{n}',st):''}
   const box=$('#tsChart');box.innerHTML=tsSVG(Math.round(box.clientWidth||900),phoneMQ.matches?220:280,true);
   $('#tsLegend').innerHTML=tsLegendHTML();
   const df=new Intl.DateTimeFormat(LOCALE[lang],{weekday:'short',year:'numeric',month:'short',day:'numeric'}),L=(state.tests||[]).map((x,k)=>({x,k})).sort((a,b)=>b.x.date.localeCompare(a.x.date)||b.k-a.k).map(o=>o.x);
-  $('#tsList').innerHTML=L.length?L.map(x=>`<div class="tsrow" data-id="${x.id}"><span class="k" style="background:${scCol(x.score)}"></span><span class="d">${esc(df.format(parse(x.date)))}<span class="muted"> · ${TEST_Q} q</span></span><span class="sc" style="color:${scCol(x.score)}">${x.score!=null?x.score+'%':esc(t('inProgress'))}</span><button type="button" data-edit="${x.id}">${esc(t('edit'))}</button><button type="button" data-delpt="${x.id}" aria-label="${esc(t('del'))}">×</button></div>`).join(''):`<div class="muted">${esc(t('tsNone'))}</div>`;
+  $('#tsList').innerHTML=L.length?L.map(x=>`<div class="tsrow" data-id="${x.id}"><span class="k" style="background:${scCol(x.score)}"></span><span class="d">${esc(df.format(parse(x.date)))}<span class="muted"> · ${TEST_Q} q</span></span><span class="sc" style="color:${scCol(x.score)}">${x.score!=null?x.score+'%':esc(t('inProgress'))}</span>${x.score==null&&x.date<todayISO()?`<span class="stale">${esc(t('staleTest'))}</span>`:''}<button type="button" data-edit="${x.id}">${esc(t('edit'))}</button><button type="button" data-delpt="${x.id}" aria-label="${esc(t('del'))}">×</button></div>`).join(''):`<div class="muted">${esc(t('tsNone'))}</div>`;
 }
 const tsLegendHTML=()=>`<span><i style="border-color:#8f99a6"></i>${esc(t('lgScore'))}</span><span><i style="border-color:#ffd08a"></i>${esc(t('lgTrend'))}</span><span><i style="border-color:#ffd08a;border-top-style:dashed"></i>${esc(t('lgTrendP'))}</span><span><i style="border-color:#ffd08a55;border-top-width:6px"></i>${esc(t('lgBand'))}</span><span><i style="border-color:#c5ccd5;border-top-style:dashed"></i>${esc(t('fcPassLine'))}</span><span><i style="border-color:#4bce97;border-top-style:dashed"></i>${esc(t('fcGoalLine'))}</span>`;
 $('#tsList').addEventListener('click',e=>{const d=e.target.closest('[data-delpt]'),ed=e.target.closest('[data-edit]');
@@ -2018,7 +2087,7 @@ function renderStatTests(){
   $('#tsTrendTxt2').innerHTML=trendText();
   const b2=$('#tsChart2');b2.innerHTML=tsSVG(Math.round(b2.clientWidth||900),phoneMQ.matches?220:280,true);$('#tsLegend2').innerHTML=tsLegendHTML();
   const sc=scoredTests(),st=distStats(sc);
-  $('#distTxt').innerHTML=sc.length?`${esc(t('distMean'))} <b>${st.mean.toFixed(1)}%</b> · ${esc(t('distSd'))} <b>${st.sd.toFixed(1)} pp</b> · ${esc(t('distRange'))} <b>${st.min}–${st.max}%</b> · n=${sc.length}`:'';
+  $('#distTxt').innerHTML=sc.length?`${esc(t('distMean'))} <b>${st.mean.toFixed(1)}%</b> · ${esc(t('distSd'))} <b>${esc(t('ptsUnit').replace('{v}',st.sd.toFixed(1)))}</b> · ${esc(t('distRange'))} <b>${st.min}–${st.max}%</b> · n=${sc.length}`:'';
   const dc=$('#distChart');dc.innerHTML=histSVG(sc,Math.round(dc.clientWidth||900),phoneMQ.matches?200:230);
   $('#distLegend').innerHTML=sc.length?`<span><i style="border-color:#e8ecf1"></i>${esc(t('distMean'))}</span><span><i style="border-color:#c5ccd5;border-top-style:dashed"></i>${esc(t('fcPassLine'))}</span><span><i style="border-color:#4bce97;border-top-style:dashed"></i>${esc(t('fcGoalLine'))}</span>`:'';
   const gaps=sc.slice(1).map((x,k)=>diffDays(sc[k].date,x.date));$('#gapTxt').textContent=gaps.length?t('gapTxt').replace('{d}',(gaps.reduce((a,x)=>a+x,0)/gaps.length).toFixed(1)):t('tsFew').replace('{n}',2);
@@ -2028,7 +2097,7 @@ function renderStatTests(){
 function renderCal(){
   const C=calibration();
   $('#calTxt').innerHTML=C.pts.length<2?`<span class="few">${esc(t('calFew').replace('{n}',C.pts.length))}</span>`:
-    `R² <b>${C.reg?C.reg.r2.toFixed(2):'—'}</b> · ${esc(t('calBias').replace('{b}',(C.bias>=0?'+':'')+C.bias.toFixed(1)))} · n=${C.pts.length}`+(C.usable?` · <b>${esc(t('calOk').replace('{c}',Math.round(C.calibrated)))}</b>`:C.pts.length<5?` · <span class="few">${esc(t('calFew').replace('{n}',C.pts.length))}</span>`:` · <span class="few">${esc(t('calBad'))}</span>`);
+    `<b>${esc(t('calRecent').replace('{n}',C.nRecent).replace('{b}',(C.biasRecent>=0?'+':'')+C.biasRecent.toFixed(1)))}</b> · ${esc(t('calBias').replace('{b}',(C.bias>=0?'+':'')+C.bias.toFixed(1)))} · <span class="muted">R² ${C.reg?C.reg.r2.toFixed(2):'—'} · n=${C.pts.length}</span>`+(C.usable?` · <b>${esc(t('calOk').replace('{c}',Math.round(C.calibrated)))}</b>`:C.pts.length<5?` · <span class="few">${esc(t('calFew').replace('{n}',C.pts.length))}</span>`:` · <span class="few">${esc(t('calBad'))}</span>`);
   const cb=$('#calChart'),cw=Math.min(600,Math.round(cb.clientWidth||600));cb.innerHTML=calSVG(C,cw,Math.round(cw*.78));
 }
 /* histogram: 5-point bins of practice-test scores */
@@ -2059,7 +2128,7 @@ function binomQuantile(n,p,q){let lc=0,c=0;for(let j=0;j<=n;j++){if(j>0)lc+=Math
 function renderFcFull(){
   const el=$('#fcFull');if(!el)return;const k=testKpis(),sc=scoredTests();
   if(!k.n){el.innerHTML=`<div class="ffhead"><span class="label">${esc(t('ffTitle'))}</span></div><div class="muted">${esc(t('tsNone'))}</div>`;return}
-  const tr=testTrend('all'),a3=k.avg3/100,pass=binomTail(EXAM_Q,a3,PASS_N),goal=binomTail(EXAM_Q,a3,GOAL_N),X=v=>Math.max(0,Math.min(100,(v-40)/60*100)),col=v=>v>=.8?'good':v>=.5?'mid':'bad';
+  const tr=testTrend('all'),a3=k.avg3/100,sd3=testsSD(null,Math.min(3,k.n)),pass=betaBinomTail(EXAM_Q,a3,sd3,PASS_N),goal=betaBinomTail(EXAM_Q,a3,sd3,GOAL_N),X=v=>Math.max(0,Math.min(100,(v-40)/60*100)),col=v=>v>=.8?'good':v>=.5?'mid':'bad';
   const l5=sc.slice(-5).map(x=>x.score),m5=l5.reduce((a,x)=>a+x,0)/l5.length,sd=l5.length>1?Math.sqrt(l5.reduce((a,x)=>a+(x-m5)**2,0)/(l5.length-1)):0;
   const marks=[['ffLast',k.last,'#e8ecf1'],['ffAvg3',k.avg3,'#ffd08a']];if(tr.reg)marks.push(['ffExam',Math.round(tr.exam),'#f5a524']);
   let bar=`<i style="width:${X(k.avg3)}%"></i><em style="left:${X(70)}%;background:#c5ccd5"></em><em style="left:${X(85)}%;background:#4bce97"></em>`;
@@ -2193,10 +2262,14 @@ function selfTest(){
     fixture([{date:D(0),topic:18,kind:'study',score:100}]);state.scores=TOPICS.map(()=>50);state.scores[18]=100;
     {const w=158/1058;ok('Forecast','Weather at 100% (just studied) raises μ by its weight × 50%',near(forecast().mu,.5+w*.5),forecast().mu)}
     fixture([{date:D(10),topic:18,kind:'study',score:100}]);state.scores=TOPICS.map(()=>50);state.scores[18]=100;
-    {const f=forecast(),R=recall(10,2),w=158/1058;ok('Forecast','recall decay lowers the topic (score × recall)',near(f.mu,.5+w*(R-.5)),f.mu)}
+    {const f=forecast(),R=recall(10,2),w=158/1058;ok('Forecast','recall decay pulls the topic toward guessing: score × recall + 1/3 × (1 − recall)',near(f.mu,.5+w*(R+(1-R)/3-.5)),f.mu)}
+    ok('Forecast','a forgotten topic tends to 1/3 (guessing among 3 options), never to 0',near(pRight(90,0),1/3)&&near(pRight(90,1),.9)&&near(pRight(20,.5),.5*.2+.5/3))
     fixture([{date:D(0),topic:18,kind:'study',score:90}],{deadline:addDays(T,30)});
     ok('Forecast','exam-day projection without reviews is lower than today',forecast(T,state.deadline).mu<forecast().mu);
-    fixture([]);state.scores=TOPICS.map(()=>70);ok('Forecast','μ=70% → pass chance 56.3%',near(forecast().pass,.56324,1e-3),forecast().pass);
+    ok('Forecast','binomial: μ=70% → P(X ≥ 42) = 56.3%',near(binomTail(60,.7,42),.56324,1e-4));
+    fixture([]);state.scores=TOPICS.map(()=>70);ok('Forecast','with ±6 points of uncertainty (beta-binomial) μ=70% → 55.5% (matches scipy betabinom)',near(forecast().pass,.555047,1e-4),forecast().pass);
+    ok('Forecast','beta-binomial 85% chance at μ=70% ± 6 → 3.70% (scipy)',near(betaBinomTail(60,.7,6,51),.036976,1e-4),betaBinomTail(60,.7,6,51));
+    ok('Forecast','no uncertainty → beta-binomial equals the binomial',near(betaBinomTail(60,.7,0,42),binomTail(60,.7,42)))
     {const f=forecast(),top=f.parts.slice().sort((a,b)=>b.lost-a.lost)[0];ok('Forecast','biggest loss = biggest topic when all scores equal (Weather)',top.i===18)}
     fixture([{date:D(3),topic:18,kind:'study',score:40}]);state.scores[18]=40;
     ok('Forecast','forecast history uses the score known at that date',scoreAt(18,D(5))===TOPICS[18].score&&scoreAt(18,D(1))===40);
@@ -2211,8 +2284,12 @@ function selfTest(){
      ok('Plan time','review minutes = 0 → only answering time',near(minutesPerQ(22,{...st,reviewMin:0},null,.3),1.5*1.15))}
     fixture([],{settings:{minutes:60,qph:40,tests:0,reviewMin:3}});{const a=buildPlan().total;state.settings={minutes:60,qph:40,tests:0,reviewMin:.5};ok('Plan time','more review time per miss → fewer questions planned',buildPlan().total>a,`${a} vs ${buildPlan().total}`)}
     fixture([{date:D(3),topic:18,kind:'study',score:90}],{settings:{minutes:600,qph:40,tests:0,reviewMin:1.5}});
-    {const P=buildPlan();ok('Plan','overdue review is first, with reason "due"',P.items[0].i===18&&P.items[0].reason==='due',JSON.stringify(P.items[0]))}
-    {const P=buildPlan(),it=P.items[0],m=srModel(18,T,true),exp=Math.min(158,Math.max(10,Math.min(40,Math.round(158*(1-m.R)))));ok('Plan','review size = clamp(q × (1 − recall), 10, 40)',it.n===exp,`${it.n} vs ${exp}`)}
+    {const P=buildPlan(),it=P.items.find(x=>x.i===18);ok('Plan','overdue review is planned with reason "due"',it&&it.reason==='due',JSON.stringify(it))}
+    {const P=buildPlan(),U={due:1.3,weak:1.15,nodata:1.1,new:1,light:.8},v=P.items.filter(x=>x.kind==='topic'&&!x.done).map(x=>(1-x.pExam)*(U[x.reason]||1)/x.per);
+     ok('Plan','medium plan is ordered by exam questions at stake per minute',v.every((x,k)=>!k||v[k-1]>=x-1e-12),v.map(x=>x.toFixed(3)).join(' '));
+     ok('Plan','each topic shows the exam-day questions at stake = 60 × n / 1,058 × (1 − p on exam day)',P.items.filter(x=>x.kind==='topic'&&x.n).every(x=>near(x.stake,60*x.n/1058*(1-x.pExam))))}
+    ok('Plan','a reviewed topic loses more by exam day than today (memory decays)',(()=>{const it=buildPlan().items.find(x=>x.i===18);return it&&it.pExam<it.p})())
+    {const P=buildPlan(),it=P.items.find(x=>x.i===18),m=srModel(18,T,true),exp=Math.min(158,Math.max(10,Math.min(40,Math.round(158*(1-m.R)))));ok('Plan','review size = clamp(q × (1 − recall), 10, 40)',it.n===exp,`${it.n} vs ${exp}`)}
     fixture([],{settings:{minutes:180,qph:40,tests:2}});{const P=buildPlan();ok('Plan','no practice test yet → a test is planned (60 q)',P.items[0].kind==='test'&&P.items[0].n===60)}
     fixture([],{settings:{minutes:180,qph:40,tests:2},tests:[{id:'a',date:D(1),q:60,score:80}]});ok('Plan','2 tests/week and one yesterday → no test today',!buildPlan().items.some(x=>x.kind==='test'));
     fixture([],{settings:{minutes:180,qph:40,testEvery:3},tests:[{id:'a',date:D(3),q:60,score:80}]});ok('Plan','test every 3 days and the last one 3 days ago → test today',buildPlan().items.some(x=>x.kind==='test'));
@@ -2248,7 +2325,8 @@ function selfTest(){
     fixture([],{tests:[{id:'a',date:D(20),q:60,score:60},{id:'b',date:D(13),q:60,score:67},{id:'c',date:D(6),q:60,score:74}]});
     {const tr=testTrend('all');ok('Regression','trend needs 4 scored tests (3 → none)',tr.n===3&&tr.reg===null)}
     fixture([],{deadline:addDays(T,60),tests:[{id:'a',date:D(21),q:60,score:60},{id:'b',date:D(14),q:60,score:67},{id:'c',date:D(7),q:60,score:74},{id:'d',date:D(0),q:60,score:81}]});
-    {const tr=testTrend('all');ok('Regression','+1 point/day → reaches 85% in 4 days',tr.cross===addDays(T,4),tr.cross);ok('Regression','projection on exam day is capped at 100%',tr.exam===100)}
+    {const tr=testTrend('all'),d=Math.ceil(-14*Math.log(1-4/14));ok('Regression','+1 point/day from 81% → reaches 85% in ⌈−14·ln(1 − 4/14)⌉ = 5 days (slowing projection)',tr.cross===addDays(T,d)&&d===5,tr.cross);
+     ok('Regression','projection on exam day = 81 + 14 × (1 − e^(−60/14)) ≈ 94.8%, never 100% from a straight line',near(tr.exam,81+14*(1-Math.exp(-60/14)),1e-6),tr.exam)}
     fixture([],{tests:[{id:'a',date:D(21),q:60,score:80},{id:'b',date:D(14),q:60,score:75},{id:'c',date:D(7),q:60,score:70},{id:'d',date:D(0),q:60,score:65}]});
     ok('Regression','falling scores → "not on track"',testTrend('all').cross==='never');
     fixture([],{tests:[{id:'a',date:D(9),q:60,score:86},{id:'b',date:D(6),q:60,score:88},{id:'c',date:D(3),q:60,score:90},{id:'d',date:D(0),q:60,score:92}]});
@@ -2258,10 +2336,12 @@ function selfTest(){
     /* --- blended score --- */
     fixture([]);state.scores=TOPICS.map(()=>60);{const B=blended();ok('Blend','no practice tests → blended = question-bank model',near(B.mu,forecast().mu)&&B.n===0)}
     fixture([],{tests:[{id:'a',date:D(1),q:60,score:90}]});state.scores=TOPICS.map(()=>60);
-    {const B=blended(),m=forecast().mu;ok('Blend','1 test → weight 1/3',near(B.w,1/3)&&near(B.mu,2/3*m+1/3*.9),B.mu)}
+    {const B=blended(),m=forecast().mu,om=Math.pow(.5,1/10),w=om/(om+2);ok('Blend','1 test yesterday → weight 0.5^(1/10) ÷ (0.5^(1/10) + 2) ≈ 0.318',near(B.w,w)&&near(B.mu,(1-w)*m+w*.9),B.w)}
     fixture([],{tests:[{id:'a',date:D(9),q:60,score:50},{id:'b',date:D(6),q:60,score:80},{id:'c',date:D(3),q:60,score:85},{id:'d',date:D(1),q:60,score:90}]});state.scores=TOPICS.map(()=>60);
-    {const B=blended(),m=forecast().mu;ok('Blend','uses only the last 3 tests, weight 3/5',near(B.w,.6)&&near(B.testsAvg,.85)&&near(B.mu,.4*m+.6*.85),B.mu)}
-    {const B=blended();ok('Blend','pass chance uses the blended score',near(B.pass,binomTail(60,B.mu,42)))}
+    {const B=blended(),m=forecast().mu,om=[6,3,1].map(a=>Math.pow(.5,a/10)),W=om[0]+om[1]+om[2],avg=(om[0]*80+om[1]*85+om[2]*90)/W/100,w=W/(W+2);
+     ok('Blend','uses only the last 3 tests, newer ones weigh more (half-life 10 days)',near(B.w,w)&&near(B.testsAvg,avg)&&near(B.mu,(1-w)*m+w*avg)&&B.testsAvg>.85,[B.w,B.testsAvg])}
+    {const B=blended();ok('Blend','an old test weighs less: 3 weeks ago ≈ 0.23 of a fresh one',near(Math.pow(.5,21/10),.233,1e-3))}
+    {const B=blended();ok('Blend','pass chance = beta-binomial around the blended score with the combined uncertainty',B.sd>0&&near(B.pass,betaBinomTail(60,B.mu,B.sd,42))&&near(B.goal,betaBinomTail(60,B.mu,B.sd,51)))}
     fixture([],{tests:[{id:'a',date:D(1),q:60,score:null}]});state.scores=TOPICS.map(()=>60);ok('Blend','tests in progress are ignored',blended().n===0);
     fixture([],{tests:[{id:'a',date:D(1),q:60,score:90}]});ok('Blend','dashboard forecast shows the blended score',(renderFcMini(),$('#fcMiniVal').textContent===Math.round(blended().mu*100)+'%'));
     /* --- calibration --- */
@@ -2276,9 +2356,23 @@ function selfTest(){
     {const d=distStats([60,70,80].map(v=>({score:v})));ok('Histogram','mean 70, sample standard deviation 10',near(d.mean,70)&&near(d.sd,10))}
     ok('Histogram','binomial 90% range for μ=0.75 on 60 questions is 39–50 (matches scipy binom.ppf)',binomQuantile(60,.75,.05)===39&&binomQuantile(60,.75,.95)===50,[binomQuantile(60,.75,.05),binomQuantile(60,.75,.95)]);
     fixture([{date:D(1),topic:1,kind:'study',score:70}],{settings:{minutes:180,qph:40,testEvery:7},tests:[{id:'a',date:D(1),q:60,score:75}]});
-    {let had;try{localStorage.setItem(STORE+'-ptday',T);had=buildPlan(T,null,'low').items.find(x=>x.kind==='test')}finally{try{localStorage.removeItem(STORE+'-ptday')}catch(e){}}
+    {state.plan={date:T,energy:'medium',test:true};const had=buildPlan(T,null,'low').items.find(x=>x.kind==='test');state.plan=null;
      ok('Cadence','a test added by hand is planned today, even on low energy, reason "Added by you"',had&&had.reason==='testManual'&&had.n===60);
      ok('Cadence','after removing it the plan has no test again',!buildPlan(T,null,'low').items.some(x=>x.kind==='test'))}
+    /* --- sync merge --- */
+    {const base={statuses:TOPICS.map(x=>x.status),scores:TOPICS.map(x=>x.score),events:[],tests:[],deadline:'2026-11-30',lang:'en'};
+     const A=normalize({...base,updatedAt:10,events:[{id:'e1',date:T,topic:1,kind:'study',score:80}],tests:[{id:'t1',date:T,q:60,score:70}]});
+     const Bs=normalize({...base,updatedAt:20,events:[{id:'e2',date:T,topic:2,kind:'study',score:60}],tests:[]});
+     const M=mergeStates(A,Bs);ok('Sync merge','events and tests from both devices are kept (union by id)',M.events.length===2&&M.tests.length===1&&M.updatedAt===20);
+     const Bd=normalize({...base,updatedAt:30,events:[],deleted:{e1:T}});ok('Sync merge','a deleted item never comes back from the other copy',!mergeStates(A,Bd).events.some(e=>e.id==='e1'));
+     const A2=normalize({...base,updatedAt:5,statuses:TOPICS.map(()=>'Todo')}),B2=normalize({...base,updatedAt:9});ok('Sync merge','lists, scores and settings come from the newer copy',JSON.stringify(mergeStates(A2,B2).statuses)===JSON.stringify(B2.statuses));
+     const Ae=normalize({...base,updatedAt:5,events:[{id:'e9',date:T,topic:1,kind:'study',score:50}]}),Be=normalize({...base,updatedAt:9,events:[{id:'e9',date:T,topic:1,kind:'study',score:95}]});ok('Sync merge','same id on both → the newer copy wins',mergeStates(Ae,Be).events[0].score===95)}
+    {fixture([{date:D(1),topic:1,kind:'study',score:70}]);prevIds=null;save(false);const id=state.events[0].id;state.events=[];save(false);
+     ok('Sync merge','deleting an event records a tombstone',!!state.deleted[id]);state.events.push({id,date:D(1),topic:1,kind:'study',score:70,from:null,to:null,partial:false,demo:false});save(false);ok('Sync merge','undo (item back) removes the tombstone',!state.deleted[id])}
+    ok('Plan day','energy and the added test are saved in the synced state',(()=>{fixture([]);state.plan={date:T,energy:'high',test:true};const n=normalize(JSON.parse(JSON.stringify(state)));state.plan=null;return n.plan.energy==='high'&&n.plan.test===true})());
+    ok('Plan day','yesterday’s choices do not carry over',(()=>{fixture([]);state.plan={date:D(1),energy:'low',test:true};const r=planDay().energy==='medium'&&!planDay().test;state.plan=null;return r})());
+    fixture([{date:D(1),topic:1,kind:'study',score:70}],{settings:{minutes:180,qph:40,testEvery:7},tests:[{id:'a',date:D(3),q:60,score:75}]});
+    ok('Cadence','recall 75–85% alone no longer brings a test forward (threshold 75%)',(()=>{const w=testWhy();return w.reason!=='testRecall'||wavg(srAll(T,true))<.75})());
     /* --- practice tests in volume and plan --- */
     fixture([],{tests:[{id:'a',date:T,q:40,score:80},{id:'b',date:T,q:60,score:null}]});ok('Volume','a scored practice test always adds 60 questions; in progress adds 0',weeklyVolume(12).at(-1).q===60);
     fixture([],{settings:{minutes:180,qph:40,testEvery:0}});ok('Cadence','every 0 days = off',!testWhy().due&&!buildPlan().items.some(x=>x.kind==='test'));
@@ -2314,7 +2408,8 @@ function showSelfTest(){
 
 /* ================= CLOUD SYNC (private GitHub Gist) =================
    The token and gist id live only in this browser (separate key) — never in the backup JSON or Save HTML.
-   Every save is pushed ~1 s later; on open / focus / back online the newest copy (by updatedAt) wins. */
+   Every save is pushed ~1 s later; on open / focus / back online both copies are MERGED: events and tests are united
+   by id (deletions are remembered), the rest comes from the newer copy. Connecting a new device always downloads. */
 const SYNC_KEY='ppl-flight-deck-sync',GIST_FILE='ppl-flight-deck.json',GH='https://api.github.com';
 let sync={}; /* DEMO: sync disabled */
 let syncStatus=sync.token?'idle':'off',syncTimer=null,syncBusy=false,syncAgain=false,lastPull=0;
@@ -2328,7 +2423,15 @@ async function gh(path,opt={},tok=sync.token){
 async function gistState(g){const f=g&&g.files&&g.files[GIST_FILE];if(!f)return null;let txt=f.content;if(f.truncated&&f.raw_url)txt=await (await fetch(f.raw_url)).text();try{return normalize(JSON.parse(txt))}catch(e){return null}}
 function setSync(st){syncStatus=st;renderSyncChip()}
 function syncErr(e){setSync(e&&e.status===401||e&&e.status===403?'auth':e&&e.status===404?'missing':(!navigator.onLine||e instanceof TypeError)?'offline':'error')}
-function adopt(remote){state=remote;lang=state.lang;try{localStorage.setItem(STORE,JSON.stringify(state))}catch(e){}render()}
+/* merge two copies: events and tests are united by id (the newer copy wins for the same id, deleted ids stay deleted);
+   everything else (lists, scores, settings, exam date, plan of the day) comes from the newer copy */
+function mergeStates(a,b){
+  const [n,o]=a.updatedAt>=b.updatedAt?[a,b]:[b,a],del={...(o.deleted||{}),...(n.deleted||{})};
+  const un=(x,y)=>{const m=new Map();x.forEach(i=>m.set(i.id,i));y.forEach(i=>{if(!m.has(i.id))m.set(i.id,i)});return [...m.values()].filter(i=>!del[i.id])};
+  return normalize({...n,events:un(n.events,o.events),tests:un(n.tests||[],o.tests||[]),deleted:del,updatedAt:Math.max(a.updatedAt,b.updatedAt)});
+}
+const sameState=(a,b)=>JSON.stringify(normalize(a))===JSON.stringify(normalize(b));
+function adopt(remote){state=remote;prevIds=new Set([...state.events,...(state.tests||[])].map(x=>x.id));lang=state.lang;try{localStorage.setItem(STORE,JSON.stringify(state))}catch(e){}render()}
 async function syncPush(){
   if(!syncOn())return;if(syncBusy){syncAgain=true;return}
   clearTimeout(syncTimer);syncTimer=null;syncBusy=true;setSync('busy');
@@ -2339,9 +2442,11 @@ async function syncPush(){
 async function syncPull(force){
   if(!syncOn()||syncBusy||syncTimer)return;if(!force&&Date.now()-lastPull<8000)return;lastPull=Date.now();setSync('busy');
   try{const remote=await gistState(await gh('/gists/'+sync.gistId));
-    if(remote&&remote.updatedAt>state.updatedAt){adopt(remote);sync.at=Date.now();syncStore();setSync('ok');toast(t('syncPulled'))}
-    else if(!remote||remote.updatedAt<state.updatedAt){await syncPush()}
-    else{sync.at=Date.now();syncStore();setSync('ok')}}
+    if(!remote){await syncPush()}
+    else if(remote.updatedAt===state.updatedAt&&sameState(remote,state)){sync.at=Date.now();syncStore();setSync('ok')}
+    else{const m=mergeStates(state,remote),changed=!sameState(m,state);
+      if(changed){adopt(m);toast(t('syncPulled'))}
+      if(!sameState(m,remote)){await syncPush()}else{sync.at=Date.now();syncStore();setSync('ok')}}}
   catch(e){syncErr(e)}
 }
 function schedulePush(){if(!syncOn())return;clearTimeout(syncTimer);setSync('pending');syncTimer=setTimeout(()=>{syncTimer=null;syncPush()},1000)}
@@ -2402,6 +2507,170 @@ window.addEventListener('hashchange',()=>{try{if(location.hash==='#selftest'&&!d
 if(!/Mac|iPhone|iPad/.test(navigator.platform))document.querySelectorAll('.kbd').forEach(k=>{if(k.textContent==='⌘K')k.textContent='Ctrl K'});
 setInterval(()=>{const delta=diffDays(todayISO(),state.deadline);renderSide()},60000);
 if(loadedFromFile)setTimeout(()=>toast(t('fromFile')),300);
+</script>
+<!-- DEMO ONLY: guided tour (injected by build.py into demo.html, never into the personal app) -->
+<style>
+.tour-hole{position:fixed;z-index:9000;border-radius:12px;pointer-events:none;box-shadow:0 0 0 9999px rgba(5,7,10,.74),0 0 0 3px #f5a524,0 0 26px 6px #f5a52455;transition:top .38s cubic-bezier(.2,.8,.2,1),left .38s cubic-bezier(.2,.8,.2,1),width .38s cubic-bezier(.2,.8,.2,1),height .38s cubic-bezier(.2,.8,.2,1),border-radius .38s}
+.tour-hole.center{width:0!important;height:0!important;box-shadow:0 0 0 9999px rgba(5,7,10,.74)}
+.tour-hole.act{animation:tourPulse 1.4s ease-in-out infinite}
+@keyframes tourPulse{0%,100%{box-shadow:0 0 0 9999px rgba(5,7,10,.74),0 0 0 3px #f5a524,0 0 18px 4px #f5a52455}50%{box-shadow:0 0 0 9999px rgba(5,7,10,.74),0 0 0 5px #ffd08a,0 0 34px 12px #f5a52477}}
+.tour-block{position:fixed;z-index:8999;background:transparent}
+.tour-card{position:fixed;z-index:9001;width:min(380px,calc(100vw - 24px));background:#1b1f24;border:1px solid #47505b;border-radius:14px;padding:16px 16px 14px;box-shadow:0 22px 60px #000c;color:var(--ink,#e8ecf1);transition:top .38s cubic-bezier(.2,.8,.2,1),left .38s cubic-bezier(.2,.8,.2,1),opacity .2s}
+.tour-card .tstep{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#ffd08a}
+.tour-card h4{margin:4px 0 6px;font-size:17px;font-weight:900;letter-spacing:-.2px}
+.tour-card p{margin:0;font-size:13.5px;line-height:1.5;color:#c5ccd5}
+.tour-card .tdo{margin-top:8px;font-size:12.5px;font-weight:800;color:#4bce97}
+.tour-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px}
+.tour-dots{display:flex;gap:4px;flex-wrap:wrap}.tour-dots i{width:6px;height:6px;border-radius:3px;background:#3a424c}.tour-dots i.on{background:#f5a524;width:14px}
+.tour-btns{display:flex;gap:6px}
+.tour-card button{padding:6px 12px;font-size:13px}
+.tour-skip{background:none!important;border:0!important;color:#8f99a6!important;padding:6px 4px!important;font-weight:700}
+#tourBtn{white-space:nowrap}
+@media (max-width:640px){#tourBtn{flex:0 0 auto;min-width:36px;padding-left:10px;padding-right:10px}}
+@media (max-width:640px){.tour-card{left:10px!important;right:10px;width:auto;top:auto!important;bottom:calc(10px + env(safe-area-inset-bottom))}}
+</style>
+<script>
+(()=>{
+const KEY='ppl-flight-deck-demo-tour';
+const T={
+  en:{next:'Next',back:'Back',skip:'Skip tour',done:'Finish',step:'Step {i} of {n}',tour:'Tour',doIt:'Try it: {a}'},
+  pt:{next:'Próximo',back:'Voltar',skip:'Pular tour',done:'Concluir',step:'Passo {i} de {n}',tour:'Tour',doIt:'Faça: {a}'},
+  ja:{next:'次へ',back:'戻る',skip:'スキップ',done:'完了',step:'{n}中{i}',tour:'ツアー',doIt:'やってみる：{a}'}};
+/* view: which tab to show · sel: element to highlight · act: a click on this selector moves the tour forward */
+const STEPS=[
+ {view:'dash',sel:null,
+  en:['Welcome to PPL Flight Deck','A one-minute tour of the demo. All data here is fictional. Use Next, the arrow keys, or Esc to leave.'],
+  pt:['Bem-vindo ao PPL Flight Deck','Um tour de um minuto pela demo. Todos os dados aqui são fictícios. Use Próximo, as setas do teclado ou Esc para sair.'],
+  ja:['PPL Flight Deckへようこそ','デモの1分ツアーです。データはすべて架空です。「次へ」、矢印キー、Escで終了。']},
+ {view:'dash',sel:'.board',
+  en:['The Kanban drives your study','Each card is one of the 26 Sporty’s topics. Drag it from To Do toward Very Comfortable as you progress, and tap a card to log a session and its score.'],
+  pt:['O Kanban guia seus estudos','Cada card é um dos 26 tópicos do Sporty’s. Arraste de A fazer até Muito confortável conforme avança e toque num card para registrar uma sessão e a nota.'],
+  ja:['カンバンが学習の中心','各カードはSporty’sの26トピックの1つ。進み具合に合わせて未着手から得意へドラッグし、タップで学習とスコアを記録。']},
+ {view:'dash',sel:'.progress',
+  en:['Question bank progress','How the 1,058 questions are spread across your lists.'],
+  pt:['Progresso do banco de questões','Como as 1.058 questões estão distribuídas nas suas listas.'],
+  ja:['問題バンクの進捗','1,058問がどのリストにあるか。']},
+ {view:'dash',sel:'#tsCard',
+  en:['Practice tests at a glance','Last score, best, average of the last 3 and the trend. ⤢ opens a quick look where you can also log a new test.'],
+  pt:['Simulados num relance','Última nota, melhor, média dos últimos 3 e a tendência. O ⤢ abre uma visão rápida onde você também registra um simulado.'],
+  ja:['模試をひと目で','最新・最高・直近3回平均と傾向。⤢でクイックビュー、そこから新しい模試も記録できます。']},
+ {view:'dash',sel:'#volCard',
+  en:['Study volume','Questions answered per week. Each practice test counts 60. ⤢ opens the full chart.'],
+  pt:['Volume de estudo','Questões respondidas por semana. Cada simulado conta 60. O ⤢ abre o gráfico completo.'],
+  ja:['学習量','週ごとの解答数。模試は60問として数えます。⤢で詳細グラフ。']},
+ {view:'dash',sel:'.cal',
+  en:['Calendar and streak','Every study day, review and practice test. The orange column counts the weeks you studied.'],
+  pt:['Calendário e sequência','Cada dia de estudo, revisão e simulado. A coluna laranja conta as semanas em que você estudou.'],
+  ja:['カレンダーと連続記録','学習・復習・模試の日。オレンジの列は学習した週の数。']},
+ {view:'dash',sel:'#fcMini',
+  en:['One exam forecast','Your question-bank model combined with your recent practice tests, with the chance to pass (70%) and to reach 85%. Tap it to see the topics that cost you the most.'],
+  pt:['Uma única previsão da prova','O modelo do banco combinado com seus simulados recentes, com a chance de passar (70%) e de chegar a 85%. Toque para ver os tópicos que mais custam pontos.'],
+  ja:['試験予測はひとつ','問題バンクのモデルと最近の模試を組み合わせ、合格（70%）と85%到達の確率を表示。タップで失点の多いトピック。']},
+ {view:'dash',sel:'.nthen',
+  en:['Today’s plan','Not in the mood to decide? This list tells you what to study next.'],
+  pt:['Plano de hoje','Sem vontade de decidir? Esta lista diz o que estudar agora.'],
+  ja:['今日の計画','迷ったときは、次に何を学ぶかをこのリストが教えてくれます。']},
+ {view:'dash',sel:'.tabs button[data-view="plan"]',act:'.tabs button[data-view="plan"]',
+  en:['Open the Plan','The full plan lives in its own tab.','click the Plan tab'],
+  pt:['Abra o Plano','O plano completo fica numa aba própria.','clique na aba Plano'],
+  ja:['計画を開く','計画の詳細は専用タブにあります。','計画タブをクリック']},
+ {view:'plan',sel:'#energyPick',act:'#energyPick [data-energy="low"]',
+  en:['Pick your energy','Low, medium or high: the plan changes size and order for the night.','choose Low'],
+  pt:['Escolha sua energia','Baixa, média ou alta: o plano muda de tamanho e de ordem para a noite.','escolha Baixa'],
+  ja:['エネルギーを選ぶ','低・中・高で、その夜の計画の量と順番が変わります。','「低」を選ぶ']},
+ {view:'plan',sel:'#planList',
+  en:['Ordered by impact','Topics come in order of exam-day questions at stake per minute, and each row shows how many. Tap a row to log it.'],
+  pt:['Ordenado por impacto','Os tópicos vêm na ordem de questões em jogo no dia da prova por minuto, e cada linha mostra quantas. Toque numa linha para registrar.'],
+  ja:['効果の大きい順','1分あたりの試験日の失点リスクが大きい順。各行にその数を表示。タップで記録。']},
+ {view:'plan',sel:'#planPt',
+  en:['Practice tests in the plan','Suggested every N days, sooner if you stop studying. Add one to today’s plan or log one you just did.'],
+  pt:['Simulados no plano','Sugeridos a cada N dias, antes se você parar de estudar. Adicione um ao plano de hoje ou registre um que acabou de fazer.'],
+  ja:['計画の中の模試','N日ごとに提案され、学習が止まると早まります。今日の計画に追加、または記録。']},
+ {view:'tests',sel:'.tshero',
+  en:['Practice tests tab','Every test, the trend line and the date you reach 85%.'],
+  pt:['Aba Simulados','Todos os simulados, a linha de tendência e a data em que você chega a 85%.'],
+  ja:['模試タブ','すべての模試、傾向線、85%に届く日。']},
+ {view:'sr',sel:'#statSeg',act:'#statSeg [data-stat="tests"]',
+  en:['Statistics','Question bank: the model and spaced repetition per topic. Practice tests: trend, histogram and a test-based forecast.','open Practice tests'],
+  pt:['Estatísticas','Banco de questões: o modelo e a repetição espaçada por tópico. Simulados: tendência, histograma e previsão pelos simulados.','abra Simulados'],
+  ja:['統計','問題バンク：モデルとトピック別の間隔反復。模試：傾向・ヒストグラム・模試ベースの予測。','模試を開く']},
+ {view:'sr',stat:'tests',sel:'#fcFull',
+  en:['Forecast from practice tests','Built only from your tests: average of the last 3, chance to pass and to reach 85% with their uncertainty, tests passed and consistency.'],
+  pt:['Previsão pelos simulados','Feita só com seus simulados: média dos últimos 3, chance de passar e de chegar a 85% com a incerteza, simulados aprovados e consistência.'],
+  ja:['模試からの予測','模試だけで計算：直近3回平均、合格と85%到達の確率（不確かさ込み）、合格回数、安定度。']},
+ {view:'dash',sel:'.flags',
+  en:['Your data, your language','English, Português or 日本語. Everything stays in your browser; Backup JSON and Save HTML keep a copy.'],
+  pt:['Seus dados, seu idioma','English, Português ou 日本語. Tudo fica no seu navegador; Backup JSON e Save HTML guardam uma cópia.'],
+  ja:['データも言語も自由に','English・Português・日本語。データはブラウザ内に保存。Backup JSONとSave HTMLでコピーを保存。']},
+ {view:'dash',sel:null,
+  en:['You’re ready','Explore freely. Restart this tour anytime with the Tour button at the top.'],
+  pt:['Pronto!','Explore à vontade. Reinicie este tour quando quiser pelo botão Tour no topo.'],
+  ja:['準備完了','自由に操作してみてください。上部の「ツアー」ボタンでいつでも再開できます。']}];
+
+const L=()=>T[lang]?lang:'en',tt=k=>T[L()][k],sx=s=>s[L()]||s.en;
+let k=-1,els=null,onAct=null;
+function build(){
+  els={hole:document.createElement('div'),card:document.createElement('div'),blocks:[0,1,2,3].map(()=>document.createElement('div'))};
+  els.hole.className='tour-hole';els.card.className='tour-card';els.card.setAttribute('role','dialog');els.card.setAttribute('aria-live','polite');
+  els.blocks.forEach(b=>{b.className='tour-block';document.body.appendChild(b)});document.body.appendChild(els.hole);document.body.appendChild(els.card);
+  document.addEventListener('keydown',key,true);window.addEventListener('resize',place);window.addEventListener('scroll',place,{passive:true});
+}
+function key(e){if(k<0)return;if(e.key==='Escape'){e.preventDefault();e.stopPropagation();end()}else if(e.key==='ArrowRight'){e.preventDefault();go(k+1)}else if(e.key==='ArrowLeft'){e.preventDefault();go(k-1)}}
+function target(){const s=STEPS[k];return s.sel?document.querySelector(s.sel):null}
+function place(){
+  if(k<0)return;const s=STEPS[k],el=target(),W=innerWidth,H=innerHeight,pad=8;
+  let r=el&&el.offsetParent!==null?el.getBoundingClientRect():null;
+  const h=els.hole;h.classList.toggle('center',!r);h.classList.toggle('act',!!s.act);
+  let x0=W/2,y0=H/2,x1=W/2,y1=H/2;
+  if(r){x0=Math.max(4,r.left-pad);y0=Math.max(4,r.top-pad);x1=Math.min(W-4,r.right+pad);y1=Math.min(H-4,r.bottom+pad);
+    Object.assign(h.style,{left:x0+'px',top:y0+'px',width:(x1-x0)+'px',height:(y1-y0)+'px'})}
+  else Object.assign(h.style,{left:W/2+'px',top:H/2+'px'});
+  /* clicks outside the highlight are blocked; inside only on interactive steps */
+  const [bt,bb,bl,br]=els.blocks,hole=!!(r&&s.act);
+  Object.assign(bt.style,{left:0,top:0,width:W+'px',height:(hole?y0:H)+'px'});
+  Object.assign(bb.style,{left:0,top:(hole?y1:H)+'px',width:W+'px',height:(hole?H-y1:0)+'px'});
+  Object.assign(bl.style,{left:0,top:y0+'px',width:(hole?x0:0)+'px',height:(hole?y1-y0:0)+'px'});
+  Object.assign(br.style,{left:(hole?x1:W)+'px',top:y0+'px',width:(hole?W-x1:0)+'px',height:(hole?y1-y0:0)+'px'});
+  const c=els.card,cw=c.offsetWidth,ch=c.offsetHeight;
+  if(W<=640)return;
+  let top,left;
+  if(!r){top=(H-ch)/2;left=(W-cw)/2}
+  else{left=Math.min(Math.max(12,x0),W-cw-12);
+    if(y1+12+ch<=H-12)top=y1+12;else if(y0-12-ch>=12)top=y0-12-ch;
+    else{top=Math.min(Math.max(12,(y0+y1)/2-ch/2),H-ch-12);left=x1+12+cw<=W-12?x1+12:Math.max(12,x0-12-cw)}}
+  c.style.left=left+'px';c.style.top=top+'px';
+}
+function go(n){
+  if(n<0)return;if(n>=STEPS.length){end();return}
+  k=n;const s=STEPS[k];
+  if(typeof curView!=='undefined'&&curView!==s.view)goView(s.view);
+  if(s.view==='sr'&&typeof setStat==='function'){const want=s.stat||'bank';if(statMode!==want)setStat(want)}
+  const el=target();if(el&&el.scrollIntoView){const r=el.getBoundingClientRect();if(r.top<0||r.bottom>innerHeight)el.scrollIntoView({block:'center'})}
+  const [title,body,act]=sx(s);
+  els.card.innerHTML=`<div class="tstep">${esc(tt('step').replace('{i}',k+1).replace('{n}',STEPS.length))}</div><h4>${esc(title)}</h4><p>${esc(body)}</p>${act?`<div class="tdo">👉 ${esc(tt('doIt').replace('{a}',act))}</div>`:''}
+    <div class="tour-foot"><button type="button" class="tour-skip" data-tour="skip">${esc(tt('skip'))}</button><div class="tour-dots">${STEPS.map((_,j)=>`<i class="${j===k?'on':''}"></i>`).join('')}</div>
+    <div class="tour-btns">${k?`<button type="button" data-tour="back">${esc(tt('back'))}</button>`:''}<button type="button" class="primary" data-tour="next">${esc(tt(k===STEPS.length-1?'done':'next'))}</button></div></div>`;
+  els.card.querySelector('[data-tour="next"]').focus({preventScroll:true});
+  if(onAct){document.removeEventListener('click',onAct,true);onAct=null}
+  if(s.act){onAct=e=>{if(e.target.closest(s.act)){document.removeEventListener('click',onAct,true);onAct=null;setTimeout(()=>go(k+1),450)}};document.addEventListener('click',onAct,true)}
+  place();setTimeout(place,60);setTimeout(place,400);
+}
+function start(){if(!els)build();els.card.hidden=els.hole.hidden=false;els.blocks.forEach(b=>b.hidden=false);go(0)}
+function end(){
+  if(k<0)return;k=-1;try{localStorage.setItem(KEY,'done')}catch(e){}
+  if(onAct){document.removeEventListener('click',onAct,true);onAct=null}
+  els.card.hidden=els.hole.hidden=true;els.blocks.forEach(b=>b.hidden=true);if(typeof goView==='function')goView('dash');
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-tour]');if(!b)return;const a=b.dataset.tour;if(a==='next')go(k+1);else if(a==='back')go(k-1);else if(a==='skip')end()});
+const btn=document.getElementById('tourBtn');
+const label=()=>{if(!btn)return;const narrow=matchMedia('(max-width:640px)').matches;btn.textContent=narrow?'?':'? '+tt('tour');btn.title=tt('tour');btn.setAttribute('aria-label',tt('tour'))};label();window.addEventListener('resize',label);
+document.querySelectorAll('.flag').forEach(f=>f.addEventListener('click',()=>{setTimeout(()=>{label();if(k>=0)go(k)},0)}));
+if(btn)btn.onclick=start;
+window.pplTour={start,end,step:()=>k,steps:STEPS.length,go};
+/* first visit opens the tour (not under automated testing — tests start it explicitly) */
+let seen=false;try{seen=localStorage.getItem(KEY)==='done'}catch(e){}
+if(!seen&&!navigator.webdriver)setTimeout(start,700);
+})();
 </script>
 </body>
 </html>
