@@ -529,9 +529,10 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 #examDate{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;-webkit-appearance:none;appearance:none;text-align:left;font-weight:700}
 #examDate::-webkit-date-and-time-value{text-align:left;margin:0}
 @media (max-width:640px){#examDate{height:38px;padding:6px 10px;border-radius:9px;font-size:16px!important}}
-.srrange{display:flex;gap:2px;padding:2px;margin:6px 0 4px;border-radius:8px;max-width:260px}
-.srrange button{flex:1;padding:3px 6px!important;font-size:11.5px!important;font-weight:800}
-.srhero .srrange{max-width:320px;margin:0 0 8px}
+.srrange{display:flex;gap:2px;padding:2px;margin:6px 0 4px;border-radius:8px;max-width:none}
+.srrange button{flex:1;min-width:0;padding:3px 2px!important;font-size:11px!important;font-weight:800}
+.volrange button{min-width:0;padding:6px 2px!important}
+.srhero .srrange{max-width:560px;margin:0 0 8px}
 </style>
 </head>
 <body>
@@ -599,7 +600,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
         <label class="prevpick"><span class="flabel" data-t="pickLabel"></span><select id="prevPick"></select></label>
         <div class="prevtitle" id="prevTitle"></div>
         <div class="prevstats" id="prevStats"></div>
-        <div class="seg srrange" data-srr><button data-sr="7d">7D</button><button data-sr="1m">1M</button><button data-sr="3m">3M</button><button data-sr="all" data-t="rAll"></button></div>
+        <div class="seg srrange" data-srr><button data-sr="3d">3D</button><button data-sr="7d">7D</button><button data-sr="2w">2W</button><button data-sr="1m">1M</button><button data-sr="3m">3M</button><button data-sr="6m">6M</button><button data-sr="1y">1Y</button><button data-sr="all" data-t="rAll"></button></div>
         <div class="chart" id="prevChart"></div>
         <div class="chartlegend small" id="srLegend2"></div>
         <div class="nthen"><div class="qh" data-t="suggest"></div><div id="sugg"></div></div>
@@ -612,7 +613,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   <div class="view" id="viewSR" hidden>
     <section class="panel srhero">
       <div class="srhead"><div><h2 class="section" data-t="tabSR"></h2><div class="muted" data-t="srSub"></div></div><div class="srkpis" id="srKpis"></div></div>
-      <div class="seg srrange" data-srr><button data-sr="7d">7D</button><button data-sr="1m">1M</button><button data-sr="3m">3M</button><button data-sr="all" data-t="rAll"></button></div>
+      <div class="seg srrange" data-srr><button data-sr="3d">3D</button><button data-sr="7d">7D</button><button data-sr="2w">2W</button><button data-sr="1m">1M</button><button data-sr="3m">3M</button><button data-sr="6m">6M</button><button data-sr="1y">1Y</button><button data-sr="all" data-t="rAll"></button></div>
       <div class="chart" id="srAvgChart"></div>
       <div class="chartlegend" id="srLegend1"></div>
     </section>
@@ -682,7 +683,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
     <div class="mhead"><h3 id="volTitle" data-t="volTitle"></h3><button class="x" id="volClose" aria-label="Close">×</button></div>
     <div class="voltot"><div><span class="vlabel" data-t="totalQ"></span><b id="volTotal">0</b><span class="vdates" id="volDates"></span></div><div class="vcmp" id="volCmp"></div></div>
     <div class="volbig" id="volBig"></div>
-    <div class="seg volrange" id="volRange"><button data-r="3d">3D</button><button data-r="7d">7D</button><button data-r="1m">1M</button><button data-r="3m" class="on">3M</button><button data-r="6m">6M</button><button data-r="1y">1Y</button></div>
+    <div class="seg volrange" id="volRange"><button data-r="3d">3D</button><button data-r="7d">7D</button><button data-r="2w">2W</button><button data-r="1m">1M</button><button data-r="3m">3M</button><button data-r="6m">6M</button><button data-r="1y">1Y</button><button data-r="all" data-t="rAll"></button></div>
     <p class="volnote" data-t="volNote"></p>
     <div hidden><span id="stAvg"><b id="avg"></b><i id="avgBar"></i></span><span id="stPace"><b id="pace"></b></span></div>
   </div>
@@ -1060,7 +1061,7 @@ function chartSVG(o){
   return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(t('tabSR'))}">${g}</svg>`;
 }
 let srRange=(()=>{try{return localStorage.getItem(STORE+'-srr')||'1m'}catch(e){return '1m'}})();
-const SRDAYS={'7d':7,'1m':30,'3m':90,'all':Infinity};
+const SRDAYS={'3d':3,'7d':7,'2w':14,'1m':30,'3m':90,'6m':182,'1y':365,'all':Infinity};
 function setSrRange(r){srRange=r;try{localStorage.setItem(STORE+'-srr',r)}catch(e){}renderSRPanel();if(!$('#viewSR').hidden)renderSRPage()}
 function paintSrRange(){document.querySelectorAll('[data-srr] button').forEach(b=>b.classList.toggle('on',b.dataset.sr===srRange))}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-srr] button');if(b)setSrRange(b.dataset.sr)});
@@ -1324,15 +1325,16 @@ function volSVG(data,W,H,big){
   const r=big?4.5:(data.length>16?2:3);
   pts.forEach((p,k)=>{const cur=k===pts.length-1;if(cur)g+=`<circle class="vhalo" cx="${f(p[0])}" cy="${f(p[1])}" r="${r*2.6}"/>`;g+=`<circle class="vdot${cur?' cur':''}" cx="${f(p[0])}" cy="${f(p[1])}" r="${r}"><title>${esc(data[k].day?new Intl.DateTimeFormat(LOCALE[lang],{weekday:'short',month:'short',day:'numeric'}).format(parse(data[k].w)):t('weekOf').replace('{d}',new Intl.DateTimeFormat(LOCALE[lang],{month:'short',day:'numeric'}).format(parse(data[k].w))))}: ${data[k].q} ${esc(t('questionsUnit'))}</title></circle>`;
     if(big&&data.length<=14&&data[k].q)g+=`<text class="vval" x="${f(p[0])}" y="${f(p[1]-9)}" text-anchor="middle">${data[k].q}</text>`});
-  if(big&&data[0].day){const n=data.length,step=n<=7?1:7,lf=new Intl.DateTimeFormat(LOCALE[lang],n<=7?{weekday:'short'}:{month:'short',day:'numeric'});data.forEach((d,k)=>{if((n-1-k)%step===0)g+=`<text class="vax" x="${f(X(k))}" y="${H-6}" text-anchor="middle">${esc(lf.format(parse(d.w)))}</text>`})}
+  if(big&&data[0].day){const n=data.length,step=n<=7?1:n<=14?2:7,lf=new Intl.DateTimeFormat(LOCALE[lang],n<=7?{weekday:'short'}:{month:'short',day:'numeric'});data.forEach((d,k)=>{if((n-1-k)%step===0)g+=`<text class="vax" x="${f(X(k))}" y="${H-6}" text-anchor="middle">${esc(lf.format(parse(d.w)))}</text>`})}
   else if(big){let lastM=-1;const mf=new Intl.DateTimeFormat(LOCALE[lang],{month:'short'});data.forEach((d,k)=>{const m=parse(d.w).getMonth();if(m!==lastM&&k>0){g+=`<text class="vax" x="${f(X(k))}" y="${H-6}" text-anchor="middle">${esc(mf.format(parse(d.w)).toUpperCase())}</text>`}lastM=m})}
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${esc(t('volTitle'))}">${g}</svg>`;
 }
 let volRange='3m';
-const RANGES={'3d':{days:3},'7d':{days:7},'1m':{days:30},'3m':{weeks:13},'6m':{weeks:26},'1y':{weeks:52}};
+const RANGES={'3d':{days:3},'7d':{days:7},'2w':{days:14},'1m':{days:30},'3m':{weeks:13},'6m':{weeks:26},'1y':{weeks:52},'all':{all:true}};
 function dailyVolume(){const by={};state.events.forEach(e=>{if((e.kind==='study'||e.kind==='review')&&!e.partial)by[e.date]=(by[e.date]||0)+TOPICS[e.topic].q});(state.tests||[]).forEach(x=>{if(x.score!=null)by[x.date]=(by[x.date]||0)+(x.q||60)});return by}
 function rangeSeries(r,shift=0){
-  const R=RANGES[r],by=dailyVolume(),today=todayISO();
+  let R=RANGES[r];const by=dailyVolume(),today=todayISO();
+  if(R.all){if(shift)return [];const ks=Object.keys(by).sort(),first=ks.length?weekStart(ks[0]):today;R={weeks:Math.max(13,Math.round(diffDays(first,weekStart(today))/7)+1)}}
   if(R.days){const end=addDays(today,-shift*R.days),out=[];for(let k=R.days-1;k>=0;k--){const d=addDays(end,-k);out.push({w:d,q:by[d]||0,day:true})}return out}
   const curW=addDays(weekStart(today),-shift*7*R.weeks),out=[];
   for(let k=R.weeks-1;k>=0;k--){const w=addDays(curW,-7*k);let q=0;for(let i=0;i<7;i++){const d=addDays(w,i);if(d<=today)q+=by[d]||0}out.push({w,q})}
