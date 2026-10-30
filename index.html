@@ -607,13 +607,47 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .rchip.light{background:#1d4835;color:#7ee2b3}
 @media (max-width:640px){.energy{gap:6px}.energy button{padding:8px}.energy .en{font-size:12.5px}.energy .es{font-size:10.5px}}
 @media (max-width:640px){#planKpis{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 12px!important;width:100%}#planKpis b{font-size:20px!important}#planKpis span{font-size:11px}.planhero .srhead{flex-direction:column;align-items:stretch}}
+
+/* practice tests */
+.tsstrip{display:grid;grid-template-columns:auto auto minmax(120px,1fr) auto auto;align-items:center;gap:18px;padding:10px 18px;flex:none}
+.tsl{display:flex;flex-direction:column;gap:2px}
+.tslast{display:flex;align-items:baseline;gap:6px}.tslast b{font-size:24px;font-weight:900;letter-spacing:-.5px}.tslast small{font-size:11.5px;color:var(--muted);font-weight:700}
+.tsk{font-size:12.5px;color:var(--muted);font-weight:700;display:flex;gap:14px;white-space:nowrap}.tsk b{color:var(--ink);font-size:14px}
+.tsspark{height:44px;min-width:0}.tsspark svg{display:block;width:100%;height:100%}
+.tsnext{font-size:12.5px;font-weight:800;color:#ffd08a;white-space:nowrap}
+.tsnextbig{font-size:13.5px;margin:6px 0 8px}
+.tshero,.tslistp{padding:18px 20px}
+.tskpis{grid-template-columns:repeat(5,minmax(0,1fr))}
+.tstrend{font-size:13.5px;font-weight:700;color:var(--ink2);margin:4px 0}
+.tstrend b{color:var(--ink)}.tstrend .few{color:var(--muted);font-weight:650}
+.tsrow{display:flex;align-items:center;gap:12px;padding:9px 2px;border-bottom:1px solid #262b31;font-size:14px}
+.tsrow .k{width:10px;height:10px;border-radius:50%;flex:none}
+.tsrow .d{flex:1;font-weight:700}.tsrow .sc{font-weight:900;font-size:15px;min-width:52px;text-align:right}
+.tsrow button{padding:3px 9px;font-size:12px}
+.statseg{max-width:420px;margin-bottom:2px}
+#statBank,#statTests{display:flex;flex-direction:column;gap:12px}
+#statBank[hidden],#statTests[hidden]{display:none}
+#calChart{max-width:560px}
+.tsduo{display:grid;grid-template-columns:minmax(0,620px) minmax(0,1fr);gap:12px;align-items:start}
+@media (max-width:1000px){.tsduo{grid-template-columns:minmax(0,1fr)}}
+.s-reg{fill:none;stroke:#ffd08a;stroke-width:2;stroke-dasharray:0}
+.s-regp{fill:none;stroke:#ffd08a;stroke-width:2;stroke-dasharray:6 5;opacity:.8}
+.s-band{fill:#ffd08a1f;stroke:none}
+.s-diag{stroke:#8590a2;stroke-width:1.2;stroke-dasharray:5 5}
+.distrow{display:grid;grid-template-columns:72px minmax(0,1fr) 34px;gap:10px;align-items:center;padding:4px 0;font-size:13px;font-weight:700}
+.distrow .bar{height:12px;border-radius:4px;background:#2a3038;position:relative}.distrow .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+.regf{font:600 12.5px/1.6 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;background:#0f1114;border:1px solid var(--line);border-radius:10px;padding:12px;margin:10px 0 0}
+.rchip.testIdle,.rchip.testRecall,.rchip.testFinal{background:#3d2b14;color:#ffd08a}
+@media (min-width:1100px) and (min-height:1050px){body:not(.srview) .tsstrip{padding:6px 16px}}
+@media (max-width:860px){.tsstrip{grid-template-columns:auto 1fr auto;gap:10px 14px}.tsstrip .tsk{grid-column:1/-1;order:3}.tsstrip .tsspark{grid-column:1/-1;order:4;height:50px}.tsstrip .tsnext{order:5}.tsstrip #tsOpen{order:6;justify-self:end}}
+@media (max-width:640px){.tskpis{grid-template-columns:repeat(3,minmax(0,1fr))}.tshero,.tslistp{padding:14px}.tabs button{min-width:0;overflow:hidden;text-overflow:ellipsis}}
 </style>
 </head>
 <body>
 <main class="app">
   <header class="top">
     <div>
-      <div class="brandrow"><div class="brand">PPL <span>/</span> FLIGHT DECK</div><nav class="tabs" role="tablist"><button type="button" role="tab" data-view="dash" data-t="tabDash"></button><button type="button" role="tab" data-view="plan" data-t="tabPlan"></button><button type="button" role="tab" data-view="sr" data-t="tabSR"></button></nav></div>
+      <div class="brandrow"><div class="brand">PPL <span>/</span> FLIGHT DECK</div><nav class="tabs" role="tablist"><button type="button" role="tab" data-view="dash" data-t="tabDash"></button><button type="button" role="tab" data-view="plan" data-t="tabPlan"></button><button type="button" role="tab" data-view="tests" data-t="tabTests"></button><button type="button" role="tab" data-view="sr" data-t="tabSR"></button></nav></div>
       <div class="subtitle"><span data-t="sub"></span></div>
     </div>
     <div class="tools">
@@ -683,8 +717,28 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
     </div>
   </section>
 
+    <section class="panel tsstrip" id="tsStrip">
+      <div class="tsl"><span class="label" data-t="tabTestsLong"></span><span class="tslast"><b id="tsLast">—</b><small data-t="tsLastLbl"></small></span></div>
+      <div class="tsk" id="tsStripKpis"></div>
+      <div class="tsspark" id="tsSpark"></div>
+      <div class="tsnext" id="tsStripNext"></div>
+      <button type="button" class="linkbtn" id="tsOpen" data-t="tsOpen"></button>
+    </section>
   </div>
 
+  <div class="view" id="viewTests" hidden>
+    <section class="panel tshero">
+      <div class="srhead"><div><h2 class="section" data-t="tabTestsLong"></h2><div class="muted" data-t="tsSub"></div></div><button type="button" class="primary" id="tsAdd" data-t="tsAdd"></button></div>
+      <div class="fckpis tskpis" id="tsKpis"></div>
+      <div class="tstrend" id="tsTrendTxt"></div>
+      <div class="tsnext tsnextbig" id="tsNext"></div>
+      <div class="seg srrange" data-tsrr><button data-tsr="3d">3D</button><button data-tsr="7d">7D</button><button data-tsr="2w">2W</button><button data-tsr="1m">1M</button><button data-tsr="3m">3M</button><button data-tsr="6m">6M</button><button data-tsr="1y">1Y</button><button data-tsr="all" data-t="rAll"></button></div>
+      <div class="chart" id="tsChart"></div>
+      <div class="chartlegend" id="tsLegend"></div>
+      <button type="button" class="linkbtn" id="tsToStats" data-t="tsFull"></button>
+    </section>
+    <section class="panel tslistp"><h3 class="fch3" data-t="tsAll"></h3><div id="tsList"></div></section>
+  </div>
   <div class="view" id="viewPlan" hidden>
     <section class="panel planhero">
       <div class="srhead"><div><h2 class="section" data-t="planTitle"></h2><div class="muted" id="planSub"></div></div><div class="srkpis" id="planKpis"></div></div>
@@ -698,13 +752,15 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
         <label class="field"><span class="flabel" data-t="setMinutes"></span><input type="number" id="setMinutes" min="15" max="600" step="15" inputmode="numeric"></label>
         <label class="field"><span class="flabel" data-t="setQph"></span><input type="number" id="setQph" min="5" max="200" step="5" inputmode="numeric"></label>
         <label class="field"><span class="flabel" data-t="setReview"></span><input type="number" id="setReviewMin" min="0" max="10" step="0.5" inputmode="decimal"></label>
-        <label class="field"><span class="flabel" data-t="setTests"></span><input type="number" id="setTests" min="0" max="7" step="1" inputmode="numeric"></label>
+        <label class="field"><span class="flabel" data-t="setTests"></span><input type="number" id="setTests" min="0" max="14" step="1" inputmode="numeric"></label>
       </div>
       <div class="planact"><button type="button" class="primary" id="planCalc"><span class="spin" hidden></span><span data-t="planCalc"></span></button><div class="muted" id="planCap"></div></div>
       <p class="planweights" data-t="planWeights"></p>
     </section>
   </div>
   <div class="view" id="viewSR" hidden>
+    <div class="seg statseg" id="statSeg"><button data-stat="bank" class="on" data-t="statBank"></button><button data-stat="tests" data-t="statTests"></button></div>
+    <div id="statBank">
     <section class="panel fchero" id="fcSection">
       <div class="srhead"><div><h2 class="section" data-t="fcTitle"></h2><div class="muted" data-t="fcSub"></div></div></div>
       <div class="fckpis" id="fcKpis"></div>
@@ -724,6 +780,34 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
     <details class="panel formula" id="formula"><summary data-t="howCalc"></summary><div id="formulaBody"></div></details>
     <div class="filters" id="srFilters"></div>
     <div class="srgrid" id="srGrid"></div>
+    </div>
+    <div id="statTests" hidden>
+      <section class="panel fchero">
+        <div class="srhead"><div><h2 class="section" data-t="ovTitle"></h2><div class="muted" data-t="ovSub"></div></div></div>
+        <div class="fckpis" id="ovKpis"></div>
+        <div class="tstrend" id="ovWeights"></div>
+      </section>
+      <section class="panel fchero">
+        <div class="srhead"><div><h2 class="section" data-t="trendTitle"></h2><div class="muted" data-t="trendSub"></div></div></div>
+        <div class="tstrend" id="tsTrendTxt2"></div>
+        <div class="seg srrange" data-tsrr><button data-tsr="3d">3D</button><button data-tsr="7d">7D</button><button data-tsr="2w">2W</button><button data-tsr="1m">1M</button><button data-tsr="3m">3M</button><button data-tsr="6m">6M</button><button data-tsr="1y">1Y</button><button data-tsr="all" data-t="rAll"></button></div>
+        <div class="chart" id="tsChart2"></div>
+        <div class="chartlegend" id="tsLegend2"></div>
+      </section>
+      <div class="tsduo">
+      <section class="panel fchero">
+        <div class="srhead"><div><h2 class="section" data-t="calTitle"></h2><div class="muted" data-t="calSub"></div></div></div>
+        <div class="tstrend" id="calTxt"></div>
+        <div class="chart" id="calChart"></div>
+        <div class="chartlegend"><span><i style="border-color:#8590a2;border-top-style:dashed"></i><span data-t="calPerfect"></span></span><span><i style="border-color:#ffd08a"></i><span data-t="calFit"></span></span></div>
+      </section>
+      <section class="panel fchero">
+        <div class="srhead"><div><h2 class="section" data-t="distTitle"></h2><div class="muted" id="gapTxt"></div></div></div>
+        <div id="distBars"></div>
+      </section>
+      </div>
+      <details class="panel formula"><summary data-t="howCalc"></summary><pre class="regf" id="regFormula"></pre></details>
+    </div>
   </div>
 </main>
 
@@ -745,6 +829,13 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
     <input id="palIn" autocomplete="off" spellcheck="false">
     <div id="palList" role="listbox"></div>
     <div class="palfoot"><span><span class="kbd">↵</span> <span data-t="study"></span></span><span><span class="kbd">⇧↵</span> <span data-t="review"></span></span><span><span class="kbd">⌥↵</span> <span data-t="openCard"></span></span><span><span class="kbd">esc</span></span></div>
+  </div>
+</div>
+<div class="modalbg" id="fcTopBg" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="fcTopTitle">
+    <div class="mhead"><div><h3 id="fcTopTitle" data-t="fcLostTitle"></h3><div class="muted" id="fcTopDesc"></div></div><button class="x" id="fcTopClose" aria-label="Close">×</button></div>
+    <div class="fclost" id="fcTopList"></div>
+    <div class="mbtns"><button class="primary" id="fcTopFull" data-t="openAnalysis"></button></div>
   </div>
 </div>
 <div class="modalbg" id="ptbg" hidden>
@@ -808,7 +899,7 @@ const COLORS=['#8590a2','#579dff','#f5a524','#4bce97','#9f8fef'];
 /* darker variants for tags drawn on the light "active day" background */
 const ONLIGHT={study:'#16935e',review:'#7158dc',move:['#5f6b7e','#2f7de1','#c98200','#16935e','#7158dc']};
 const GOAL=85;
-const DEF_SET0={minutes:180,qph:40,tests:2,reviewMin:1.5};
+const DEF_SET0={minutes:180,qph:40,testEvery:3,reviewMin:1.5};
 const LOCALE={en:'en-US',pt:'pt-BR',ja:'ja-JP'};
 const I18N={
 en:{activeLegend:'Active day',vcLegend:'Moved to Very Comfortable (names)',mDays:'active days this month',mTopics:'moved to Very Comfortable',mActs:'actions',sub:'FAA Private Pilot Knowledge Test · Study tracker',demo:'EXAMPLE DATA',clear:'Clear examples',backup:'Backup JSON',import:'Import',save:'Save HTML',progress:'Question bank progress',total:'{n} questions',today:'Today',wk:'WK',wkTitle:'Weeks with study',streak:'day streak',keep:'Study today to keep the streak',exam:'Exam countdown',toGo:'days to go',since:'days since exam date',examToday:'Exam day — good luck!',examShort:'EXAM',avg:'Avg score',avgTip:'Weighted average of your Sporty’s scores (goal ≥ 85%). Moving cards does not change it.',avgSub:'goal ≥ 85%',pace:'Pace / day',paceTip:'Questions per day to get every topic into Very Comfortable before the exam',paceVal:'{n}/day',active:'Active days',activities:'Logged actions',board:'Your cards',drag:'Drag between lists · Click or Enter to log',activity:'Activity',status:'Status',date:'Date',record:'Save',cancel:'Cancel',history:'History',study:'Studied',review:'Reviewed',move:'Moved',none:'Status only',labels:['To Do','Doing','Not Comfortable','Very Comfortable','To Review'],days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],qn:'{n} q',ago:'{n}d',todayShort:'today',examLegend:'Exam date',demoConfirm:'Remove all example activity? Your card positions and your own records stay.',cleared:'Examples removed',saved:'Recorded',undo:'Undo',undone:'Undone',exported:'File downloaded',imported:'Backup imported',invalid:'This is not a valid PPL Flight Deck backup.',inactive:'No records yet.',already:'Already in this list',nothing:'Nothing to save — choose an activity or a new status',example:'example',del:'Delete',deleted:'Record deleted',fromFile:'Loaded the newer data saved inside this file',nextLabel:'Cleared next',nextWhy:'{q} q · score {s} · {last}',never:'never logged',then:'Then, in order',quick:'quick log',openCard:'open card',palPh:'Log study — type a topic…',metarTitle:'Your study state, METAR-style: time · days to exam · Very Comfortable share · avg/goal · streak · pace',logged:'{t} — {k}'},
@@ -858,6 +949,9 @@ Object.assign(I18N.ja,{"planMinOf": "予定 / {b}", "planCapTxt": "{m}で約{c}�
 Object.assign(I18N.en,{"en_low": "Low energy", "en_medium": "Medium", "en_high": "High energy", "workload": "Workload", "rs_light": "light", "reason_light": "Light review of a topic you know"});
 Object.assign(I18N.pt,{"en_low": "Pouca energia", "en_medium": "Média", "en_high": "Muita energia", "workload": "Carga", "rs_light": "leve", "reason_light": "Revisão leve de um tópico que você domina"});
 Object.assign(I18N.ja,{"en_low": "低エネルギー", "en_medium": "普通", "en_high": "高エネルギー", "workload": "負荷", "rs_light": "軽め", "reason_light": "得意なトピックの軽い復習"});
+Object.assign(I18N.en,{"fcTopDesc":"Overall {s}% · pass {p}% · 85% {g}% — these 3 topics cost you the most questions on a 60-question exam","calPerfect":"Perfect model (predicted = real)","calFit":"Fitted line","tabTests": "Tests", "tabTestsLong": "Practice tests", "tsSub": "FAA practice tests · always 60 questions", "tsAdd": "+ Log practice test", "tsLastLbl": "last", "tsBest": "Best", "tsAvg3": "Avg last 3", "ts70": "tests ≥ 70%", "ts85": "tests ≥ 85%", "tsFew": "Log {n} more scored practice tests to see the trend", "tsCons": "consistent progress", "tsMod": "moderate", "tsNoisy": "scores jump around", "tsCross": "reaches 85% on {d}", "tsAlready": "already above 85%", "tsNever": "not on track to reach 85% before the exam", "tsExam": "≈ {s}% on exam day", "tsNextToday": "Next practice test: today", "tsNextIn": "Next practice test: in {n} d", "tsOff": "Practice tests not scheduled (every 0 days)", "tsNone": "No scored practice tests yet.", "tsAll": "All practice tests", "tsFull": "Full statistics →", "tsOpen": "Practice tests →", "edit": "Edit", "statBank": "Question bank", "statTests": "Practice tests", "ovTitle": "Overall score", "ovSub": "Question-bank model combined with your recent practice tests", "ovScore": "Overall expected score", "ovModel": "Question-bank model alone", "ovWeights": "Practice tests {t}% (last {n}, weight {w}%) · Question-bank model {m}% (weight {mw}%)", "ovNoTests": "No scored practice tests yet — the overall score is the question-bank model.", "trendTitle": "Practice-test trend", "trendSub": "Linear regression of your scores over time", "calTitle": "Does the model get it right?", "calSub": "Question-bank forecast on each test day vs. the score you got", "calFew": "Calibration needs 5 scored tests (you have {n})", "calBias": "real − predicted: {b} pp on average", "calOk": "calibrated forecast ≈ {c}%", "calBad": "R² below 0.3 — not reliable enough to correct the forecast", "calPredicted": "predicted", "calReal": "real", "calAxis": "x: predicted · y: real", "distTitle": "Score distribution", "gapTxt": "On average one test every {d} days", "lgScore": "Score", "lgTrend": "Trend", "lgTrendP": "Projection", "lgBand": "± 1 standard error", "setTests": "Practice test every N days (0 = off)", "reason_test": "Practice test due (every N days)", "reason_testIdle": "3+ days without studying — a test shows what slipped", "reason_testRecall": "Recall below 85% or many reviews due", "reason_testFinal": "Final 10 days: a test every 2 days", "rs_testIdle": "test", "rs_testRecall": "test", "rs_testFinal": "test", "regFormula": "Overall = (1 − w) × model + w × average of last 3 tests,   w = n ÷ (n + 2)\nTrend: score = a + b × day (least squares)\n  b = Σ(x − x̄)(y − ȳ) ÷ Σ(x − x̄)²,   a = ȳ − b·x̄\n  R² = 1 − Σ(y − ŷ)² ÷ Σ(y − ȳ)²\n  band = ± se·√(1 + 1/n + (x − x̄)² ÷ Σ(x − x̄)²)\nCalibration: real = α + β × model (from 5 tests, R² ≥ 0.3)"});
+Object.assign(I18N.pt,{"fcTopDesc":"Nota geral {s}% · passar {p}% · 85% {g}% — estes 3 tópicos custam mais questões numa prova de 60","calPerfect":"Modelo perfeito (previsto = real)","calFit":"Reta ajustada","tabTests": "Simulados", "tabTestsLong": "Simulados", "tsSub": "Simulados FAA · sempre 60 questões", "tsAdd": "+ Registrar simulado", "tsLastLbl": "último", "tsBest": "Melhor", "tsAvg3": "Média últimos 3", "ts70": "simulados ≥ 70%", "ts85": "simulados ≥ 85%", "tsFew": "Registre mais {n} simulados com nota para ver a tendência", "tsCons": "progresso consistente", "tsMod": "moderado", "tsNoisy": "notas oscilando", "tsCross": "chega a 85% em {d}", "tsAlready": "já acima de 85%", "tsNever": "no ritmo atual não chega a 85% antes da prova", "tsExam": "≈ {s}% no dia da prova", "tsNextToday": "Próximo simulado: hoje", "tsNextIn": "Próximo simulado: em {n} d", "tsOff": "Simulados não agendados (a cada 0 dias)", "tsNone": "Nenhum simulado com nota ainda.", "tsAll": "Todos os simulados", "tsFull": "Estatísticas completas →", "tsOpen": "Simulados →", "edit": "Editar", "statBank": "Banco de questões", "statTests": "Simulados", "ovTitle": "Nota geral", "ovSub": "Modelo do banco de questões combinado com seus simulados recentes", "ovScore": "Nota geral esperada", "ovModel": "Só o modelo do banco", "ovWeights": "Simulados {t}% (últimos {n}, peso {w}%) · Modelo do banco {m}% (peso {mw}%)", "ovNoTests": "Nenhum simulado com nota ainda — a nota geral é o modelo do banco.", "trendTitle": "Tendência dos simulados", "trendSub": "Regressão linear das suas notas ao longo do tempo", "calTitle": "O modelo acerta?", "calSub": "Previsão do banco no dia de cada simulado × a nota que você tirou", "calFew": "A calibração precisa de 5 simulados com nota (você tem {n})", "calBias": "real − previsto: {b} pp em média", "calOk": "previsão calibrada ≈ {c}%", "calBad": "R² abaixo de 0,3 — não confiável para corrigir a previsão", "calPredicted": "previsto", "calReal": "real", "calAxis": "x: previsto · y: real", "distTitle": "Distribuição das notas", "gapTxt": "Em média um simulado a cada {d} dias", "lgScore": "Nota", "lgTrend": "Tendência", "lgTrendP": "Projeção", "lgBand": "± 1 erro padrão", "setTests": "Simulado a cada N dias (0 = desligado)", "reason_test": "Simulado na vez (a cada N dias)", "reason_testIdle": "3+ dias sem estudar — um simulado mostra o que caiu", "reason_testRecall": "Retenção abaixo de 85% ou muitas revisões vencidas", "reason_testFinal": "Últimos 10 dias: simulado a cada 2 dias", "rs_testIdle": "simulado", "rs_testRecall": "simulado", "rs_testFinal": "simulado", "regFormula": "Nota geral = (1 − w) × modelo + w × média dos últimos 3 simulados,   w = n ÷ (n + 2)\nTendência: nota = a + b × dia (mínimos quadrados)\n  b = Σ(x − x̄)(y − ȳ) ÷ Σ(x − x̄)²,   a = ȳ − b·x̄\n  R² = 1 − Σ(y − ŷ)² ÷ Σ(y − ȳ)²\n  faixa = ± se·√(1 + 1/n + (x − x̄)² ÷ Σ(x − x̄)²)\nCalibração: real = α + β × modelo (a partir de 5 simulados, R² ≥ 0,3)"});
+Object.assign(I18N.ja,{"fcTopDesc":"総合 {s}% · 合格 {p}% · 85% {g}% — 60問の試験で最も失点が多い3トピック","calPerfect":"完全なモデル（予測＝実際）","calFit":"回帰直線","tabTests": "模試", "tabTestsLong": "模擬試験", "tsSub": "FAA模擬試験 · 常に60問", "tsAdd": "＋ 模擬試験を記録", "tsLastLbl": "最新", "tsBest": "最高", "tsAvg3": "直近3回平均", "ts70": "70%以上の回数", "ts85": "85%以上の回数", "tsFew": "傾向を見るには正答率付きの模試をあと{n}回記録", "tsCons": "安定した伸び", "tsMod": "普通", "tsNoisy": "ばらつき大", "tsCross": "{d}に85%到達", "tsAlready": "すでに85%以上", "tsNever": "このペースでは試験前に85%に届かない", "tsExam": "試験日 約{s}%", "tsNextToday": "次の模試：今日", "tsNextIn": "次の模試：{n}日後", "tsOff": "模試の予定なし（0日ごと）", "tsNone": "正答率付きの模試はまだありません。", "tsAll": "すべての模試", "tsFull": "詳しい統計 →", "tsOpen": "模試 →", "edit": "編集", "statBank": "問題バンク", "statTests": "模擬試験", "ovTitle": "総合スコア", "ovSub": "問題バンクのモデルと最近の模試の組み合わせ", "ovScore": "総合予想正答率", "ovModel": "問題バンクのモデルのみ", "ovWeights": "模試 {t}%（直近{n}回、重み{w}%）· 問題バンク {m}%（重み{mw}%）", "ovNoTests": "正答率付きの模試がまだないため、総合スコア＝問題バンクのモデル。", "trendTitle": "模試の傾向", "trendSub": "正答率の線形回帰", "calTitle": "モデルは当たっている？", "calSub": "各模試の日の予測と実際の正答率", "calFew": "補正には正答率付きの模試が5回必要（現在{n}回）", "calBias": "実際 − 予測：平均 {b} pp", "calOk": "補正後の予測 約{c}%", "calBad": "R²が0.3未満 — 補正には不十分", "calPredicted": "予測", "calReal": "実際", "calAxis": "x：予測 · y：実際", "distTitle": "正答率の分布", "gapTxt": "平均{d}日ごとに1回", "lgScore": "正答率", "lgTrend": "傾向", "lgTrendP": "予測", "lgBand": "±1標準誤差", "setTests": "模試の間隔（日、0＝オフ）", "reason_test": "模試の予定（N日ごと）", "reason_testIdle": "3日以上学習なし — 模試で弱点を確認", "reason_testRecall": "保持率85%未満または復習が多い", "reason_testFinal": "最後の10日：2日ごとに模試", "rs_testIdle": "模試", "rs_testRecall": "模試", "rs_testFinal": "模試", "regFormula": "総合 = (1 − w) × モデル + w × 直近3回の模試平均,   w = n ÷ (n + 2)\n傾向：正答率 = a + b × 日（最小二乗法）\n  b = Σ(x − x̄)(y − ȳ) ÷ Σ(x − x̄)²,   a = ȳ − b·x̄\n  R² = 1 − Σ(y − ŷ)² ÷ Σ(y − ȳ)²\n  帯 = ± se·√(1 + 1/n + (x − x̄)² ÷ Σ(x − x̄)²)\n補正：実際 = α + β × モデル（5回以上、R² ≥ 0.3）"});
 const $=s=>document.querySelector(s);
 const pad=n=>String(n).padStart(2,'0');
 const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -907,7 +1001,7 @@ function normalize(o){
     scores:Array.isArray(o.scores)&&o.scores.length===TOPICS.length?o.scores.map(cl):TOPICS.map(x=>x.score),
     events:o.events.filter(e=>e&&ok(e.date)&&Number.isInteger(e.topic)&&TOPICS[e.topic]&&['study','review','move'].includes(e.kind))
       .map(e=>({id:e.id||uid(),date:e.date,topic:e.topic,kind:e.kind,from:e.from||null,to:e.kind==='move'?(e.to||e.status||null):null,score:cl(e.score),partial:!!e.partial,demo:!!e.demo})),
-    settings:o.settings&&typeof o.settings==='object'?{minutes:+o.settings.minutes||DEF_SET0.minutes,qph:+o.settings.qph||DEF_SET0.qph,tests:Number.isFinite(+o.settings.tests)?+o.settings.tests:DEF_SET0.tests,reviewMin:Number.isFinite(+o.settings.reviewMin)&&o.settings.reviewMin!==''&&o.settings.reviewMin!=null?+o.settings.reviewMin:DEF_SET0.reviewMin}:{...DEF_SET0},
+    settings:o.settings&&typeof o.settings==='object'?{minutes:+o.settings.minutes||DEF_SET0.minutes,qph:+o.settings.qph||DEF_SET0.qph,testEvery:o.settings.testEvery!=null&&Number.isFinite(+o.settings.testEvery)?+o.settings.testEvery:(o.settings.tests!=null&&Number.isFinite(+o.settings.tests)?(+o.settings.tests>0?Math.round(7/+o.settings.tests):0):DEF_SET0.testEvery),reviewMin:Number.isFinite(+o.settings.reviewMin)&&o.settings.reviewMin!==''&&o.settings.reviewMin!=null?+o.settings.reviewMin:DEF_SET0.reviewMin}:{...DEF_SET0},
     tests:Array.isArray(o.tests)?o.tests.filter(x=>x&&ok(x.date)).map(x=>({id:x.id||uid(),date:x.date,q:+x.q||60,score:cl(x.score)})):[],
     deadline:ok(o.deadline)?o.deadline:'2026-11-30',
     lang:I18N[o.lang]?o.lang:'en',
@@ -1056,7 +1150,7 @@ const phoneMQ=matchMedia('(max-width:640px)');
 function laneInView(){const lanes=[...lanesEl.children];if(!lanes.length)return 0;const mid=lanesEl.getBoundingClientRect().left+lanesEl.clientWidth/2;let best=0,dist=1e9;lanes.forEach((l,k)=>{const r=l.getBoundingClientRect(),d=Math.abs(r.left+r.width/2-mid);if(d<dist){dist=d;best=k}});return best}
 function updateDots(){const k=laneInView();document.querySelectorAll('#laneDots button').forEach((b,j)=>b.classList.toggle('on',j===k))}
 function goLane(k,smooth=true){const l=lanesEl.children[k];if(!l)return;lanesEl.scrollTo({left:l.offsetLeft-(lanesEl.clientWidth-l.offsetWidth)/2,behavior:smooth?'smooth':'auto'})}
-function render(){updateTexts();renderProgress();renderCalendar();renderSide();renderBoard();renderSRPanel();if(!$('#viewSR').hidden)renderSRPage();if(!$('#viewPlan').hidden)renderPlanPage();if(typeof renderSyncChip==='function')renderSyncChip()}
+function render(){updateTexts();renderProgress();renderCalendar();renderSide();renderBoard();renderSRPanel();renderTsStrip();if(!$('#viewSR').hidden){if(statMode==='tests')renderStatTests();else renderSRPage()}if(!$('#viewPlan').hidden)renderPlanPage();if(!$('#viewTests').hidden)renderTestsPage();if(typeof renderSyncChip==='function')renderSyncChip()}
 
 /* ---------- actions ---------- */
 function moveCard(i,to,date=todayISO()){
@@ -1176,8 +1270,61 @@ function forecast(asOf,at){
     const p=sc==null?.5:Math.max(0,Math.min(1,sc/100*R));mu+=w*p;parts.push({i,w,p,known:sc!=null,lost:EXAM_Q*w*(1-p)})});
   return {mu,pass:binomTail(EXAM_Q,mu,PASS_N),goal:binomTail(EXAM_Q,mu,GOAL_N),parts};
 }
+/* ===== practice tests: blended score, regression, calibration, cadence =====
+   blended score = (1 − w) × question-bank model + w × average of the last 3 scored practice tests,  w = n / (n + 2)
+   pass / 85% chances use the same Binomial(60, blended score).
+   trend         = least-squares line  score = a + b × day   (R² = 1 − SSres / SStot), shown from 4 scored tests
+   band          = ± 1 standard error of the prediction  se·√(1 + 1/n + (x − x̄)² / Sxx)
+   calibration   = least-squares  real = α + β × model forecast on that day, used from 5 tests when R² ≥ 0.3 */
+const TEST_Q=60;
+function scoredTests(upTo){return (state.tests||[]).filter(x=>x.score!=null&&(!upTo||x.date<=upTo)).slice().sort((a,b)=>a.date.localeCompare(b.date))}
+function blended(asOf){
+  asOf=asOf||todayISO();const f=forecast(asOf),last=scoredTests(asOf).slice(-3),n=last.length;
+  if(!n)return {...f,model:f.mu,testsAvg:null,n:0,w:0};
+  const avg=last.reduce((a,x)=>a+x.score,0)/n/100,w=n/(n+2),mu=(1-w)*f.mu+w*avg;
+  return {...f,mu,model:f.mu,testsAvg:avg,n,w,pass:binomTail(EXAM_Q,mu,PASS_N),goal:binomTail(EXAM_Q,mu,GOAL_N)};
+}
+function linReg(pts){
+  const n=pts.length;if(n<2)return null;
+  const mx=pts.reduce((a,p)=>a+p[0],0)/n,my=pts.reduce((a,p)=>a+p[1],0)/n;
+  let sxx=0,sxy=0,sst=0;pts.forEach(([x,y])=>{sxx+=(x-mx)**2;sxy+=(x-mx)*(y-my);sst+=(y-my)**2});
+  if(sxx===0)return null;
+  const b=sxy/sxx,a=my-b*mx;let sse=0;pts.forEach(([x,y])=>{sse+=(y-(a+b*x))**2});
+  const r2=sst===0?(sse<1e-12?1:0):Math.max(0,1-sse/sst),se=n>2?Math.sqrt(sse/(n-2)):0;
+  return {a,b,r2,n,mx,sxx,se,at:x=>a+b*x,band:x=>se*Math.sqrt(1+1/n+(x-mx)**2/sxx)};
+}
+let tsRange=(()=>{try{return localStorage.getItem(STORE+'-tsr')||'all'}catch(e){return 'all'}})();
+function testTrend(range){
+  const all=scoredTests(),today=todayISO();if(!all.length)return {n:0,pts:[],reg:null};
+  const from=(range||tsRange)==='all'?all[0].date:addDays(today,-SRDAYS[range||tsRange]+1);
+  const base=all[0].date,list=all.filter(x=>x.date>=from),pts=list.map(x=>[diffDays(base,x.date),x.score]);
+  const reg=pts.length>=4?linReg(pts):null;let cross=null,exam=null;
+  if(reg){const xE=diffDays(base,state.deadline);exam=Math.max(0,Math.min(100,reg.at(xE)));
+    const lastX=pts[pts.length-1][0];
+    if(reg.at(lastX)>=GOAL)cross='already';else if(reg.b>0){const xc=(GOAL-reg.a)/reg.b;cross=xc<=xE?addDays(base,Math.ceil(xc)):'late'}else cross='never'}
+  return {n:pts.length,pts,reg,base,from,cross,exam,list};
+}
+function calibration(){
+  const pts=scoredTests().map(x=>[forecast(x.date).mu*100,x.score]);
+  const reg=pts.length>=2?linReg(pts):null,bias=pts.length?pts.reduce((a,p)=>a+(p[1]-p[0]),0)/pts.length:null;
+  const usable=!!reg&&pts.length>=5&&reg.r2>=.3;
+  return {pts,reg,bias,usable,calibrated:usable?Math.max(0,Math.min(100,reg.at(forecast().mu*100))):null};
+}
+function testWhy(asOf,st){
+  st=st||settings();asOf=asOf||todayISO();const every=+st.testEvery||0;if(!every)return {due:false,every:0,next:null};
+  const prev=(state.tests||[]).filter(x=>x.date<asOf).map(x=>x.date).sort(),last=prev[prev.length-1];
+  const daysLeft=diffDays(asOf,state.deadline),ev=daysLeft>=0&&daysLeft<=10?Math.min(every,2):every;
+  const since=last?diffDays(last,asOf):Infinity;
+  const acts=[...state.events.map(e=>e.date),...(state.tests||[]).map(x=>x.date)].filter(d=>d<asOf).sort(),lastAct=acts[acts.length-1],idle=lastAct?diffDays(lastAct,asOf):0;
+  const ms=srAll(asOf,true),avgR=wavg(ms),nDue=ms.filter(m=>m.reps.length&&m.over>=0).length;
+  let reason=null;
+  if(!last||since>=ev)reason=ev<every?'testFinal':'test';
+  else if(idle>=3&&since>=2)reason='testIdle';
+  else if(((avgR!=null&&avgR<.85)||nDue>=5)&&since>=2)reason='testRecall';
+  return {due:!!reason,reason,every:ev,since,overdue:last?since-ev:0,next:reason?asOf:addDays(last,ev)};
+}
 const fcCls=v=>v>=.85?'good':v>=.7?'mid':'bad';
-function renderFcMini(){const f=forecast();const b=$('#fcMiniBar');if(!b)return;
+function renderFcMini(){const f=blended();const b=$('#fcMiniBar');if(!b)return;
   $('#fcMiniVal').textContent=Math.round(f.mu*100)+'%';b.style.width=Math.round(f.mu*100)+'%';b.style.background=f.mu>=.85?COLORS[3]:f.mu>=.7?COLORS[2]:'#ff6b5e';
   $('#fcMiniSub').innerHTML=t('fcMiniSub').replace('{p}',`<b>${Math.round(f.pass*100)}%</b>`).replace('{g}',`<b>${Math.round(f.goal*100)}%</b>`)}
 function forecastSeries(){
@@ -1225,8 +1372,8 @@ function renderForecast(){
    ease_i       = from spaced-repetition stability S: 1.15 (no data) … 0.75 (S ≥ 30 days) — well-known topics go faster
    Order: 1) practice test when due  2) reviews due today  3) topics never scored, weak topics (< 70%)
           4) new material (skipped in the last 7 days). Each item is cut to what still fits in the remaining minutes. */
-const DEF_SET={minutes:180,qph:40,tests:2,reviewMin:1.5};
-const settings=()=>({...DEF_SET,...(state.settings||{})});
+const DEF_SET={minutes:180,qph:40,testEvery:3,reviewMin:1.5};
+const settings=()=>{const o=state.settings||{},r={...DEF_SET,...o};if(o.testEvery==null&&o.tests!=null)r.testEvery=+o.tests>0?Math.round(7/+o.tests):0;delete r.tests;return r};
 const DIFF={7:2,12:2,16:2,6:1.6,18:1.6,14:1.3,0:1.3,8:1.3};          /* Pilotage, Cross-Country, Performance · Navigation, Weather · Airspace, Comms/Lights, Night */
 const diffOf=i=>DIFF[i]||1;
 const easeOf=m=>!m||!m.reps.length?1.15:Math.max(.75,Math.min(1.15,1.15-.12*Math.log2(1+m.S)));
@@ -1252,9 +1399,8 @@ function buildPlan(asOf,over,mode){
     it.min=Math.round(it.n*per);left-=it.n*per;items.push(it);if(it.kind==='topic')planned.add(it.i);return true};
   const topicItem=(i,n,reason)=>{const m=M(i),p=topicPNow(i,m);return {kind:'topic',i,n,reason,done:doneT.has(i),per:minutesPerQ(i,st,m,p)*E.speed,diff:diffOf(i),p}};
   const cands=[];const add=it=>cands.push(it);
-  const prevTests=(state.tests||[]).filter(x=>x.date<asOf).map(x=>x.date).sort(),lastT=prevTests[prevTests.length-1];
-  if(st.tests>0&&(testsToday||!lastT||diffDays(lastT,asOf)>=Math.floor(7/st.tests))){
-    const mu=forecast(asOf).mu;if(E.test||testsToday)add({kind:'test',n:60,reason:'test',done:!!testsToday,per:((60/st.qph)*1.1+(1-mu)*st.reviewMin)*E.speed,diff:1.1,p:mu})}
+  const tw=testWhy(asOf,st0);
+  if(testsToday||tw.due){const mu=blended(asOf).mu;if(E.test||testsToday||tw.overdue>=2)add({kind:'test',forced:!E.test&&tw.overdue>=2,n:TEST_Q,reason:tw.due?tw.reason:'test',done:!!testsToday,per:((60/st.qph)*1.1+(1-mu)*st.reviewMin)*E.speed,diff:1.1,p:mu})}
   const ms=srAll(asOf,true);
   ms.filter(m=>m.reps.length&&m.over>=0).forEach(m=>{const q=TOPICS[m.i].q;used.add(m.i);add(topicItem(m.i,Math.min(q,Math.max(10,Math.min(40,Math.round(q*(1-m.R))))),'due'))});
   ms.filter(m=>!m.reps.length&&!used.has(m.i)).forEach(m=>{used.add(m.i);add(topicItem(m.i,Math.min(TOPICS[m.i].q,40),'nodata'))});
@@ -1266,7 +1412,8 @@ function buildPlan(asOf,over,mode){
   if(E.order==='easy')TOPICS.map((x,i)=>i).filter(i=>!used.has(i)&&state.statuses[i]==='Very Comfortable').forEach(i=>{used.add(i);const it=topicItem(i,Math.min(TOPICS[i].q,20),'light');if(it.p>=.6)add(it)});
   cands.push(...newOnes);
   const done=cands.filter(x=>x.done),todo=cands.filter(x=>!x.done);
-  if(E.order==='easy')todo.sort((a,b)=>(a.kind==='test')-(b.kind==='test')||a.per-b.per||b.p-a.p);
+  const tRank=x=>x.kind!=='test'?1:x.forced?0:2;
+  if(E.order==='easy')todo.sort((a,b)=>tRank(a)-tRank(b)||a.per-b.per||b.p-a.p);
   if(E.order==='hard')todo.sort((a,b)=>(b.kind==='test')-(a.kind==='test')||(1-b.p)*b.diff-(1-a.p)*a.diff);
   [...done,...todo].forEach(push);
   doneT.forEach(i=>{if(!planned.has(i))items.push({kind:'topic',i,n:0,min:0,reason:'extra',done:true,diff:diffOf(i)})});
@@ -1290,16 +1437,27 @@ function renderPlanPage(){
   $('#planSub').textContent=df.format(parse(todayISO()))+(P.final?' · '+t('planFinal'):'');
   $('#planKpis').innerHTML=`<div><b>${fmtMin(P.minutes)}</b><span>${esc(t('planMinOf').replace('{b}',fmtMin(P.budget)))}</span></div><div><b>${P.total}</b><span>${esc(t('planQToday'))}</span></div><div><b>${P.done}</b><span>${esc(t('planDone'))}</span></div><div><b>${P.pace}</b><span>${esc(t('planPace'))}</span></div><div><b>${P.daysLeft}</b><span>${esc(t('toGo'))}</span></div>`;
   $('#planList').innerHTML=P.items.length?P.items.map(it=>`<div class="pitem2${it.done?' done':''}" ${it.kind==='test'?'data-pt="1"':`data-q="${it.i}"`}><span class="pck">${it.done?'✓':''}</span><span class="pn">${esc(planRowName(it))}<small>${esc(t('reason_'+it.reason))}${it.diff>1.05?' · '+esc(t(it.diff>=2?'diffCalc':it.diff>=1.5?'diffNav':'diffChart')):''}${it.p!=null&&it.kind==='topic'?' · '+esc(t('planChance').replace('{p}',Math.round(it.p*100))):''}</small></span><span class="rchip ${it.reason}">${esc(t('rs_'+it.reason))}</span><span class="pq">${it.n?it.n+' q':''}<small>${it.min?'~'+fmtMin(it.min):''}</small></span></div>`).join(''):`<div class="muted">${esc(t('allClear'))}</div>`;
-  ['minutes','qph','tests','reviewMin'].forEach(k=>{const el=$('#set'+k[0].toUpperCase()+k.slice(1));if(document.activeElement!==el)el.value=st[k]});
+  ['minutes','qph','testEvery','reviewMin'].forEach(k=>{const el=$('#'+SET_ID[k]);if(document.activeElement!==el)el.value=st[k]});
   updateDraft();
 }
 function startPlanItem(el){if(!el)return;if(el.dataset.pt){openPt();return}const i=+el.dataset.q;openModal(i,srModel(i).reps.length?'review':'study')}
 $('#energyPick').addEventListener('click',e=>{const b=e.target.closest('[data-energy]');if(!b)return;const l=$('#planList');l.classList.add('loading');setTimeout(()=>{setEnergy(b.dataset.energy);l.classList.remove('loading');void l.offsetWidth;l.classList.add('fresh')},250)});
 $('#planList').addEventListener('click',e=>startPlanItem(e.target.closest('[data-q],[data-pt]')));
 $('#openPlan').onclick=()=>goView('plan');
-$('#fcMini').onclick=()=>goView('sr','fc');
-const SET_LIM={minutes:[15,600],qph:[5,200],tests:[0,7],reviewMin:[0,10]};
-function draftSettings(){const d={...settings()};['minutes','qph','tests','reviewMin'].forEach(k=>{const el=$('#set'+k[0].toUpperCase()+k.slice(1));const raw=+el.value,v=k==='reviewMin'?Math.round(raw*2)/2:Math.round(raw);if(el.value!==''&&isFinite(v))d[k]=Math.max(SET_LIM[k][0],Math.min(SET_LIM[k][1],v))});return d}
+function openFcTop(){
+  const B=blended(),top=B.parts.slice().sort((a,b)=>b.lost-a.lost).slice(0,3),mx=Math.max(.01,...top.map(x=>x.lost));
+  $('#fcTopDesc').textContent=t('fcTopDesc').replace('{s}',Math.round(B.mu*100)).replace('{p}',Math.round(B.pass*100)).replace('{g}',Math.round(B.goal*100));
+  $('#fcTopList').innerHTML=top.map(x=>`<div class="lostrow" data-q="${x.i}"><span class="n">${esc(TOPICS[x.i].name)}</span><span class="bar"><i style="width:${x.lost/mx*100}%"></i></span><span class="v">−${x.lost.toFixed(1)} q</span><span class="pp">${x.known?Math.round(x.p*100)+'%':'?'}</span></div>`).join('');
+  $('#fcTopBg').hidden=false;$('#fcTopFull').focus()}
+const closeFcTop=()=>{$('#fcTopBg').hidden=true};
+$('#fcMini').onclick=openFcTop;
+$('#fcTopClose').onclick=closeFcTop;
+$('#fcTopBg').addEventListener('pointerdown',e=>{if(e.target.id==='fcTopBg')closeFcTop()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#fcTopBg').hidden)closeFcTop()});
+$('#fcTopFull').onclick=()=>{closeFcTop();goView('sr','fc')};
+const SET_LIM={minutes:[15,600],qph:[5,200],testEvery:[0,14],reviewMin:[0,10]};
+const SET_ID={minutes:'setMinutes',qph:'setQph',testEvery:'setTests',reviewMin:'setReviewMin'};
+function draftSettings(){const d={...settings()};['minutes','qph','testEvery','reviewMin'].forEach(k=>{const el=$('#'+SET_ID[k]);const raw=+el.value,v=k==='reviewMin'?Math.round(raw*2)/2:Math.round(raw);if(el.value!==''&&isFinite(v))d[k]=Math.max(SET_LIM[k][0],Math.min(SET_LIM[k][1],v))});return d}
 function updateDraft(){const d=draftSettings(),P=buildPlan(null,d,energyMode),ch=JSON.stringify(d)!==JSON.stringify(settings());
   $('#planCap').textContent=t(ch?'planCapNew':'planCapTxt').replace('{c}',P.total).replace('{m}',fmtMin(d.minutes));$('#planCap').classList.toggle('changed',ch)}
 ['Minutes','Qph','Tests','ReviewMin'].forEach(k=>{const el=$('#set'+k);el.addEventListener('input',updateDraft);el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();calcPlan()}})});
@@ -1458,19 +1616,20 @@ $('#srGrid').onclick=e=>{const b=e.target.closest('[data-log]');if(b)openModal(+
    the hash is only updated as a best-effort extra so a real browser tab keeps back/forward */
 let curView='dash';
 function showView(v,focus){
-  curView=v;const sr=v==='sr',pl=v==='plan';document.body.classList.toggle('srview',sr||pl);
-  $('#viewDash').hidden=sr||pl;$('#viewSR').hidden=!sr;$('#viewPlan').hidden=!pl;
+  curView=v;const sr=v==='sr',pl=v==='plan',ts=v==='tests';document.body.classList.toggle('srview',sr||pl||ts);
+  $('#viewDash').hidden=sr||pl||ts;$('#viewSR').hidden=!sr;$('#viewPlan').hidden=!pl;$('#viewTests').hidden=!ts;
   document.querySelectorAll('.tabs button').forEach(a=>{const on=a.dataset.view===v;a.classList.toggle('on',on);a.setAttribute('aria-selected',on)});
-  if(sr){renderSRPage(focus==='fc'?null:focus);if(focus==='fc')$('#fcSection').scrollIntoView({block:'start'});else if(focus==null)window.scrollTo(0,0)}
+  if(sr){if(focus==='tests'){setStat('tests');window.scrollTo(0,0)}else{setStat('bank');renderSRPage(focus==='fc'?null:focus);if(focus==='fc')$('#fcSection').scrollIntoView({block:'start'});else if(focus==null)window.scrollTo(0,0)}}
   else if(pl){renderPlanPage();window.scrollTo(0,0)}
-  else{renderCalendar();renderSRPanel();window.scrollTo(0,0)}
+  else if(ts){renderTestsPage();window.scrollTo(0,0)}
+  else{renderCalendar();renderSRPanel();renderTsStrip();window.scrollTo(0,0)}
 }
 function goView(v,focus){
   showView(v,focus);
-  const h=v==='sr'?'#review'+(focus!=null&&focus!=='fc'?'/'+focus:''):v==='plan'?'#plan':'#dashboard';
+  const h=v==='sr'?(focus==='tests'?'#stats-tests':'#review'+(focus!=null&&focus!=='fc'?'/'+focus:'')):v==='plan'?'#plan':v==='tests'?'#tests':'#dashboard';
   try{if(location.hash!==h)history.pushState({v,focus},'',h)}catch(e){}
 }
-function fromHash(){let h='';try{h=location.hash||''}catch(e){}if(h.startsWith('#review')){const f=h.split('/')[1];showView('sr',f?+f:null)}else if(h==='#plan')showView('plan');else showView('dash')}
+function fromHash(){let h='';try{h=location.hash||''}catch(e){}if(h.startsWith('#review')){const f=h.split('/')[1];showView('sr',f?+f:null)}else if(h==='#plan')showView('plan');else if(h==='#tests')showView('tests');else if(h==='#stats-tests')showView('sr','tests');else showView('dash')}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>goView(b.dataset.view));
 window.addEventListener('popstate',e=>{const st=e.state;if(st&&st.v)showView(st.v,st.focus);else fromHash()});
 
@@ -1546,15 +1705,16 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#modalbg').hidd
 
 /* practice tests (FAA Practice Test sessions are not tied to one topic) */
 function renderPtHist(){const df=new Intl.DateTimeFormat(LOCALE[lang],{year:'numeric',month:'short',day:'numeric'});const L=(state.tests||[]).map((x,k)=>({x,k})).sort((a,b)=>b.x.date.localeCompare(a.x.date)||b.k-a.k).map(o=>o.x);
-  $('#ptHist').innerHTML=L.length?L.map(x=>`<div class="hrow"><span class="k" style="background:${x.score==null?'#8590a2':x.score>=80?COLORS[3]:COLORS[2]}"></span><span>${esc(df.format(parse(x.date)))} · ${x.q} q · ${x.score!=null?x.score+'%':esc(t('inProgress'))}</span><button type="button" data-delpt="${x.id}" aria-label="${esc(t('del'))}">×</button></div>`).join(''):`<div class="muted">${esc(t('inactive'))}</div>`}
-function openPt(){$('#ptScore').value='';$('#ptScore').placeholder=t('blankInProgress');$('#ptDate').value=todayISO();$('#ptDesc').textContent=t('ptDesc');renderPtHist();$('#ptbg').hidden=false;$('#ptScore').focus()}
+  $('#ptHist').innerHTML=L.length?L.map(x=>`<div class="hrow"><span class="k" style="background:${x.score==null?'#8590a2':x.score>=80?COLORS[3]:COLORS[2]}"></span><span>${esc(df.format(parse(x.date)))} · ${TEST_Q} q · ${x.score!=null?x.score+'%':esc(t('inProgress'))}</span><button type="button" data-delpt="${x.id}" aria-label="${esc(t('del'))}">×</button></div>`).join(''):`<div class="muted">${esc(t('inactive'))}</div>`}
+let ptEdit=null;
+function openPt(id){const x=id&&typeof id==='string'?(state.tests||[]).find(y=>y.id===id):null;ptEdit=x?x.id:null;$('#ptScore').value=x&&x.score!=null?x.score:'';$('#ptScore').placeholder=t('blankInProgress');$('#ptDate').value=x?x.date:todayISO();$('#ptDesc').textContent=t('ptDesc');renderPtHist();$('#ptbg').hidden=false;$('#ptScore').focus()}
 const closePt=()=>{$('#ptbg').hidden=true};
-$('#ptStat').onclick=openPt;$('#ptStat').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openPt()}};
+$('#ptStat').onclick=()=>openPt();$('#ptStat').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openPt()}};
 $('#ptClose').onclick=$('#ptCancel').onclick=closePt;
 $('#ptbg').addEventListener('pointerdown',e=>{if(e.target.id==='ptbg')closePt()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#ptbg').hidden)closePt()});
 $('#ptSave').onclick=()=>{const d=$('#ptDate').value;if(!d)return;const v=$('#ptScore').value.trim(),sc=v===''?null:Math.max(0,Math.min(100,Math.round(+v)));
-  commit(()=>{(state.tests??=[]).push({id:uid(),date:d,q:60,score:sc})},t('saved'));closePt()};
+  const eid=ptEdit;commit(()=>{if(eid){const x=state.tests.find(y=>y.id===eid);if(x){x.date=d;x.score=sc;x.q=TEST_Q}}else (state.tests??=[]).push({id:uid(),date:d,q:TEST_Q,score:sc})},t('saved'));ptEdit=null;closePt()};
 $('#ptHist').onclick=e=>{const b=e.target.closest('[data-delpt]');if(!b)return;const id=b.dataset.delpt;commit(()=>{state.tests=state.tests.filter(x=>x.id!==id)},t('deleted'));renderPtHist()};
 
 /* day summary: tap/click any day of the calendar */
@@ -1588,7 +1748,7 @@ function weekStart(isoD){const d=parse(isoD);d.setDate(d.getDate()-((d.getDay()+
 function weeklyVolume(n){
   const by={};const add=(d,q)=>{const k=weekStart(d);by[k]=(by[k]||0)+q};
   state.events.forEach(e=>{if((e.kind==='study'||e.kind==='review')&&!e.partial)add(e.date,TOPICS[e.topic].q)});
-  (state.tests||[]).forEach(x=>{if(x.score!=null)add(x.date,x.q||60)});
+  (state.tests||[]).forEach(x=>{if(x.score!=null)add(x.date,TEST_Q)});
   const cur=weekStart(todayISO());let first=cur;
   if(n){first=addDays(cur,-7*(n-1))}else{const ks=Object.keys(by).sort();first=ks.length&&ks[0]<cur?ks[0]:addDays(cur,-7*11);if(diffDays(first,cur)/7<11)first=addDays(cur,-7*11)}
   const out=[];for(let w=first;w<=cur;w=addDays(w,7))out.push({w,q:by[w]||0});return out;
@@ -1611,7 +1771,7 @@ function volSVG(data,W,H,big){
 }
 let volRange='3m';
 const RANGES={'3d':{days:3},'7d':{days:7},'2w':{days:14},'1m':{days:30},'3m':{weeks:13},'6m':{weeks:26},'1y':{weeks:52},'all':{all:true}};
-function dailyVolume(){const by={};state.events.forEach(e=>{if((e.kind==='study'||e.kind==='review')&&!e.partial)by[e.date]=(by[e.date]||0)+TOPICS[e.topic].q});(state.tests||[]).forEach(x=>{if(x.score!=null)by[x.date]=(by[x.date]||0)+(x.q||60)});return by}
+function dailyVolume(){const by={};state.events.forEach(e=>{if((e.kind==='study'||e.kind==='review')&&!e.partial)by[e.date]=(by[e.date]||0)+TOPICS[e.topic].q});(state.tests||[]).forEach(x=>{if(x.score!=null)by[x.date]=(by[x.date]||0)+TEST_Q});return by}
 function rangeSeries(r,shift=0){
   let R=RANGES[r];const by=dailyVolume(),today=todayISO();
   if(R.all){if(shift)return [];const ks=Object.keys(by).sort(),first=ks.length?weekStart(ks[0]):today;R={weeks:Math.max(13,Math.round(diffDays(first,weekStart(today))/7)+1)}}
@@ -1647,6 +1807,96 @@ $('#volbg').addEventListener('pointerdown',e=>{if(e.target.id==='volbg')closeVol
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#volbg').hidden)closeVol()});
 $('#volRange').onclick=e=>{const b=e.target.closest('button');if(b){volRange=b.dataset.r;renderVolBig()}};
 let rzVol;window.addEventListener('resize',()=>{clearTimeout(rzVol);rzVol=setTimeout(renderVolume,120)});
+
+/* ===== practice tests UI ===== */
+const scCol=v=>v==null?'#8590a2':v>=85?COLORS[3]:v>=70?COLORS[2]:'#ff6b5e';
+function tsSVG(w,h,big){
+  const tr=testTrend(),all=scoredTests();if(!all.length)return `<div class="empty">${esc(t('tsNone'))}</div>`;
+  const base=tr.base||all[0].date,x0=diffDays(base,tr.from||base),today=diffDays(base,todayISO()),xE=diffDays(base,state.deadline);
+  const x1=Math.max(today+1,big&&xE>today&&xE-today<=60?xE:today+1),pts=tr.pts;
+  const lo=Math.max(0,Math.min(60,Math.floor((Math.min(...pts.map(p=>p[1]),70)-8)/10)*10));
+  const L=big?36:4,R=big?10:4,T=big?16:4,B=big?22:4,pw=w-L-R,ph=h-T-B,X=x=>L+(x-x0)/Math.max(1,x1-x0)*pw,Y=v=>T+(1-(v-lo)/(100-lo))*ph,f=n=>n.toFixed(1);
+  let g='';
+  if(big){[lo,(lo+100)/2,100].forEach(v=>g+=`<line class="cg" x1="${L}" x2="${w-R}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="cy" x="${L-5}" y="${f(Y(v)+3.5)}" text-anchor="end">${Math.round(v)}%</text>`);
+    const df=new Intl.DateTimeFormat(LOCALE[lang],{month:'short',day:'numeric'}),span=x1-x0,stp=span<=10?1:span<=24?3:span<=60?7:span<=130?14:30;let lx=-99;
+    for(let x=x0;x<=x1;x+=stp){const px=X(x);if(px-lx>40&&px<w-14){g+=`<text class="cx" x="${f(px)}" y="${h-6}" text-anchor="middle">${esc(df.format(parse(addDays(base,x))))}</text>`;lx=px}}
+    g+=`<line class="ctoday" x1="${f(X(today))}" x2="${f(X(today))}" y1="${T}" y2="${T+ph}"/>`;
+    if(xE<=x1)g+=`<line class="cexam" x1="${f(X(xE))}" x2="${f(X(xE))}" y1="${T}" y2="${T+ph}"/><text class="cx" x="${f(X(xE)-3)}" y="${T-3}" text-anchor="end" style="fill:var(--exam)">${esc(t('examShort'))}</text>`}
+  g+=`<line class="c70" x1="${L}" x2="${w-R}" y1="${f(Y(70))}" y2="${f(Y(70))}"/><line class="c85" x1="${L}" x2="${w-R}" y1="${f(Y(85))}" y2="${f(Y(85))}"/>`;
+  if(tr.reg&&big){const r=tr.reg,xa=pts[0][0],xb=pts[pts.length-1][0],up=[],dn=[];
+    for(let x=xa;x<=x1;x+=Math.max(.5,(x1-xa)/40)){const v=r.at(x),e=r.band(x);up.push([X(x),Y(Math.min(100,v+e))]);dn.push([X(x),Y(Math.max(lo,v-e))])}
+    g+=`<path class="s-band" d="M${up.map(p=>f(p[0])+' '+f(p[1])).join('L')}L${dn.reverse().map(p=>f(p[0])+' '+f(p[1])).join('L')}Z"/>`;
+    g+=`<path class="s-reg" d="M${f(X(xa))} ${f(Y(r.at(xa)))}L${f(X(xb))} ${f(Y(r.at(xb)))}"/><path class="s-regp" d="M${f(X(xb))} ${f(Y(r.at(xb)))}L${f(X(x1))} ${f(Y(Math.max(lo,Math.min(100,r.at(x1)))))}"/>`}
+  if(pts.length>1)g+=`<path fill="none" stroke="${big?'#8f99a6':'#ffd08a'}" stroke-width="${big?1.4:2}" d="${pts.map((p,k)=>(k?'L':'M')+f(X(p[0]))+' '+f(Y(p[1]))).join('')}"/>`;
+  const df2=new Intl.DateTimeFormat(LOCALE[lang],{month:'short',day:'numeric'});
+  pts.forEach((p,k)=>{g+=`<circle cx="${f(X(p[0]))}" cy="${f(Y(p[1]))}" r="${big?4.5:3.4}" fill="${scCol(p[1])}" stroke="#16191d" stroke-width="1.5"><title>${esc(df2.format(parse(tr.list[k].date)))}: ${p[1]}%</title></circle>`;
+    if(big&&pts.length<=14)g+=`<text class="vval" x="${f(X(p[0]))}" y="${f(Y(p[1])-9)}" text-anchor="middle">${p[1]}</text>`});
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="${big?'xMidYMid meet':'none'}" role="img" aria-label="${esc(t('tabTestsLong'))}">${g}</svg>`;
+}
+function trendText(){
+  const tr=testTrend(),need=4-tr.n;if(tr.n<4)return `<span class="few">${esc(t('tsFew').replace('{n}',Math.max(1,need)))}</span>`;
+  const r=tr.reg,wk=r.b*7,cons=r.r2>=.6?'tsCons':r.r2>=.3?'tsMod':'tsNoisy',df=new Intl.DateTimeFormat(LOCALE[lang],{month:'short',day:'numeric'});
+  const cross=tr.cross==='already'?t('tsAlready'):tr.cross==='never'||tr.cross==='late'?t('tsNever'):t('tsCross').replace('{d}',df.format(parse(tr.cross)));
+  return `<b>${wk>=0?'+':''}${wk.toFixed(1)} pp/${esc(t('wk').toLowerCase())}</b> · R² <b>${r.r2.toFixed(2)}</b> (${esc(t(cons))}) · ${esc(cross)} · ${esc(t('tsExam').replace('{s}',Math.round(tr.exam)))}`;
+}
+function nextText(){const w=testWhy();if(!w.every)return t('tsOff');if(w.due)return t('tsNextToday')+' · '+t('reason_'+w.reason);return t('tsNextIn').replace('{n}',diffDays(todayISO(),w.next))}
+function testKpis(){const sc=scoredTests(),last=sc[sc.length-1],l3=sc.slice(-3);
+  return {last:last?last.score:null,best:sc.length?Math.max(...sc.map(x=>x.score)):null,avg3:l3.length?Math.round(l3.reduce((a,x)=>a+x.score,0)/l3.length):null,n70:sc.filter(x=>x.score>=70).length,n85:sc.filter(x=>x.score>=85).length,n:sc.length}}
+const pctOr=v=>v==null?'—':v+'%';
+function renderTsStrip(){
+  if(!$('#tsStrip'))return;const k=testKpis();$('#tsLast').textContent=pctOr(k.last);$('#tsLast').style.color=k.last==null?'':scCol(k.last);
+  $('#tsStripKpis').innerHTML=`<span>${esc(t('tsBest'))} <b>${pctOr(k.best)}</b></span><span>${esc(t('tsAvg3'))} <b>${pctOr(k.avg3)}</b></span>`;
+  const sp=$('#tsSpark');sp.innerHTML=k.n?tsSVG(Math.max(120,Math.round(sp.clientWidth||300)),Math.max(30,Math.round(sp.clientHeight||44)),false):`<span class="muted" style="font-size:12px">${esc(t('tsNone'))}</span>`;
+  $('#tsStripNext').textContent=nextText();
+}
+function paintTsRange(){document.querySelectorAll('[data-tsrr] button').forEach(b=>b.classList.toggle('on',b.dataset.tsr===tsRange))}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-tsrr] button');if(!b)return;tsRange=b.dataset.tsr;try{localStorage.setItem(STORE+'-tsr',tsRange)}catch(x){}if(!$('#viewTests').hidden)renderTestsPage();if(!$('#viewSR').hidden)renderStatTests()});
+function renderTestsPage(){
+  paintTsRange();const k=testKpis();
+  $('#tsKpis').innerHTML=[['tsLastLbl',pctOr(k.last),k.last],['tsBest',pctOr(k.best),k.best],['tsAvg3',pctOr(k.avg3),k.avg3],['ts70',k.n70,null],['ts85',k.n85,null]].map(([l,v,c])=>`<div><b class="${c==null?'':c>=85?'good':c>=70?'mid':'bad'}">${v}</b><span>${esc(t(l))}</span></div>`).join('');
+  $('#tsTrendTxt').innerHTML=trendText();$('#tsNext').textContent=nextText();
+  const box=$('#tsChart');box.innerHTML=tsSVG(Math.round(box.clientWidth||900),phoneMQ.matches?220:280,true);
+  $('#tsLegend').innerHTML=tsLegendHTML();
+  const df=new Intl.DateTimeFormat(LOCALE[lang],{weekday:'short',year:'numeric',month:'short',day:'numeric'}),L=(state.tests||[]).map((x,k)=>({x,k})).sort((a,b)=>b.x.date.localeCompare(a.x.date)||b.k-a.k).map(o=>o.x);
+  $('#tsList').innerHTML=L.length?L.map(x=>`<div class="tsrow" data-id="${x.id}"><span class="k" style="background:${scCol(x.score)}"></span><span class="d">${esc(df.format(parse(x.date)))}<span class="muted"> · ${TEST_Q} q</span></span><span class="sc" style="color:${scCol(x.score)}">${x.score!=null?x.score+'%':esc(t('inProgress'))}</span><button type="button" data-edit="${x.id}">${esc(t('edit'))}</button><button type="button" data-delpt="${x.id}" aria-label="${esc(t('del'))}">×</button></div>`).join(''):`<div class="muted">${esc(t('tsNone'))}</div>`;
+}
+const tsLegendHTML=()=>`<span><i style="border-color:#8f99a6"></i>${esc(t('lgScore'))}</span><span><i style="border-color:#ffd08a"></i>${esc(t('lgTrend'))}</span><span><i style="border-color:#ffd08a;border-top-style:dashed"></i>${esc(t('lgTrendP'))}</span><span><i style="border-color:#ffd08a55;border-top-width:6px"></i>${esc(t('lgBand'))}</span><span><i style="border-color:#c5ccd5;border-top-style:dashed"></i>${esc(t('fcPassLine'))}</span><span><i style="border-color:#4bce97;border-top-style:dashed"></i>${esc(t('fcGoalLine'))}</span>`;
+$('#tsList').addEventListener('click',e=>{const d=e.target.closest('[data-delpt]'),ed=e.target.closest('[data-edit]');
+  if(d){const id=d.dataset.delpt;commit(()=>{state.tests=state.tests.filter(x=>x.id!==id)},t('deleted'))}else if(ed)openPt(ed.dataset.edit)});
+$('#tsAdd').onclick=()=>openPt();
+$('#tsOpen').onclick=()=>goView('tests');
+$('#tsToStats').onclick=()=>goView('sr','tests');
+
+/* Statistics: Bank | Practice tests */
+let statMode='bank';
+function setStat(m){statMode=m;$('#statBank').hidden=m!=='bank';$('#statTests').hidden=m!=='tests';document.querySelectorAll('#statSeg button').forEach(b=>b.classList.toggle('on',b.dataset.stat===m));if(m==='tests')renderStatTests();else renderSRPage()}
+$('#statSeg').onclick=e=>{const b=e.target.closest('[data-stat]');if(b)setStat(b.dataset.stat)};
+function renderStatTests(){
+  paintTsRange();const B=blended(),pc=v=>Math.round(v*100)+'%';
+  $('#ovKpis').innerHTML=`<div><b class="${fcCls(B.mu)}">${pc(B.mu)}</b><span>${esc(t('ovScore'))}</span></div><div><b class="${B.pass>=.8?'good':B.pass>=.5?'mid':'bad'}">${pc(B.pass)}</b><span>${esc(t('fcPass'))}</span></div><div><b class="${B.goal>=.8?'good':B.goal>=.5?'mid':'bad'}">${pc(B.goal)}</b><span>${esc(t('fcGoal'))}</span></div><div><b>${pc(B.model)}</b><span>${esc(t('ovModel'))}</span></div>`;
+  $('#ovWeights').innerHTML=B.n?esc(t('ovWeights').replace('{t}',Math.round(B.testsAvg*100)).replace('{n}',B.n).replace('{w}',Math.round(B.w*100)).replace('{m}',Math.round(B.model*100)).replace('{mw}',Math.round((1-B.w)*100))):`<span class="few">${esc(t('ovNoTests'))}</span>`;
+  $('#tsTrendTxt2').innerHTML=trendText();
+  const b2=$('#tsChart2');b2.innerHTML=tsSVG(Math.round(b2.clientWidth||900),phoneMQ.matches?220:280,true);$('#tsLegend2').innerHTML=tsLegendHTML();
+  const C=calibration();
+  $('#calTxt').innerHTML=C.pts.length<2?`<span class="few">${esc(t('calFew').replace('{n}',C.pts.length))}</span>`:
+    `R² <b>${C.reg?C.reg.r2.toFixed(2):'—'}</b> · ${esc(t('calBias').replace('{b}',(C.bias>=0?'+':'')+C.bias.toFixed(1)))} · n=${C.pts.length}`+(C.usable?` · <b>${esc(t('calOk').replace('{c}',Math.round(C.calibrated)))}</b>`:C.pts.length<5?` · <span class="few">${esc(t('calFew').replace('{n}',C.pts.length))}</span>`:` · <span class="few">${esc(t('calBad'))}</span>`);
+  const cb=$('#calChart'),cw=Math.min(560,Math.round(cb.clientWidth||560));cb.innerHTML=calSVG(C,cw,Math.round(cw*.78));
+  const sc=scoredTests(),bins=[[0,59,'< 60'],[60,69,'60–69'],[70,79,'70–79'],[80,84,'80–84'],[85,100,'85+']],mx=Math.max(1,...bins.map(([a,z])=>sc.filter(x=>x.score>=a&&x.score<=z).length));
+  $('#distBars').innerHTML=bins.map(([a,z,lb])=>{const n=sc.filter(x=>x.score>=a&&x.score<=z).length;return `<div class="distrow"><span>${lb}%</span><span class="bar"><i style="width:${n/mx*100}%;background:${scCol(a)}"></i></span><span>${n}</span></div>`}).join('');
+  const gaps=sc.slice(1).map((x,k)=>diffDays(sc[k].date,x.date));$('#gapTxt').textContent=gaps.length?t('gapTxt').replace('{d}',(gaps.reduce((a,x)=>a+x,0)/gaps.length).toFixed(1)):t('tsFew').replace('{n}',2);
+  $('#regFormula').textContent=t('regFormula');
+}
+function calSVG(C,w,h){
+  if(C.pts.length<1)return `<div class="empty">${esc(t('tsNone'))}</div>`;
+  const vals=C.pts.flat(),lo=Math.max(0,Math.floor((Math.min(...vals)-8)/10)*10),L=40,R=18,T=12,B=26,pw=w-L-R,ph=h-T-B;
+  const X=v=>L+(v-lo)/(100-lo)*pw,Y=v=>T+(1-(v-lo)/(100-lo))*ph,f=n=>n.toFixed(1);let g='';
+  [lo,(lo+100)/2,100].forEach(v=>g+=`<line class="cg" x1="${L}" x2="${w-R}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="cy" x="${L-5}" y="${f(Y(v)+3.5)}" text-anchor="end">${Math.round(v)}%</text><text class="cx" x="${f(Math.min(X(v),w-R-12))}" y="${h-8}" text-anchor="middle">${Math.round(v)}%</text>`);
+  g+=`<line class="s-diag" x1="${f(X(lo))}" y1="${f(Y(lo))}" x2="${f(X(100))}" y2="${f(Y(100))}"/>`;
+  if(C.reg){const xs=C.pts.map(p=>p[0]),xa=Math.min(...xs),xb=Math.max(...xs),cl=v=>Math.max(lo,Math.min(100,v));g+=`<path class="s-reg" d="M${f(X(xa))} ${f(Y(cl(C.reg.at(xa))))}L${f(X(xb))} ${f(Y(cl(C.reg.at(xb))))}"/>`}
+  C.pts.forEach(p=>g+=`<circle cx="${f(X(p[0]))}" cy="${f(Y(p[1]))}" r="5" fill="${scCol(p[1])}" stroke="#16191d" stroke-width="1.5"><title>${esc(t('calPredicted'))} ${Math.round(p[0])}% → ${esc(t('calReal'))} ${p[1]}%</title></circle>`);
+  g+=`<text class="cx" x="${L+6}" y="${T+10}">${esc(t('calAxis'))}</text>`;
+  return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(t('calTitle'))}">${g}</svg>`;
+}
 
 /* header & calendar controls */
 document.querySelectorAll('.flag').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;state.lang=lang;save(false);render()});
@@ -1779,7 +2029,7 @@ function selfTest(){
     {const P=buildPlan(),it=P.items[0],m=srModel(18,T,true),exp=Math.min(158,Math.max(10,Math.min(40,Math.round(158*(1-m.R)))));ok('Plan','review size = clamp(q × (1 − recall), 10, 40)',it.n===exp,`${it.n} vs ${exp}`)}
     fixture([],{settings:{minutes:180,qph:40,tests:2}});{const P=buildPlan();ok('Plan','no practice test yet → a test is planned (60 q)',P.items[0].kind==='test'&&P.items[0].n===60)}
     fixture([],{settings:{minutes:180,qph:40,tests:2},tests:[{id:'a',date:D(1),q:60,score:80}]});ok('Plan','2 tests/week and one yesterday → no test today',!buildPlan().items.some(x=>x.kind==='test'));
-    fixture([],{settings:{minutes:180,qph:40,tests:2},tests:[{id:'a',date:D(3),q:60,score:80}]});ok('Plan','2 tests/week and the last one 3 days ago → test today',buildPlan().items.some(x=>x.kind==='test'));
+    fixture([],{settings:{minutes:180,qph:40,testEvery:3},tests:[{id:'a',date:D(3),q:60,score:80}]});ok('Plan','test every 3 days and the last one 3 days ago → test today',buildPlan().items.some(x=>x.kind==='test'));
     fixture([],{settings:{minutes:180,qph:40,tests:0},deadline:addDays(T,5)});ok('Plan','last 7 days before the exam: no new material',!buildPlan().items.some(x=>x.reason==='new')&&buildPlan().final);
     fixture([],{settings:{minutes:600,qph:200,tests:0}});ok('Plan','with lots of time, new material is planned (biggest first among To Do)',buildPlan().items.filter(x=>x.reason==='new').some(x=>x.i===0));
     fixture([{date:D(3),topic:18,kind:'study',score:90},{date:D(0),topic:18,kind:'review',score:92}],{settings:{minutes:180,qph:40,tests:0}});
@@ -1787,8 +2037,9 @@ function selfTest(){
     fixture([{date:D(1),topic:12,kind:'study',score:95},{date:D(0),topic:12,kind:'review',score:96}],{settings:{minutes:180,qph:40,tests:0}});ok('Plan','reviewing a topic that was not due shows as "extra", done',buildPlan().items.some(x=>x.i===12&&x.reason==='extra'&&x.done));
     fixture([{date:D(0),topic:9,kind:'study',score:90}],{settings:{minutes:180,qph:40,tests:0}});ok('Plan','anything studied today appears in the plan as done',buildPlan().items.some(x=>x.i===9&&x.done));
     fixture([],{settings:{minutes:30,qph:20,tests:0,reviewMin:1.5}});ok('Plan','tiny budget (30 min) still plans at least one item, within 30 min',buildPlan().items.length>=1&&buildPlan().minutes<=30,buildPlan().minutes);
-    {const n=normalize({statuses:TOPICS.map(t=>t.status),events:[],settings:{minutes:90,qph:30,tests:1,reviewMin:2.5}});ok('Plan','settings survive save / import (incl. review minutes)',n.settings.minutes===90&&n.settings.qph===30&&n.settings.tests===1&&n.settings.reviewMin===2.5)}
-    {const n=normalize({statuses:TOPICS.map(t=>t.status),events:[]});ok('Plan','old backups get default settings (180 min, 40 q/h, 2 tests, 1.5 min review)',n.settings.minutes===180&&n.settings.qph===40&&n.settings.tests===2&&n.settings.reviewMin===1.5)}
+    {const n=normalize({statuses:TOPICS.map(t=>t.status),events:[],settings:{minutes:90,qph:30,testEvery:4,reviewMin:2.5}});ok('Plan','settings survive save / import (incl. review minutes and test cadence)',n.settings.minutes===90&&n.settings.qph===30&&n.settings.testEvery===4&&n.settings.reviewMin===2.5)}
+    {const n=normalize({statuses:TOPICS.map(t=>t.status),events:[],settings:{minutes:90,qph:30,tests:1}});ok('Plan','old backup with 1 test per week imports as every 7 days',n.settings.testEvery===7)}
+    {const n=normalize({statuses:TOPICS.map(t=>t.status),events:[]});ok('Plan','old backups get default settings (180 min, 40 q/h, test every 3 days, 1.5 min review)',n.settings.minutes===180&&n.settings.qph===40&&n.settings.testEvery===3&&n.settings.reviewMin===1.5)}
     /* --- energy modes --- */
     fixture([{date:D(6),topic:18,kind:'study',score:30},{date:D(5),topic:13,kind:'study',score:95},{date:D(5),topic:12,kind:'study',score:92}],{settings:{minutes:120,qph:40,tests:2,reviewMin:1.5}});
     {const L=buildPlan(T,null,'low'),Mm=buildPlan(T,null,'medium'),H=buildPlan(T,null,'high');
@@ -1802,6 +2053,49 @@ function selfTest(){
      ok('Energy','every plan fits its minutes',L.minutes<=L.budget&&Mm.minutes<=Mm.budget&&H.minutes<=H.budget,`${L.minutes}/${L.budget} ${Mm.minutes}/${Mm.budget} ${H.minutes}/${H.budget}`);
      ok('Energy','low energy may include light reviews of topics you know',L.items.every(x=>x.reason!=='light'||state.statuses[x.i]==='Very Comfortable'));
      ok('Energy','medium = the standard plan (default)',JSON.stringify(buildPlan(T).items.map(x=>x.i))===JSON.stringify(Mm.items.map(x=>x.i)))}
+    /* --- practice tests: regression --- */
+    {const r=linReg([[0,60],[7,67],[14,74],[21,81]]);ok('Regression','perfect line → slope 1/day, intercept 60, R² = 1',near(r.b,1)&&near(r.a,60)&&near(r.r2,1),JSON.stringify(r&&{a:r.a,b:r.b,r2:r.r2}))}
+    {const r=linReg([[0,70],[1,80],[2,70],[3,80]]);ok('Regression','no trend (zig-zag) → R² ≈ 0.2, small slope',r.r2<.25&&Math.abs(r.b)<3.5,r.r2)}
+    {const r=linReg([[0,50],[10,60],[20,80],[30,90]]);const ex=(()=>{const xs=[0,10,20,30],ys=[50,60,80,90],mx=15,my=70;let sxy=0,sxx=0;xs.forEach((x,k)=>{sxy+=(x-mx)*(ys[k]-my);sxx+=(x-mx)**2});return sxy/sxx})();ok('Regression','least-squares slope matches the textbook formula',near(r.b,ex),r.b)}
+    ok('Regression','fewer than 2 points → no regression',linReg([[0,80]])===null);
+    {const r=linReg([[0,60],[7,66],[14,75],[21,80]]);ok('Regression','prediction band is wider away from the data',r.band(60)>r.band(10))}
+    fixture([],{tests:[{id:'a',date:D(20),q:60,score:60},{id:'b',date:D(13),q:60,score:67},{id:'c',date:D(6),q:60,score:74}]});
+    {const tr=testTrend('all');ok('Regression','trend needs 4 scored tests (3 → none)',tr.n===3&&tr.reg===null)}
+    fixture([],{deadline:addDays(T,60),tests:[{id:'a',date:D(21),q:60,score:60},{id:'b',date:D(14),q:60,score:67},{id:'c',date:D(7),q:60,score:74},{id:'d',date:D(0),q:60,score:81}]});
+    {const tr=testTrend('all');ok('Regression','+1 point/day → reaches 85% in 4 days',tr.cross===addDays(T,4),tr.cross);ok('Regression','projection on exam day is capped at 100%',tr.exam===100)}
+    fixture([],{tests:[{id:'a',date:D(21),q:60,score:80},{id:'b',date:D(14),q:60,score:75},{id:'c',date:D(7),q:60,score:70},{id:'d',date:D(0),q:60,score:65}]});
+    ok('Regression','falling scores → "not on track"',testTrend('all').cross==='never');
+    fixture([],{tests:[{id:'a',date:D(9),q:60,score:86},{id:'b',date:D(6),q:60,score:88},{id:'c',date:D(3),q:60,score:90},{id:'d',date:D(0),q:60,score:92}]});
+    ok('Regression','already above 85% → "already"',testTrend('all').cross==='already');
+    fixture([],{tests:[{id:'a',date:D(30),q:60,score:50},{id:'b',date:D(9),q:60,score:86},{id:'c',date:D(6),q:60,score:88},{id:'d',date:D(3),q:60,score:90},{id:'e',date:D(0),q:60,score:92}]});
+    ok('Regression','interval 2W ignores tests older than 14 days',testTrend('2w').n===4&&testTrend('all').n===5);
+    /* --- blended score --- */
+    fixture([]);state.scores=TOPICS.map(()=>60);{const B=blended();ok('Blend','no practice tests → blended = question-bank model',near(B.mu,forecast().mu)&&B.n===0)}
+    fixture([],{tests:[{id:'a',date:D(1),q:60,score:90}]});state.scores=TOPICS.map(()=>60);
+    {const B=blended(),m=forecast().mu;ok('Blend','1 test → weight 1/3',near(B.w,1/3)&&near(B.mu,2/3*m+1/3*.9),B.mu)}
+    fixture([],{tests:[{id:'a',date:D(9),q:60,score:50},{id:'b',date:D(6),q:60,score:80},{id:'c',date:D(3),q:60,score:85},{id:'d',date:D(1),q:60,score:90}]});state.scores=TOPICS.map(()=>60);
+    {const B=blended(),m=forecast().mu;ok('Blend','uses only the last 3 tests, weight 3/5',near(B.w,.6)&&near(B.testsAvg,.85)&&near(B.mu,.4*m+.6*.85),B.mu)}
+    {const B=blended();ok('Blend','pass chance uses the blended score',near(B.pass,binomTail(60,B.mu,42)))}
+    fixture([],{tests:[{id:'a',date:D(1),q:60,score:null}]});state.scores=TOPICS.map(()=>60);ok('Blend','tests in progress are ignored',blended().n===0);
+    fixture([],{tests:[{id:'a',date:D(1),q:60,score:90}]});ok('Blend','dashboard forecast shows the blended score',(renderFcMini(),$('#fcMiniVal').textContent===Math.round(blended().mu*100)+'%'));
+    /* --- calibration --- */
+    fixture([],{tests:[{id:'a',date:D(1),q:60,score:70}]});ok('Calibration','fewer than 5 tests → no correction',!calibration().usable);
+    fixture([0,1,2,3,4].map(k=>({date:D(11-2*k),topic:k,kind:'study',score:90})),{tests:[0,1,2,3,4].map(k=>({id:'t'+k,date:D(10-2*k),q:60,score:60+k*5}))});{const C=calibration();ok('Calibration','5 tests → regression of real on predicted, with bias',C.pts.length===5&&C.reg!==null&&C.bias!=null,JSON.stringify(C.pts))}
+    fixture([],{tests:[0,1,2,3,4].map(k=>({id:'t'+k,date:D(10-2*k),q:60,score:60+k*5}))});{const C=calibration();ok('Calibration','model flat on every test day → no regression, no crash',C.reg===null&&!C.usable&&C.bias!=null)}
+    /* --- practice tests in volume and plan --- */
+    fixture([],{tests:[{id:'a',date:T,q:40,score:80},{id:'b',date:T,q:60,score:null}]});ok('Volume','a scored practice test always adds 60 questions; in progress adds 0',weeklyVolume(12).at(-1).q===60);
+    fixture([],{settings:{minutes:180,qph:40,testEvery:0}});ok('Cadence','every 0 days = off',!testWhy().due&&!buildPlan().items.some(x=>x.kind==='test'));
+    fixture([{date:D(5),topic:1,kind:'study',score:70}],{settings:{minutes:180,qph:40,testEvery:7},tests:[{id:'a',date:D(5),q:60,score:75}]});
+    ok('Cadence','3+ days without studying triggers a test early (reason "idle")',testWhy().reason==='testIdle',testWhy().reason);
+    fixture([{date:D(1),topic:1,kind:'study',score:70}],{settings:{minutes:180,qph:40,testEvery:7},deadline:addDays(T,8),tests:[{id:'a',date:D(2),q:60,score:75}]});
+    ok('Cadence','last 10 days before the exam → every 2 days',testWhy().due&&testWhy().reason==='testFinal',JSON.stringify(testWhy()));
+    fixture([{date:D(1),topic:1,kind:'study',score:70}],{settings:{minutes:180,qph:40,testEvery:3},tests:[{id:'a',date:D(1),q:60,score:75}]});
+    ok('Cadence','next test date = last + N days',testWhy().next===addDays(D(1),3)&&!testWhy().due);
+    fixture([{date:D(1),topic:1,kind:'study',score:70}],{settings:{minutes:180,qph:40,testEvery:3},tests:[{id:'a',date:D(3),q:60,score:75}]});
+    ok('Cadence','low energy skips a test that is just due',!buildPlan(T,null,'low').items.some(x=>x.kind==='test')&&buildPlan(T,null,'medium').items.some(x=>x.kind==='test'));
+    fixture([{date:D(1),topic:1,kind:'study',score:70}],{settings:{minutes:180,qph:40,testEvery:3},tests:[{id:'a',date:D(6),q:60,score:75}]});
+    ok('Cadence','low energy still plans a test overdue by 2+ days',buildPlan(T,null,'low').items.some(x=>x.kind==='test'));
+    fixture([],{settings:{minutes:180,qph:40,tests:2}});ok('Cadence','old "2 tests per week" setting becomes every 4 days',settings().testEvery===4);
     /* --- translations --- */
     const keys=Object.keys(I18N.en);
     ['pt','ja'].forEach(L=>{const miss=keys.filter(k=>I18N[L][k]==null);ok('Languages',`${L}: every English label has a translation`,!miss.length,miss.join(', '))});
