@@ -184,9 +184,9 @@ body.dragging,body.dragging *{cursor:grabbing!important;user-select:none!importa
 .toprow .stat .sv{font-size:17px;min-width:56px}
 .toprow .stats{gap:3px!important;padding:8px 14px!important}
 .toprow .stat .sl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.toprow{grid-template-columns:minmax(0,1fr) 194px 214px}
+.toprow{grid-template-columns:minmax(0,1fr) 194px 300px}
 .toprow .meter{display:none}
-@media (max-width:1180px){.toprow{grid-template-columns:minmax(0,1fr) 160px 160px}}
+@media (max-width:1180px){.toprow{grid-template-columns:minmax(0,1fr) 170px 240px}}
 @media (max-width:860px){.toprow{grid-template-columns:1fr 1fr}.toprow .progress{grid-column:1/-1}}
 
 /* FIT MODE: on large screens the dashboard fits in one window (all cards still visible, no scroll inside lists) */
@@ -472,6 +472,63 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .dssum{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:12.5px;color:var(--muted);font-weight:650}
 .dssum b{color:var(--ink);font-size:16px;margin-right:4px}
 @media (max-width:640px){#daybg{align-items:flex-end;padding:0}#daybg .modal{width:100%;border-radius:18px 18px 0 0;max-height:80dvh}}
+
+/* weekly volume card (Strava-style) */
+.vol{padding:10px 14px 9px;display:flex;flex-direction:column;cursor:pointer;min-width:0;transition:border-color .15s}
+.vol:hover{border-color:#5a3a26}
+.volhead{display:flex;justify-content:space-between;align-items:flex-start}
+.volnum{font-size:12px;color:var(--muted);font-weight:700;margin-top:2px}
+.volnum b{font-size:22px;color:var(--ink);font-weight:900;letter-spacing:-.5px}
+.volmore{color:var(--muted);font-size:20px;line-height:1;font-weight:700}
+.volchart{flex:1;min-height:38px;margin:4px 0 2px}
+.volchart svg,.volbig svg{display:block;width:100%;height:100%}
+.volfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap}
+.volfoot .ptest{display:inline-flex;align-items:center;gap:4px;padding:1px 6px;border-radius:6px;cursor:pointer;min-width:0;overflow:hidden}
+.volfoot .ptest:hover{background:#262b31;color:var(--ink)}
+.volfoot #ptBest{color:var(--ink)}
+.vline{fill:none;stroke:#fc5200;stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
+.varea{fill:url(#vgrad)}
+.vdot{fill:#16191d;stroke:#fc5200;stroke-width:2}
+.vdot.cur{fill:#fc5200;stroke:#fc5200}
+.vhalo{fill:#fc520033}
+.vgrid{stroke:#2a2f36;stroke-width:1}
+.vax{fill:#8f99a6;font:650 10px system-ui,sans-serif}
+.vval{fill:#c5ccd5;font:750 10px system-ui,sans-serif}
+.vnow{stroke:#eef1f4;stroke-width:1.6}
+.actchip{font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap;background:#20252b;border:1px solid var(--line2);border-radius:999px;padding:3px 10px}
+.actchip b{color:var(--ink);font-size:13px}
+.volmodal{width:min(760px,100%)}
+.volrange{margin-top:14px;max-width:320px}
+.volbig{height:260px;margin-top:12px}
+.volkpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 18px;margin-top:14px}
+.volkpis b{display:block;font-size:22px;font-weight:900;letter-spacing:-.4px}
+.volkpis span{font-size:12px;color:var(--muted);font-weight:650}
+.volkpis .meter{position:relative;height:5px;border-radius:3px;background:#2a3038;margin-top:5px}
+.volkpis .meter i{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
+.volkpis .meter .goal{left:85%;width:2px;background:var(--ink);top:-3px;bottom:-3px}
+.volnote{font-size:12px;color:var(--muted);line-height:1.5;margin:14px 0 0}
+@media (max-width:640px){.volbig{height:200px}.volkpis{grid-template-columns:repeat(2,minmax(0,1fr))}.volfoot>span:first-child{display:none}.vol{padding:10px 12px}.actchip{font-size:11px;padding:2px 8px}#volbg{align-items:flex-end;padding:0}#volbg .modal{width:100%;border-radius:18px 18px 0 0;max-height:88dvh}}
+
+.volmore{background:transparent;border:1px solid transparent;color:var(--muted);font-size:15px;line-height:1;padding:3px 6px;border-radius:7px;cursor:pointer}
+.volmore:hover{color:var(--ink);border-color:var(--line2);background:#20252b}
+.vol{cursor:default!important}
+.voltot{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:14px}
+.voltot .vlabel{display:block;font-size:14px;font-weight:800}
+.voltot b{display:block;font-size:44px;font-weight:900;letter-spacing:-1.5px;line-height:1.1}
+.voltot .vdates{font-size:13px;color:var(--muted);font-weight:650}
+.vcmp{text-align:right;font-size:12.5px;color:var(--muted);font-weight:650}
+.vcmp b{font-size:20px;letter-spacing:-.3px;color:var(--ink)}
+.vcmp b.up{color:#4bce97}.vcmp b.down{color:#ff8a7a}
+.volbig{height:280px;margin-top:10px}
+.volrange{margin-top:10px;max-width:none!important}
+.volrange button{font-weight:800}
+@media (max-width:640px){.voltot b{font-size:36px}.volbig{height:230px}}
+
+/* exam date field: never wider than its card (iOS gives date inputs a fixed minimum width) */
+.countdown{min-width:0;overflow:hidden}
+#examDate{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;-webkit-appearance:none;appearance:none;text-align:left;font-weight:700}
+#examDate::-webkit-date-and-time-value{text-align:left;margin:0}
+@media (max-width:640px){#examDate{height:38px;padding:6px 10px;border-radius:9px;font-size:16px!important}}
 </style>
 </head>
 <body>
@@ -510,12 +567,11 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
         <div class="cdrow"><div class="big" id="countdown">—</div><div class="unit" id="countLabel"></div></div>
         <input type="date" id="examDate" aria-label="Exam date">
       </div>
-      <div class="panel stats">
-        <div class="stat" id="stAvg"><div class="sv" id="avg">—</div><div class="sl" data-t="avg"></div><div class="meter"><i id="avgBar"></i><b style="left:85%"></b></div></div>
-                <div class="stat" id="stPace"><div class="sv" id="pace">—</div><div class="sl" data-t="pace"></div></div>
-        <div class="stat"><div class="sv" id="activeDays">0</div><div class="sl" data-t="active"></div></div>
-        <div class="stat ptest" id="ptStat" role="button" tabindex="0"><div class="sv" id="ptBest">—</div><div class="sl"><span data-t="practiceTests"></span> <b class="addpt">+</b></div></div>
-              </div>
+      <div class="panel vol" id="volCard">
+        <div class="volhead"><div><span class="label" data-t="thisWeek"></span><div class="volnum"><b id="volWeek">0</b> <span data-t="questionsUnit"></span></div></div><button type="button" class="volmore" id="volOpen" aria-label="Open study volume" data-tt="volTitle">⤢</button></div>
+        <div class="volchart" id="volMini"></div>
+        <div class="volfoot"><span data-t="past12"></span><span class="ptest" id="ptStat" role="button" tabindex="0"><span data-t="practiceTests"></span> <b id="ptBest">—</b> <b class="addpt">+</b></span></div>
+      </div>
   </div>
 
   <section class="panel board">
@@ -528,6 +584,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
     <div class="panel cal">
       <div class="calhead">
         <h2 class="section" id="month"></h2>
+        <span class="actchip"><b id="activeDays">0</b> <span data-t="active"></span></span>
         <div class="callegend" id="callegend"></div>
         <div class="calnav"><button id="prev" aria-label="Previous month">‹</button><button id="now" data-t="today"></button><button id="next" aria-label="Next month">›</button></div>
       </div>
@@ -615,6 +672,16 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
     <div id="dayBody"></div>
   </div>
 </div>
+<div class="modalbg" id="volbg" hidden>
+  <div class="modal volmodal" role="dialog" aria-modal="true" aria-labelledby="volTitle">
+    <div class="mhead"><h3 id="volTitle" data-t="volTitle"></h3><button class="x" id="volClose" aria-label="Close">×</button></div>
+    <div class="voltot"><div><span class="vlabel" data-t="totalQ"></span><b id="volTotal">0</b><span class="vdates" id="volDates"></span></div><div class="vcmp" id="volCmp"></div></div>
+    <div class="volbig" id="volBig"></div>
+    <div class="seg volrange" id="volRange"><button data-r="3d">3D</button><button data-r="7d">7D</button><button data-r="1m">1M</button><button data-r="3m" class="on">3M</button><button data-r="6m">6M</button><button data-r="1y">1Y</button></div>
+    <p class="volnote" data-t="volNote"></p>
+    <div hidden><span id="stAvg"><b id="avg"></b><i id="avgBar"></i></span><span id="stPace"><b id="pace"></b></span></div>
+  </div>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script id="embedded" type="application/json">null</script>
@@ -659,6 +726,12 @@ Object.assign(I18N.ja,{"backupShort": "JSON", "clearShort": "削除", "saveShort
 Object.assign(I18N.en,{"dayActive": "Active day", "dayEmpty": "No activity", "dayNone": "Nothing logged on this day.", "daySessions": "Study sessions", "dayVC": "to Very Comfortable", "dayMoves": "Other moves"});
 Object.assign(I18N.pt,{"dayActive": "Dia ativo", "dayEmpty": "Sem atividade", "dayNone": "Nada registrado neste dia.", "daySessions": "Sessões de estudo", "dayVC": "para Muito confortável", "dayMoves": "Outras movimentações"});
 Object.assign(I18N.ja,{"dayActive": "学習した日", "dayEmpty": "活動なし", "dayNone": "この日の記録はありません。", "daySessions": "学習セッション", "dayVC": "「十分理解」へ", "dayMoves": "その他の移動"});
+Object.assign(I18N.en,{"thisWeek": "This week", "questionsUnit": "questions", "past12": "Past 12 weeks", "volTitle": "Study volume", "volSub": "Questions answered per week (Monday–Sunday)", "r12": "12 weeks", "r26": "6 months", "rAll": "All", "weekAvg": "Weekly average", "bestWeek": "Best week", "totalQ": "Total questions", "weekOf": "Week of {d}", "volNote": "A finished study or review session counts all questions of that topic; a scored practice test counts its 60 questions. Sessions in progress and card moves count 0.", "avg": "Avg score", "pace": "Pace / day to finish"});
+Object.assign(I18N.pt,{"thisWeek": "Esta semana", "questionsUnit": "questões", "past12": "Últimas 12 semanas", "volTitle": "Volume de estudo", "volSub": "Questões respondidas por semana (segunda a domingo)", "r12": "12 semanas", "r26": "6 meses", "rAll": "Tudo", "weekAvg": "Média semanal", "bestWeek": "Melhor semana", "totalQ": "Total de questões", "weekOf": "Semana de {d}", "volNote": "Uma sessão de estudo ou revisão concluída conta todas as questões do tópico; um simulado com nota conta 60 questões. Sessões em andamento e movimentações contam 0.", "avg": "Média de acertos", "pace": "Ritmo / dia para concluir"});
+Object.assign(I18N.ja,{"thisWeek": "今週", "questionsUnit": "問", "past12": "過去12週間", "volTitle": "学習量", "volSub": "週ごとの解答数（月〜日）", "r12": "12週間", "r26": "6か月", "rAll": "すべて", "weekAvg": "週平均", "bestWeek": "最高の週", "totalQ": "合計問題数", "weekOf": "{d}の週", "volNote": "完了した学習・復習セッションはそのトピックの全問題数、正答率のある模擬試験は60問として数えます。進行中のセッションとカード移動は0です。", "avg": "平均正答率", "pace": "完了に必要な1日のペース"});
+Object.assign(I18N.en,{"totalQ": "Total questions", "vsPrior": "vs. prior period", "volNote": "Counts questions from finished study/review sessions (the topic’s full question count) and scored practice tests (60). Sessions in progress and card moves count 0."});
+Object.assign(I18N.pt,{"totalQ": "Total de questões", "vsPrior": "vs. período anterior", "volNote": "Conta as questões das sessões de estudo/revisão concluídas (todas as questões do tópico) e dos simulados com nota (60). Sessões em andamento e movimentações contam 0."});
+Object.assign(I18N.ja,{"totalQ": "合計問題数", "vsPrior": "前の期間と比較", "volNote": "完了した学習・復習セッション（トピックの全問題数）と正答率のある模擬試験（60問）を数えます。進行中のセッションとカード移動は0です。"});
 const $=s=>document.querySelector(s);
 const pad=n=>String(n).padStart(2,'0');
 const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -744,6 +817,7 @@ function commit(mut,msg){
 function updateTexts(){
   document.documentElement.lang=lang==='pt'?'pt-BR':lang;
   document.querySelectorAll('[data-t]').forEach(el=>el.textContent=t(el.dataset.t));
+  document.querySelectorAll('[data-tt]').forEach(el=>{el.title=t(el.dataset.tt);el.setAttribute('aria-label',t(el.dataset.tt))});
   if(matchMedia('(max-width:640px)').matches){$('#backup').textContent=t('backupShort');$('#clearDemo').textContent=t('clearShort');$('#saveHtml').textContent=t('saveShort')}
   document.querySelectorAll('.flag').forEach(b=>{const on=b.dataset.lang===lang;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});
   document.querySelectorAll('#seg button').forEach(b=>b.textContent=t(b.dataset.kind));
@@ -820,6 +894,7 @@ function renderSide(){
   $('#pace').textContent=delta>0?fmt(Math.ceil(left/delta)):'—';
   const s=streakInfo();
   $('#activeDays').textContent=fmt(s.days);
+  renderVolume();
   const pts=(state.tests||[]).filter(x=>x.score!=null).sort((a,b)=>a.date.localeCompare(b.date));
   $('#ptBest').textContent=pts.length?Math.max(...pts.map(x=>x.score))+'%':'—';
   $('#ptStat').title=pts.length?t('ptTip').replace('{last}',pts[pts.length-1].score+'%').replace('{n}',(state.tests||[]).length):t('practiceTests');
@@ -1203,6 +1278,72 @@ $('#calgrid').addEventListener('click',e=>{const d=e.target.closest('.day[data-d
 $('#dayClose').onclick=closeDay;
 $('#daybg').addEventListener('pointerdown',e=>{if(e.target.id==='daybg')closeDay()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#daybg').hidden)closeDay()});
+
+/* ===== weekly study volume (questions) =====
+   A completed study/review session counts the topic's question count; a completed practice test counts its questions.
+   Sessions in progress and card moves count 0. Weeks run Monday–Sunday, like the calendar. */
+function weekStart(isoD){const d=parse(isoD);d.setDate(d.getDate()-((d.getDay()+6)%7));return iso(d)}
+function weeklyVolume(n){
+  const by={};const add=(d,q)=>{const k=weekStart(d);by[k]=(by[k]||0)+q};
+  state.events.forEach(e=>{if((e.kind==='study'||e.kind==='review')&&!e.partial)add(e.date,TOPICS[e.topic].q)});
+  (state.tests||[]).forEach(x=>{if(x.score!=null)add(x.date,x.q||60)});
+  const cur=weekStart(todayISO());let first=cur;
+  if(n){first=addDays(cur,-7*(n-1))}else{const ks=Object.keys(by).sort();first=ks.length&&ks[0]<cur?ks[0]:addDays(cur,-7*11);if(diffDays(first,cur)/7<11)first=addDays(cur,-7*11)}
+  const out=[];for(let w=first;w<=cur;w=addDays(w,7))out.push({w,q:by[w]||0});return out;
+}
+function volSVG(data,W,H,big){
+  const L=big?8:4,Rp=big?46:4,T=big?16:6,B=big?24:4,pw=W-L-Rp,ph=H-T-B;
+  const max=Math.max(1,...data.map(d=>d.q));const nice=big?Math.ceil(max/50)*50||50:max;
+  const X=k=>L+(data.length<2?pw/2:k*pw/(data.length-1)),Y=v=>T+ph-(v/nice)*ph,f=n=>n.toFixed(1);
+  const pts=data.map((d,k)=>[X(k),Y(d.q)]),line=pts.map((p,k)=>(k?'L':'M')+f(p[0])+' '+f(p[1])).join('');
+  let g=`<defs><linearGradient id="vgrad${big?'b':'m'}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fc5200" stop-opacity=".45"/><stop offset="1" stop-color="#fc5200" stop-opacity="0"/></linearGradient></defs>`;
+  if(big){[0,.5,1].forEach(r=>{const y=T+ph-r*ph;g+=`<line class="vgrid" x1="${L}" x2="${L+pw}" y1="${f(y)}" y2="${f(y)}"/><text class="vax" x="${W-4}" y="${f(y+3.5)}" text-anchor="end">${fmt(Math.round(nice*r))}</text>`})}
+  g+=`<path d="${line}L${f(pts.at(-1)[0])} ${T+ph}L${f(pts[0][0])} ${T+ph}Z" fill="url(#vgrad${big?'b':'m'})"/><path class="vline" d="${line}"/>`;
+  const xn=pts.at(-1)[0];g+=`<line class="vnow" x1="${f(xn)}" x2="${f(xn)}" y1="${T}" y2="${T+ph}"/>`;
+  const r=big?4.5:(data.length>16?2:3);
+  pts.forEach((p,k)=>{const cur=k===pts.length-1;if(cur)g+=`<circle class="vhalo" cx="${f(p[0])}" cy="${f(p[1])}" r="${r*2.6}"/>`;g+=`<circle class="vdot${cur?' cur':''}" cx="${f(p[0])}" cy="${f(p[1])}" r="${r}"><title>${esc(data[k].day?new Intl.DateTimeFormat(LOCALE[lang],{weekday:'short',month:'short',day:'numeric'}).format(parse(data[k].w)):t('weekOf').replace('{d}',new Intl.DateTimeFormat(LOCALE[lang],{month:'short',day:'numeric'}).format(parse(data[k].w))))}: ${data[k].q} ${esc(t('questionsUnit'))}</title></circle>`;
+    if(big&&data.length<=14&&data[k].q)g+=`<text class="vval" x="${f(p[0])}" y="${f(p[1]-9)}" text-anchor="middle">${data[k].q}</text>`});
+  if(big&&data[0].day){const n=data.length,step=n<=7?1:7,lf=new Intl.DateTimeFormat(LOCALE[lang],n<=7?{weekday:'short'}:{month:'short',day:'numeric'});data.forEach((d,k)=>{if((n-1-k)%step===0)g+=`<text class="vax" x="${f(X(k))}" y="${H-6}" text-anchor="middle">${esc(lf.format(parse(d.w)))}</text>`})}
+  else if(big){let lastM=-1;const mf=new Intl.DateTimeFormat(LOCALE[lang],{month:'short'});data.forEach((d,k)=>{const m=parse(d.w).getMonth();if(m!==lastM&&k>0){g+=`<text class="vax" x="${f(X(k))}" y="${H-6}" text-anchor="middle">${esc(mf.format(parse(d.w)).toUpperCase())}</text>`}lastM=m})}
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${esc(t('volTitle'))}">${g}</svg>`;
+}
+let volRange='3m';
+const RANGES={'3d':{days:3},'7d':{days:7},'1m':{days:30},'3m':{weeks:13},'6m':{weeks:26},'1y':{weeks:52}};
+function dailyVolume(){const by={};state.events.forEach(e=>{if((e.kind==='study'||e.kind==='review')&&!e.partial)by[e.date]=(by[e.date]||0)+TOPICS[e.topic].q});(state.tests||[]).forEach(x=>{if(x.score!=null)by[x.date]=(by[x.date]||0)+(x.q||60)});return by}
+function rangeSeries(r,shift=0){
+  const R=RANGES[r],by=dailyVolume(),today=todayISO();
+  if(R.days){const end=addDays(today,-shift*R.days),out=[];for(let k=R.days-1;k>=0;k--){const d=addDays(end,-k);out.push({w:d,q:by[d]||0,day:true})}return out}
+  const curW=addDays(weekStart(today),-shift*7*R.weeks),out=[];
+  for(let k=R.weeks-1;k>=0;k--){const w=addDays(curW,-7*k);let q=0;for(let i=0;i<7;i++){const d=addDays(w,i);if(d<=today)q+=by[d]||0}out.push({w,q})}
+  return out;
+}
+function renderVolume(){
+  const d=weeklyVolume(12),box=$('#volMini');if(!box)return;
+  $('#volWeek').textContent=fmt(d.at(-1).q);
+  const w=Math.max(120,Math.round(box.clientWidth||240)),h=Math.max(30,Math.round(box.clientHeight||46));
+  box.innerHTML=volSVG(d,w,h,false);
+  if(!$('#volbg').hidden)renderVolBig();
+}
+function renderVolBig(){
+  const d=rangeSeries(volRange),prev=rangeSeries(volRange,1),box=$('#volBig');
+  const tot=d.reduce((a,x)=>a+x.q,0),ptot=prev.reduce((a,x)=>a+x.q,0);
+  $('#volTotal').textContent=fmt(tot);
+  const df=new Intl.DateTimeFormat(LOCALE[lang],{month:'short',day:'numeric',year:'numeric'});
+  const last=d.at(-1).day?d.at(-1).w:(addDays(d.at(-1).w,6)>todayISO()?todayISO():addDays(d.at(-1).w,6));
+  $('#volDates').textContent=`${df.format(parse(d[0].w))} – ${df.format(parse(last))}`;
+  if(ptot>0){const ch=Math.round((tot-ptot)/ptot*100);$('#volCmp').innerHTML=`<b class="${ch>=0?'up':'down'}">${ch>=0?'▲':'▼'} ${Math.abs(ch)}%</b><br>${esc(t('vsPrior'))}`}
+  else $('#volCmp').innerHTML='';
+  box.innerHTML=volSVG(d,Math.round(box.clientWidth||700),Math.round(box.clientHeight||280),true);
+  document.querySelectorAll('#volRange button').forEach(b=>b.classList.toggle('on',b.dataset.r===volRange));
+}
+function openVol(){$('#volbg').hidden=false;renderVolBig();$('#volClose').focus()}
+const closeVol=()=>{$('#volbg').hidden=true};
+$('#volOpen').addEventListener('click',e=>{e.stopPropagation();openVol()});
+$('#volClose').onclick=closeVol;
+$('#volbg').addEventListener('pointerdown',e=>{if(e.target.id==='volbg')closeVol()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#volbg').hidden)closeVol()});
+$('#volRange').onclick=e=>{const b=e.target.closest('button');if(b){volRange=b.dataset.r;renderVolBig()}};
+let rzVol;window.addEventListener('resize',()=>{clearTimeout(rzVol);rzVol=setTimeout(renderVolume,120)});
 
 /* header & calendar controls */
 document.querySelectorAll('.flag').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;state.lang=lang;save(false);render()});
