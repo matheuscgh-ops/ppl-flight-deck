@@ -1811,7 +1811,7 @@ function renderSRPage(focus){
   paintSrRange();renderForecast();
   const all=srAll(),avg=wavg(all),due=all.filter(m=>!m.reps.length||m.over>=0);
   $('#srKpis').innerHTML=`<div><b>${pct(avg)}</b><span>${esc(t('avgRet'))}</span></div><div><b>${due.length}</b><span>${esc(t('dueCount'))}</span></div><div><b>${all.length}</b><span>${esc(t('trackedN'))}</span></div>`;
-  {const el=$('#srAvgChart'),wide=window.innerWidth>=1100;el.innerHTML=avgChart(all,wide?Math.round(el.clientWidth||1100):1100,wide?260:280)}
+  {const el=$('#srAvgChart');el.innerHTML=avgChart(all,Math.round(el.clientWidth||1100),phoneMQ.matches?200:260)}
   $('#srLegend1').innerHTML=legendHTML(false);
   $('#formulaBody').innerHTML=t('formula');
   document.querySelectorAll('[data-srcr] button').forEach(b=>b.classList.toggle('on',b.dataset.scr===srCardRange));
@@ -1823,6 +1823,8 @@ function renderSRPage(focus){
     <div class="kpirow"><div><b class="${m.R!=null&&m.R<.9?'over':''}">${pct(m.R)}</b><span>${esc(t('retention'))}</span></div><div><b>${m.S?fmt(m.S,1)+'d':'—'}</b><span>${esc(t('stability'))}</span></div><div><b class="${cl}">${m.next?esc(df.format(parse(m.next))):'—'}</b><span>${esc(dt)}</span></div><div><b>${m.reps.length}</b><span>${esc(t('sessions'))}</span></div><div><b>${m.p!=null?m.p+'%':'—'}</b><span>${esc(t('lastScore'))}</span></div></div>
     <div class="chart">${m.reps.length?topicChart(m,520,220,srCardRange):`<div class="empty">${esc(t('noHistLong'))}</div>`}</div>
     <div class="acts"><button data-log="${m.i}">${esc(t('logReview'))}</button></div></article>`}).join('')||`<div class="muted">${esc(t('allClear'))}</div>`;
+  /* phone / tablet: redraw each topic chart at its real width so text and lines keep their size (desktop keeps 520 × 220) */
+  if(window.innerWidth<1100)list.forEach(m=>{if(!m.reps.length)return;const box=document.querySelector(`#sr-${m.i} .chart`),w=box&&Math.round(box.clientWidth);if(w)box.innerHTML=topicChart(m,w,phoneMQ.matches?190:210,srCardRange)});
   if(focus!=null){const el=document.getElementById('sr-'+focus);if(el){el.scrollIntoView({block:'center'});el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}}
 }
 $('#srFilters').onclick=e=>{const b=e.target.closest('button');if(b){srFilter=b.dataset.f;renderSRPage()}};
