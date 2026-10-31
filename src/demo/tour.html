@@ -1,0 +1,192 @@
+<!-- DEMO ONLY: guided tour (injected by build.py into demo.html, never into the personal app) -->
+<style>
+.tour-hole{position:fixed;z-index:9000;border-radius:12px;pointer-events:none;box-shadow:0 0 0 9999px rgba(5,7,10,.74),0 0 0 3px #f5a524,0 0 26px 6px #f5a52455;transition:top .38s cubic-bezier(.2,.8,.2,1),left .38s cubic-bezier(.2,.8,.2,1),width .38s cubic-bezier(.2,.8,.2,1),height .38s cubic-bezier(.2,.8,.2,1),border-radius .38s}
+.tour-hole.center{width:0!important;height:0!important;box-shadow:0 0 0 9999px rgba(5,7,10,.74)}
+.tour-hole.act{animation:tourPulse 1.4s ease-in-out infinite}
+@keyframes tourPulse{0%,100%{box-shadow:0 0 0 9999px rgba(5,7,10,.74),0 0 0 3px #f5a524,0 0 18px 4px #f5a52455}50%{box-shadow:0 0 0 9999px rgba(5,7,10,.74),0 0 0 5px #ffd08a,0 0 34px 12px #f5a52477}}
+.tour-block{position:fixed;z-index:8999;background:transparent}
+.tour-card{position:fixed;z-index:9001;width:min(380px,calc(100vw - 24px));background:#1b1f24;border:1px solid #47505b;border-radius:14px;padding:16px 16px 14px;box-shadow:0 22px 60px #000c;color:var(--ink,#e8ecf1);transition:top .38s cubic-bezier(.2,.8,.2,1),left .38s cubic-bezier(.2,.8,.2,1),opacity .2s}
+.tour-card .thead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tour-card .tflags{display:flex;gap:2px;background:#14171b;border:1px solid #2f363e;border-radius:8px;padding:2px}
+.tour-card .tflags button{background:none!important;border:0!important;padding:2px 6px!important;font-size:15px!important;line-height:1.2;border-radius:6px;opacity:.55;cursor:pointer}
+.tour-card .tflags button.on{opacity:1;background:#343b44!important}
+.tour-card .tstep{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#ffd08a}
+.tour-card h4{margin:4px 0 6px;font-size:17px;font-weight:900;letter-spacing:-.2px}
+.tour-card p{margin:0;font-size:13.5px;line-height:1.5;color:#c5ccd5}
+.tour-card .tdo{margin-top:8px;font-size:12.5px;font-weight:800;color:#4bce97}
+.tour-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px}
+.tour-dots{display:flex;gap:4px;flex-wrap:wrap}.tour-dots i{width:6px;height:6px;border-radius:3px;background:#3a424c}.tour-dots i.on{background:#f5a524;width:14px}
+.tour-btns{display:flex;gap:6px}
+.tour-card button{padding:6px 12px;font-size:13px}
+.tour-skip{background:none!important;border:0!important;color:#8f99a6!important;padding:6px 4px!important;font-weight:700}
+#tourBtn{white-space:nowrap}
+@media (max-width:640px){#tourBtn{flex:0 0 auto;min-width:36px;padding-left:10px;padding-right:10px}}
+@media (max-width:640px){.tour-card{left:10px!important;right:10px;width:auto;top:auto!important;bottom:calc(10px + env(safe-area-inset-bottom))}}
+</style>
+<script>
+(()=>{
+const KEY='ppl-flight-deck-demo-tour';
+const T={
+  en:{next:'Next',back:'Back',skip:'Skip tour',done:'Finish',step:'Step {i} of {n}',tour:'Tour',doIt:'Try it: {a}'},
+  pt:{next:'Próximo',back:'Voltar',skip:'Pular tour',done:'Concluir',step:'Passo {i} de {n}',tour:'Tour',doIt:'Faça: {a}'},
+  ja:{next:'次へ',back:'戻る',skip:'スキップ',done:'完了',step:'{n}中{i}',tour:'ツアー',doIt:'やってみる：{a}'}};
+/* view: which tab to show · sel: element to highlight · act: a click on this selector moves the tour forward */
+const STEPS=[
+ {view:'dash',sel:null,
+  en:['Welcome to PPL Flight Deck','A one-minute tour of the demo. All data here is fictional. Use Next, the arrow keys, or Esc to leave.'],
+  pt:['Bem-vindo ao PPL Flight Deck','Um tour de um minuto pela demo. Todos os dados aqui são fictícios. Use Próximo, as setas do teclado ou Esc para sair.'],
+  ja:['PPL Flight Deckへようこそ','デモの1分ツアーです。データはすべて架空です。「次へ」、矢印キー、Escで終了。']},
+ {view:'dash',sel:'.board',
+  en:['The Kanban drives your study','Each card is one of the 26 Sporty’s topics. Drag it from To Do toward Very Comfortable as you progress, and tap a card to log a session and its score.'],
+  pt:['O Kanban guia seus estudos','Cada card é um dos 26 tópicos do Sporty’s. Arraste de A fazer até Muito confortável conforme avança e toque num card para registrar uma sessão e a nota.'],
+  ja:['カンバンが学習の中心','各カードはSporty’sの26トピックの1つ。進み具合に合わせて未着手から得意へドラッグし、タップで学習とスコアを記録。']},
+ {view:'dash',sel:'.progress',
+  en:['Question bank progress','How the 1,058 questions are spread across your lists.'],
+  pt:['Progresso do banco de questões','Como as 1.058 questões estão distribuídas nas suas listas.'],
+  ja:['問題バンクの進捗','1,058問がどのリストにあるか。']},
+ {view:'dash',sel:'#tsCard',
+  en:['Practice tests at a glance','Last score, best, average of the last 3 and the trend. ⤢ opens a quick look where you can also log a new test.'],
+  pt:['Simulados num relance','Última nota, melhor, média dos últimos 3 e a tendência. O ⤢ abre uma visão rápida onde você também registra um simulado.'],
+  ja:['模試をひと目で','最新・最高・直近3回平均と傾向。⤢でクイックビュー、そこから新しい模試も記録できます。']},
+ {view:'dash',sel:'#volCard',
+  en:['Study volume','Questions answered per week. Each practice test counts 60. ⤢ opens the full chart.'],
+  pt:['Volume de estudo','Questões respondidas por semana. Cada simulado conta 60. O ⤢ abre o gráfico completo.'],
+  ja:['学習量','週ごとの解答数。模試は60問として数えます。⤢で詳細グラフ。']},
+ {view:'dash',sel:'.cal',
+  en:['Calendar and streak','Every study day, review and practice test. The orange column counts the weeks you studied.'],
+  pt:['Calendário e sequência','Cada dia de estudo, revisão e simulado. A coluna laranja conta as semanas em que você estudou.'],
+  ja:['カレンダーと連続記録','学習・復習・模試の日。オレンジの列は学習した週の数。']},
+ {view:'dash',sel:'#fcMini',
+  en:['One exam forecast','Your question-bank model combined with your recent practice tests, with the chance to pass (70%) and to reach 85%. Tap it to see the topics that cost you the most.'],
+  pt:['Uma única previsão da prova','O modelo do banco combinado com seus simulados recentes, com a chance de passar (70%) e de chegar a 85%. Toque para ver os tópicos que mais custam pontos.'],
+  ja:['試験予測はひとつ','問題バンクのモデルと最近の模試を組み合わせ、合格（70%）と85%到達の確率を表示。タップで失点の多いトピック。']},
+ {view:'dash',sel:'.nthen',
+  en:['Today’s plan','Not in the mood to decide? This list tells you what to study next.'],
+  pt:['Plano de hoje','Sem vontade de decidir? Esta lista diz o que estudar agora.'],
+  ja:['今日の計画','迷ったときは、次に何を学ぶかをこのリストが教えてくれます。']},
+ {view:'dash',sel:'.tabs button[data-view="plan"]',act:'.tabs button[data-view="plan"]',
+  en:['Open the Plan','The full plan lives in its own tab.','click the Plan tab'],
+  pt:['Abra o Plano','O plano completo fica numa aba própria.','clique na aba Plano'],
+  ja:['計画を開く','計画の詳細は専用タブにあります。','計画タブをクリック']},
+ {view:'plan',sel:'#planWeek',
+  en:['Plans: block your week','Create a daily or weekly plan: select time in 15-minute blocks, get topics placed by your statistics (hardest first), edit them, save. An example plan is ready for next week (›). “Sync with Kanban” moves today’s topics to Doing after you approve.'],
+  pt:['Planos: reserve sua semana','Crie um plano diário ou semanal: selecione o tempo em blocos de 15 minutos, receba os tópicos pelas suas estatísticas (os mais difíceis primeiro), edite e salve. Há um plano de exemplo para a próxima semana (›). “Sincronizar com o Kanban” move os tópicos de hoje para Doing depois que você aprova.'],
+  ja:['プラン：1週間を確保','日・週のプランを作成：15分単位で時間を選び、統計に基づいてトピックを配置（難しい順）、編集して保存。来週のサンプルがあります（›）。「Kanbanと同期」で承認後に今日のトピックをDoingへ。']},
+ {view:'plan',sel:'#energyPick',act:'#energyPick [data-energy="low"]',
+  en:['Pick your energy','Low, medium or high: the plan changes size and order for the night.','choose Low'],
+  pt:['Escolha sua energia','Baixa, média ou alta: o plano muda de tamanho e de ordem para a noite.','escolha Baixa'],
+  ja:['エネルギーを選ぶ','低・中・高で、その夜の計画の量と順番が変わります。','「低」を選ぶ']},
+ {view:'plan',sel:'#planList',
+  en:['Ordered by impact','Topics come in order of exam-day questions at stake per minute, and each row shows how many. Tap a row to log it.'],
+  pt:['Ordenado por impacto','Os tópicos vêm na ordem de questões em jogo no dia da prova por minuto, e cada linha mostra quantas. Toque numa linha para registrar.'],
+  ja:['効果の大きい順','1分あたりの試験日の失点リスクが大きい順。各行にその数を表示。タップで記録。']},
+ {view:'plan',sel:'#planPt',
+  en:['Practice tests in the plan','Suggested every N days, sooner if you stop studying. Add one to today’s plan or log one you just did.'],
+  pt:['Simulados no plano','Sugeridos a cada N dias, antes se você parar de estudar. Adicione um ao plano de hoje ou registre um que acabou de fazer.'],
+  ja:['計画の中の模試','N日ごとに提案され、学習が止まると早まります。今日の計画に追加、または記録。']},
+ {view:'tests',sel:'.tshero',
+  en:['Practice tests tab','Every test, the trend line and the date you reach 85%.'],
+  pt:['Aba Simulados','Todos os simulados, a linha de tendência e a data em que você chega a 85%.'],
+  ja:['模試タブ','すべての模試、傾向線、85%に届く日。']},
+ {view:'sr',sel:'#statSeg',act:'#statSeg [data-stat="tests"]',
+  en:['Statistics','Question bank: the model and spaced repetition per topic. Practice tests: trend, histogram and a test-based forecast.','open Practice tests'],
+  pt:['Estatísticas','Banco de questões: o modelo e a repetição espaçada por tópico. Simulados: tendência, histograma e previsão pelos simulados.','abra Simulados'],
+  ja:['統計','問題バンク：モデルとトピック別の間隔反復。模試：傾向・ヒストグラム・模試ベースの予測。','模試を開く']},
+ {view:'sr',stat:'tests',sel:'#fcFull',
+  en:['Forecast from practice tests','Built only from your tests: average of the last 3, chance to pass and to reach 85% with their uncertainty, tests passed and consistency.'],
+  pt:['Previsão pelos simulados','Feita só com seus simulados: média dos últimos 3, chance de passar e de chegar a 85% com a incerteza, simulados aprovados e consistência.'],
+  ja:['模試からの予測','模試だけで計算：直近3回平均、合格と85%到達の確率（不確かさ込み）、合格回数、安定度。']},
+ {view:'dash',sel:'.flags',
+  en:['Your data, your language','English, Português or 日本語. Everything stays in your browser; Backup JSON and Save HTML keep a copy.'],
+  pt:['Seus dados, seu idioma','English, Português ou 日本語. Tudo fica no seu navegador; Backup JSON e Save HTML guardam uma cópia.'],
+  ja:['データも言語も自由に','English・Português・日本語。データはブラウザ内に保存。Backup JSONとSave HTMLでコピーを保存。']},
+ {view:'dash',sel:null,
+  en:['You’re ready','Explore freely. Restart this tour anytime with the Tour button at the top.'],
+  pt:['Pronto!','Explore à vontade. Reinicie este tour quando quiser pelo botão Tour no topo.'],
+  ja:['準備完了','自由に操作してみてください。上部の「ツアー」ボタンでいつでも再開できます。']}];
+
+const L=()=>T[lang]?lang:'en',tt=k=>T[L()][k],sx=s=>s[L()]||s.en;
+let k=-1,els=null,onAct=null;
+function build(){
+  els={hole:document.createElement('div'),card:document.createElement('div'),blocks:[0,1,2,3].map(()=>document.createElement('div'))};
+  els.hole.className='tour-hole';els.card.className='tour-card';els.card.setAttribute('role','dialog');els.card.setAttribute('aria-live','polite');
+  els.blocks.forEach(b=>{b.className='tour-block';document.body.appendChild(b)});document.body.appendChild(els.hole);document.body.appendChild(els.card);
+  document.addEventListener('keydown',key,true);window.addEventListener('resize',place);
+  /* while the page scrolls the spotlight sticks to the element (no slide animation), then animations come back */
+  let st=null;window.addEventListener('scroll',()=>{els.hole.style.transition=els.card.style.transition='none';place();clearTimeout(st);st=setTimeout(()=>{els.hole.style.transition=els.card.style.transition=''},140)},{passive:true});
+}
+function key(e){if(k<0)return;if(e.key==='Escape'){e.preventDefault();e.stopPropagation();end()}else if(e.key==='ArrowRight'){e.preventDefault();go(k+1)}else if(e.key==='ArrowLeft'){e.preventDefault();go(k-1)}}
+function target(){const s=STEPS[k];return s.sel?document.querySelector(s.sel):null}
+function place(){
+  if(k<0)return;const s=STEPS[k],el=target(),W=innerWidth,H=innerHeight,pad=8;
+  let r=el&&el.offsetParent!==null?el.getBoundingClientRect():null;
+  const h=els.hole;h.classList.toggle('center',!r);h.classList.toggle('act',!!s.act);
+  let x0=W/2,y0=H/2,x1=W/2,y1=H/2;
+  if(r){x0=Math.max(4,r.left-pad);y0=Math.max(4,r.top-pad);x1=Math.min(W-4,r.right+pad);y1=Math.min(H-4,r.bottom+pad);
+    Object.assign(h.style,{left:x0+'px',top:y0+'px',width:(x1-x0)+'px',height:(y1-y0)+'px'})}
+  else Object.assign(h.style,{left:W/2+'px',top:H/2+'px'});
+  /* clicks outside the highlight are blocked; inside only on interactive steps */
+  const [bt,bb,bl,br]=els.blocks,hole=!!(r&&s.act);
+  Object.assign(bt.style,{left:0,top:0,width:W+'px',height:(hole?y0:H)+'px'});
+  Object.assign(bb.style,{left:0,top:(hole?y1:H)+'px',width:W+'px',height:(hole?H-y1:0)+'px'});
+  Object.assign(bl.style,{left:0,top:y0+'px',width:(hole?x0:0)+'px',height:(hole?y1-y0:0)+'px'});
+  Object.assign(br.style,{left:(hole?x1:W)+'px',top:y0+'px',width:(hole?W-x1:0)+'px',height:(hole?y1-y0:0)+'px'});
+  const c=els.card,cw=c.offsetWidth,ch=c.offsetHeight;
+  if(W<=640)return;
+  let top,left;
+  if(!r){top=(H-ch)/2;left=(W-cw)/2}
+  else{left=Math.min(Math.max(12,x0),W-cw-12);
+    if(y1+12+ch<=H-12)top=y1+12;else if(y0-12-ch>=12)top=y0-12-ch;
+    else{top=Math.min(Math.max(12,(y0+y1)/2-ch/2),H-ch-12);left=x1+12+cw<=W-12?x1+12:Math.max(12,x0-12-cw)}}
+  c.style.left=left+'px';c.style.top=top+'px';
+}
+function go(n){
+  if(n<0)return;if(n>=STEPS.length){end();return}
+  k=n;const s=STEPS[k];
+  if(typeof curView!=='undefined'&&curView!==s.view)goView(s.view);
+  if(s.view==='sr'&&typeof setStat==='function'){const want=s.stat||'bank';if(statMode!==want)setStat(want)}
+  const [title,body,act]=sx(s);
+  els.card.innerHTML=`<div class="thead"><div class="tstep">${esc(tt('step').replace('{i}',k+1).replace('{n}',STEPS.length))}</div><div class="tflags" role="group" aria-label="Language">${[['en','🇺🇸','English'],['pt','🇧🇷','Português'],['ja','🇯🇵','日本語']].map(([c,f,n])=>`<button type="button" data-tlang="${c}" class="${L()===c?'on':''}" title="${n}" aria-label="${n}" aria-pressed="${L()===c}">${f}</button>`).join('')}</div></div><h4>${esc(title)}</h4><p>${esc(body)}</p>${act?`<div class="tdo">👉 ${esc(tt('doIt').replace('{a}',act))}</div>`:''}
+    <div class="tour-foot"><button type="button" class="tour-skip" data-tour="skip">${esc(tt('skip'))}</button><div class="tour-dots">${STEPS.map((_,j)=>`<i class="${j===k?'on':''}"></i>`).join('')}</div>
+    <div class="tour-btns">${k?`<button type="button" data-tour="back">${esc(tt('back'))}</button>`:''}<button type="button" class="primary" data-tour="next">${esc(tt(k===STEPS.length-1?'done':'next'))}</button></div></div>`;
+  els.card.querySelector('[data-tour="next"]').focus({preventScroll:true});
+  if(onAct){document.removeEventListener('click',onAct,true);onAct=null}
+  if(s.act){onAct=e=>{if(e.target.closest(s.act)){document.removeEventListener('click',onAct,true);onAct=null;setTimeout(()=>go(k+1),450)}};document.addEventListener('click',onAct,true)}
+  place();
+  /* scroll after the new tab has been drawn, so the element sits in the free part of the screen */
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{if(k===n)follow()}));
+  setTimeout(place,450);setTimeout(place,900);
+}
+/* bring the highlighted element into the free area: the whole screen on desktop, above the bottom panel on phones.
+   Centered when it fits, top-aligned when it is taller than the free area. */
+function follow(){
+  const el=target();if(!el||el.offsetParent===null){window.scrollTo({top:0,behavior:'smooth'});return}
+  const phone=innerWidth<=640,c=els.card.getBoundingClientRect();
+  /* on phones the page gets room at the bottom so the last elements can rise above the panel */
+  document.body.style.paddingBottom=phone?Math.ceil(c.height+24)+'px':'';
+  const r=el.getBoundingClientRect(),H=innerHeight;
+  const freeTop=8,freeBot=phone?Math.max(160,c.top-12):H-8,free=freeBot-freeTop;
+  /* desktop/tablet: when element + card fit together, center the pair (card goes below), so they never overlap */
+  const ch=c.height+12;
+  let dy=!phone&&r.height+ch+16<=free?r.top-freeTop-(free-r.height-ch)/2:r.height<=free?(r.top-freeTop)-(free-r.height)/2:r.top-freeTop-4;
+  const max=document.documentElement.scrollHeight-H,to=Math.max(0,Math.min(max,scrollY+dy));
+  if(Math.abs(to-scrollY)>2)window.scrollTo({top:to,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+  place();
+}
+function start(){if(!els)build();els.card.hidden=els.hole.hidden=false;els.blocks.forEach(b=>b.hidden=false);go(0)}
+function end(){
+  if(k<0)return;k=-1;try{localStorage.setItem(KEY,'done')}catch(e){}
+  if(onAct){document.removeEventListener('click',onAct,true);onAct=null}
+  els.card.hidden=els.hole.hidden=true;els.blocks.forEach(b=>b.hidden=true);document.body.style.paddingBottom='';if(typeof goView==='function')goView('dash');
+}
+document.addEventListener('click',e=>{const f=e.target.closest('[data-tlang]');if(f){const h=document.querySelector(`.flag[data-lang="${f.dataset.tlang}"]`);if(h)h.click();return}const b=e.target.closest('[data-tour]');if(!b)return;const a=b.dataset.tour;if(a==='next')go(k+1);else if(a==='back')go(k-1);else if(a==='skip')end()});
+const btn=document.getElementById('tourBtn');
+const label=()=>{if(!btn)return;const narrow=matchMedia('(max-width:640px)').matches;btn.textContent=narrow?'?':'? '+tt('tour');btn.title=tt('tour');btn.setAttribute('aria-label',tt('tour'))};label();window.addEventListener('resize',label);
+document.querySelectorAll('.flag').forEach(f=>f.addEventListener('click',()=>{setTimeout(()=>{label();if(k>=0)go(k)},0)}));
+if(btn)btn.onclick=start;
+window.pplTour={start,end,step:()=>k,steps:STEPS.length,go};
+/* first visit opens the tour (not under automated testing — tests start it explicitly) */
+let seen=false;try{seen=localStorage.getItem(KEY)==='done'}catch(e){}
+if(!seen&&!navigator.webdriver)setTimeout(start,700);
+})();
+</script>

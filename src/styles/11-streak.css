@@ -1,0 +1,167 @@
+/* Strava-style streak strip */
+:root {
+  --strava: #fc5200;
+}
+.strip {
+  background: #3b1b0e;
+  border: 0;
+  border-radius: 999px;
+}
+.wd.wk {
+  color: #ff8a57;
+}
+.wcheck {
+  width: 34px;
+  height: 34px;
+  border: 2px solid #8f4322;
+  color: #1b0b04;
+  font-size: 19px;
+  font-weight: 900;
+  background: transparent;
+  position: relative;
+}
+.wcheck:not(.on)::after {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #a0502a;
+}
+.wcheck.on {
+  background: var(--strava);
+  border-color: var(--strava);
+}
+.wcheck.cur {
+  box-shadow: none;
+}
+.wcheck.cur:not(.on) {
+  border-color: #c3622f;
+}
+.bubble {
+  width: 54px;
+  height: 54px;
+  background: var(--strava);
+  color: #1b0b04;
+  font-size: 26px;
+  font-weight: 900;
+  box-shadow: none;
+}
+.bubblewrap small {
+  color: #ffa67c;
+}
+@media (min-width: 1100px) and (min-height: 1050px) {
+  .wcheck {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+  .bubble {
+    width: 44px;
+    height: 44px;
+    font-size: 21px;
+  }
+}
+#selftestBox {
+  position: fixed;
+  inset: 0;
+  background: #000c;
+  z-index: 90;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 30px 16px;
+  overflow: auto;
+}
+.stpanel {
+  width: min(760px, 100%);
+  background: #1b1f24;
+  border: 1px solid #47505b;
+  border-radius: 14px;
+  padding: 16px 20px;
+}
+.sthead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+}
+.stpanel h4 {
+  margin: 14px 0 4px;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.strow {
+  font-size: 13px;
+  padding: 2px 0;
+  color: #9fe3c0;
+}
+.strow.bad {
+  color: #ff9c95;
+}
+.strow code {
+  color: #ffd08a;
+  font-size: 11px;
+}
+.syncchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.syncchip i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6b7480;
+  flex: none;
+}
+.syncchip.ok i {
+  background: #4bce97;
+}
+.syncchip.busy i {
+  background: #579dff;
+  animation: pulse 1s infinite;
+}
+.syncchip.warn i {
+  background: #f5a524;
+}
+.syncchip.bad i {
+  background: #ff6b5e;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+.syncsteps {
+  margin: 14px 0 4px;
+  padding-left: 20px;
+  color: var(--ink2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.syncsteps a {
+  color: #8fb8ff;
+  font-weight: 750;
+}
+.syncmsg {
+  min-height: 18px;
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffb3ab;
+}
+.syncnote {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 10px 0 0;
+}
+.syncrow {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  margin-top: 14px;
+  font-size: 15px;
+}

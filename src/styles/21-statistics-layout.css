@@ -1,0 +1,177 @@
+/* ===== Statistics → Question bank layout =====
+   top row: forecast | where you lose | needs-recall carousel
+   middle row: compact heat map (today) | study volume */
+.stattrio {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+@media (min-width: 1100px) {
+  .stattrio {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+  .stattrio #fcSection {
+    grid-column: 1 / -1;
+  }
+}
+@media (min-width: 1400px) {
+  .stattrio {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .stattrio #fcSection {
+    grid-column: auto;
+  }
+  /* the forecast shares the row, so its four numbers go two by two */
+  .stattrio .fckpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 14px;
+  }
+  .stattrio .fckpis b {
+    font-size: 26px;
+  }
+}
+.stattrio #fcLostPanel .lostrow {
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) 54px 40px;
+  gap: 8px;
+}
+
+/* needs-recall carousel */
+.schead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.schead .fch3 {
+  margin: 0;
+}
+#scDots {
+  margin: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+#scDots i {
+  cursor: pointer;
+}
+.scsub {
+  font-size: 12px;
+  margin: 2px 0 8px;
+}
+#scTitle,
+#scStats {
+  cursor: pointer;
+}
+#scChart {
+  margin-top: 6px;
+}
+#scChart .empty {
+  padding: 30px 0;
+}
+
+/* compact heat map: today only, one tile per topic */
+#heatPanel {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+#heatPanel:hover {
+  border-color: var(--line2);
+}
+#heatPanel .srhead {
+  align-items: flex-start;
+  flex-wrap: nowrap;
+}
+.heatnow {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  grid-auto-rows: minmax(44px, 1fr);
+  gap: 4px;
+  margin-top: 12px;
+  flex: 1;
+}
+.hnt {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  transition: transform 0.08s;
+}
+.hnt b {
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+.hnt em {
+  font-style: normal;
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.9;
+}
+.hnt.empty {
+  background: #20252b;
+  color: var(--muted);
+}
+.hnt:hover {
+  transform: scale(1.04);
+  outline: 2px solid #eef1f4;
+  outline-offset: -1px;
+}
+
+/* study volume, always open on the page */
+#volPanel .section {
+  margin-bottom: 0;
+}
+#volPanel .voltot {
+  margin-top: 8px;
+}
+#volPanel .volbig {
+  height: 210px;
+}
+#volPanel .volnote {
+  margin-bottom: 0;
+}
+
+/* heat-map history dialog */
+.modal.heatmodal {
+  width: min(1240px, 100%);
+  max-height: 92dvh;
+  overflow: auto;
+}
+.heatmodal .heatrange {
+  margin: 10px 0 4px;
+  max-width: 360px;
+}
+@media (max-width: 640px) {
+  .heatnow {
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 3px;
+  }
+  .heatnow {
+    grid-auto-rows: 40px;
+  }
+  .hnt {
+    min-height: 40px;
+    padding: 3px 6px;
+  }
+  #heatbg {
+    align-items: flex-end;
+    padding: 0;
+  }
+  #heatbg .modal {
+    width: 100%;
+    border-radius: 18px 18px 0 0;
+    max-height: 90dvh;
+  }
+  .heatmodal .heatrange {
+    max-width: none;
+  }
+}

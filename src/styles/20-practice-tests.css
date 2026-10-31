@@ -1,0 +1,407 @@
+/* practice tests */
+.toprow {
+  grid-template-columns: minmax(0, 1fr) 194px 250px 300px;
+}
+@media (min-width: 1351px) and (max-width: 1700px) {
+  .toprow {
+    grid-template-columns: minmax(0, 1fr) 194px 214px 270px;
+  }
+  .progress .legend {
+    grid-template-columns: repeat(5, auto);
+    justify-content: space-between;
+  }
+  .progress .legend .lg strong {
+    display: block;
+    font-size: 12px;
+    overflow: visible;
+  }
+  .progress .legend .lg small {
+    display: block;
+    margin-left: 0;
+    font-size: 11.5px;
+  }
+}
+@media (max-width: 1350px) {
+  .toprow {
+    grid-template-columns: 194px minmax(0, 1fr) 300px;
+  }
+  .toprow .progress {
+    grid-column: 1/-1;
+  }
+}
+@media (max-width: 1000px) {
+  .toprow {
+    grid-template-columns: 170px minmax(0, 1fr) 240px;
+  }
+  .toprow .progress {
+    grid-column: 1/-1;
+  }
+}
+/* tablet & phone: countdown and "This week" keep their old side-by-side layout; practice tests get their own row below */
+@media (max-width: 860px) {
+  .toprow {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .toprow .tscard {
+    grid-column: 1/-1;
+    order: 5;
+  }
+  .tscard .volchart {
+    min-height: 56px;
+  }
+}
+@media (max-width: 640px) {
+  .toprow {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+.tsk {
+  display: inline-flex;
+  gap: 4px;
+  white-space: nowrap;
+}
+.tsk b {
+  color: var(--ink);
+}
+.tsbest {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-weight: 700;
+  margin-left: 4px;
+}
+.tsbest b {
+  font-size: inherit !important;
+  color: var(--ink) !important;
+  letter-spacing: 0 !important;
+}
+.tsspark {
+  min-width: 0;
+}
+.tscard .volfoot .tsnext {
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tscard .volfoot > span.tsk {
+  display: inline-flex !important;
+}
+#tsQChart {
+  margin-top: 6px;
+}
+.tsnext {
+  font-weight: 800;
+  color: #ffd08a;
+  white-space: nowrap;
+}
+.tsnextbig {
+  font-size: 13.5px;
+  margin: 6px 0 8px;
+}
+.tshero,
+.tslistp {
+  padding: 18px 20px;
+}
+.tskpis {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.tstrend {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink2);
+  margin: 4px 0;
+}
+.tstrend b {
+  color: var(--ink);
+}
+.tstrend .few {
+  color: var(--muted);
+  font-weight: 650;
+}
+.tsrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 2px;
+  border-bottom: 1px solid #262b31;
+  font-size: 14px;
+}
+.tsrow .k {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: none;
+}
+.tsrow .d {
+  flex: 1;
+  font-weight: 700;
+}
+.tsrow .sc {
+  font-weight: 900;
+  font-size: 15px;
+  min-width: 52px;
+  text-align: right;
+}
+.tsrow button {
+  padding: 3px 9px;
+  font-size: 12px;
+}
+.statseg {
+  max-width: 420px;
+  margin-bottom: 2px;
+}
+#statBank,
+#statTests {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+#statBank[hidden],
+#statTests[hidden] {
+  display: none;
+}
+#calChart {
+  max-width: 600px;
+}
+/* desktop: charts share the screen in two columns instead of stretching full width */
+.statduo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+#fcLostPanel .fch3 {
+  margin-top: 0;
+}
+.heatkpis {
+  justify-content: flex-start;
+  margin-top: 10px;
+}
+.planpt {
+  padding: 14px 20px;
+}
+.planpt .fch3 {
+  margin: 0 0 2px;
+}
+.pphead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ppbtns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+@media (max-width: 640px) {
+  .planpt {
+    padding: 14px;
+  }
+  .ppbtns {
+    width: 100%;
+  }
+  .ppbtns button {
+    flex: 1;
+  }
+}
+.fcfull {
+  margin-top: 14px;
+  border: 1px solid var(--line2);
+  background: #1b2027;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.fcfull .ffhead {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.fcfull .ffhead b {
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.6px;
+}
+.fcfull .ffscale {
+  position: relative;
+  height: 10px;
+  border-radius: 5px;
+  background: #2a3038;
+  margin: 16px 8px 22px;
+}
+.fcfull .fflg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.fcfull .fflg b {
+  color: var(--ink);
+}
+.fcfull .fflg s {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  margin-right: 6px;
+  vertical-align: -1px;
+}
+.fcfull .ffscale > i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 5px;
+  background: #f5a524;
+}
+.fcfull .ffscale > em {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+}
+.fcfull .ffscale > span {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.fcfull .ffscale > span.ax {
+  top: 15px;
+}
+.fcfull .ffscale > span.mk {
+  bottom: 15px;
+  color: var(--ink2);
+}
+.fcfull .ffscale > s {
+  position: absolute;
+  top: -2px;
+  width: 10px;
+  height: 14px;
+  margin-left: -5px;
+  border-radius: 3px;
+  border: 2px solid #16191d;
+}
+.fcfull .ffk {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.fcfull .ffk.four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.fcfull .ffnote {
+  font-size: 12px;
+  margin-top: 10px;
+}
+@media (max-width: 640px) {
+  .fcfull .ffk.four {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.fcfull .ffk b {
+  display: block;
+  font-size: 20px;
+  font-weight: 900;
+}
+.fcfull .ffk span {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-weight: 700;
+}
+@media (min-width: 1100px) {
+  .statduo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+  .statduo.top {
+    align-items: start;
+  }
+}
+.modal.wide {
+  width: min(660px, 100%);
+}
+.callink {
+  font-size: 12.5px;
+  margin: 0 0 6px;
+  align-self: flex-start;
+}
+.calhelp {
+  font-size: 12.5px;
+  margin: 10px 0 0;
+  line-height: 1.5;
+}
+#distChart svg {
+  display: block;
+  width: 100%;
+}
+.s-hbar {
+  stroke: #16191d;
+  stroke-width: 1;
+}
+.s-mean {
+  stroke: #e8ecf1;
+  stroke-width: 1.6;
+}
+.s-reg {
+  fill: none;
+  stroke: #ffd08a;
+  stroke-width: 2;
+  stroke-dasharray: 0;
+}
+.s-regp {
+  fill: none;
+  stroke: #ffd08a;
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+  opacity: 0.8;
+}
+.s-band {
+  fill: #ffd08a1f;
+  stroke: none;
+}
+.s-diag {
+  stroke: #8590a2;
+  stroke-width: 1.2;
+  stroke-dasharray: 5 5;
+}
+.regf {
+  font:
+    600 12.5px/1.6 ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
+  white-space: pre-wrap;
+  background: #0f1114;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  margin: 10px 0 0;
+}
+.rchip.testIdle,
+.rchip.testRecall,
+.rchip.testFinal,
+.rchip.testManual {
+  background: #3d2b14;
+  color: #ffd08a;
+}
+@media (max-width: 640px) {
+  .tskpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .tshero,
+  .tslistp {
+    padding: 14px;
+  }
+  .tabs button {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

@@ -1,0 +1,210 @@
+/* top row: progress + countdown + stats */
+.toprow {
+  display: grid;
+  gap: 12px;
+}
+.toprow .countdown {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.toprow .stats {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.toprow .stat {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  border: 0 !important;
+  padding: 0 !important;
+}
+.toprow .stat .sv {
+  font-size: 17px;
+  min-width: 56px;
+}
+.toprow .stats {
+  gap: 3px !important;
+  padding: 8px 14px !important;
+}
+.toprow .stat .sl {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toprow .meter {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .toprow .progress {
+    grid-column: 1/-1;
+  }
+}
+
+/* FIT MODE: on large screens the dashboard fits in one window (all cards still visible, no scroll inside lists) */
+@media (min-width: 1100px) and (min-height: 1050px) {
+  body:not(.srview) .app {
+    height: 100dvh;
+    padding: 10px 18px 12px;
+    gap: 10px;
+  }
+  #viewDash {
+    flex: 1;
+    min-height: 0;
+    gap: 10px;
+  }
+  #viewDash .center {
+    flex: 1;
+    min-height: 260px;
+  }
+  .subtitle {
+    display: none;
+  }
+  .progress {
+    padding: 10px 16px 8px;
+  }
+  .track {
+    height: 34px;
+    margin: 8px 0 6px;
+  }
+  .chunk b {
+    font-size: 13px;
+  }
+  .legend .lg strong {
+    display: inline;
+  }
+  .legend .lg small {
+    display: inline;
+    margin-left: 6px;
+  }
+  .lg {
+    padding: 1px 4px;
+  }
+  .toprow .countdown {
+    padding: 8px 14px;
+  }
+  .toprow .big {
+    font-size: 38px;
+    margin: 2px 0 0;
+  }
+  .toprow .countdown input {
+    margin-top: 6px;
+    padding: 4px 8px;
+  }
+  .board {
+    padding: 9px 12px 11px;
+  }
+  .boardhead {
+    margin-bottom: 7px;
+  }
+  .lanehead {
+    padding: 7px 10px 5px;
+    font-size: 13px;
+  }
+  .lanecards {
+    padding: 2px 6px 7px;
+    gap: 4px;
+    min-height: 30px;
+  }
+  .lanes {
+    align-items: stretch;
+  }
+  .task {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+  }
+  .tname {
+    flex: 1;
+    min-width: 0;
+    font-size: 12.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .tmeta {
+    margin-top: 0;
+    flex: none;
+  }
+  .tmeta .last {
+    min-width: 34px;
+    text-align: right;
+  }
+  .lanecards.multi {
+    display: block;
+    column-gap: 6px;
+  }
+  .lanecards.multi .task {
+    break-inside: avoid;
+    margin-bottom: 4px;
+  }
+  .tmeta .last {
+    display: none;
+  }
+  .tmeta {
+    gap: 5px;
+  }
+  .cal {
+    padding: 9px 12px 6px;
+    min-height: 0;
+  }
+  .calhead {
+    margin-bottom: 4px;
+  }
+  .calgrid {
+    grid-template-rows: auto repeat(var(--weeks, 6), minmax(0, 1fr));
+    gap: 4px;
+  }
+  .day {
+    padding: 3px 7px;
+  }
+  .dnum {
+    font-size: 14px;
+  }
+  .daytag {
+    font-size: 10px;
+    line-height: 1.25;
+  }
+  .tags {
+    margin-top: 2px;
+    gap: 1px;
+  }
+
+  .sr {
+    overflow: hidden;
+  }
+  .sr .chart,
+  .sr .chartlegend,
+  .sr .prevtitle,
+  .sr .prevstats {
+    flex: none;
+  }
+  .sr .nthen {
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+}
+
+.ptest {
+  cursor: pointer;
+}
+.ptest:hover .sl {
+  color: var(--ink);
+}
+.addpt {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: #2c333b;
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1;
+  margin-left: 2px;
+}

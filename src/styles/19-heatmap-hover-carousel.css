@@ -1,0 +1,241 @@
+/* period selectors never stretch across a whole desktop panel */
+.srrange {
+  max-width: 420px;
+}
+/* heat map */
+#heatPanel .srhead {
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.heatrange {
+  min-width: 240px;
+  margin: 0;
+}
+.heatgrid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 8px;
+}
+.hmrow {
+  display: grid;
+  grid-template-columns: minmax(120px, 220px) repeat(var(--hn), minmax(0, 1fr));
+  gap: 2px;
+  align-items: center;
+}
+.hmrow .hmn {
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 8px;
+}
+.hmrow .hmc {
+  height: 22px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  transition: transform 0.08s;
+}
+.hmrow .hmc.empty {
+  background: #20252b;
+}
+.hmrow .hmc.hovon {
+  outline: 2px solid #eef1f4;
+  outline-offset: -1px;
+  transform: scale(1.06);
+  position: relative;
+  z-index: 1;
+}
+.hmhead .hmh {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--muted);
+  text-align: center;
+  white-space: nowrap;
+  overflow: visible;
+}
+.ctip .warm {
+  color: #c4261c;
+  font-weight: 800;
+}
+.ctip .cool {
+  color: #2f4bd8;
+  font-weight: 800;
+}
+@media (max-width: 640px) {
+  .hmrow {
+    grid-template-columns: 96px repeat(var(--hn), minmax(0, 1fr));
+    gap: 1px;
+  }
+  .hmrow .hmn {
+    font-size: 11px;
+  }
+  .hmrow .hmc {
+    height: 18px;
+    border-radius: 2px;
+  }
+  .heatrange {
+    min-width: 0;
+    width: 100%;
+  }
+}
+/* dashboard preview carousel */
+.cardots {
+  display: flex;
+  gap: 4px;
+  margin: 2px 0 4px;
+}
+.cardots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: #3a424c;
+  transition:
+    width 0.2s,
+    background 0.2s;
+}
+.cardots i.on {
+  width: 14px;
+  background: #579dff;
+}
+#sugg .qrow.car {
+  background: #579dff14;
+  box-shadow: inset 3px 0 0 #579dff;
+  border-radius: 6px;
+}
+/* chart hover */
+.ctip {
+  position: fixed;
+  z-index: 9600;
+  pointer-events: none;
+  background: #eef1f4;
+  color: #15181c;
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 12.5px;
+  font-weight: 650;
+  box-shadow: 0 8px 24px #0008;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-width: 280px;
+}
+.ctip .ctd {
+  font-weight: 800;
+  color: #4a525c;
+  font-size: 11.5px;
+}
+.ctip span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.ctip b {
+  font-weight: 900;
+}
+.ctip i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+  box-shadow: 0 0 0 1.5px #15181c55;
+}
+.hov .hx {
+  stroke: #c5ccd5;
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  pointer-events: none;
+}
+.hov .hdot {
+  stroke: #16191d;
+  stroke-width: 2;
+  pointer-events: none;
+}
+.hovon {
+  filter: brightness(1.25);
+  stroke: #eef1f4;
+  stroke-width: 2;
+}
+svg[data-hmode='bars'] rect[data-bin] {
+  transition: opacity 0.12s;
+}
+svg[data-hmode='bars']:has(.hovon) rect[data-bin]:not(.hovon) {
+  opacity: 0.35;
+}
+svg[data-hmode] {
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* small topic charts: their own interval, next to the filters */
+.srcardbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  flex-wrap: wrap;
+}
+.srcardr {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.srcardr .srrange {
+  margin: 0;
+  min-width: 300px;
+}
+@media (max-width: 640px) {
+  .srcardr {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+  .srcardr .srrange {
+    min-width: 0;
+  }
+}
+/* phone: tabs size to their label so “Practice tests” fits next to the short “Plan” */
+@media (max-width: 640px) {
+  .tabs button {
+    flex: 1 1 auto;
+    padding: 5px 4px !important;
+    font-size: 12px !important;
+  }
+}
+.tsrow .stale {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #ffd08a;
+  background: #3d2b14;
+  border-radius: 6px;
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+.stalebar {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #ffd08a;
+  background: #3d2b14;
+  border: 1px solid #6b4a1c;
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin: 4px 0 8px;
+}
+@media (max-width: 640px) {
+  .tsrow {
+    flex-wrap: wrap;
+  }
+  .tsrow .stale {
+    order: 9;
+    margin-left: 22px;
+  }
+}

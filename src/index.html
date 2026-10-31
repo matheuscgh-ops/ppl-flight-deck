@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PPL Flight Deck</title>
+<style>@@CSS@@</style>
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <div>
+      <div class="brandrow"><div class="brand">PPL <span>/</span> FLIGHT DECK</div><nav class="tabs" role="tablist"><button type="button" role="tab" data-view="dash" data-t="tabDash"></button><button type="button" role="tab" data-view="plan" data-t="tabPlan"></button><button type="button" role="tab" data-view="tests" data-t="tabTests"></button><button type="button" role="tab" data-view="sr" data-t="tabSR"></button></nav></div>
+      <div class="subtitle"><span data-t="sub"></span></div>
+    </div>
+    <div class="tools">
+      <span class="demo" id="demoBadge" data-t="demo"></span>
+      <button id="clearDemo" data-t="clear"></button>
+      <span class="sep" id="demoSep"></span>
+      <button id="syncChip" class="syncchip" type="button"><i></i><span></span></button>
+      <button id="backup" data-t="backup"></button>
+      <button id="restore" data-t="import"></button>
+      <button id="saveHtml" data-t="save"></button>
+      <input type="file" id="file" accept="application/json,.json" hidden>
+      <div class="flags" role="group" aria-label="Language">
+        <button class="flag" data-lang="en" title="English" aria-label="English">🇺🇸</button>
+        <button class="flag" data-lang="pt" title="Português" aria-label="Português">🇧🇷</button>
+        <button class="flag" data-lang="ja" title="日本語" aria-label="日本語">🇯🇵</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="view" id="viewDash">
+  <div class="toprow">
+  <section class="panel progress">
+    <div class="phead"><h2 class="section" data-t="progress"></h2><div class="ptotal" id="total"></div></div>
+    <div class="track" id="track"></div>
+    <div class="legend" id="legend"></div>
+  </section>
+      <div class="panel countdown">
+        <div class="label" data-t="exam"></div>
+        <div class="cdrow"><div class="big" id="countdown">—</div><div class="unit" id="countLabel"></div></div>
+        <input type="date" id="examDate" aria-label="Exam date">
+      </div>
+      <div class="panel vol tscard" id="tsCard">
+        <div class="volhead"><div><span class="label" data-t="tabTestsLong"></span><div class="volnum"><b id="tsLast">—</b> <span data-t="tsLastLbl"></span> <span class="tsbest" id="tsBestMini"></span></div></div><button type="button" class="volmore" id="tsExpand" aria-label="Open practice tests" data-tt="tabTestsLong">⤢</button></div>
+        <div class="volchart tsspark" id="tsSpark"></div>
+        <div class="volfoot"><span class="tsk" id="tsStripKpis"></span><span class="tsnext" id="tsStripNext"></span></div>
+      </div>
+      <div class="panel vol" id="volCard">
+        <div class="volhead"><div><span class="label" data-t="thisWeek"></span><div class="volnum"><b id="volWeek">0</b> <span data-t="questionsUnit"></span></div></div><button type="button" class="volmore" id="volOpen" aria-label="Open study volume" data-tt="volTitle">⤢</button></div>
+        <div class="volchart" id="volMini"></div>
+        <div class="volfoot"><span data-t="past12"></span><span class="ptest" id="ptStat" role="button" tabindex="0"><span data-t="practiceTests"></span> <b id="ptBest">—</b> <b class="addpt">+</b></span></div>
+      </div>
+  </div>
+
+  <section class="panel board">
+    <div class="boardhead"><h2 class="section"><span data-t="board"></span> <span class="muted" id="cardCount"></span></h2><div class="hint"><span data-t="drag"></span></div></div>
+    <div class="lanes" id="lanes"></div>
+    <div class="lanedots" id="laneDots"></div>
+  </section>
+
+  <section class="center">
+    <div class="panel cal">
+      <div class="calhead">
+        <h2 class="section" id="month"></h2>
+        <span class="actchip"><b id="activeDays">0</b> <span data-t="active"></span></span>
+        <div class="callegend" id="callegend"></div>
+        <div class="calnav"><button id="prev" aria-label="Previous month">‹</button><button id="now" data-t="today"></button><button id="next" aria-label="Next month">›</button></div>
+      </div>
+      <div class="calgrid" id="calgrid"></div>
+    </div>
+    <div class="side">
+      <div class="panel sr" id="srPanel">
+        <button type="button" class="fcmini" id="fcMini"><span class="fclab" data-t="fcTitle"></span><b id="fcMiniVal">—</b><span class="fcbar"><i id="fcMiniBar"></i><em class="m70"></em><em class="m85"></em></span><span class="fcsub" id="fcMiniSub"></span></button>
+        <div class="srtop"><span class="label" data-t="srLabel"></span><button class="linkbtn" id="openSR" data-t="openAnalysis"></button></div>
+        <label class="prevpick"><span class="flabel" data-t="pickLabel"></span><select id="prevPick"></select></label>
+        <div class="prevtitle" id="prevTitle"></div><div class="cardots" id="carDots" hidden></div>
+        <div class="prevstats" id="prevStats"></div>
+        <div class="seg srrange" data-srr><button data-sr="3d">3D</button><button data-sr="7d">7D</button><button data-sr="2w">2W</button><button data-sr="1m">1M</button><button data-sr="3m">3M</button><button data-sr="6m">6M</button><button data-sr="1y">1Y</button><button data-sr="all" data-t="rAll"></button></div>
+        <div class="chart" id="prevChart"></div>
+        <div class="chartlegend small" id="srLegend2"></div>
+        <div class="nthen"><div class="qh planhead"><span data-t="planToday"></span><span id="planMiniTot"></span><span class="enpill" id="planMiniMode"></span><button type="button" class="linkbtn" id="openPlan" data-t="planOpen"></button></div><div id="sugg"></div></div>
+      </div>
+    </div>
+  </section>
+
+  </div>
+
+  <div class="view" id="viewTests" hidden>
+    <div class="statduo top">
+    <section class="panel tshero">
+      <div class="srhead"><div><h2 class="section" data-t="tabTestsLong"></h2><div class="muted" data-t="tsSub"></div></div><button type="button" class="primary" id="tsAdd" data-t="tsAdd"></button></div>
+      <div class="fckpis tskpis" id="tsKpis"></div>
+      <div class="tstrend" id="tsTrendTxt"></div>
+      <button type="button" class="linkbtn callink" data-t="calLink"></button>
+      <div class="tsnext tsnextbig" id="tsNext"></div>
+      <div class="stalebar" id="tsStale" hidden></div>
+      <div class="seg srrange" data-tsrr><button data-tsr="3d">3D</button><button data-tsr="7d">7D</button><button data-tsr="2w">2W</button><button data-tsr="1m">1M</button><button data-tsr="3m">3M</button><button data-tsr="6m">6M</button><button data-tsr="1y">1Y</button><button data-tsr="all" data-t="rAll"></button></div>
+      <div class="chart" id="tsChart"></div>
+      <div class="chartlegend" id="tsLegend"></div>
+      <button type="button" class="linkbtn" id="tsToStats" data-t="tsFull"></button>
+    </section>
+    <section class="panel tslistp"><h3 class="fch3" data-t="tsAll"></h3><div id="tsList"></div></section>
+    </div>
+  </div>
+  <div class="view" id="viewPlan" hidden>
+    <section class="panel planweek" id="planWeek">
+      <div class="pwhead"><div><h2 class="section" data-t="pwTitle"></h2><div class="muted" id="pwSource"></div></div>
+        <div class="pwbtns"><div class="seg pwtabs" id="pwTabs"><button type="button" data-pw="week" data-t="pwWeek"></button><button type="button" data-pw="plans" data-t="pwPlans"></button></div><button type="button" id="kbSync" data-t="kbSync"></button><button type="button" class="primary" id="pwNew" data-t="pwNew"></button></div></div>
+      <div id="pwWeekBox">
+        <div class="pwnav"><button type="button" id="pwPrev" aria-label="Previous week">‹</button><b id="pwRange"></b><button type="button" id="pwNext" aria-label="Next week">›</button><button type="button" id="pwToday" data-t="today"></button><span class="pwstats" id="pwStats"></span></div>
+        <div class="pwnudge" id="pwNudge" hidden></div>
+        <div id="pwStrip"></div>
+        <div id="pwGrid"></div>
+        <div class="pwlegend" id="pwLegend"></div>
+      </div>
+      <div id="pwPlansBox" hidden><div id="pwList"></div></div>
+    </section>
+    <section class="panel planhero">
+      <div class="srhead"><div><h2 class="section" data-t="planTitle"></h2><div class="muted" id="planSub"></div></div><div class="srkpis" id="planKpis"></div></div>
+      <div class="energy" id="energyPick" role="tablist"></div>
+      <div id="planList" class="planlist"></div>
+      <p class="volnote" data-t="planNote"></p>
+    </section>
+    <section class="panel planpt" id="planPt">
+      <div class="pphead"><div><h3 class="fch3" data-t="ppTitle"></h3><div class="muted" id="ppInfo"></div></div>
+      <div class="ppbtns"><button type="button" id="ppAdd"></button><button type="button" class="primary" id="ppLog" data-t="ppLog"></button></div></div>
+    </section>
+    <section class="panel planset">
+      <h3 class="fch3" data-t="planSettings"></h3>
+      <div class="planinputs">
+        <label class="field"><span class="flabel" data-t="setMinutes"></span><input type="number" id="setMinutes" min="15" max="600" step="15" inputmode="numeric"></label>
+        <label class="field"><span class="flabel" data-t="setQph"></span><input type="number" id="setQph" min="5" max="200" step="5" inputmode="numeric"></label>
+        <label class="field"><span class="flabel" data-t="setReview"></span><input type="number" id="setReviewMin" min="0" max="10" step="0.5" inputmode="decimal"></label>
+        <label class="field"><span class="flabel" data-t="setTests"></span><input type="number" id="setTests" min="0" max="14" step="1" inputmode="numeric"></label>
+      </div>
+      <div class="planact"><button type="button" class="primary" id="planCalc"><span class="spin" hidden></span><span data-t="planCalc"></span></button><div class="muted" id="planCap"></div></div>
+      <p class="planweights" data-t="planWeights"></p>
+    </section>
+  </div>
+  <div class="view" id="viewSR" hidden>
+    <div class="seg statseg" id="statSeg"><button data-stat="bank" class="on" data-t="statBank"></button><button data-stat="tests" data-t="statTests"></button></div>
+    <div id="statBank">
+    <div class="stattrio">
+    <section class="panel fchero" id="fcSection">
+      <div class="srhead"><div><h2 class="section" data-t="bankTitle"></h2><div class="muted" data-t="bankSub"></div></div></div>
+      <div class="tstrend" id="fcOverall"></div>
+      <div class="fckpis" id="fcKpis"></div>
+      <div class="seg srrange" data-srr><button data-sr="3d">3D</button><button data-sr="7d">7D</button><button data-sr="2w">2W</button><button data-sr="1m">1M</button><button data-sr="3m">3M</button><button data-sr="6m">6M</button><button data-sr="1y">1Y</button><button data-sr="all" data-t="rAll"></button></div>
+      <div class="chart" id="fcChart"></div>
+      <div class="chartlegend" id="fcLegend"></div>
+      <details class="fcwhy"><summary data-t="howCalc"></summary><div id="fcFormula"></div></details>
+    </section>
+    <section class="panel fchero" id="fcLostPanel"><h3 class="fch3" data-t="fcLostTitle"></h3><div id="fcLost"></div></section>
+    <section class="panel fchero" id="scPanel">
+      <div class="schead"><h3 class="fch3" data-t="scTitle"></h3><div class="cardots" id="scDots"></div></div>
+      <div class="muted scsub" id="scSub"></div>
+      <div class="prevtitle" id="scTitle"></div>
+      <div class="prevstats" id="scStats"></div>
+      <div class="chart" id="scChart"></div>
+      <div class="chartlegend small" id="scLegend"></div>
+    </section>
+    </div>
+    <div class="statduo statmid">
+    <section class="panel fchero" id="heatPanel">
+      <div class="srhead"><div><h2 class="section" data-t="heatTitle"></h2><div class="muted" data-t="heatNowSub"></div></div><button type="button" class="volmore" id="heatOpen" data-tt="heatOpen">⤢</button></div>
+      <div class="srkpis heatkpis" id="srKpis"></div>
+      <div class="heatnow" id="heatNow"></div>
+    </section>
+    <section class="panel fchero" id="volPanel">
+      <h2 class="section" data-t="volTitle"></h2>
+      <div class="voltot"><div><span class="vlabel" data-t="totalQ"></span><b id="svTotal">0</b><span class="vdates" id="svDates"></span></div><div class="vcmp" id="svCmp"></div></div>
+      <div class="volbig" id="svBig"></div>
+      <div class="seg volrange" id="svRange"><button data-r="3d">3D</button><button data-r="7d">7D</button><button data-r="2w">2W</button><button data-r="1m">1M</button><button data-r="3m">3M</button><button data-r="6m">6M</button><button data-r="1y">1Y</button><button data-r="all" data-t="rAll"></button></div>
+      <p class="volnote" data-t="volNote"></p>
+    </section>
+    </div>
+    <details class="panel formula" id="formula"><summary data-t="howCalc"></summary><div id="formulaBody"></div></details>
+    <div class="srcardbar"><div class="filters" id="srFilters"></div><div class="srcardr"><span class="label" data-t="cardRange"></span><div class="seg srrange" data-srcr><button data-scr="3d">3D</button><button data-scr="7d">7D</button><button data-scr="2w">2W</button><button data-scr="1m">1M</button><button data-scr="3m">3M</button><button data-scr="6m">6M</button><button data-scr="1y">1Y</button><button data-scr="all" data-t="rAll"></button></div></div></div>
+    <div class="srgrid" id="srGrid"></div>
+    </div>
+    <div id="statTests" hidden>
+      <section class="panel fchero">
+        <div class="srhead"><div><h2 class="section" data-t="ovTitle"></h2><div class="muted" data-t="ovSub"></div></div></div>
+        <div class="fckpis" id="ovKpis"></div>
+        <div class="tstrend" id="ovWeights"></div>
+      </section>
+      <div class="statduo">
+      <section class="panel fchero">
+        <div class="srhead"><div><h2 class="section" data-t="trendTitle"></h2><div class="muted" data-t="trendSub"></div></div></div>
+        <div class="tstrend" id="tsTrendTxt2"></div>
+        <button type="button" class="linkbtn callink" data-t="calLink"></button>
+        <div class="seg srrange" data-tsrr><button data-tsr="3d">3D</button><button data-tsr="7d">7D</button><button data-tsr="2w">2W</button><button data-tsr="1m">1M</button><button data-tsr="3m">3M</button><button data-tsr="6m">6M</button><button data-tsr="1y">1Y</button><button data-tsr="all" data-t="rAll"></button></div>
+        <div class="chart" id="tsChart2"></div>
+        <div class="chartlegend" id="tsLegend2"></div>
+      </section>
+      <section class="panel fchero">
+        <div class="srhead"><div><h2 class="section" data-t="distTitle"></h2><div class="muted" id="gapTxt"></div></div></div>
+        <div class="tstrend" id="distTxt"></div>
+        <div class="chart" id="distChart"></div>
+        <div class="chartlegend" id="distLegend"></div>
+        <div class="fcfull" id="fcFull"></div>
+      </section>
+      </div>
+      <details class="panel formula"><summary data-t="howCalc"></summary><pre class="regf" id="regFormula"></pre></details>
+    </div>
+  </div>
+</main>
+
+<div class="modalbg" id="modalbg" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="mhead"><div><h3 id="mTitle"></h3><div class="muted" id="mDesc"></div></div><button class="x" id="mClose" aria-label="Close">×</button></div>
+    <div class="field"><span class="flabel" data-t="activity"></span><div class="seg" id="seg"><button data-kind="study"></button><button data-kind="review"></button><button data-kind="none"></button></div></div>
+    <label class="field"><span class="flabel" data-t="scoreField"></span><input type="number" id="mScore" min="0" max="100" step="1" inputmode="numeric" data-ph="blankInProgress"></label>
+    <div class="row2">
+      <label class="field"><span class="flabel" data-t="status"></span><select id="mStatus"></select></label>
+      <label class="field"><span class="flabel" data-t="date"></span><input type="date" id="mDate"></label>
+    </div>
+    <div class="mbtns"><button class="primary" id="mSave" data-t="record"></button><button id="mCancel" data-t="cancel"></button></div>
+    <div class="hist"><span class="flabel" data-t="history"></span><div id="mHist"></div></div>
+  </div>
+</div>
+<div class="palbg" id="palbg" hidden>
+  <div class="pal" role="dialog" aria-modal="true" aria-label="Quick log">
+    <input id="palIn" autocomplete="off" spellcheck="false">
+    <div id="palList" role="listbox"></div>
+    <div class="palfoot"><span><span class="kbd">↵</span> <span data-t="study"></span></span><span><span class="kbd">⇧↵</span> <span data-t="review"></span></span><span><span class="kbd">⌥↵</span> <span data-t="openCard"></span></span><span><span class="kbd">esc</span></span></div>
+  </div>
+</div>
+<div class="modalbg" id="fcTopBg" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="fcTopTitle">
+    <div class="mhead"><div><h3 id="fcTopTitle" data-t="fcLostTitle"></h3><div class="muted" id="fcTopDesc"></div></div><button class="x" id="fcTopClose" aria-label="Close">×</button></div>
+    <div class="fclost" id="fcTopList"></div>
+    <div class="mbtns"><button class="primary" id="fcTopFull" data-t="openAnalysis"></button></div>
+  </div>
+</div>
+<div class="modalbg" id="tsQuickBg" hidden>
+  <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="tsQuickTitle">
+    <div class="mhead"><div><h3 id="tsQuickTitle" data-t="tabTestsLong"></h3><div class="muted" data-t="tsSub"></div></div><button class="x" id="tsQuickClose" aria-label="Close">×</button></div>
+    <div class="fckpis tskpis" id="tsQKpis"></div>
+    <div class="tstrend" id="tsQTrend"></div>
+    <button type="button" class="linkbtn callink" data-t="calLink"></button>
+    <div class="chart" id="tsQChart"></div>
+    <div class="tsnext tsnextbig" id="tsQNext"></div>
+    <div class="mbtns"><button class="primary" id="tsQAdd" data-t="tsAdd"></button><button type="button" id="tsOpen" data-t="tsOpen"></button></div>
+  </div>
+</div>
+<div class="modalbg" id="calBg" hidden>
+  <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="calTitleH">
+    <div class="mhead"><div><h3 id="calTitleH" data-t="calTitle"></h3><div class="muted" data-t="calSub"></div></div><button class="x" id="calClose" aria-label="Close">×</button></div>
+    <div class="tstrend" id="calTxt"></div>
+    <div class="chart" id="calChart"></div>
+    <div class="chartlegend"><span><i style="border-color:#8590a2;border-top-style:dashed"></i><span data-t="calPerfect"></span></span><span><i style="border-color:#ffd08a"></i><span data-t="calFit"></span></span></div>
+    <p class="muted calhelp" data-t="calHelp"></p>
+  </div>
+</div>
+<div class="modalbg" id="ptbg" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ptTitle">
+    <div class="mhead"><div><h3 id="ptTitle" data-t="practiceTest"></h3><div class="muted" id="ptDesc"></div></div><button class="x" id="ptClose" aria-label="Close">×</button></div>
+    <div class="row2">
+      <label class="field"><span class="flabel" data-t="scoreField"></span><input type="number" id="ptScore" min="0" max="100" inputmode="numeric"></label>
+      <label class="field"><span class="flabel" data-t="date"></span><input type="date" id="ptDate"></label>
+    </div>
+    <div class="mbtns"><button class="primary" id="ptSave" data-t="record"></button><button id="ptCancel" data-t="cancel"></button></div>
+    <div class="hist"><span class="flabel" data-t="history"></span><div id="ptHist"></div></div>
+  </div>
+</div>
+<div class="modalbg" id="syncbg" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="syncTitle">
+    <div class="mhead"><div><h3 id="syncTitle" data-t="syncTitle"></h3><div class="muted" data-t="syncSub"></div></div><button class="x" id="syncClose" aria-label="Close">×</button></div>
+    <div id="syncOffBox">
+      <ol class="syncsteps"><li><span data-t="syncStep1"></span> <a href="https://github.com/settings/tokens/new?scopes=gist&amp;description=PPL%20Flight%20Deck%20sync" target="_blank" rel="noopener" data-t="syncTokenLink"></a></li><li data-t="syncStep2"></li><li data-t="syncStep3"></li></ol>
+      <label class="field"><span class="flabel" data-t="syncTokenLabel"></span><input type="password" id="syncToken" autocomplete="off" spellcheck="false" placeholder="ghp_…"></label>
+      <div class="mbtns"><button class="primary" id="syncConnect" data-t="syncConnect"></button></div>
+      <div class="syncmsg" id="syncMsg" role="status"></div>
+      <p class="syncnote" data-t="syncPrivacy"></p>
+    </div>
+    <div id="syncOnBox" hidden>
+      <div class="syncrow"><b id="syncState"></b><span class="muted" id="syncWho"></span></div>
+      <div class="muted" id="syncLast"></div>
+      <div class="mbtns"><button class="primary" id="syncNow" data-t="syncNow"></button><button id="syncOff" data-t="syncDisconnect"></button></div>
+      <p class="syncnote" data-t="syncHow"></p>
+    </div>
+  </div>
+</div>
+<div class="modalbg" id="daybg" hidden>
+  <div class="modal daysheet" role="dialog" aria-modal="true" aria-labelledby="dayTitle">
+    <div class="mhead"><div><h3 id="dayTitle"></h3><div class="muted" id="daySub"></div></div><button class="x" id="dayClose" aria-label="Close">×</button></div>
+    <div id="dayBody"></div>
+  </div>
+</div>
+<div class="modalbg" id="wizbg" hidden>
+  <div class="modal wizard" role="dialog" aria-modal="true" aria-labelledby="wzTitle">
+    <div class="mhead"><div><h3 id="wzTitle"></h3><div class="wzsteps" id="wzSteps"></div></div><button class="x" id="wzClose" aria-label="Close">×</button></div>
+    <div class="wzbody" id="wzBody"></div>
+    <div class="wzfoot"><button type="button" id="wzBack"></button><span></span><button type="button" id="wzSaveOff"></button><button type="button" class="primary" id="wzNext"></button></div>
+    <datalist id="wzPresets"></datalist>
+  </div>
+</div>
+<div class="modalbg" id="kbbg" hidden>
+  <div class="modal kbsheet" role="dialog" aria-modal="true" aria-labelledby="kbTitle">
+    <div class="mhead"><div><h3 id="kbTitle" data-t="kbTitle"></h3><div class="muted" id="kbSub"></div></div><button class="x" id="kbClose" aria-label="Close">×</button></div>
+    <div id="kbList"></div>
+    <div class="mbtns"><button type="button" id="kbCancel" data-t="cancel"></button><button type="button" class="primary" id="kbOk"></button></div>
+  </div>
+</div>
+<div class="modalbg askbg" id="askbg" hidden>
+  <div class="modal asksheet" role="alertdialog" aria-modal="true" aria-labelledby="askText">
+    <p id="askText"></p>
+    <div class="mbtns"><button type="button" id="askNo" data-t="cancel"></button><button type="button" class="primary" id="askYes"></button></div>
+  </div>
+</div>
+<div class="modalbg" id="heatbg" hidden>
+  <div class="modal heatmodal" role="dialog" aria-modal="true" aria-labelledby="heatHistTitle">
+    <div class="mhead"><div><h3 id="heatHistTitle" data-t="heatHistTitle"></h3><div class="muted" data-t="heatSub"></div></div><button class="x" id="heatClose" aria-label="Close">×</button></div>
+    <div class="seg srrange heatrange" data-heatr><button data-hr="2w">2W</button><button data-hr="1m">1M</button><button data-hr="3m">3M</button><button data-hr="6m">6M</button><button data-hr="1y">1Y</button></div>
+    <div class="heatgrid" id="heatGrid"></div>
+  </div>
+</div>
+<div class="modalbg" id="volbg" hidden>
+  <div class="modal volmodal" role="dialog" aria-modal="true" aria-labelledby="volTitle">
+    <div class="mhead"><h3 id="volTitle" data-t="volTitle"></h3><button class="x" id="volClose" aria-label="Close">×</button></div>
+    <div class="voltot"><div><span class="vlabel" data-t="totalQ"></span><b id="volTotal">0</b><span class="vdates" id="volDates"></span></div><div class="vcmp" id="volCmp"></div></div>
+    <div class="volbig" id="volBig"></div>
+    <div class="seg volrange" id="volRange"><button data-r="3d">3D</button><button data-r="7d">7D</button><button data-r="2w">2W</button><button data-r="1m">1M</button><button data-r="3m">3M</button><button data-r="6m">6M</button><button data-r="1y">1Y</button><button data-r="all" data-t="rAll"></button></div>
+    <p class="volnote" data-t="volNote"></p>
+    <div hidden><span id="stAvg"><b id="avg"></b><i id="avgBar"></i></span><span id="stPace"><b id="pace"></b></span></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script id="embedded" type="application/json">null</script>
+<script>@@JS@@</script>
+</body>
+</html>

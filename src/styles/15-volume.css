@@ -1,0 +1,276 @@
+/* weekly volume card (Strava-style) */
+.vol {
+  padding: 10px 14px 9px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  transition: border-color 0.15s;
+}
+.vol:hover {
+  border-color: #5a3a26;
+}
+.volhead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.volnum {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+  margin-top: 2px;
+}
+.volnum b {
+  font-size: 22px;
+  color: var(--ink);
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+.volmore {
+  font-weight: 700;
+}
+.volchart {
+  flex: 1;
+  min-height: 38px;
+  margin: 4px 0 2px;
+}
+.volchart svg,
+.volbig svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.volfoot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.volfoot .ptest {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  min-width: 0;
+  overflow: hidden;
+}
+.volfoot .ptest:hover {
+  background: #262b31;
+  color: var(--ink);
+}
+.volfoot #ptBest {
+  color: var(--ink);
+}
+.vline {
+  fill: none;
+  stroke: #fc5200;
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.varea {
+  fill: url(#vgrad);
+}
+.vdot {
+  fill: #16191d;
+  stroke: #fc5200;
+  stroke-width: 2;
+}
+.vdot.cur {
+  fill: #fc5200;
+  stroke: #fc5200;
+}
+.vhalo {
+  fill: #fc520033;
+}
+.vgrid {
+  stroke: #2a2f36;
+  stroke-width: 1;
+}
+.vax {
+  fill: #8f99a6;
+  font:
+    650 10px system-ui,
+    sans-serif;
+}
+.vval {
+  fill: #c5ccd5;
+  font:
+    750 10px system-ui,
+    sans-serif;
+}
+.vnow {
+  stroke: #eef1f4;
+  stroke-width: 1.6;
+}
+.actchip {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+  white-space: nowrap;
+  background: #20252b;
+  border: 1px solid var(--line2);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+.actchip b {
+  color: var(--ink);
+  font-size: 13px;
+}
+.volmodal {
+  width: min(760px, 100%);
+}
+
+.volkpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 18px;
+  margin-top: 14px;
+}
+.volkpis b {
+  display: block;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.4px;
+}
+.volkpis span {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 650;
+}
+.volkpis .meter {
+  position: relative;
+  height: 5px;
+  border-radius: 3px;
+  background: #2a3038;
+  margin-top: 5px;
+}
+.volkpis .meter i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 3px;
+}
+.volkpis .meter .goal {
+  left: 85%;
+  width: 2px;
+  background: var(--ink);
+  top: -3px;
+  bottom: -3px;
+}
+.volnote {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 14px 0 0;
+}
+@media (max-width: 640px) {
+  .volkpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .volfoot > span:first-child {
+    display: none;
+  }
+  .vol {
+    padding: 10px 12px;
+  }
+  .actchip {
+    font-size: 11px;
+    padding: 2px 8px;
+  }
+  #volbg {
+    align-items: flex-end;
+    padding: 0;
+  }
+  #volbg .modal {
+    width: 100%;
+    border-radius: 18px 18px 0 0;
+    max-height: 88dvh;
+  }
+}
+
+.volmore {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+.volmore:hover {
+  color: var(--ink);
+  border-color: var(--line2);
+  background: #20252b;
+}
+.vol {
+  cursor: default !important;
+}
+.voltot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  margin-top: 14px;
+}
+.voltot .vlabel {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+}
+.voltot b {
+  display: block;
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+}
+.voltot .vdates {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 650;
+}
+.vcmp {
+  text-align: right;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-weight: 650;
+}
+.vcmp b {
+  font-size: 20px;
+  letter-spacing: -0.3px;
+  color: var(--ink);
+}
+.vcmp b.up {
+  color: #4bce97;
+}
+.vcmp b.down {
+  color: #ff8a7a;
+}
+.volbig {
+  height: 280px;
+  margin-top: 10px;
+}
+.volrange {
+  margin-top: 10px;
+  max-width: none !important;
+}
+.volrange button {
+  font-weight: 800;
+}
+@media (max-width: 640px) {
+  .voltot b {
+    font-size: 36px;
+  }
+  .volbig {
+    height: 230px;
+  }
+}

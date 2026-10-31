@@ -1,0 +1,127 @@
+/* analysis page */
+.srhead {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.srhead .muted {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.srkpis {
+  display: flex;
+  gap: 28px;
+}
+.srkpis b {
+  display: block;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+.srkpis span {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 650;
+}
+.formula {
+  padding: 14px 18px;
+}
+.formula summary {
+  cursor: pointer;
+  font-weight: 850;
+  font-size: 14px;
+}
+.formula pre {
+  font:
+    600 13px/1.65 ui-monospace,
+    'SF Mono',
+    Menlo,
+    Consolas,
+    monospace;
+  background: #0f1114;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  overflow: auto;
+  color: #dfe5ec;
+  white-space: pre-wrap;
+  margin: 12px 0 8px;
+}
+.formula p {
+  color: var(--ink2);
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 6px 0;
+}
+.filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.filters button.on {
+  background: #343b44;
+  border-color: #5a6470;
+}
+.srgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(470px, 1fr));
+  gap: 12px;
+}
+.srcard {
+  padding: 14px 16px;
+}
+.srcard.flash {
+  animation: flash 1.6s ease;
+}
+.srch {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+.srch h3 {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.25;
+}
+.chip {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: #242a31;
+  white-space: nowrap;
+}
+.kpirow {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0 8px;
+}
+.kpirow b {
+  display: block;
+  font-size: 17px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.kpirow b.over {
+  color: #ff9c95;
+}
+.kpirow b.now {
+  color: #f8c96a;
+}
+.kpirow span {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 650;
+}
+.srcard .acts {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}

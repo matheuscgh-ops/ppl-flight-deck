@@ -1,0 +1,112 @@
+:root {
+  --bg: #0d0f12;
+  --panel: #16191d;
+  --panel2: #1e2227;
+  --lane: #0f1114;
+  --card: #22272b;
+  --cardh: #2c333a;
+  --line: #2a2f36;
+  --line2: #3a414a;
+  --ink: #eef1f4;
+  --ink2: #c5ccd5;
+  --muted: #8f99a6;
+  --s0: #8590a2;
+  --s1: #579dff;
+  --s2: #f5a524;
+  --s3: #4bce97;
+  --s4: #9f8fef;
+  --fire: #ff6a1f;
+  --fireLine: #5e2a12;
+  --exam: #ffb43a;
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+[hidden] {
+  display: none !important;
+}
+html,
+body {
+  min-height: 100%;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font:
+    500 14px/1.35 system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Hiragino Sans',
+    'Noto Sans JP',
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+button {
+  cursor: pointer;
+  background: var(--panel2);
+  border: 1px solid var(--line2);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-weight: 650;
+  font-size: 13px;
+  white-space: nowrap;
+}
+button:hover {
+  background: #272c33;
+  border-color: #4b535e;
+}
+button:focus-visible,
+.task:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--s1);
+  outline-offset: 2px;
+}
+input,
+select {
+  background: var(--panel2);
+  border: 1px solid var(--line2);
+  border-radius: 8px;
+  padding: 7px 9px;
+  min-width: 0;
+}
+input[type='date']::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+}
+.muted {
+  color: var(--muted);
+}
+.section {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink2);
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 20px 28px;
+  max-width: 2100px;
+  margin: 0 auto;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  min-height: 0;
+  min-width: 0;
+}

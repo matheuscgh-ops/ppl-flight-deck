@@ -1,0 +1,99 @@
+/* ===== TABLET portrait (iPad mini etc., 641–1099 px): two lists per screen, swipe; taller calendar with names ===== */
+@media (min-width: 641px) and (max-width: 1099px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+  .board {
+    padding: 14px 0 12px;
+  }
+  .boardhead {
+    padding: 0 16px;
+  }
+  .lanes {
+    display: flex !important;
+    align-items: flex-start;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 0 16px;
+    scroll-padding: 0 16px;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+  .lanes::-webkit-scrollbar {
+    display: none;
+  }
+  .lane {
+    flex: 0 0 calc(50% - 22px);
+    scroll-snap-align: start;
+  }
+  .task {
+    padding: 10px 12px;
+  }
+  .tname {
+    font-size: 14px;
+  }
+  .lanedots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .lanedots button {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #ffffff59;
+  }
+  .lanedots button.on {
+    background: #fff;
+  }
+  .calgrid {
+    grid-template-rows: auto repeat(var(--weeks, 6), minmax(104px, auto)) !important;
+  }
+  .daytag {
+    font-size: 10.5px !important;
+  }
+  .callegend {
+    display: flex !important;
+  }
+}
+.prevpick {
+  display: none;
+}
+@media (hover: none), (max-width: 1099px) {
+  .prevpick {
+    display: block;
+    margin: 4px 0 2px;
+  }
+  .prevpick select {
+    width: 100%;
+    font-size: 16px !important;
+    padding: 9px 10px;
+    border-radius: 10px;
+    background: #20252b;
+    border: 1px solid var(--line2);
+    font-weight: 700;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image:
+      linear-gradient(45deg, transparent 50%, #8f99a6 50%), linear-gradient(135deg, #8f99a6 50%, transparent 50%);
+    background-position:
+      calc(100% - 18px) 55%,
+      calc(100% - 12px) 55%;
+    background-size: 6px 6px;
+    background-repeat: no-repeat;
+    padding-right: 32px;
+  }
+  .prevpick .flabel {
+    margin-bottom: 5px;
+  }
+}

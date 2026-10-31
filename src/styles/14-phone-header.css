@@ -1,0 +1,146 @@
+/* ===== PHONE header: slim. Flags top-right, thin tabs, one row of small buttons ===== */
+@media (max-width: 640px) {
+  .top {
+    position: relative;
+    gap: 8px !important;
+  }
+  .brandrow {
+    display: block !important;
+  }
+  .brand {
+    font-size: 19px !important;
+    line-height: 30px;
+    padding-right: 112px;
+  }
+  .tabs {
+    display: flex !important;
+    margin-top: 8px;
+    padding: 2px;
+    border-radius: 9px;
+  }
+  .tabs button {
+    flex: 1;
+    padding: 5px 6px !important;
+    font-size: 12.5px !important;
+  }
+  .tools {
+    display: flex !important;
+    gap: 6px !important;
+    flex-wrap: nowrap;
+  }
+  .tools > button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 5px 6px !important;
+    font-size: 11.5px !important;
+    font-weight: 650;
+    border-radius: 7px;
+    height: 28px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    justify-content: center;
+  }
+  .tools #syncChip {
+    grid-column: auto !important;
+    flex: 1.25 1 0;
+    gap: 5px;
+  }
+  .tools .flags {
+    position: absolute;
+    top: 0;
+    right: 0;
+    grid-column: auto !important;
+    padding: 2px;
+    gap: 0;
+    border-radius: 8px;
+  }
+  .flags .flag {
+    flex: none !important;
+    font-size: 15px !important;
+    padding: 2px 5px !important;
+    line-height: 1.3;
+  }
+  .demotag {
+    font-size: 0.5em !important;
+  }
+}
+@media (max-width: 360px) {
+  .tools {
+    gap: 4px !important;
+  }
+  .tools > button {
+    font-size: 10.5px !important;
+    padding: 4px 3px !important;
+  }
+  .syncchip i {
+    width: 6px;
+    height: 6px;
+  }
+}
+@media (hover: none) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+.day[data-date] {
+  cursor: pointer;
+}
+.daysheet h3 {
+  margin: 0;
+}
+.dsgroup {
+  margin-top: 14px;
+}
+.dsrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 2px;
+  border-bottom: 1px solid #262b31;
+  font-size: 14px;
+}
+.dsrow .k {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+}
+.dsrow .n {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+}
+.dsrow .v {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.dssum {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-weight: 650;
+}
+.dssum b {
+  color: var(--ink);
+  font-size: 16px;
+  margin-right: 4px;
+}
+@media (max-width: 640px) {
+  #daybg {
+    align-items: center;
+    padding: 16px;
+  }
+  #daybg .modal {
+    width: 100%;
+    border-radius: 16px;
+    max-height: 80dvh;
+  }
+}

@@ -1,0 +1,77 @@
+/* progress */
+.progress {
+  padding: 14px 20px 12px;
+}
+.phead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+.ptotal {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 650;
+}
+.track {
+  display: flex;
+  height: 48px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #232830;
+  margin: 12px 0 10px;
+  gap: 2px;
+}
+.chunk {
+  position: relative;
+  min-width: 0;
+  transition: width 0.35s ease;
+}
+.chunk b {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 850;
+  color: #0b0f14;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.legend {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+.lg {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  padding: 4px 6px;
+  border-radius: 8px;
+  min-width: 0;
+}
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  flex: none;
+}
+.lg div {
+  min-width: 0;
+}
+.lg strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lg small {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
