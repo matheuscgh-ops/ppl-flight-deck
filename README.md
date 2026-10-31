@@ -16,7 +16,7 @@ The app follows the 26 topics of the Sporty's question bank (1,058 questions). I
 | **Dashboard (Kanban)** | Every day — it drives your decisions | One card per topic. Drag cards from *To Do* → *Doing* → *Not Comfortable* / *Very Comfortable* / *To Review*, and tap a card to log a session and its score. |
 | **Plan** | When you don't want to decide | Today's list, built from your statistics: topics ordered by **exam-day questions at stake per minute**, sized to your available time and energy (low / medium / high), plus a practice test every N days. |
 | **Practice tests** | After each FAA practice test (always 60 questions) | Log the score, see the trend line, the date you reach 85% and the next suggested test. |
-| **Statistics** | When you want to analyse | *Question bank*: forecast model, where you lose questions, a spaced-repetition curve per topic. *Practice tests*: trend, histogram, test-based forecast and model accuracy. |
+| **Statistics** | When you want to analyse | *Question bank*: forecast model, where you lose questions, heat map by topic, a spaced-repetition curve per topic. *Practice tests*: trend, histogram, test-based forecast and model accuracy. |
 
 One statistics engine feeds every screen, so the dashboard, the plan and the statistics always show the same numbers.
 
@@ -38,6 +38,9 @@ The *How it is calculated* sections in the app list every formula.
 - Calendar with study streak, activity per day and practice tests.
 - Charts with hover: a dashed crosshair to both axes, a dot on each line and the values. On practice tests the cursor snaps to each test. Tap and drag on phones.
 - Range selectors (3D → All) on every chart, with a separate one for all the small topic charts.
+- **Heat map by topic:** each square is a day, week or month, coloured cold → hot by the **chance of a right answer** (`score × recall + 1/3 × (1 − recall)`, the same number the forecast uses). The coldest topics come first; hover or tap a square for details.
+- **Dashboard preview carousel:** every 3 s the spaced-repetition preview moves through the topics left in today's plan. It pauses on hover.
+- All percentage charts use the same full 0–100% scale.
 - Practice tests count as 60 questions in the weekly volume.
 - English, Português and 日本語.
 - Layouts for desktop (one-screen dashboard), laptop, iPad and phone.

@@ -250,7 +250,6 @@ body.dragging,body.dragging *{cursor:grabbing!important;user-select:none!importa
 .duechip{font-size:11px;font-weight:800;color:var(--muted);white-space:nowrap;min-width:64px;text-align:right}
 .duechip.over{color:#ff9c95}.duechip.now{color:#f8c96a}
 /* analysis page */
-.srhero{padding:18px 20px}
 .srhead{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px}
 .srhead .muted{margin-top:4px;font-size:13px;font-weight:600}
 .srkpis{display:flex;gap:28px}
@@ -409,8 +408,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   .sr{padding:14px}
   .chartlegend{font-size:11px}
   .duechip{min-width:0}
-  .modal{padding:16px}
-  .srhero{padding:14px}.srkpis{gap:14px}.srkpis b{font-size:24px}
+  .modal{padding:16px}.srkpis{gap:14px}.srkpis b{font-size:24px}
   .kpirow b{font-size:15px}
 }
 
@@ -523,7 +521,6 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .srrange{display:flex;gap:2px;padding:2px;margin:6px 0 4px;border-radius:8px;max-width:none}
 .srrange button{flex:1;min-width:0;padding:3px 2px!important;font-size:11px!important;font-weight:800}
 .volrange button{min-width:0;padding:6px 2px!important}
-.srhero .srrange{max-width:560px;margin:0 0 8px}
 
 /* forecast */
 .fcmini{display:grid;grid-template-columns:auto auto 1fr;align-items:center;gap:4px 10px;width:100%;text-align:left;background:#1b2027;border:1px solid var(--line2);border-radius:10px;padding:7px 10px;margin-bottom:6px}
@@ -601,6 +598,20 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 
 /* period selectors never stretch across a whole desktop panel */
 .srrange{max-width:420px}
+/* heat map */
+#heatPanel .srhead{align-items:flex-start;gap:12px;flex-wrap:wrap}.heatrange{min-width:240px;margin:0}
+.heatgrid{display:flex;flex-direction:column;gap:2px;margin-top:8px}
+.hmrow{display:grid;grid-template-columns:minmax(120px,220px) repeat(var(--hn),minmax(0,1fr));gap:2px;align-items:center}
+.hmrow .hmn{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:8px}
+.hmrow .hmc{height:22px;border-radius:3px;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:default;transition:transform .08s}
+.hmrow .hmc.empty{background:#20252b}
+.hmrow .hmc.hovon{outline:2px solid #eef1f4;outline-offset:-1px;transform:scale(1.06);position:relative;z-index:1}
+.hmhead .hmh{font-size:10.5px;font-weight:700;color:var(--muted);text-align:center;white-space:nowrap;overflow:visible}
+.ctip .warm{color:#c4261c;font-weight:800}.ctip .cool{color:#2f4bd8;font-weight:800}
+@media (max-width:640px){.hmrow{grid-template-columns:96px repeat(var(--hn),minmax(0,1fr));gap:1px}.hmrow .hmn{font-size:11px}.hmrow .hmc{height:18px;border-radius:2px}.heatrange{min-width:0;width:100%}}
+/* dashboard preview carousel */
+.cardots{display:flex;gap:4px;margin:2px 0 4px}.cardots i{width:6px;height:6px;border-radius:3px;background:#3a424c;transition:width .2s,background .2s}.cardots i.on{width:14px;background:#579dff}
+#sugg .qrow.car{background:#579dff14;box-shadow:inset 3px 0 0 #579dff;border-radius:6px}
 /* chart hover */
 .ctip{position:fixed;z-index:9600;pointer-events:none;background:#eef1f4;color:#15181c;border-radius:8px;padding:7px 10px;font-size:12.5px;font-weight:650;box-shadow:0 8px 24px #0008;display:flex;flex-direction:column;gap:3px;max-width:280px}
 .ctip .ctd{font-weight:800;color:#4a525c;font-size:11.5px}
@@ -652,6 +663,7 @@ svg[data-hmode]{touch-action:pan-y;-webkit-user-select:none;user-select:none}
 /* desktop: charts share the screen in two columns instead of stretching full width */
 .statduo{display:flex;flex-direction:column;gap:12px}
 #fcLostPanel .fch3{margin-top:0}
+.heatkpis{justify-content:flex-start;margin-top:10px}
 .planpt{padding:14px 20px}.planpt .fch3{margin:0 0 2px}
 .pphead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .ppbtns{display:flex;gap:8px;flex-wrap:wrap}
@@ -669,8 +681,7 @@ svg[data-hmode]{touch-action:pan-y;-webkit-user-select:none;user-select:none}
 .fcfull .ffk{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.fcfull .ffk.four{grid-template-columns:repeat(4,minmax(0,1fr))}.fcfull .ffnote{font-size:12px;margin-top:10px}
 @media (max-width:640px){.fcfull .ffk.four{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .fcfull .ffk b{display:block;font-size:20px;font-weight:900}.fcfull .ffk span{font-size:11.5px;color:var(--muted);font-weight:700}
-@media (min-width:1100px){.statduo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch}.statduo.top{align-items:start}
-  #fcLostPanel #fcLost{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:40px}}
+@media (min-width:1100px){.statduo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch}.statduo.top{align-items:start}}
 .modal.wide{width:min(660px,100%)}
 .callink{font-size:12.5px;margin:0 0 6px;align-self:flex-start}
 .calhelp{font-size:12.5px;margin:10px 0 0;line-height:1.5}
@@ -755,7 +766,7 @@ svg[data-hmode]{touch-action:pan-y;-webkit-user-select:none;user-select:none}
         <button type="button" class="fcmini" id="fcMini"><span class="fclab" data-t="fcTitle"></span><b id="fcMiniVal">—</b><span class="fcbar"><i id="fcMiniBar"></i><em class="m70"></em><em class="m85"></em></span><span class="fcsub" id="fcMiniSub"></span></button>
         <div class="srtop"><span class="label" data-t="srLabel"></span><button class="linkbtn" id="openSR" data-t="openAnalysis"></button></div>
         <label class="prevpick"><span class="flabel" data-t="pickLabel"></span><select id="prevPick"></select></label>
-        <div class="prevtitle" id="prevTitle"></div>
+        <div class="prevtitle" id="prevTitle"></div><div class="cardots" id="carDots" hidden></div>
         <div class="prevstats" id="prevStats"></div>
         <div class="seg srrange" data-srr><button data-sr="3d">3D</button><button data-sr="7d">7D</button><button data-sr="2w">2W</button><button data-sr="1m">1M</button><button data-sr="3m">3M</button><button data-sr="6m">6M</button><button data-sr="1y">1Y</button><button data-sr="all" data-t="rAll"></button></div>
         <div class="chart" id="prevChart"></div>
@@ -820,14 +831,13 @@ svg[data-hmode]{touch-action:pan-y;-webkit-user-select:none;user-select:none}
       <div class="chartlegend" id="fcLegend"></div>
       <details class="fcwhy"><summary data-t="howCalc"></summary><div id="fcFormula"></div></details>
     </section>
-    <section class="panel srhero">
-      <div class="srhead"><div><h2 class="section" data-t="srLabel"></h2><div class="muted" data-t="srSub"></div></div><div class="srkpis" id="srKpis"></div></div>
-      <div class="seg srrange" data-srr><button data-sr="3d">3D</button><button data-sr="7d">7D</button><button data-sr="2w">2W</button><button data-sr="1m">1M</button><button data-sr="3m">3M</button><button data-sr="6m">6M</button><button data-sr="1y">1Y</button><button data-sr="all" data-t="rAll"></button></div>
-      <div class="chart" id="srAvgChart"></div>
-      <div class="chartlegend" id="srLegend1"></div>
-    </section>
-    </div>
     <section class="panel fchero" id="fcLostPanel"><h3 class="fch3" data-t="fcLostTitle"></h3><div id="fcLost"></div></section>
+    </div>
+    <section class="panel fchero" id="heatPanel">
+      <div class="srhead"><div><h2 class="section" data-t="heatTitle"></h2><div class="muted" data-t="heatSub"></div><div class="srkpis heatkpis" id="srKpis"></div></div>
+        <div class="seg srrange heatrange" data-heatr><button data-hr="2w">2W</button><button data-hr="1m">1M</button><button data-hr="3m">3M</button><button data-hr="6m">6M</button><button data-hr="1y">1Y</button></div></div>
+      <div class="heatgrid" id="heatGrid"></div>
+    </section>
     <details class="panel formula" id="formula"><summary data-t="howCalc"></summary><div id="formulaBody"></div></details>
     <div class="srcardbar"><div class="filters" id="srFilters"></div><div class="srcardr"><span class="label" data-t="cardRange"></span><div class="seg srrange" data-srcr><button data-scr="3d">3D</button><button data-scr="7d">7D</button><button data-scr="2w">2W</button><button data-scr="1m">1M</button><button data-scr="3m">3M</button><button data-scr="6m">6M</button><button data-scr="1y">1Y</button><button data-scr="all" data-t="rAll"></button></div></div></div>
     <div class="srgrid" id="srGrid"></div>
@@ -975,9 +985,9 @@ en:{activeLegend:'Active day',vcLegend:'Moved to Very Comfortable (names)',sub:'
 pt:{activeLegend:'Dia ativo',vcLegend:'Movido para Muito confortável (nomes)',sub:'Prova teórica FAA Private Pilot · Painel de estudos',demo:'DADOS DE EXEMPLO',clear:'Limpar exemplos',backup:'Backup JSON',import:'Importar',save:'Salvar HTML',progress:'Progresso do banco de questões',total:'{n} questões',today:'Hoje',wk:'SEM',wkTitle:'Semanas com estudo',streak:'dias seguidos',exam:'Contagem para a prova',toGo:'dias restantes',since:'dias desde a data da prova',examToday:'Dia da prova — boa sorte!',examShort:'PROVA',avg:'Média',avgTip:'Média ponderada das notas do Sporty’s (meta ≥ 85%). Mover cards não a altera.',pace:'Ritmo / dia',paceTip:'Questões por dia para deixar todos os tópicos em Muito confortável antes da prova',active:'Dias ativos',board:'Seus cards',drag:'Arraste entre listas · Clique ou Enter para registrar',activity:'Atividade',status:'Status',date:'Data',record:'Salvar',cancel:'Cancelar',history:'Histórico',study:'Estudou',review:'Revisou',move:'Moveu',none:'Só status',labels:['A fazer','Fazendo','Pouco confortável','Muito confortável','Para revisar'],days:['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],qn:'{n} q',ago:'{n}d',todayShort:'hoje',examLegend:'Data da prova',demoConfirm:'Remover todas as atividades de exemplo? A posição dos cards e seus registros reais permanecem.',cleared:'Exemplos removidos',saved:'Registrado',undo:'Desfazer',undone:'Desfeito',exported:'Arquivo baixado',imported:'Backup importado',invalid:'Este arquivo não é um backup válido do PPL Flight Deck.',inactive:'Nenhum registro ainda.',already:'Já está nesta lista',nothing:'Nada a salvar — escolha uma atividade ou um novo status',example:'exemplo',del:'Apagar',deleted:'Registro apagado',fromFile:'Carregados os dados mais recentes salvos neste arquivo',never:'nunca registrado',openCard:'abrir card',palPh:'Registrar estudo — digite um tópico…',logged:'{t} — {k}'},
 ja:{activeLegend:'学習した日',vcLegend:'「十分理解」へ移動（名前）',sub:'FAA自家用操縦士 筆記試験 · 学習トラッカー',demo:'サンプルデータ',clear:'サンプルを削除',backup:'JSONバックアップ',import:'読み込み',save:'HTML保存',progress:'問題バンクの進捗',total:'全{n}問',today:'今日',wk:'週',wkTitle:'学習した週',streak:'日連続',exam:'試験までの日数',toGo:'日',since:'日経過（試験日から）',examToday:'試験当日 — 頑張って！',examShort:'試験',avg:'平均正答率',avgTip:'Sporty’sの加重平均正答率（目標85%以上）。カード移動では変わりません。',pace:'必要ペース',paceTip:'試験までに全トピックを「十分理解」にするための1日あたりの問題数',active:'学習した日',board:'カード一覧',drag:'ドラッグで移動 · クリック／Enterで記録',activity:'活動',status:'状態',date:'日付',record:'保存',cancel:'キャンセル',history:'履歴',study:'学習',review:'復習',move:'移動',none:'状態のみ',labels:['未着手','学習中','要強化','十分理解','要復習'],days:['月','火','水','木','金','土','日'],qn:'{n}問',ago:'{n}日前',todayShort:'今日',examLegend:'試験日',demoConfirm:'サンプルの活動をすべて削除しますか？カードの位置と実際の記録は残ります。',cleared:'サンプルを削除しました',saved:'記録しました',undo:'元に戻す',undone:'元に戻しました',exported:'ダウンロードしました',imported:'読み込みました',invalid:'有効なバックアップファイルではありません。',inactive:'記録はまだありません。',already:'すでにこのリストにあります',nothing:'保存する内容がありません — 活動か新しい状態を選んでください',example:'サンプル',del:'削除',deleted:'記録を削除しました',fromFile:'このファイルに保存された新しいデータを読み込みました',never:'未記録',openCard:'カードを開く',palPh:'学習を記録 — トピック名を入力…',logged:'{t} — {k}'}};
 
-Object.assign(I18N.en,{"tabDash": "Dashboard", "tabSR": "Spaced repetition", "srSub": "DEMO model · one forgetting curve per topic that reached Not Comfortable or Very Comfortable", "openAnalysis": "Full analysis →", "avgCurve": "All tracked topics · average", "hoverHint": "hover a card to preview it", "retention": "Recall now", "stability": "Stability", "sessions": "Sessions", "lastScore": "Last score", "dueAgo": "{n}d overdue", "dueToday": "due today", "dueIn": "in {n}d", "noHist": "no sessions yet", "noHistLong": "No scored sessions yet — log a study or review to start this curve.", "dueCount": "due", "avgRet": "average recall now", "trackedN": "topics tracked", "todayMark": "today", "dayN": "Day {n}", "lgRecall": "Recall", "lgProj": "Projection", "lgGhost": "If you stop reviewing", "lgExam": "Recall on exam day", "lgThresh": "Review at 90%", "howCalc": "How it is calculated", "fAll": "All", "fDue": "Due", "logReview": "Log a review", "allClear": "Nothing tracked yet.", "scoreField": "Score this session (%)", "editScore": "Click to edit your latest score", "scoreSaved": "{t} — score {n}%", "formula": "<p>A simplified model inspired by FSRS / SM-2, built for this <b>demo</b>. It uses the score you log for each study or review session (or edit on the card). Moving a card is not a session.</p><pre>Recall after t days:     R(t) = 1 / (1 + t / (9·S))\nS (stability) = days until recall falls to 90%\n\nFirst session:           S = 1 day (score &lt; 70%) · 1.5 (70–84%) · 2 (≥ 85%)\nEach later session, score p, recall R at that moment:\n  p ≥ 70%   →  S ← S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  S ← S × 1.2\n  p &lt; 60%   →  S ← max(1, 0.4 × S)      (lapse)\n\nNext review  = last session + S days   (when R reaches 90%)\nPriority     = (1 − R_now + 0.05 × min(days overdue, 10))\n               × √questions × list weight × (1 + max(0, 85 − score)/100)\nList weight: Not Comfortable 1.4 · To review 1.3 · Very Comfortable 1.0</pre><p>Reviewing a little later, once recall has dropped, grows S more than reviewing right away — that is the spacing effect in the chart. The white line is the recall you would still have on exam day if you stopped reviewing at that point.</p>"});
-Object.assign(I18N.pt,{"tabDash": "Painel", "tabSR": "Repetição espaçada", "srSub": "Modelo DEMO · uma curva de esquecimento por tópico que chegou a Pouco ou Muito confortável", "openAnalysis": "Análise completa →", "avgCurve": "Todos os tópicos acompanhados · média", "hoverHint": "passe o mouse num card para ver", "retention": "Retenção hoje", "stability": "Estabilidade", "sessions": "Sessões", "lastScore": "Última nota", "dueAgo": "{n}d atrasado", "dueToday": "revisar hoje", "dueIn": "em {n}d", "noHist": "sem sessões ainda", "noHistLong": "Nenhuma sessão com nota ainda — registre um estudo ou revisão para iniciar esta curva.", "dueCount": "para revisar", "avgRet": "retenção média hoje", "trackedN": "tópicos acompanhados", "todayMark": "hoje", "dayN": "Dia {n}", "lgRecall": "Retenção", "lgProj": "Projeção", "lgGhost": "Se parar de revisar", "lgExam": "Retenção no dia da prova", "lgThresh": "Revisar em 90%", "howCalc": "Como é calculado", "fAll": "Todos", "fDue": "Vencidos", "logReview": "Registrar revisão", "allClear": "Nada acompanhado ainda.", "scoreField": "Nota desta sessão (%)", "editScore": "Clique para editar sua última nota", "scoreSaved": "{t} — nota {n}%", "formula": "<p>Modelo simplificado inspirado em FSRS / SM-2, feito para esta <b>demo</b>. Usa a nota registrada em cada sessão de estudo ou revisão (ou editada no card). Mover um card não conta como sessão.</p><pre>Retenção após t dias:    R(t) = 1 / (1 + t / (9·S))\nS (estabilidade) = dias até a retenção cair para 90%\n\nPrimeira sessão:         S = 1 dia (nota &lt; 70%) · 1,5 (70–84%) · 2 (≥ 85%)\nCada sessão seguinte, nota p, retenção R naquele momento:\n  p ≥ 70%   →  S ← S × (1 + 1,2 × p/100 × (1,5 − R))\n  60–69%    →  S ← S × 1,2\n  p &lt; 60%   →  S ← max(1; 0,4 × S)      (esquecimento)\n\nPróxima revisão = última sessão + S dias   (quando R chega a 90%)\nPrioridade      = (1 − R_hoje + 0,05 × min(dias de atraso; 10))\n                  × √questões × peso da lista × (1 + max(0; 85 − nota)/100)\nPeso: Pouco confortável 1,4 · Para revisar 1,3 · Muito confortável 1,0</pre><p>Revisar um pouco depois, quando a retenção já caiu, aumenta mais o S do que revisar logo em seguida — é o efeito de espaçamento no gráfico. A linha branca é a retenção que você ainda teria no dia da prova se parasse de revisar naquele ponto.</p>"});
-Object.assign(I18N.ja,{"tabDash": "ダッシュボード", "tabSR": "間隔反復", "srSub": "デモモデル · 「要強化」または「十分理解」に入ったトピックごとの忘却曲線", "openAnalysis": "詳細分析 →", "avgCurve": "追跡中の全トピック · 平均", "hoverHint": "カードにマウスを乗せると表示", "retention": "現在の保持率", "stability": "安定度", "sessions": "セッション", "lastScore": "最新の正答率", "dueAgo": "{n}日超過", "dueToday": "今日が復習日", "dueIn": "{n}日後", "noHist": "セッションなし", "noHistLong": "正答率付きのセッションがまだありません — 学習か復習を記録すると曲線が始まります。", "dueCount": "件 要復習", "avgRet": "現在の平均保持率", "trackedN": "追跡中のトピック", "todayMark": "今日", "dayN": "{n}日目", "lgRecall": "保持率", "lgProj": "予測", "lgGhost": "復習をやめた場合", "lgExam": "試験当日の保持率", "lgThresh": "90%で復習", "howCalc": "計算方法", "fAll": "すべて", "fDue": "期限切れ・今日", "logReview": "復習を記録", "allClear": "まだ追跡中のトピックはありません。", "scoreField": "このセッションの正答率（%）", "editScore": "クリックして最新の正答率を編集", "scoreSaved": "{t} — 正答率 {n}%", "formula": "<p>このデモ用に作った、FSRS／SM-2を参考にした簡易モデルです。学習・復習ごとに記録した正答率（またはカード上で編集した値）を使います。カードの移動はセッションに数えません。</p><pre>t日後の記憶保持率:   R(t) = 1 / (1 + t / (9·S))\nS（安定度）= 保持率が90%まで下がるまでの日数\n\n初回:                S = 1日（70%未満）· 1.5（70–84%）· 2（85%以上）\n2回目以降（正答率p、その時点の保持率R）:\n  p ≥ 70%   →  S ← S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  S ← S × 1.2\n  p &lt; 60%   →  S ← max(1, 0.4 × S)     （忘却）\n\n次の復習 = 最終セッション + S日（Rが90%になる時点）\n優先度   = (1 − 今日のR + 0.05 × min(超過日数, 10))\n           × √問題数 × リスト重み × (1 + max(0, 85 − 正答率)/100)\n重み: 要強化 1.4 · 要復習 1.3 · 十分理解 1.0</pre><p>少し忘れかけた頃に復習すると、すぐに復習するよりSが大きく伸びます（間隔効果）。白い線は、その時点で復習をやめた場合の試験当日の保持率です。</p>"});
+Object.assign(I18N.en,{"tabDash": "Dashboard", "tabSR": "Spaced repetition", "openAnalysis": "Full analysis →", "avgCurve": "All tracked topics · average", "hoverHint": "hover a card to preview it", "retention": "Recall now", "stability": "Stability", "sessions": "Sessions", "lastScore": "Last score", "dueAgo": "{n}d overdue", "dueToday": "due today", "dueIn": "in {n}d", "noHist": "no sessions yet", "noHistLong": "No scored sessions yet — log a study or review to start this curve.", "dueCount": "due", "avgRet": "average recall now", "trackedN": "topics tracked", "todayMark": "today", "dayN": "Day {n}", "lgRecall": "Recall", "lgProj": "Projection", "lgGhost": "If you stop reviewing", "lgExam": "Recall on exam day", "lgThresh": "Review at 90%", "howCalc": "How it is calculated", "fAll": "All", "fDue": "Due", "logReview": "Log a review", "allClear": "Nothing tracked yet.", "scoreField": "Score this session (%)", "editScore": "Click to edit your latest score", "scoreSaved": "{t} — score {n}%", "formula": "<p>A simplified model inspired by FSRS / SM-2, built for this <b>demo</b>. It uses the score you log for each study or review session (or edit on the card). Moving a card is not a session.</p><pre>Recall after t days:     R(t) = 1 / (1 + t / (9·S))\nS (stability) = days until recall falls to 90%\n\nFirst session:           S = 1 day (score &lt; 70%) · 1.5 (70–84%) · 2 (≥ 85%)\nEach later session, score p, recall R at that moment:\n  p ≥ 70%   →  S ← S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  S ← S × 1.2\n  p &lt; 60%   →  S ← max(1, 0.4 × S)      (lapse)\n\nNext review  = last session + S days   (when R reaches 90%)\nPriority     = (1 − R_now + 0.05 × min(days overdue, 10))\n               × √questions × list weight × (1 + max(0, 85 − score)/100)\nList weight: Not Comfortable 1.4 · To review 1.3 · Very Comfortable 1.0</pre><p>Reviewing a little later, once recall has dropped, grows S more than reviewing right away — that is the spacing effect in the chart. The white line is the recall you would still have on exam day if you stopped reviewing at that point.</p>"});
+Object.assign(I18N.pt,{"tabDash": "Painel", "tabSR": "Repetição espaçada", "openAnalysis": "Análise completa →", "avgCurve": "Todos os tópicos acompanhados · média", "hoverHint": "passe o mouse num card para ver", "retention": "Retenção hoje", "stability": "Estabilidade", "sessions": "Sessões", "lastScore": "Última nota", "dueAgo": "{n}d atrasado", "dueToday": "revisar hoje", "dueIn": "em {n}d", "noHist": "sem sessões ainda", "noHistLong": "Nenhuma sessão com nota ainda — registre um estudo ou revisão para iniciar esta curva.", "dueCount": "para revisar", "avgRet": "retenção média hoje", "trackedN": "tópicos acompanhados", "todayMark": "hoje", "dayN": "Dia {n}", "lgRecall": "Retenção", "lgProj": "Projeção", "lgGhost": "Se parar de revisar", "lgExam": "Retenção no dia da prova", "lgThresh": "Revisar em 90%", "howCalc": "Como é calculado", "fAll": "Todos", "fDue": "Vencidos", "logReview": "Registrar revisão", "allClear": "Nada acompanhado ainda.", "scoreField": "Nota desta sessão (%)", "editScore": "Clique para editar sua última nota", "scoreSaved": "{t} — nota {n}%", "formula": "<p>Modelo simplificado inspirado em FSRS / SM-2, feito para esta <b>demo</b>. Usa a nota registrada em cada sessão de estudo ou revisão (ou editada no card). Mover um card não conta como sessão.</p><pre>Retenção após t dias:    R(t) = 1 / (1 + t / (9·S))\nS (estabilidade) = dias até a retenção cair para 90%\n\nPrimeira sessão:         S = 1 dia (nota &lt; 70%) · 1,5 (70–84%) · 2 (≥ 85%)\nCada sessão seguinte, nota p, retenção R naquele momento:\n  p ≥ 70%   →  S ← S × (1 + 1,2 × p/100 × (1,5 − R))\n  60–69%    →  S ← S × 1,2\n  p &lt; 60%   →  S ← max(1; 0,4 × S)      (esquecimento)\n\nPróxima revisão = última sessão + S dias   (quando R chega a 90%)\nPrioridade      = (1 − R_hoje + 0,05 × min(dias de atraso; 10))\n                  × √questões × peso da lista × (1 + max(0; 85 − nota)/100)\nPeso: Pouco confortável 1,4 · Para revisar 1,3 · Muito confortável 1,0</pre><p>Revisar um pouco depois, quando a retenção já caiu, aumenta mais o S do que revisar logo em seguida — é o efeito de espaçamento no gráfico. A linha branca é a retenção que você ainda teria no dia da prova se parasse de revisar naquele ponto.</p>"});
+Object.assign(I18N.ja,{"tabDash": "ダッシュボード", "tabSR": "間隔反復", "openAnalysis": "詳細分析 →", "avgCurve": "追跡中の全トピック · 平均", "hoverHint": "カードにマウスを乗せると表示", "retention": "現在の保持率", "stability": "安定度", "sessions": "セッション", "lastScore": "最新の正答率", "dueAgo": "{n}日超過", "dueToday": "今日が復習日", "dueIn": "{n}日後", "noHist": "セッションなし", "noHistLong": "正答率付きのセッションがまだありません — 学習か復習を記録すると曲線が始まります。", "dueCount": "件 要復習", "avgRet": "現在の平均保持率", "trackedN": "追跡中のトピック", "todayMark": "今日", "dayN": "{n}日目", "lgRecall": "保持率", "lgProj": "予測", "lgGhost": "復習をやめた場合", "lgExam": "試験当日の保持率", "lgThresh": "90%で復習", "howCalc": "計算方法", "fAll": "すべて", "fDue": "期限切れ・今日", "logReview": "復習を記録", "allClear": "まだ追跡中のトピックはありません。", "scoreField": "このセッションの正答率（%）", "editScore": "クリックして最新の正答率を編集", "scoreSaved": "{t} — 正答率 {n}%", "formula": "<p>このデモ用に作った、FSRS／SM-2を参考にした簡易モデルです。学習・復習ごとに記録した正答率（またはカード上で編集した値）を使います。カードの移動はセッションに数えません。</p><pre>t日後の記憶保持率:   R(t) = 1 / (1 + t / (9·S))\nS（安定度）= 保持率が90%まで下がるまでの日数\n\n初回:                S = 1日（70%未満）· 1.5（70–84%）· 2（85%以上）\n2回目以降（正答率p、その時点の保持率R）:\n  p ≥ 70%   →  S ← S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  S ← S × 1.2\n  p &lt; 60%   →  S ← max(1, 0.4 × S)     （忘却）\n\n次の復習 = 最終セッション + S日（Rが90%になる時点）\n優先度   = (1 − 今日のR + 0.05 × min(超過日数, 10))\n           × √問題数 × リスト重み × (1 + max(0, 85 − 正答率)/100)\n重み: 要強化 1.4 · 要復習 1.3 · 十分理解 1.0</pre><p>少し忘れかけた頃に復習すると、すぐに復習するよりSが大きく伸びます（間隔効果）。白い線は、その時点で復習をやめた場合の試験当日の保持率です。</p>"});
 
 Object.assign(I18N.en,{"practiceTest": "FAA practice test", "practiceTests": "Practice test (best)", "ptTip": "Last: {last} · {n} practice tests logged — click to add", "ptDesc": "60-question FAA practice test. Leave the score blank if it is still in progress.", "inProgress": "in progress", "blankInProgress": "blank = in progress"});
 Object.assign(I18N.pt,{"practiceTest": "Simulado FAA", "practiceTests": "Simulado (melhor)", "ptTip": "Último: {last} · {n} simulados registrados — clique para adicionar", "ptDesc": "Simulado FAA de 60 questões. Deixe a nota em branco se ainda estiver em andamento.", "inProgress": "em andamento", "blankInProgress": "vazio = em andamento"});
@@ -1027,6 +1037,9 @@ Object.assign(I18N.ja,{"bankTitle": "問題バンクのモデル", "bankSub": "�
 Object.assign(I18N.en,{"cardRange": "Interval of the topic charts", "histN": "{n} test(s)"});
 Object.assign(I18N.pt,{"cardRange": "Intervalo dos gráficos por tópico", "histN": "{n} simulado(s)"});
 Object.assign(I18N.ja,{"cardRange": "トピック別グラフの期間", "histN": "{n}回"});
+Object.assign(I18N.en,{"heatTitle": "Heat map by topic", "heatSub": "Chance of a right answer per topic over time (coldest first) · hover or tap a square", "heatWord": "Chance of a right answer", "heatWarm": "warming", "heatCool": "cooling", "heatSame": "steady"});
+Object.assign(I18N.pt,{"heatTitle": "Mapa de calor por tópico", "heatSub": "Chance de acertar cada tópico ao longo do tempo (mais frios primeiro) · passe o mouse ou toque", "heatWord": "Chance de acertar", "heatWarm": "esquentando", "heatCool": "esfriando", "heatSame": "estável"});
+Object.assign(I18N.ja,{"heatTitle": "トピック別ヒートマップ", "heatSub": "トピック別の正答確率の推移（冷たい順）· カーソルまたはタップ", "heatWord": "正答の確率", "heatWarm": "上昇", "heatCool": "低下", "heatSame": "横ばい"});
 const $=s=>document.querySelector(s);
 const pad=n=>String(n).padStart(2,'0');
 const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -1466,7 +1479,7 @@ function forecastSeries(){
 }
 function fcChartSVG(w,h){
   const {start,span,pts}=forecastSeries(),ex=diffDays(start,state.deadline),x1=Math.max(span+1,Math.min(ex,span+31)),exam=forecast(todayISO(),state.deadline).mu;
-  const L=36,R=8,T=14,B=22,pw=w-L-R,ph=h-T-B,lo=Math.max(0,Math.min(.5,Math.floor((Math.min(...pts.map(p=>p[1]),exam)-.05)*10)/10));
+  const L=36,R=8,T=14,B=22,pw=w-L-R,ph=h-T-B,lo=0;  /* every percentage chart uses the full 0–100% scale */
   const X=x=>L+x/x1*pw,Y=v=>T+(1-(v-lo)/(1-lo))*ph,f=n=>n.toFixed(1);let g='';
   [lo,(lo+1)/2,1].forEach(v=>g+=`<line class="cg" x1="${L}" x2="${w-R}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="cy" x="${L-5}" y="${f(Y(v)+3.5)}" text-anchor="end">${Math.round(v*100)}%</text>`);
   g+=`<line class="c70" x1="${L}" x2="${w-R}" y1="${f(Y(.7))}" y2="${f(Y(.7))}"/><line class="c85" x1="${L}" x2="${w-R}" y1="${f(Y(.85))}" y2="${f(Y(.85))}"/>`;
@@ -1640,7 +1653,7 @@ function chartSVG(o){
   const {w,h,x0,x1,series,ticks=[],todayX,examX}=o;
   const L=36,R=8,T=14,B=22,pw=w-L-R,ph=h-T-B;
   let lo=1;series.forEach(s=>s.pts.forEach(p=>{lo=Math.min(lo,p[1])}));
-  const ymin=Math.max(0,Math.min(.6,Math.floor((lo-.04)*10)/10));
+  const ymin=0;  /* full 0–100% scale, like every percentage chart */
   const X=x=>L+(x-x0)/Math.max(1e-6,x1-x0)*pw,Y=v=>T+(1-(v-ymin)/(1-ymin))*ph;
   const f=n=>n.toFixed(1);
   let g='';
@@ -1693,11 +1706,30 @@ function legendHTML(withGhost){return `<span><i style="border-color:#579dff"></i
 
 /* side panel: average by default, a card's own curve while hovering it */
 let preview=null,prevTimer=null,pinned=null;
+/* carousel: every 3 s the dashboard preview moves through today's plan topics that have a memory curve
+   (average → topic → topic …). It pauses while the mouse is over the panel or a card, or when a topic is picked. */
+let carTopic=null,carIdx=0,carHold=false;
+const CAR_MS=3000;
+/* rebuilt on every turn from today's plan as it is now (same order, topics still to do) — it follows any change to the plan */
+function carList(){const seen=new Set();return [null,...buildPlan(null,null,energyMode).items.filter(x=>x.kind==='topic'&&!x.done&&!seen.has(x.i)&&seen.add(x.i)&&srModel(x.i).reps.length).map(x=>x.i)]}
+function carPaint(){const L=carList(),k=Math.max(0,L.indexOf(carTopic)),on=preview==null&&pinned==null;
+  document.querySelectorAll('#sugg .qrow').forEach(r=>r.classList.toggle('car',on&&carTopic!=null&&r.dataset.q===String(carTopic)));
+  const d=$('#carDots');if(d){d.hidden=L.length<2||!on;d.innerHTML=L.map((_,j)=>`<i class="${j===k?'on':''}"></i>`).join('')}}
+function carTick(){
+  if(carHold||preview!=null||pinned!=null||document.hidden||$('#viewDash').hidden||!$('#srPanel').offsetParent)return;
+  const L=carList();if(L.length<2){if(carTopic!=null){carTopic=null;drawPreview()}carPaint();return}
+  carIdx=(Math.max(0,L.indexOf(carTopic))+1)%L.length;carTopic=L[carIdx];drawPreview();
+}
+setInterval(carTick,CAR_MS);
+$('#srPanel').addEventListener('mouseenter',()=>{carHold=true});
+$('#srPanel').addEventListener('mouseleave',()=>{carHold=false});
+lanesEl.addEventListener('mouseenter',()=>{carHold=true});
+lanesEl.addEventListener('mouseleave',()=>{carHold=false});
 fitMQ.addEventListener?.('change',()=>render());
 let rzFit;window.addEventListener('resize',()=>{clearTimeout(rzFit);rzFit=setTimeout(()=>{if(fitMQ.matches)drawPreview()},150)});
 function setPreview(i){clearTimeout(prevTimer);if(i==null){prevTimer=setTimeout(()=>{if(preview!=null){preview=null;drawPreview()}},140);return}if(i!==preview){preview=i;drawPreview()}}
 function drawPreview(){
-  const cur=preview!=null?preview:pinned;
+  const cur=preview!=null?preview:pinned!=null?pinned:carTopic;
   syncPick();
   if(cur!=null){
     const m=srModel(cur),[dt,cl]=dueText(m);
@@ -1712,6 +1744,7 @@ function drawPreview(){
     $('#prevChart').innerHTML=avgChart(ms,380,fitH());
     $('#srLegend2').innerHTML=legendHTML(false);
   }
+  carPaint();
 }
 /* picker: "All topics · average" + every tracked topic, most urgent first */
 function syncPick(){const sel=$('#prevPick');if(!sel)return;const ms=srAll();
@@ -1754,11 +1787,9 @@ lanesEl.addEventListener('click',e=>{
 let srFilter='all';
 const FILTERS=[['all','fAll'],['due','fDue'],['Not Comfortable',null],['Very Comfortable',null],['To review',null]];
 function renderSRPage(focus){
-  paintSrRange();renderForecast();
+  paintSrRange();renderForecast();renderHeat();
   const all=srAll(),avg=wavg(all),due=all.filter(m=>!m.reps.length||m.over>=0);
   $('#srKpis').innerHTML=`<div><b>${pct(avg)}</b><span>${esc(t('avgRet'))}</span></div><div><b>${due.length}</b><span>${esc(t('dueCount'))}</span></div><div><b>${all.length}</b><span>${esc(t('trackedN'))}</span></div>`;
-  {const el=$('#srAvgChart');el.innerHTML=avgChart(all,Math.round(el.clientWidth||1100),phoneMQ.matches?200:260)}
-  $('#srLegend1').innerHTML=legendHTML(false);
   $('#formulaBody').innerHTML=t('formula');
   document.querySelectorAll('[data-srcr] button').forEach(b=>b.classList.toggle('on',b.dataset.scr===srCardRange));
   $('#srFilters').innerHTML=FILTERS.map(([k,lk])=>`<button data-f="${esc(k)}" class="${srFilter===k?'on':''}">${esc(lk?t(lk):label(k))}</button>`).join('');
@@ -1978,7 +2009,7 @@ function tsSVG(w,h,big){
   const tr=testTrend(),all=scoredTests();if(!all.length)return `<div class="empty">${esc(t('tsNone'))}</div>`;
   const base=tr.base||all[0].date,x0=diffDays(base,tr.from||base),today=diffDays(base,todayISO()),xE=diffDays(base,state.deadline);
   const x1=Math.max(today+1,big&&xE>today&&xE-today<=60?xE:today+1),pts=tr.pts;
-  const lo=Math.max(0,Math.min(60,Math.floor((Math.min(...pts.map(p=>p[1]),70)-8)/10)*10));
+  const lo=big?0:Math.max(0,Math.min(60,Math.floor((Math.min(...pts.map(p=>p[1]),70)-8)/10)*10));  /* big charts: 0–100%; the tiny dashboard sparkline zooms */
   const L=big?36:4,R=big?10:4,T=big?16:4,B=big?22:4,pw=w-L-R,ph=h-T-B,X=x=>L+(x-x0)/Math.max(1,x1-x0)*pw,Y=v=>T+(1-(v-lo)/(100-lo))*ph,f=n=>n.toFixed(1);
   let g='';
   if(big){[lo,(lo+100)/2,100].forEach(v=>g+=`<line class="cg" x1="${L}" x2="${w-R}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="cy" x="${L-5}" y="${f(Y(v)+3.5)}" text-anchor="end">${Math.round(v)}%</text>`);
@@ -2073,6 +2104,53 @@ function renderCal(){
     `<b>${esc(t('calRecent').replace('{n}',C.nRecent).replace('{b}',(C.biasRecent>=0?'+':'')+C.biasRecent.toFixed(1)))}</b> · ${esc(t('calBias').replace('{b}',(C.bias>=0?'+':'')+C.bias.toFixed(1)))} · <span class="muted">R² ${C.reg?C.reg.r2.toFixed(2):'—'} · n=${C.pts.length}</span>`+(C.usable?` · <b>${esc(t('calOk').replace('{c}',Math.round(C.calibrated)))}</b>`:C.pts.length<5?` · <span class="few">${esc(t('calFew').replace('{n}',C.pts.length))}</span>`:` · <span class="few">${esc(t('calBad'))}</span>`);
   const cb=$('#calChart'),cw=Math.min(600,Math.round(cb.clientWidth||600));cb.innerHTML=calSVG(C,cw,Math.round(cw*.78));
 }
+/* ===== heat map: how warm each topic is, period by period =====
+   heat (0–100) at the end of a period = chance of a right answer, the same number the exam forecast uses:
+   last score × recall + 1/3 × (1 − recall)  (a fully forgotten topic falls to guessing, about 33).
+   It cools when you stop reviewing (recall falls) or score badly, and warms when you review and get things right.
+   Coldest topics first: the ones that need attention are at the top. */
+const HEAT_R={'2w':{n:14,len:1},'1m':{n:30,len:1},'3m':{n:13,len:7},'6m':{n:26,len:7},'1y':{n:12,len:30}};
+let heatRange=(()=>{try{const v=localStorage.getItem(STORE+'-heatr');return HEAT_R[v]?v:'3m'}catch(e){return '3m'}})();
+function heatAt(i,d){const m=srModel(i,d);if(!m.reps.length)return null;const R=m.R,sc=m.reps[m.reps.length-1].p;return {heat:Math.round(100*pRight(sc,R)),R,score:sc}}
+function heatData(range){
+  const H=HEAT_R[range||heatRange],today=todayISO(),ends=Array.from({length:H.n},(_,k)=>addDays(today,-(H.n-1-k)*H.len));
+  const rows=TOPICS.map((x,i)=>({i,cells:ends.map(d=>heatAt(i,d))}));
+  const last=r=>{for(let k=r.cells.length-1;k>=0;k--)if(r.cells[k])return r.cells[k].heat;return Infinity};
+  rows.sort((a,b)=>last(a)-last(b)||TOPICS[b.i].q-TOPICS[a.i].q);
+  return {ends,rows,len:H.len};
+}
+/* colors spread over the range that matters (≤ 50 cold blue … ≥ 95 hot red) so 80 vs 95 is clearly different */
+const HEAT_STOPS=[[0,[47,75,216]],[50,[47,75,216]],[62,[125,147,232]],[72,[160,143,208]],[82,[224,138,134]],[95,[242,57,44]],[100,[242,57,44]]];
+function heatColor(v){let a=HEAT_STOPS[0],b=HEAT_STOPS[HEAT_STOPS.length-1];for(let k=0;k<HEAT_STOPS.length-1;k++)if(v>=HEAT_STOPS[k][0]&&v<=HEAT_STOPS[k+1][0]){a=HEAT_STOPS[k];b=HEAT_STOPS[k+1];break}
+  const f=b[0]===a[0]?0:(v-a[0])/(b[0]-a[0]),c=a[1].map((x,j)=>Math.round(x+(b[1][j]-x)*f));return `rgb(${c.join(',')})`}
+/* monthly squares (30 days) are labelled by the month they start in, so two periods never show the same month */
+function heatLabel(d,len){const df=new Intl.DateTimeFormat(LOCALE[lang],len===30?{month:'short'}:len===7?{month:'short',day:'numeric'}:{day:'numeric'});return df.format(parse(len===30?addDays(d,-(len-1)):d))}
+function renderHeat(){
+  const box=$('#heatGrid');if(!box)return;
+  document.querySelectorAll('[data-heatr] button').forEach(b=>b.classList.toggle('on',b.dataset.hr===heatRange));
+  const {ends,rows,len}=heatData(),n=ends.length,cw=(box.clientWidth||900)-(phoneMQ.matches?118:230),showNum=cw/n>=26;
+  const step=n<=14?(cw/n<22?2:1):n<=13?1:n<=26?(cw/n<30?2:1):1,head=ends.map((d,k)=>`<span class="hmh">${(n-1-k)%step===0?esc(heatLabel(d,len)):''}</span>`).join('');
+  box.style.setProperty('--hn',n);
+  box.innerHTML=`<div class="hmrow hmhead"><span class="hmn"></span>${head}</div>`+rows.map(r=>`<div class="hmrow"><span class="hmn" title="${esc(TOPICS[r.i].name)}">${esc(TOPICS[r.i].name)}</span>${r.cells.map((c,k)=>c?`<span class="hmc" data-hi="${r.i}" data-hk="${k}" style="background:${heatColor(c.heat)};color:${c.heat>=88||c.heat<=56?'#fff':'#15181c'}">${showNum?c.heat:''}</span>`:`<span class="hmc empty" data-hi="${r.i}" data-hk="${k}"></span>`).join('')}</div>`).join('');
+  box._data={ends,rows,len};
+}
+function heatTip(e,cell){
+  const D=$('#heatGrid')._data;if(!D)return;const i=+cell.dataset.hi,k=+cell.dataset.hk,row=D.rows.find(r=>r.i===i),c=row.cells[k],prev=k?row.cells[k-1]:null;
+  const df=new Intl.DateTimeFormat(LOCALE[lang],{month:'short',day:'numeric'}),end=D.ends[k],start=addDays(end,-(D.len-1));
+  const period=D.len===1?df.format(parse(end)):`${df.format(parse(start))} – ${df.format(parse(end))}`;
+  let html=`<div class="ctd">${esc(TOPICS[i].name)} · ${esc(period)}</div>`;
+  if(!c)html+=`<span class="muted">${esc(t('noHist'))}</span>`;
+  else{html+=`<span><i style="background:${heatColor(c.heat)}"></i>${esc(t('heatWord'))} <b>${c.heat}</b></span><span>${esc(t('lgRecall'))} <b>${pct(c.R)}</b> · ${esc(t('lastScore'))} <b>${c.score}%</b></span>`;
+    if(prev){const dv=c.heat-prev.heat;html+=`<span class="${dv>0?'warm':dv<0?'cool':''}">${dv>0?'▲ +'+dv+' '+esc(t('heatWarm')):dv<0?'▼ '+dv+' '+esc(t('heatCool')):'= '+esc(t('heatSame'))}</span>`}}
+  document.querySelectorAll('#heatGrid .hmc.hovon').forEach(x=>x.classList.remove('hovon'));cell.classList.add('hovon');
+  ctip.innerHTML=html;ctip.hidden=false;
+  const r=ctip.getBoundingClientRect(),touch=e.pointerType==='touch';let x=touch?e.clientX-r.width/2:e.clientX+14,y=e.clientY-r.height-(touch?40:12);
+  x=Math.max(8,Math.min(innerWidth-r.width-8,x));if(y<8)y=e.clientY+20;ctip.style.left=x+'px';ctip.style.top=y+'px';
+}
+document.addEventListener('mousemove',e=>{if(!HOVER_OK.matches)return;const c=e.target.closest&&e.target.closest('#heatGrid .hmc');if(c)heatTip(e,c);else if(document.querySelector('#heatGrid .hmc.hovon')){document.querySelectorAll('#heatGrid .hmc.hovon').forEach(x=>x.classList.remove('hovon'));if(!e.target.closest('svg[data-hmode]'))ctip.hidden=true}},{passive:true});
+document.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch')return;const c=e.target.closest&&e.target.closest('#heatGrid .hmc');if(c)heatTip(e,c);else document.querySelectorAll('#heatGrid .hmc.hovon').forEach(x=>x.classList.remove('hovon'))},{passive:true});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-heatr] button');if(!b)return;heatRange=b.dataset.hr;try{localStorage.setItem(STORE+'-heatr',heatRange)}catch(x){}renderHeat()});
+
 /* histogram: 5-point bins of practice-test scores */
 function distStats(sc){const v=sc.map(x=>x.score),n=v.length;if(!n)return {mean:0,sd:0,min:0,max:0};const m=v.reduce((a,x)=>a+x,0)/n;
   return {mean:m,sd:n>1?Math.sqrt(v.reduce((a,x)=>a+(x-m)**2,0)/(n-1)):0,min:Math.min(...v),max:Math.max(...v)}}
@@ -2116,7 +2194,7 @@ function renderFcFull(){
 }
 function calSVG(C,w,h){
   if(C.pts.length<1)return `<div class="empty">${esc(t('tsNone'))}</div>`;
-  const vals=C.pts.flat(),lo=Math.max(0,Math.floor((Math.min(...vals)-8)/10)*10),L=40,R=18,T=12,B=26,pw=w-L-R,ph=h-T-B;
+  const lo=0,L=40,R=18,T=12,B=26,pw=w-L-R,ph=h-T-B;
   const X=v=>L+(v-lo)/(100-lo)*pw,Y=v=>T+(1-(v-lo)/(100-lo))*ph,f=n=>n.toFixed(1);let g='';
   [lo,(lo+100)/2,100].forEach(v=>g+=`<line class="cg" x1="${L}" x2="${w-R}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="cy" x="${L-5}" y="${f(Y(v)+3.5)}" text-anchor="end">${Math.round(v)}%</text><text class="cx" x="${f(Math.min(X(v),w-R-12))}" y="${h-8}" text-anchor="middle">${Math.round(v)}%</text>`);
   g+=`<line class="s-diag" x1="${f(X(lo))}" y1="${f(Y(lo))}" x2="${f(X(100))}" y2="${f(Y(100))}"/>`;
@@ -2178,10 +2256,10 @@ function hoverShow(svg,e){
 }
 let touchSvg=null;
 document.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'&&e.pointerType!=='pen')return;const svg=e.target.closest&&e.target.closest('svg[data-hmode]');
-  if(!svg){if(!ctip.hidden)hoverClear();touchSvg=null;return}touchSvg=svg;hoverShow(svg,e)},{passive:true});
+  if(!svg){if(!ctip.hidden&&!(e.target.closest&&e.target.closest('#heatGrid .hmc')))hoverClear();touchSvg=null;return}touchSvg=svg;hoverShow(svg,e)},{passive:true});
 document.addEventListener('pointermove',e=>{if((e.pointerType==='touch'||e.pointerType==='pen')&&touchSvg&&e.buttons)hoverShow(touchSvg,e)},{passive:true});
 document.addEventListener('pointercancel',e=>{if(e.pointerType==='touch'){touchSvg=null;hoverClear()}});
-document.addEventListener('mousemove',e=>{if(!HOVER_OK.matches)return;const svg=e.target.closest&&e.target.closest('svg[data-hmode]');if(!svg){if(!ctip.hidden)hoverClear();return}hoverShow(svg,e)},{passive:true});
+document.addEventListener('mousemove',e=>{if(!HOVER_OK.matches)return;const svg=e.target.closest&&e.target.closest('svg[data-hmode]');if(!svg){if(!ctip.hidden&&!(e.target.closest&&e.target.closest('#heatGrid .hmc')))hoverClear();return}hoverShow(svg,e)},{passive:true});
 document.addEventListener('mouseleave',()=>hoverClear());
 window.addEventListener('scroll',()=>{if(!ctip.hidden)hoverClear()},{passive:true});
 
@@ -2405,6 +2483,14 @@ function selfTest(){
     ok('Plan day','yesterday’s choices do not carry over',(()=>{fixture([]);state.plan={date:D(1),energy:'low',test:true};const r=planDay().energy==='medium'&&!planDay().test;state.plan=null;return r})());
     fixture([{date:D(1),topic:1,kind:'study',score:70}],{settings:{minutes:180,qph:40,testEvery:7},tests:[{id:'a',date:D(3),q:60,score:75}]});
     ok('Cadence','recall 75–85% alone no longer brings a test forward (threshold 75%)',(()=>{const w=testWhy();return w.reason!=='testRecall'||wavg(srAll(T,true))<.75})());
+    /* --- heat map --- */
+    fixture([{date:D(10),topic:5,kind:'study',score:80}]);
+    {const h=heatAt(5,T),m=srModel(5,T);ok('Heat map','heat = chance of a right answer = score × recall + 1/3 × (1 − recall)',h&&h.heat===Math.round(100*(.8*m.R+(1-m.R)/3)),h)}
+    ok('Heat map','a forgotten topic never goes below guessing (≈ 33)',Math.round(100*pRight(90,0))===33)
+    ok('Heat map','no history → no heat',heatAt(6,T)===null);
+    {const a=heatAt(5,D(9)),b=heatAt(5,T);ok('Heat map','without reviews the topic cools over time',a.heat>b.heat,[a.heat,b.heat])}
+    {const d=heatData('3m');ok('Heat map','3M = 13 weekly periods ending today; all 26 topics, coldest first, no history last',d.ends.length===13&&d.ends[12]===T&&d.rows.length===26&&d.rows[0].i===5&&d.rows[25].cells.every(c=>c===null))}
+    ok('Heat map','colors go from cold blue to hot red',heatColor(0)==='rgb(47,75,216)'&&heatColor(100)==='rgb(242,57,44)');
     /* --- practice tests in volume and plan --- */
     fixture([],{tests:[{id:'a',date:T,q:40,score:80},{id:'b',date:T,q:60,score:null}]});ok('Volume','a scored practice test always adds 60 questions; in progress adds 0',weeklyVolume(12).at(-1).q===60);
     fixture([],{settings:{minutes:180,qph:40,testEvery:0}});ok('Cadence','every 0 days = off',!testWhy().due&&!buildPlan().items.some(x=>x.kind==='test'));
