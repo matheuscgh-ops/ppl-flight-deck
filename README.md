@@ -14,7 +14,7 @@ The app follows the 26 topics of the Sporty's question bank (1,058 questions). I
 | | When | What it does |
 |---|---|---|
 | **Dashboard (Kanban)** | Every day — it drives your decisions | One card per topic. Drag cards from *To Do* → *Doing* → *Not Comfortable* / *Very Comfortable* / *To Review*, and tap a card to log a session and its score. |
-| **Plan** | When you don't want to decide | Today's list, built from your statistics: topics ordered by **exam-day questions at stake per minute**, sized to your available time and energy (low / medium / high), plus a practice test every N days. |
+| **Plan** | Planning your day or week ahead | A week view of your saved plans and **My plans** (create, view, edit, activate / deactivate, copy to next week, delete). New plans take 4 steps: type (daily / weekly) → **time blocks** (click and drag in 15-minute steps; tap a start and an end on touch; Undo / Redo) → **topics** placed by your statistics (editable, plus your own activities such as *Simulator*) → review and save. **⇄ Sync with Kanban** proposes moving today's topics to *Doing* and applies only the moves you approve. Today's list comes from the active daily plan, else the active weekly plan, else the suggestion (topics ordered by **exam-day questions at stake per minute**, sized to your time and energy). |
 | **Practice tests** | After each FAA practice test (always 60 questions) | Log the score, see the trend line, the date you reach 85% and the next suggested test. |
 | **Statistics** | When you want to analyse | *Question bank*: forecast model, where you lose questions, a *needs recall* carousel, today's heat map (click for its history), study volume and a spaced-repetition curve per topic. *Practice tests*: trend, histogram, test-based forecast and model accuracy. |
 
@@ -28,7 +28,8 @@ One statistics engine feeds every screen, so the dashboard, the plan and the sta
 - **Exam forecast:** the question-bank model blended with your last 3 practice tests. Newer tests weigh more (half-life of 10 days).
 - **Chance to pass / reach 85%:** a beta-binomial over 60 questions, so the uncertainty of the estimate is included.
 - **Trend:** least-squares line over practice-test scores (R² is shown as a tooltip). After the last test the projection slows down instead of running to 100%.
-- **Plan order:** `(1 − p on exam day) × urgency ÷ minutes per question`.
+- **Plan order:** `(1 − p on exam day) × urgency ÷ minutes per question`. Topics you missed in a plan during the last 7 days get a 25% boost.
+- **Filling time blocks:** each continuous block is a knapsack (most exam-day questions protected within its minutes, then the leftover time goes to part of the next topic). Following Cal Newport's deep work, a block holds at most one topic per ~45 minutes, and the hardest or longest-unreviewed topic goes first while you are fresh. A weekly plan fills the days in order and assumes the earlier days were done, so a topic reviewed on Monday is not due again on Tuesday.
 
 The *How it is calculated* sections in the app list every formula.
 
@@ -39,6 +40,7 @@ The *How it is calculated* sections in the app list every formula.
 - Charts with hover: a dashed crosshair to both axes, a dot on each line and the values. On practice tests the cursor snaps to each test. Tap and drag on phones.
 - Range selectors (3D → All) on every chart, with a separate one for all the small topic charts.
 - **Heat map by topic:** one tile per topic for today, coloured cold → hot by the **chance of a right answer** (`score × recall + 1/3 × (1 − recall)`, the same number the forecast uses), coldest first. Click the card for the history (days, weeks or months, with interval filters and hover details).
+- **Plans and weekly review:** planned vs done for the week, missed blocks marked, and a nudge from Friday on to plan next week. A daily plan over an active weekly plan asks before replacing that day; a second weekly plan for the same week asks before replacing the week.
 - **Carousels:** every 3 s the dashboard preview and the *Needs recall* card on Statistics move through the topics left in today's plan (most urgent first). They pause on hover.
 - **Study volume** is always open on Statistics, and in a dialog from the dashboard.
 - All percentage charts use the same full 0–100% scale.

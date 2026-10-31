@@ -4051,6 +4051,8 @@ svg[data-hmode] {
 /* compact heat map: today only, one tile per topic */
 #heatPanel {
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
 }
 #heatPanel:hover {
   border-color: var(--line2);
@@ -4062,8 +4064,10 @@ svg[data-hmode] {
 .heatnow {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  grid-auto-rows: minmax(44px, 1fr);
   gap: 4px;
   margin-top: 12px;
+  flex: 1;
 }
 .hnt {
   display: flex;
@@ -4071,7 +4075,7 @@ svg[data-hmode] {
   justify-content: center;
   gap: 1px;
   min-width: 0;
-  height: 44px;
+  min-height: 44px;
   padding: 3px 8px;
   border-radius: 5px;
   transition: transform 0.08s;
@@ -4129,8 +4133,11 @@ svg[data-hmode] {
     grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
     gap: 3px;
   }
+  .heatnow {
+    grid-auto-rows: 40px;
+  }
   .hnt {
-    height: 40px;
+    min-height: 40px;
     padding: 3px 6px;
   }
   #heatbg {
@@ -4144,6 +4151,859 @@ svg[data-hmode] {
   }
   .heatmodal .heatrange {
     max-width: none;
+  }
+}
+
+/* ===== saved plans: week view, My plans, plan wizard ===== */
+.rchip.custom {
+  background: #2b3036;
+  color: #d5dbe2;
+}
+.qtime {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--muted);
+  margin-right: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.pn .qtime {
+  display: block;
+  margin: 0 0 1px;
+}
+.enpill.fromplan {
+  background: #1f3350;
+  color: #9cc3ff;
+}
+button.pck {
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+}
+button.pck:hover {
+  border-color: #4bce97;
+}
+.pitem2.missed .pn {
+  color: #ff9c95;
+}
+
+/* Plan tab card */
+.planweek {
+  padding: 18px 20px;
+}
+.pwhead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.pwbtns {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.pwtabs {
+  margin: 0;
+  min-width: 220px;
+}
+.pwnav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 8px;
+  flex-wrap: wrap;
+}
+.pwnav b {
+  min-width: 130px;
+  text-align: center;
+  font-size: 14px;
+}
+.pwnav button {
+  padding: 4px 10px;
+}
+.pwstats {
+  margin-left: auto;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-weight: 650;
+}
+.pwstats b {
+  color: var(--ink);
+}
+.pwstats .miss {
+  color: #ff9c95;
+  font-weight: 800;
+}
+.pwnudge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #9cc3ff;
+  background: #16263d;
+  border: 1px solid #284a78;
+  border-radius: 8px;
+  padding: 7px 10px;
+  margin-bottom: 8px;
+}
+.pwnudge[hidden] {
+  display: none;
+}
+.pwempty {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 650;
+  padding: 10px 2px;
+}
+.pwlegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: var(--muted);
+  font-weight: 700;
+}
+.pwlegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.pwlegend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+/* week grid */
+.wk {
+  --rowh: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #121519;
+}
+.wk.select {
+  --rowh: 16px;
+}
+.wkhead,
+.wkbody {
+  display: grid;
+  grid-template-columns: 46px repeat(var(--days), minmax(0, 1fr));
+}
+.wkhead {
+  border-bottom: 1px solid var(--line);
+  background: #171a1f;
+}
+.wkd {
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+  padding: 6px 2px;
+  border-left: 1px solid var(--line);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wkd small {
+  display: block;
+  font-size: 10.5px;
+  color: var(--muted);
+  font-weight: 700;
+  min-height: 13px;
+}
+.wkd.today {
+  color: #579dff;
+}
+.wkd.past {
+  color: var(--muted);
+}
+.wkscroll {
+  max-height: 520px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.wk.select .wkscroll {
+  max-height: min(56dvh, 560px);
+}
+.wktimes {
+  position: relative;
+}
+.wkh {
+  position: absolute;
+  right: 6px;
+  transform: translateY(-1px);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.wkcol {
+  position: relative;
+  border-left: 1px solid var(--line);
+  min-width: 0;
+}
+.wkcol.today {
+  background: #579dff0a;
+}
+.wkcol.past {
+  background: repeating-linear-gradient(135deg, #ffffff05 0 6px, transparent 6px 12px);
+}
+.wkline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px solid #ffffff0d;
+}
+.wkblk {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  background: #579dff1f;
+  border: 1px dashed #579dff66;
+  border-radius: 6px;
+}
+.wknow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 2px solid #ff5d4f;
+  z-index: 3;
+}
+.wkdaily {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  font-style: normal;
+  font-size: 9.5px;
+  font-weight: 900;
+  color: #15181c;
+  background: #ffd08a;
+  border-radius: 4px;
+  padding: 0 4px;
+  z-index: 4;
+}
+b.wkdaily {
+  position: static;
+}
+.wki {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 0;
+  border-left: 3px solid currentColor;
+  text-align: left;
+  overflow: hidden;
+  cursor: pointer;
+  font: inherit;
+  min-height: 0;
+}
+.wki b {
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  color: var(--ink);
+}
+.wki span {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink2);
+  white-space: nowrap;
+}
+.wki.tiny span {
+  display: none;
+}
+.wki:hover {
+  filter: brightness(1.2);
+}
+.wki.done {
+  opacity: 0.55;
+}
+.wki.missed {
+  outline: 1px dashed #ff9c95;
+  outline-offset: -1px;
+}
+.r-due {
+  background: #4d2222;
+  color: #ff9c95;
+}
+.r-weak {
+  background: #4a3913;
+  color: #f8c96a;
+}
+.r-new {
+  background: #1f3350;
+  color: #9cc3ff;
+}
+.r-test {
+  background: #3d2b14;
+  color: #ffd08a;
+}
+.r-nodata {
+  background: #2f2a45;
+  color: #c3b6ff;
+}
+.r-light {
+  background: #1d4835;
+  color: #7ee2b3;
+}
+.r-custom,
+.r-extra {
+  background: #2b3036;
+  color: #d5dbe2;
+}
+.pwlegend i.r-due,
+.pwlegend i.r-weak,
+.pwlegend i.r-new,
+.pwlegend i.r-test,
+.pwlegend i.r-nodata {
+  border-left: 3px solid currentColor;
+}
+
+/* time-block selection */
+.wk.select .wkcol {
+  display: grid;
+  grid-template-rows: repeat(72, var(--rowh));
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.wks {
+  border-top: 1px solid #ffffff08;
+  cursor: crosshair;
+}
+.wks.hr {
+  border-top-color: #ffffff1c;
+}
+.wks.on {
+  background: #579dff;
+  border-top-color: #579dff;
+}
+.wks.anchor {
+  background: #ffd08a;
+  box-shadow: inset 0 0 0 2px #fff;
+}
+.wkcol.past .wks {
+  cursor: not-allowed;
+}
+.wkstrip {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  margin: 0 0 8px;
+}
+.wkstrip button {
+  flex: 1 0 auto;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.wkstrip button.on {
+  background: #579dff;
+  color: #0d0f12;
+  border-color: #579dff;
+}
+.wkstrip button.today:not(.on) {
+  color: #579dff;
+}
+
+/* My plans */
+.pwrow {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr) 70px auto;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+}
+.pwtype {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.pwtype.weekly {
+  color: #9cc3ff;
+}
+.pwtype.daily {
+  color: #ffd08a;
+}
+.pwname {
+  font-weight: 800;
+  font-size: 14px;
+  min-width: 0;
+}
+.pwname small {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 650;
+}
+.pwstat {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--muted);
+}
+.pwrow.on .pwstat {
+  color: #4bce97;
+}
+.pwacts {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.pwacts button {
+  padding: 4px 9px;
+  font-size: 12px;
+}
+.pwacts .danger {
+  color: #ff9c95;
+}
+
+/* wizard */
+.modal.wizard {
+  width: min(1180px, 100%);
+  max-height: calc(100dvh - 24px);
+  display: flex;
+  flex-direction: column;
+  padding: 18px 20px 14px;
+}
+.wzsteps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 750;
+  color: var(--muted);
+}
+.wzsteps span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.wzsteps b {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  background: #2a3038;
+  font-size: 11px;
+}
+.wzsteps .on {
+  color: var(--ink);
+}
+.wzsteps .on b {
+  background: #579dff;
+  color: #0d0f12;
+}
+.wzsteps .past b {
+  background: #1d4835;
+  color: #7ee2b3;
+}
+.wzsteps i {
+  width: 16px;
+  border-top: 1px solid var(--line2);
+}
+.wzbody {
+  flex: 1;
+  overflow: auto;
+  margin: 12px 0;
+  min-height: 0;
+}
+.wzfoot {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.wzfoot span {
+  flex: 1;
+}
+.wzfoot [hidden] {
+  display: none;
+}
+.wztypes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.wztype {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 16px;
+  border-radius: 12px;
+  text-align: left;
+}
+.wztype b {
+  font-size: 16px;
+}
+.wztype span {
+  font-size: 12.5px;
+  color: var(--muted);
+  font-weight: 650;
+}
+.wztype.on {
+  border-color: #4bce97;
+  background: #1d3529;
+}
+.wzfields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+.wzweek {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.wzweek b {
+  flex: 1;
+  text-align: center;
+}
+.wztip,
+.wzhint {
+  font-size: 12.5px;
+  color: var(--muted);
+  font-weight: 650;
+  margin: 10px 0;
+}
+.wzhint {
+  margin-top: 0;
+}
+.wztools {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.wztools button {
+  padding: 5px 10px;
+  font-size: 12.5px;
+}
+.wztotal {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 700;
+}
+.wztotal b {
+  color: var(--ink);
+}
+.wztips {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #f8c96a;
+  font-weight: 700;
+}
+.wzday {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+.wzdh {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.wzdh > span {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+}
+.wzen {
+  margin: 0 0 0 auto;
+  min-width: 230px;
+}
+.wzen button {
+  font-size: 12px;
+}
+.wzblk {
+  border-left: 2px dashed #579dff66;
+  padding-left: 10px;
+  margin: 6px 0;
+}
+.wzbh {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #9cc3ff;
+  margin-bottom: 4px;
+}
+.wzit {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+  padding: 5px 8px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  border-left: 3px solid currentColor;
+}
+.wzit .wzt {
+  font-size: 11.5px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.wzn {
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 13px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wzn small {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink2);
+}
+.wzq {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.wzacts {
+  display: flex;
+  gap: 4px;
+}
+.wzacts button {
+  padding: 2px 8px;
+  font-size: 12px;
+}
+.wzit.edit {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr) 72px auto auto auto;
+  background: #20252b;
+  color: var(--ink2);
+  border-left-color: #579dff;
+}
+.wzit.edit[data-kind='q'] [data-f='label'],
+.wzit.edit[data-kind='t'] [data-f='label'] {
+  visibility: hidden;
+}
+.wzit.edit[data-kind='t'] [data-f='n'] {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.wzit.edit select,
+.wzit.edit input {
+  min-width: 0;
+  padding: 5px 8px;
+  font-size: 13px;
+}
+.wzunit {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--muted);
+}
+.wzfree {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+  padding: 2px 0 2px 8px;
+}
+.wzfree button {
+  padding: 2px 9px;
+  font-size: 12px;
+}
+.wzfree.over {
+  color: #ff9c95;
+}
+.wzsum {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.wzsum div {
+  display: flex;
+  flex-direction: column;
+}
+.wzsum b {
+  font-size: 20px;
+  font-weight: 900;
+}
+.wzsum span {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+}
+.askbg {
+  z-index: 9700;
+}
+.asksheet p {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0 0 14px;
+}
+
+@media (max-width: 640px) {
+  .planweek {
+    padding: 14px;
+  }
+  .pwbtns {
+    width: 100%;
+  }
+  .pwtabs {
+    flex: 1;
+    min-width: 0;
+  }
+  .pwstats {
+    margin-left: 0;
+    width: 100%;
+  }
+  .wk {
+    --rowh: 14px;
+  }
+  .wk.select {
+    --rowh: 22px;
+  }
+  .pwrow {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .pwrow .pwtype {
+    grid-column: 1 / -1;
+  }
+  .pwacts {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+  #wizbg {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .modal.wizard {
+    width: 100%;
+    max-height: 94dvh;
+    border-radius: 18px 18px 0 0;
+    padding: 14px;
+  }
+  .wztypes,
+  .wzfields {
+    grid-template-columns: 1fr;
+  }
+  .wzen {
+    margin-left: 0;
+    min-width: 0;
+    width: 100%;
+  }
+  .wzit {
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+  }
+  .wzit .wzacts {
+    grid-column: 2 / -1;
+    justify-content: flex-end;
+  }
+  .wzit.edit {
+    grid-template-columns: minmax(0, 1fr) 64px auto auto auto;
+  }
+  .wzit.edit [data-f='label'] {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .wzit.edit[data-kind='q'] [data-f='label'],
+  .wzit.edit[data-kind='t'] [data-f='label'] {
+    display: none;
+  }
+  .wzfoot {
+    flex-wrap: wrap;
+  }
+  .wzfoot #wzSaveOff {
+    order: 5;
+    width: 100%;
+  }
+}
+
+/* sync with Kanban */
+.modal.kbsheet {
+  width: min(560px, 100%);
+}
+#kbList {
+  margin: 10px 0 14px;
+  max-height: 50dvh;
+  overflow: auto;
+}
+.kbrow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 2px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+}
+.kbrow input {
+  width: 18px;
+  height: 18px;
+  accent-color: #4bce97;
+}
+.kbn {
+  font-weight: 800;
+  font-size: 13.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kbmv {
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+#kbOk:disabled {
+  opacity: 0.45;
+}
+@media (max-width: 640px) {
+  .pwbtns {
+    flex-wrap: wrap;
+  }
+  .pwbtns .pwtabs {
+    flex: 1 1 100%;
+  }
+  .pwbtns #kbSync,
+  .pwbtns #pwNew {
+    flex: 1;
+  }
+  .kbrow {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .kbmv {
+    grid-column: 2;
   }
 }
 </style>
@@ -4247,6 +5107,18 @@ svg[data-hmode] {
     </div>
   </div>
   <div class="view" id="viewPlan" hidden>
+    <section class="panel planweek" id="planWeek">
+      <div class="pwhead"><div><h2 class="section" data-t="pwTitle"></h2><div class="muted" id="pwSource"></div></div>
+        <div class="pwbtns"><div class="seg pwtabs" id="pwTabs"><button type="button" data-pw="week" data-t="pwWeek"></button><button type="button" data-pw="plans" data-t="pwPlans"></button></div><button type="button" id="kbSync" data-t="kbSync"></button><button type="button" class="primary" id="pwNew" data-t="pwNew"></button></div></div>
+      <div id="pwWeekBox">
+        <div class="pwnav"><button type="button" id="pwPrev" aria-label="Previous week">‹</button><b id="pwRange"></b><button type="button" id="pwNext" aria-label="Next week">›</button><button type="button" id="pwToday" data-t="today"></button><span class="pwstats" id="pwStats"></span></div>
+        <div class="pwnudge" id="pwNudge" hidden></div>
+        <div id="pwStrip"></div>
+        <div id="pwGrid"></div>
+        <div class="pwlegend" id="pwLegend"></div>
+      </div>
+      <div id="pwPlansBox" hidden><div id="pwList"></div></div>
+    </section>
     <section class="panel planhero">
       <div class="srhead"><div><h2 class="section" data-t="planTitle"></h2><div class="muted" id="planSub"></div></div><div class="srkpis" id="planKpis"></div></div>
       <div class="energy" id="energyPick" role="tablist"></div>
@@ -4418,6 +5290,27 @@ svg[data-hmode] {
   <div class="modal daysheet" role="dialog" aria-modal="true" aria-labelledby="dayTitle">
     <div class="mhead"><div><h3 id="dayTitle"></h3><div class="muted" id="daySub"></div></div><button class="x" id="dayClose" aria-label="Close">×</button></div>
     <div id="dayBody"></div>
+  </div>
+</div>
+<div class="modalbg" id="wizbg" hidden>
+  <div class="modal wizard" role="dialog" aria-modal="true" aria-labelledby="wzTitle">
+    <div class="mhead"><div><h3 id="wzTitle"></h3><div class="wzsteps" id="wzSteps"></div></div><button class="x" id="wzClose" aria-label="Close">×</button></div>
+    <div class="wzbody" id="wzBody"></div>
+    <div class="wzfoot"><button type="button" id="wzBack"></button><span></span><button type="button" id="wzSaveOff"></button><button type="button" class="primary" id="wzNext"></button></div>
+    <datalist id="wzPresets"></datalist>
+  </div>
+</div>
+<div class="modalbg" id="kbbg" hidden>
+  <div class="modal kbsheet" role="dialog" aria-modal="true" aria-labelledby="kbTitle">
+    <div class="mhead"><div><h3 id="kbTitle" data-t="kbTitle"></h3><div class="muted" id="kbSub"></div></div><button class="x" id="kbClose" aria-label="Close">×</button></div>
+    <div id="kbList"></div>
+    <div class="mbtns"><button type="button" id="kbCancel" data-t="cancel"></button><button type="button" class="primary" id="kbOk"></button></div>
+  </div>
+</div>
+<div class="modalbg askbg" id="askbg" hidden>
+  <div class="modal asksheet" role="alertdialog" aria-modal="true" aria-labelledby="askText">
+    <p id="askText"></p>
+    <div class="mbtns"><button type="button" id="askNo" data-t="cancel"></button><button type="button" class="primary" id="askYes"></button></div>
   </div>
 </div>
 <div class="modalbg" id="heatbg" hidden>
@@ -5591,7 +6484,7 @@ const Translations = (() => {
     scTitle: 'Needs recall',
     scSub: "Today's plan topics, most urgent first · changes every 3 s",
     scNone: 'Nothing to recall today: no topic with a memory curve is left in the plan.',
-    scFallback: 'Lowest recall first (nothing left in today\'s plan)',
+    scFallback: "Lowest recall first (nothing left in today's plan)",
   });
   Object.assign(I18N.pt, {
     heatNowSub: 'Chance de acertar cada tópico hoje (mais frios primeiro) · clique para ver o histórico',
@@ -5610,6 +6503,301 @@ const Translations = (() => {
     scSub: '今日のプランのトピック（緊急度順）· 3秒ごとに切替',
     scNone: '今日復習するものはありません。',
     scFallback: '記憶率の低い順（今日のプランは完了）',
+  });
+  Object.assign(I18N.en, {
+    pwTitle: 'Plans',
+    pwWeek: 'Week',
+    pwPlans: 'My plans',
+    pwNew: '+ New plan',
+    pwFrom: 'Today from: {s} “{n}”',
+    pwFromSuggested: 'Today from: suggestion (no active plan)',
+    srcDaily: 'Daily plan',
+    srcWeekly: 'Weekly plan',
+    pwWeekOf: 'Week of {d}',
+    pwEmptyWeek: 'Nothing planned this week. Create a plan to block your study time.',
+    pwMissed: 'missed',
+    pwDailyDay: 'day from a daily plan',
+    pDaily: 'Daily',
+    pWeekly: 'Weekly',
+    pDailyLong: 'Daily plan',
+    pWeeklyLong: 'Weekly plan',
+    pwTopics: '{n} topics',
+    pwActive: 'Active',
+    pwInactive: 'Off',
+    pwView: 'View',
+    pwEdit: 'Edit',
+    pwActivate: 'Activate',
+    pwDeactivate: 'Deactivate',
+    pwCopy: 'Copy to next week',
+    pwNoPlans: 'No plans yet. Create one with “+ New plan”.',
+    pwPlanned: 'Planned',
+    pwNudge: 'Weekly planning: next week has no plan yet. Decide now when the important study happens.',
+    pwNudgeBtn: 'Plan next week',
+    askReplaceDaily: 'A daily plan (“{n}”) is already active for {d}. Replace it?',
+    askReplaceWeek: 'A weekly plan (“{n}”) is already active for {d}. Replace the week?',
+    askReplaceDayBtn: 'Replace {d}',
+    askReplaceWeekBtn: 'Replace the week',
+    askOverWeekly: 'A weekly plan is active for {w}. Replace only {d} with this daily plan?',
+    planSavedOn: 'Plan saved and active',
+    planSaved: 'Plan saved (not active)',
+    planOn: 'Plan activated',
+    planOff: 'Plan deactivated',
+    planDeleted: 'Deleted “{n}”',
+    wzType: 'Type',
+    wzBlocks: 'Time blocks',
+    wzTopics: 'Topics',
+    wzReview: 'Review',
+    wzViewTitle: 'Plan',
+    wzEditTitle: 'Edit plan',
+    wzNewTitle: 'New plan',
+    wzDailyHint: 'One date: block the hours of a single day',
+    wzWeeklyHint: 'One week, Monday to Sunday',
+    wzWeek: 'Week',
+    wzName: 'Name',
+    wzNameHint: 'optional',
+    wzTipDeep:
+      'Deep work: blocks of 45–90 minutes without distractions work best. Start smaller after a tiring period and grow gradually.',
+    wzTipLong: '{d} {t}: over 2 hours in one go — consider a break in the middle.',
+    wzTipShort: '{d} {t}: under 30 minutes — short blocks leave little room for deep focus.',
+    redo: 'Redo',
+    wzClear: 'Clear {d}',
+    wzCopyDay: 'Copy {d} to the other days',
+    wzTotal: 'Total',
+    wzHintTouch:
+      'Tap a start block, then tap an end block in the same day (15-minute steps). Tap a selected block twice to remove it.',
+    wzHintMouse:
+      'Click and drag down a day to block time (15-minute steps). Drag over selected time to remove it. The drag stays in the day where it started.',
+    wzNoBlocks: 'No time blocked on today or later days. Go back and select some time.',
+    wzResuggest: 'Suggest again',
+    wzPlanned: 'Planned',
+    wzBlocked: 'blocked',
+    wzPlannedLow: 'planned',
+    wzGoal: 'goal ≥ 85% and review every miss',
+    wzUp: 'Move up',
+    wzFree: '{m} free',
+    wzAdd: 'add',
+    wzOver: '{m} over the block',
+    wzNothingFits: 'Nothing suggested here — add a topic or your own activity',
+    wzBack: '← Back',
+    wzSaveOff: 'Save without activating',
+    wzSaveOn: 'Save & activate',
+    wzNext: 'Next →',
+    wzCustom: '✎ Your own activity…',
+    wzCustomHint: 'e.g. Review the material, Simulator',
+    wzCustomDefault: 'Own activity',
+    wzAmount: 'Questions or minutes',
+    wzPresetList: 'Review the material|Simulator|Error analysis|Weekly review|Flashcards',
+    itemChecked: 'Marked done',
+    itemUnchecked: 'Marked not done',
+    itemCheck: 'Mark done',
+    planRestDay: 'Nothing planned for today in your plan.',
+    rs_custom: 'own',
+    reason_custom: 'Added by you',
+    demoPlanName: 'Example week',
+  });
+  Object.assign(I18N.pt, {
+    pwTitle: 'Planos',
+    pwWeek: 'Semana',
+    pwPlans: 'Meus planos',
+    pwNew: '+ Novo plano',
+    pwFrom: 'Hoje vem de: {s} “{n}”',
+    pwFromSuggested: 'Hoje vem da sugestão (nenhum plano ativo)',
+    srcDaily: 'Plano diário',
+    srcWeekly: 'Plano semanal',
+    pwWeekOf: 'Semana de {d}',
+    pwEmptyWeek: 'Nada planejado nesta semana. Crie um plano para reservar seu tempo de estudo.',
+    pwMissed: 'perdido(s)',
+    pwDailyDay: 'dia de um plano diário',
+    pDaily: 'Diário',
+    pWeekly: 'Semanal',
+    pDailyLong: 'Plano diário',
+    pWeeklyLong: 'Plano semanal',
+    pwTopics: '{n} tópicos',
+    pwActive: 'Ativo',
+    pwInactive: 'Inativo',
+    pwView: 'Ver',
+    pwEdit: 'Editar',
+    pwActivate: 'Ativar',
+    pwDeactivate: 'Desativar',
+    pwCopy: 'Copiar para a próxima semana',
+    pwNoPlans: 'Nenhum plano ainda. Crie um em “+ Novo plano”.',
+    pwPlanned: 'Planejado',
+    pwNudge:
+      'Planejamento semanal: a próxima semana ainda não tem plano. Decida agora quando o estudo importante acontece.',
+    pwNudgeBtn: 'Planejar a próxima semana',
+    askReplaceDaily: 'Já existe um plano diário (“{n}”) ativo para {d}. Substituir?',
+    askReplaceWeek: 'Já existe um plano semanal (“{n}”) ativo para {d}. Substituir a semana?',
+    askReplaceDayBtn: 'Substituir {d}',
+    askReplaceWeekBtn: 'Substituir a semana',
+    askOverWeekly: 'Há um plano semanal ativo para {w}. Substituir só {d} por este plano diário?',
+    planSavedOn: 'Plano salvo e ativo',
+    planSaved: 'Plano salvo (inativo)',
+    planOn: 'Plano ativado',
+    planOff: 'Plano desativado',
+    planDeleted: '“{n}” apagado',
+    wzType: 'Tipo',
+    wzBlocks: 'Blocos de tempo',
+    wzTopics: 'Tópicos',
+    wzReview: 'Revisão',
+    wzViewTitle: 'Plano',
+    wzEditTitle: 'Editar plano',
+    wzNewTitle: 'Novo plano',
+    wzDailyHint: 'Uma data: reserve as horas de um único dia',
+    wzWeeklyHint: 'Uma semana, de segunda a domingo',
+    wzWeek: 'Semana',
+    wzName: 'Nome',
+    wzNameHint: 'opcional',
+    wzTipDeep:
+      'Deep work: blocos de 45–90 minutos sem distrações funcionam melhor. Depois de um período cansativo, comece menor e aumente aos poucos.',
+    wzTipLong: '{d} {t}: mais de 2 horas seguidas — considere uma pausa no meio.',
+    wzTipShort: '{d} {t}: menos de 30 minutos — blocos curtos deixam pouco espaço para concentração profunda.',
+    redo: 'Refazer',
+    wzClear: 'Limpar {d}',
+    wzCopyDay: 'Copiar {d} para os outros dias',
+    wzTotal: 'Total',
+    wzHintTouch:
+      'Toque num bloco de início e depois num bloco de fim no mesmo dia (passos de 15 minutos). Toque duas vezes num bloco selecionado para removê-lo.',
+    wzHintMouse:
+      'Clique e arraste para baixo num dia para reservar tempo (passos de 15 minutos). Arraste sobre o tempo selecionado para removê-lo. O arraste fica no dia onde começou.',
+    wzNoBlocks: 'Nenhum tempo reservado hoje ou nos próximos dias. Volte e selecione um horário.',
+    wzResuggest: 'Sugerir de novo',
+    wzPlanned: 'Planejado',
+    wzBlocked: 'reservado',
+    wzPlannedLow: 'planejado',
+    wzGoal: 'meta ≥ 85% e revisar cada erro',
+    wzUp: 'Subir',
+    wzFree: '{m} livre',
+    wzAdd: 'adicionar',
+    wzOver: '{m} além do bloco',
+    wzNothingFits: 'Nada sugerido aqui — adicione um tópico ou uma atividade sua',
+    wzBack: '← Voltar',
+    wzSaveOff: 'Salvar sem ativar',
+    wzSaveOn: 'Salvar e ativar',
+    wzNext: 'Próximo →',
+    wzCustom: '✎ Atividade sua…',
+    wzCustomHint: 'ex.: Revisar o material, Simulador',
+    wzCustomDefault: 'Atividade própria',
+    wzAmount: 'Questões ou minutos',
+    wzPresetList: 'Revisar o material|Simulador|Análise dos erros|Revisão semanal|Flashcards',
+    itemChecked: 'Marcado como feito',
+    itemUnchecked: 'Desmarcado',
+    itemCheck: 'Marcar como feito',
+    planRestDay: 'Nada planejado para hoje no seu plano.',
+    rs_custom: 'próprio',
+    reason_custom: 'Adicionado por você',
+    demoPlanName: 'Semana de exemplo',
+  });
+  Object.assign(I18N.ja, {
+    pwTitle: 'プラン',
+    pwWeek: '週',
+    pwPlans: 'マイプラン',
+    pwNew: '+ 新しいプラン',
+    pwFrom: '今日の出典：{s}「{n}」',
+    pwFromSuggested: '今日の出典：提案（有効なプランなし）',
+    srcDaily: '日プラン',
+    srcWeekly: '週プラン',
+    pwWeekOf: '{d}の週',
+    pwEmptyWeek: '今週の予定はありません。プランを作って勉強時間を確保しましょう。',
+    pwMissed: '未実施',
+    pwDailyDay: '日プランの日',
+    pDaily: '日',
+    pWeekly: '週',
+    pDailyLong: '日プラン',
+    pWeeklyLong: '週プラン',
+    pwTopics: '{n}トピック',
+    pwActive: '有効',
+    pwInactive: '無効',
+    pwView: '表示',
+    pwEdit: '編集',
+    pwActivate: '有効にする',
+    pwDeactivate: '無効にする',
+    pwCopy: '翌週にコピー',
+    pwNoPlans: 'プランはまだありません。「+ 新しいプラン」で作成できます。',
+    pwPlanned: '予定',
+    pwNudge: '週の計画：来週のプランがまだありません。大事な勉強をいつするか今決めましょう。',
+    pwNudgeBtn: '来週を計画',
+    askReplaceDaily: '{d}には日プラン「{n}」が有効です。置き換えますか？',
+    askReplaceWeek: '{d}には週プラン「{n}」が有効です。週を置き換えますか？',
+    askReplaceDayBtn: '{d}を置き換え',
+    askReplaceWeekBtn: '週を置き換え',
+    askOverWeekly: '{w}に週プランが有効です。{d}だけこの日プランに置き換えますか？',
+    planSavedOn: 'プランを保存して有効化',
+    planSaved: 'プランを保存（無効）',
+    planOn: 'プランを有効化',
+    planOff: 'プランを無効化',
+    planDeleted: '「{n}」を削除',
+    wzType: '種類',
+    wzBlocks: '時間ブロック',
+    wzTopics: 'トピック',
+    wzReview: '確認',
+    wzViewTitle: 'プラン',
+    wzEditTitle: 'プランを編集',
+    wzNewTitle: '新しいプラン',
+    wzDailyHint: '1日：その日の時間を確保',
+    wzWeeklyHint: '1週間（月〜日）',
+    wzWeek: '週',
+    wzName: '名前',
+    wzNameHint: '任意',
+    wzTipDeep:
+      'ディープワーク：邪魔のない45〜90分のブロックが最適です。疲れている時期は短めから始めて徐々に伸ばしましょう。',
+    wzTipLong: '{d} {t}：2時間以上連続 — 途中で休憩を。',
+    wzTipShort: '{d} {t}：30分未満 — 短いブロックは集中しにくいです。',
+    redo: 'やり直す',
+    wzClear: '{d}をクリア',
+    wzCopyDay: '{d}を他の日にコピー',
+    wzTotal: '合計',
+    wzHintTouch:
+      '同じ日の開始ブロックをタップし、次に終了ブロックをタップ（15分単位）。選択済みブロックを2回タップで解除。',
+    wzHintMouse:
+      '日の列を下にドラッグして時間を確保（15分単位）。選択済みの上をドラッグで解除。ドラッグは開始した日にとどまります。',
+    wzNoBlocks: '今日以降に確保した時間がありません。戻って時間を選んでください。',
+    wzResuggest: '再提案',
+    wzPlanned: '予定',
+    wzBlocked: '確保',
+    wzPlannedLow: '予定',
+    wzGoal: '目標85%以上・間違いはすべて復習',
+    wzUp: '上へ',
+    wzFree: '空き{m}',
+    wzAdd: '追加',
+    wzOver: 'ブロックを{m}超過',
+    wzNothingFits: '提案なし — トピックか自分の活動を追加',
+    wzBack: '← 戻る',
+    wzSaveOff: '有効にせず保存',
+    wzSaveOn: '保存して有効化',
+    wzNext: '次へ →',
+    wzCustom: '✎ 自分の活動…',
+    wzCustomHint: '例：教材の復習、シミュレーター',
+    wzCustomDefault: '自分の活動',
+    wzAmount: '問題数または分',
+    wzPresetList: '教材の復習|シミュレーター|間違いの分析|週の振り返り|フラッシュカード',
+    itemChecked: '完了にしました',
+    itemUnchecked: '未完了にしました',
+    itemCheck: '完了にする',
+    planRestDay: 'プランでは今日の予定はありません。',
+    rs_custom: '自分',
+    reason_custom: '自分で追加',
+    demoPlanName: 'サンプルの週',
+  });
+  Object.assign(I18N.en, {
+    kbSync: '⇄ Sync with Kanban',
+    kbTitle: "Sync today's plan with the Kanban",
+    kbNothing: "The Kanban already matches today's plan.",
+    kbApply: 'OK · move {n}',
+    kbDone: '{n} card(s) moved',
+  });
+  Object.assign(I18N.pt, {
+    kbSync: '⇄ Sincronizar com o Kanban',
+    kbTitle: 'Sincronizar o plano de hoje com o Kanban',
+    kbNothing: 'O Kanban já corresponde ao plano de hoje.',
+    kbApply: 'OK · mover {n}',
+    kbDone: '{n} cartão(ões) movido(s)',
+  });
+  Object.assign(I18N.ja, {
+    kbSync: '⇄ Kanbanと同期',
+    kbTitle: '今日のプランをKanbanと同期',
+    kbNothing: 'Kanbanはすでに今日のプランと一致しています。',
+    kbApply: 'OK · {n}件移動',
+    kbDone: '{n}枚のカードを移動',
   });
   return { I18N };
 })();
@@ -5758,7 +6946,8 @@ const AppState = (() => {
               test: !!o.plan.test,
             }
           : null,
-      /* ids of deleted events / tests (so a sync merge never brings them back); kept 60 days */
+      plans: Array.isArray(o.plans) ? o.plans.map(normPlan).filter(Boolean) : [],
+      /* ids of deleted events / tests / plans (so a sync merge never brings them back); kept 60 days */
       deleted:
         o.deleted && typeof o.deleted === 'object'
           ? Object.fromEntries(
@@ -5768,6 +6957,63 @@ const AppState = (() => {
             )
           : {},
       updatedAt: +o.updatedAt || 0,
+    };
+  }
+  /* a saved study plan (see Schedule); anything malformed is dropped */
+  function normPlan(p) {
+    const ok = s => /^\d{4}-\d{2}-\d{2}$/.test(s || ''),
+      mins = v => Number.isInteger(v) && v >= 0 && v <= 1440;
+    if (!p || typeof p !== 'object' || !['daily', 'weekly'].includes(p.type) || !ok(p.start)) return null;
+    const blocks = {};
+    Object.entries(p.blocks && typeof p.blocks === 'object' ? p.blocks : {}).forEach(([d, rs]) => {
+      if (!ok(d) || !Array.isArray(rs)) return;
+      const clean = rs.filter(r => Array.isArray(r) && mins(r[0]) && mins(r[1]) && r[1] > r[0]).map(r => [r[0], r[1]]);
+      if (clean.length) blocks[d] = clean;
+    });
+    const energy = {};
+    Object.entries(p.energy && typeof p.energy === 'object' ? p.energy : {}).forEach(([d, e]) => {
+      if (ok(d) && ['low', 'medium', 'high'].includes(e)) energy[d] = e;
+    });
+    const items = (Array.isArray(p.items) ? p.items : [])
+      .filter(
+        it =>
+          it &&
+          ok(it.date) &&
+          mins(it.start) &&
+          +it.min > 0 &&
+          (it.kind === 'test' ||
+            it.kind === 'custom' ||
+            (it.kind === 'topic' && Number.isInteger(it.i) && TOPICS[it.i]))
+      )
+      .map(it => {
+        const o = {
+          id: String(it.id || uid()),
+          date: it.date,
+          start: it.start,
+          min: Math.round(+it.min),
+          kind: it.kind,
+          i: it.kind === 'topic' ? it.i : null,
+          n: Math.max(0, Math.round(+it.n || 0)),
+          reason: typeof it.reason === 'string' ? it.reason.slice(0, 12) : 'custom',
+        };
+        if (it.kind === 'custom') o.label = String(it.label || '').slice(0, 60);
+        if (it.custom) o.custom = true;
+        if (it.check) o.check = true;
+        return o;
+      });
+    const extra = p.demo ? { demo: true } : {};
+    return {
+      id: String(p.id || uid()),
+      type: p.type,
+      name: String(p.name || '').slice(0, 40),
+      start: p.start,
+      active: !!p.active,
+      blocks,
+      energy,
+      items,
+      created: +p.created || 0,
+      updated: +p.updated || 0,
+      ...extra,
     };
   }
   function readLocal() {
@@ -5811,7 +7057,7 @@ const AppState = (() => {
   /* remember which ids existed; any that disappear (delete, undo of an add, import) become tombstones */
   var prevIds = null;
   function trackDeletes() {
-    const now = new Set([...state.events, ...(state.tests || [])].map(x => x.id));
+    const now = new Set([...state.events, ...(state.tests || []), ...(state.plans || [])].map(x => x.id));
     state.deleted ??= {};
     if (prevIds)
       prevIds.forEach(id => {
@@ -6895,7 +8141,8 @@ const PlanModel = (() => {
                   1.3 chart-reading topics, 1.0 everything else
    ease_i       = from spaced-repetition stability S: 1.15 (no data) … 0.75 (S ≥ 30 days) — well-known topics go faster
    Order: 1) practice test when due  2) reviews due today  3) topics never scored, weak topics (< 70%)
-          4) new material (skipped in the last 7 days). Each item is cut to what still fits in the remaining minutes. */
+          4) new material (skipped in the last 7 days). Each item is cut to what still fits in the remaining minutes.
+   Topics left undone in a saved plan during the last 7 days get a 25% priority boost (see Schedule). */
   const DEF_SET = { minutes: 180, qph: 40, testEvery: 3, reviewMin: 1.5 };
   const settings = () => {
     const o = state.settings || {},
@@ -7054,7 +8301,8 @@ const PlanModel = (() => {
      (1 − pExam) × urgency ÷ minutes per question — every bank question is equally likely on the exam, so this is the
      expected exam-day questions protected per minute (urgency: overdue review 1.3, weak 1.15, no data 1.1, new 1.0) */
     const URG = { due: 1.3, weak: 1.15, nodata: 1.1, new: 1, light: 0.8 },
-      val = x => ((1 - x.pExam) * (URG[x.reason] || 1)) / x.per;
+      missed = typeof missedTopics === 'function' ? missedTopics(asOf) : new Set(),
+      val = x => ((1 - x.pExam) * (URG[x.reason] || 1) * (missed.has(x.i) ? 1.25 : 1)) / x.per;
     if (E.order === 'standard') todo.sort((a, b) => (b.kind === 'test') - (a.kind === 'test') || val(b) - val(a));
     if (E.order === 'hard')
       todo.sort((a, b) => (b.kind === 'test') - (a.kind === 'test') || (1 - b.p) * b.diff - (1 - a.p) * a.diff);
@@ -7120,26 +8368,464 @@ const PlanModel = (() => {
 })();
 const { settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName } = PlanModel;
 
+/* ===== module Schedule (js/model/schedule.js) =====
+   public: SLOT, DAY_START, DAY_END, mondayOf, planDays, planTotal, rangesTotal, normRanges, activeFor, todayPlan,
+           itemDone, itemMissed, missedTopics, suggestDays, packDay, perQ, conflictsFor, weeklyUnder, clockOf,
+           knapsack, toggleCheck
+   Saved study plans (state.plans) and the scheduler that fills selected time blocks with topics.
+
+   A plan: { id, type: 'daily' | 'weekly', name, start (the date, or the Monday of the week), active,
+             blocks: { date: [[startMin, endMin], …] }   time you blocked, minutes from midnight, 15-min steps
+             energy: { date: 'low' | 'medium' | 'high' }
+             items:  [{ id, date, start, min, kind: 'topic' | 'test' | 'custom', i, n, label, reason, custom, check }] }
+             kind 'custom' = your own activity ("Review the material", "Simulator" …): a name and minutes, done by hand
+
+   Where today's plan comes from: active daily plan for today → active weekly plan covering today → the suggestion
+   built from your statistics (buildPlan).
+
+   Filling the time (suggestDays):
+     1. candidates = buildPlan for that day with the day's blocked minutes as the budget (same scoring as the daily
+        plan: overdue reviews, topics without data, weak topics, new material; minutes per question from your speed,
+        the topic's difficulty and the review time for misses). Topics missed in a plan during the last 7 days get
+        a 25% priority boost.
+     2. each continuous block is a knapsack: pick the chunks that protect the most exam-day questions
+        (n × (1 − p on exam day) × urgency) within the block's minutes (dynamic programming, 1-minute steps); any
+        time left is filled with part of the best remaining topic (at least 5 questions).
+        Deep work (Cal Newport): few context switches, so a block holds at most one topic per ~45 minutes; the
+        topics kept grow into the freed time (up to the topic's question count).
+     3. inside a block the hardest work goes first, while you are fresh: practice test, then
+        (1 − p now) × difficulty, plus a boost for overdue reviews and for topics not seen in a long time.
+     4. for a week, the days are filled in order and each day assumes the earlier days were done (simulated sessions),
+        so a topic reviewed on Monday is not due again on Tuesday. A topic appears at most once per day. */
+const Schedule = (() => {
+  const SLOT = 15,
+    DAY_START = 6 * 60,
+    DAY_END = 24 * 60,
+    MIN_CHUNK_Q = 5,
+    MISSED_BOOST = 1.25,
+    DEEP_MIN = 45,
+    URGENCY = { due: 1.3, weak: 1.15, nodata: 1.1, new: 1, light: 0.8, test: 1.4, testDue: 1.4, custom: 1 };
+
+  const plans = () => state.plans || (state.plans = []);
+  function mondayOf(date) {
+    const d = parse(date);
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    return iso(d);
+  }
+  const planDays = p => (p.type === 'daily' ? [p.start] : Array.from({ length: 7 }, (_, k) => addDays(p.start, k)));
+  const rangesTotal = rs => (rs || []).reduce((a, [s, e]) => a + (e - s), 0);
+  const planTotal = p => Object.values(p.blocks || {}).reduce((a, rs) => a + rangesTotal(rs), 0);
+  const clockOf = m => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+
+  /* merge a set of 15-minute slots (start minutes) into sorted [start, end] ranges */
+  function normRanges(slots) {
+    const s = [...new Set(slots)].sort((a, b) => a - b),
+      out = [];
+    s.forEach(m => {
+      const last = out[out.length - 1];
+      if (last && last[1] === m) last[1] = m + SLOT;
+      else out.push([m, m + SLOT]);
+    });
+    return out;
+  }
+
+  /* ---------- which plan drives a date ---------- */
+  function activeFor(date) {
+    const on = plans().filter(p => p.active),
+      newest = (a, b) => (b.updated || 0) - (a.updated || 0);
+    const daily = on.filter(p => p.type === 'daily' && p.start === date).sort(newest)[0];
+    if (daily) return { plan: daily, kind: 'daily' };
+    const weekly = on
+      .filter(p => p.type === 'weekly' && date >= p.start && date <= addDays(p.start, 6))
+      .sort(newest)[0];
+    return weekly ? { plan: weekly, kind: 'weekly' } : null;
+  }
+
+  function itemDone(it) {
+    if (it.check) return true;
+    if (it.kind === 'custom') return false;
+    if (it.kind === 'test') return (state.tests || []).some(x => x.date === it.date && x.score != null);
+    return state.events.some(
+      e => e.date === it.date && e.topic === it.i && (e.kind === 'study' || e.kind === 'review')
+    );
+  }
+  const itemMissed = it => it.date < todayISO() && !itemDone(it);
+
+  /* topics left undone in an active plan during the 7 days before asOf (they get a priority boost) */
+  function missedTopics(asOf) {
+    const from = addDays(asOf, -7),
+      out = new Set();
+    plans()
+      .filter(p => p.active)
+      .forEach(p =>
+        (p.items || []).forEach(it => {
+          if (it.kind === 'topic' && it.date >= from && it.date < asOf && !itemDone(it)) out.add(it.i);
+        })
+      );
+    return out;
+  }
+
+  /* today's list, from the plan that drives today, else the suggestion — same item shape as buildPlan */
+  function todayPlan() {
+    const today = todayISO(),
+      src = activeFor(today);
+    if (!src) return { source: 'suggested', items: buildPlan(null, null, energyMode).items };
+    const items = (src.plan.items || [])
+      .filter(it => it.date === today)
+      .sort((a, b) => a.start - b.start)
+      .map(it => ({ ...it, done: itemDone(it), reason: it.reason || 'custom' }));
+    return { source: src.kind, plan: src.plan, items };
+  }
+
+  /* minutes for one question of topic i on a date (same formula as the daily plan) */
+  function perQ(i, date, energy) {
+    const m = srModel(i, date, true),
+      sc = m.reps.length ? m.reps[m.reps.length - 1].p : state.scores[i],
+      p = pRight(sc, m.reps.length ? m.R : 1),
+      speed = { low: 1.15, medium: 1, high: 0.9 }[energy || 'medium'];
+    return { per: minutesPerQ(i, settings(), m, p) * speed, p };
+  }
+
+  /* 0/1 knapsack over whole chunks, then fill what is left with part of the best remaining splittable chunk */
+  function knapsack(cands, cap) {
+    const n = cands.length,
+      w = cands.map(c => Math.max(1, Math.ceil(c.n * c.per))),
+      best = Array.from({ length: n + 1 }, () => new Float64Array(cap + 1));
+    for (let k = 1; k <= n; k++)
+      for (let c = 0; c <= cap; c++) {
+        best[k][c] = best[k - 1][c];
+        if (w[k - 1] <= c) best[k][c] = Math.max(best[k][c], best[k - 1][c - w[k - 1]] + cands[k - 1].value);
+      }
+    const pick = [];
+    let c = cap;
+    for (let k = n; k >= 1; k--)
+      if (best[k][c] !== best[k - 1][c]) {
+        pick.push({ ...cands[k - 1] });
+        c -= w[k - 1];
+      }
+    const rest = cands.filter(x => !pick.some(p => p.key === x.key) && x.kind === 'topic');
+    rest.sort((a, b) => b.value / b.n - a.value / a.n);
+    for (const r of rest) {
+      const fit = Math.floor((c + 1e-9) / r.per);
+      if (fit >= MIN_CHUNK_Q) {
+        const part = { ...r, n: Math.min(r.n, fit) };
+        part.value = (r.value * part.n) / r.n;
+        pick.push(part);
+        c -= Math.ceil(part.n * part.per);
+        break;
+      }
+    }
+    return pick;
+  }
+
+  const hardness = c => {
+    if (c.kind === 'test') return 99;
+    const m = srModel(c.i, c.date, true),
+      last = m.reps.length ? m.reps[m.reps.length - 1].date : null,
+      idle = last ? Math.min(0.5, diffDays(last, c.date) / 60) : 0.3;
+    return (1 - c.p) * (c.diff || 1) + (c.reason === 'due' ? 0.3 : 0) + idle;
+  };
+
+  /* fill one day's blocks; returns items with start times */
+  function packDay(date, ranges, energy) {
+    const total = rangesTotal(ranges);
+    if (!total) return [];
+    const boost = missedTopics(date),
+      P = buildPlan(date, { ...settings(), minutes: total * 4 }, energy || 'medium');
+    let cands = P.items
+      .filter(x => !x.done && x.n > 0 && (x.kind === 'test' || x.kind === 'topic'))
+      .map((x, k) => ({
+        key: x.kind + (x.i ?? 't') + '_' + k,
+        kind: x.kind,
+        i: x.i,
+        n: x.kind === 'test' ? TEST_Q : x.n,
+        per: x.per,
+        p: x.p,
+        diff: x.diff,
+        reason: x.reason,
+        date,
+        value:
+          (x.kind === 'test' ? TEST_Q * 1.5 : x.n * (1 - (x.pExam ?? x.p ?? 0.5))) *
+          (URGENCY[x.reason] || 1) *
+          (x.kind === 'topic' && boost.has(x.i) ? MISSED_BOOST : 1),
+      }))
+      .filter(c => c.per > 0);
+    const out = [];
+    for (const [s, e] of ranges) {
+      if (!cands.length) break;
+      const cap = e - s;
+      let pick = knapsack(cands, cap);
+      /* deep work: few topic switches — at most one topic per ~45 min; the kept topics grow into the freed time */
+      const maxTopics = Math.max(1, Math.round(cap / DEEP_MIN));
+      if (pick.length > maxTopics) {
+        pick = pick.sort((a, b) => b.value - a.value).slice(0, maxTopics);
+        let left = cap - pick.reduce((a, c) => a + Math.ceil(c.n * c.per), 0);
+        pick.forEach(c => {
+          if (c.kind !== 'topic') return;
+          const more = Math.min(TOPICS[c.i].q - c.n, Math.floor((left + 1e-9) / c.per));
+          if (more > 0) {
+            c.n += more;
+            left -= Math.ceil(more * c.per);
+          }
+        });
+      }
+      pick.sort((a, b) => hardness(b) - hardness(a));
+      let t0 = s;
+      pick.forEach(c => {
+        const min = Math.max(1, Math.round(c.n * c.per));
+        out.push({
+          id: uid(),
+          date,
+          start: t0,
+          min,
+          kind: c.kind,
+          i: c.kind === 'topic' ? c.i : null,
+          n: c.n,
+          reason: c.reason,
+        });
+        t0 += min;
+        /* a topic is used once per day: drop the whole candidate even when only part of it was placed */
+        cands = cands.filter(x => !(x.kind === c.kind && x.i === c.i));
+      });
+    }
+    return out;
+  }
+
+  /* fill several days in order, simulating the earlier days as done; returns { date: items } */
+  function suggestDays(days, blocks, energies) {
+    const saved = { events: state.events, tests: state.tests },
+      out = {};
+    try {
+      state.events = state.events.slice();
+      state.tests = (state.tests || []).slice();
+      days
+        .slice()
+        .sort()
+        .forEach(d => {
+          const items = d < todayISO() ? [] : packDay(d, blocks[d] || [], (energies || {})[d]);
+          out[d] = items;
+          items.forEach(it => {
+            if (it.kind === 'test')
+              state.tests.push({ id: 'sim' + it.id, date: d, q: TEST_Q, score: Math.round(blended(d).mu * 100) });
+            else {
+              const m = srModel(it.i, d, true),
+                last = m.reps.length ? m.reps[m.reps.length - 1].p : 0;
+              state.events.push({
+                id: 'sim' + it.id,
+                date: d,
+                topic: it.i,
+                kind: m.reps.length ? 'review' : 'study',
+                score: Math.min(95, Math.max(70, last)),
+                partial: false,
+                demo: false,
+              });
+            }
+          });
+        });
+    } finally {
+      state.events = saved.events;
+      state.tests = saved.tests;
+    }
+    return out;
+  }
+
+  /* demo only: an example weekly plan for next week (evenings 19:30–21:00 on weekdays — Newport's deep-work block —,
+     Saturday morning with room for a practice test, Sunday weekly review), created once. It starts next week so
+     today's list still shows the suggestion and the energy choice; the week view's › shows the example. */
+  function seedDemoPlan() {
+    if (!BUILD.demo || (state.plans || []).length || !state.events.some(e => e.demo)) return;
+    try {
+      if (localStorage.getItem(STORE + '-seeded')) return;
+      localStorage.setItem(STORE + '-seeded', '1');
+    } catch (e) {}
+    const mon = addDays(mondayOf(todayISO()), 7),
+      blocks = {};
+    for (let k = 0; k < 7; k++)
+      blocks[addDays(mon, k)] =
+        k < 5 ? [[19 * 60 + 30, 21 * 60]] : k === 5 ? [[9 * 60, 11 * 60 + 30]] : [[10 * 60, 11 * 60]];
+    const days = Object.keys(blocks),
+      items = [];
+    days.filter(d => d < todayISO()).forEach(d => items.push(...packDay(d, blocks[d], 'medium')));
+    Object.values(
+      suggestDays(
+        days.filter(d => d >= todayISO()),
+        blocks,
+        {}
+      )
+    ).forEach(l => items.push(...l));
+    const sun = addDays(mon, 6),
+      sunItems = items.filter(it => it.date === sun);
+    const reviewStart = sunItems.length
+      ? Math.min(
+          11 * 60 - 30,
+          sunItems.reduce((a, it) => Math.max(a, it.start + it.min), 10 * 60)
+        )
+      : 10 * 60;
+    state.plans = [
+      {
+        id: uid(),
+        type: 'weekly',
+        name: t('demoPlanName'),
+        start: mon,
+        active: true,
+        blocks,
+        energy: {},
+        items: items
+          .filter(it => !(it.date === sun && it.start + it.min > 11 * 60 - 30))
+          .concat([
+            {
+              id: uid(),
+              date: sun,
+              start: Math.min(reviewStart, 11 * 60 - 30),
+              min: 30,
+              kind: 'custom',
+              i: null,
+              n: 0,
+              label: t('wzPresetList').split('|')[3],
+              reason: 'custom',
+              custom: true,
+            },
+          ]),
+        created: Date.now(),
+        updated: Date.now(),
+        demo: true,
+      },
+    ];
+  }
+  /* the manual done mark on a plan item (your own activities are only done this way) */
+  function toggleCheck(id) {
+    const p = (state.plans || []).find(x => (x.items || []).some(it => it.id === id));
+    if (!p) return;
+    const it = p.items.find(x => x.id === id),
+      on = !it.check;
+    commit(
+      () => {
+        const q = state.plans.find(x => x.id === p.id).items.find(x => x.id === id);
+        if (on) q.check = true;
+        else delete q.check;
+        state.plans.find(x => x.id === p.id).updated = Date.now();
+      },
+      t(on ? 'itemChecked' : 'itemUnchecked')
+    );
+  }
+  /* other active plans a plan would collide with when activated */
+  function conflictsFor(plan) {
+    return plans().filter(
+      p =>
+        p.active &&
+        p.id !== plan.id &&
+        p.type === plan.type &&
+        (plan.type === 'daily' ? p.start === plan.start : p.start === plan.start)
+    );
+  }
+  /* an active weekly plan that covers the date of a daily plan (the daily plan replaces only that day) */
+  const weeklyUnder = plan =>
+    plan.type === 'daily'
+      ? plans().find(p => p.active && p.type === 'weekly' && plan.start >= p.start && plan.start <= addDays(p.start, 6))
+      : null;
+
+  return {
+    SLOT,
+    DAY_START,
+    DAY_END,
+    mondayOf,
+    planDays,
+    planTotal,
+    rangesTotal,
+    normRanges,
+    activeFor,
+    todayPlan,
+    itemDone,
+    itemMissed,
+    missedTopics,
+    suggestDays,
+    packDay,
+    perQ,
+    conflictsFor,
+    weeklyUnder,
+    clockOf,
+    knapsack,
+    toggleCheck,
+    seedDemoPlan,
+  };
+})();
+const {
+  SLOT,
+  DAY_START,
+  DAY_END,
+  mondayOf,
+  planDays,
+  planTotal,
+  rangesTotal,
+  normRanges,
+  activeFor,
+  todayPlan,
+  itemDone,
+  itemMissed,
+  missedTopics,
+  suggestDays,
+  packDay,
+  perQ,
+  conflictsFor,
+  weeklyUnder,
+  clockOf,
+  knapsack,
+  toggleCheck,
+  seedDemoPlan,
+} = Schedule;
+
 /* ===== module PlanView (js/views/plan.js) =====
    public: renderPlanMini, renderPlanPage, manualTest, setManualTest, draftSettings */
 const PlanView = (() => {
+  /* totals of today's list, whatever drives it (a saved plan or the suggestion) */
+  function todayList() {
+    const T = todayPlan();
+    if (T.source === 'suggested') return { ...buildPlan(null, null, energyMode), source: 'suggested' };
+    const sum = (arr, k) => arr.reduce((a, x) => a + (x[k] || 0), 0),
+      P = buildPlan(null, null, energyMode);
+    return {
+      ...P,
+      source: T.source,
+      plan: T.plan,
+      items: T.items,
+      total: sum(T.items, 'n'),
+      minutes: sum(T.items, 'min'),
+      done: sum(
+        T.items.filter(x => x.done),
+        'n'
+      ),
+      budget: rangesTotal((T.plan.blocks || {})[todayISO()]),
+    };
+  }
+  const rowAttr = it =>
+    it.kind === 'test' ? 'data-pt="1"' : it.kind === 'custom' ? `data-cid="${esc(it.id)}"` : `data-q="${it.i}"`;
+  const rowName = it => (it.kind === 'custom' ? it.label || t('wzCustomDefault') : planRowName(it));
+  const checkBtn = it =>
+    it.id
+      ? `<button type="button" class="pck" data-chk="${esc(it.id)}" aria-label="${esc(t('itemCheck'))}">${it.done ? '✓' : ''}</button>`
+      : `<span class="pck">${it.done ? '✓' : ''}</span>`;
   function renderPlanMini() {
-    const P = buildPlan(null, null, energyMode);
-    $('#planMiniMode').textContent = t('en_' + energyMode);
-    $('#planMiniMode').className = 'enpill ' + energyMode;
+    const P = todayList(),
+      fromPlan = P.source !== 'suggested';
+    $('#planMiniMode').textContent = fromPlan
+      ? t(P.source === 'daily' ? 'srcDaily' : 'srcWeekly')
+      : t('en_' + energyMode);
+    $('#planMiniMode').className = 'enpill ' + (fromPlan ? 'fromplan' : energyMode);
     $('#planMiniTot').textContent = `· ${P.total} q · ${fmtMin(P.minutes)}`;
     $('#sugg').innerHTML = P.items.length
       ? P.items
           .map(
             it =>
-              `<div class="qrow${it.done ? ' done' : ''}" ${it.kind === 'test' ? 'data-pt="1"' : `data-q="${it.i}"`} title="${esc(t('reason_' + it.reason))}"><span class="pck">${it.done ? '✓' : ''}</span><span class="qt">${esc(planRowName(it))}</span><span class="pq">${it.n ? it.n + ' q' : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
+              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
           )
           .join('')
-      : `<div class="muted">${esc(t('allClear'))}</div>`;
+      : `<div class="muted">${esc(t(fromPlan ? 'planRestDay' : 'allClear'))}</div>`;
   }
   function renderPlanPage() {
     renderPlanPt();
-    const P = buildPlan(null, null, energyMode),
+    renderPlanWeek();
+    const P = todayList(),
+      fromPlan = P.source !== 'suggested',
       st = settings(),
       df = new Intl.DateTimeFormat(LOCALE[lang], { weekday: 'long', day: 'numeric', month: 'long' });
     $('#energyPick').innerHTML = ['low', 'medium', 'high']
@@ -7148,17 +8834,26 @@ const PlanView = (() => {
         return `<button type="button" role="tab" data-energy="${m}" class="${m === energyMode ? 'on' : ''}" aria-selected="${m === energyMode}"><span class="en">${['low', 'medium', 'high'].indexOf(m) === 0 ? '🔋' : m === 'medium' ? '⚡' : '🚀'} ${esc(t('en_' + m))}</span><span class="es">${Q.total} q · ${fmtMin(Q.minutes)}</span><span class="ew"><i style="width:${Q.workload * 10}%"></i></span><span class="es">${esc(t('workload'))} ${Q.workload}/10</span></button>`;
       })
       .join('');
-    $('#planSub').textContent = df.format(parse(todayISO())) + (P.final ? ' · ' + t('planFinal') : '');
+    $('#energyPick').hidden = fromPlan;
+    $('#planSub').textContent =
+      df.format(parse(todayISO())) +
+      (fromPlan
+        ? ' · ' +
+          t('pwFrom')
+            .replace('{s}', t(P.source === 'daily' ? 'srcDaily' : 'srcWeekly'))
+            .replace('{n}', planLabel(P.plan).name)
+        : ' · ' + t('pwFromSuggested')) +
+      (P.final ? ' · ' + t('planFinal') : '');
     $('#planKpis').innerHTML =
       `<div><b>${fmtMin(P.minutes)}</b><span>${esc(t('planMinOf').replace('{b}', fmtMin(P.budget)))}</span></div><div><b>${P.total}</b><span>${esc(t('planQToday'))}</span></div><div><b>${P.done}</b><span>${esc(t('planDone'))}</span></div><div><b>${P.pace}</b><span>${esc(t('planPace'))}</span></div><div><b>${P.daysLeft}</b><span>${esc(t('toGo'))}</span></div>`;
     $('#planList').innerHTML = P.items.length
       ? P.items
           .map(
             it =>
-              `<div class="pitem2${it.done ? ' done' : ''}" ${it.kind === 'test' ? 'data-pt="1"' : `data-q="${it.i}"`}><span class="pck">${it.done ? '✓' : ''}</span><span class="pn">${esc(planRowName(it))}<small>${esc(t('reason_' + it.reason))}${it.diff > 1.05 ? ' · ' + esc(t(it.diff >= 2 ? 'diffCalc' : it.diff >= 1.5 ? 'diffNav' : 'diffChart')) : ''}${it.p != null && it.kind === 'topic' ? ' · ' + esc(t('planChance').replace('{p}', Math.round(it.p * 100))) : ''}${it.stake ? ' · ' + esc(t('planStake').replace('{x}', it.stake.toFixed(1))) : ''}</small></span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span><span class="pq">${it.n ? it.n + ' q' : ''}<small>${it.min ? '~' + fmtMin(it.min) : ''}</small></span></div>`
+              `<div class="pitem2${it.done ? ' done' : ''}${it.done || it.date == null || !itemMissed(it) ? '' : ' missed'}" ${rowAttr(it)}>${checkBtn(it)}<span class="pn">${it.start != null ? `<small class="qtime">${clockOf(it.start)}–${clockOf(it.start + it.min)}</small>` : ''}${esc(rowName(it))}<small>${esc(t('reason_' + it.reason))}${it.diff > 1.05 ? ' · ' + esc(t(it.diff >= 2 ? 'diffCalc' : it.diff >= 1.5 ? 'diffNav' : 'diffChart')) : ''}${it.p != null && it.kind === 'topic' ? ' · ' + esc(t('planChance').replace('{p}', Math.round(it.p * 100))) : ''}${it.stake ? ' · ' + esc(t('planStake').replace('{x}', it.stake.toFixed(1))) : ''}</small></span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span><span class="pq">${it.n ? it.n + ' q' : ''}<small>${it.min ? '~' + fmtMin(it.min) : ''}</small></span></div>`
           )
           .join('')
-      : `<div class="muted">${esc(t('allClear'))}</div>`;
+      : `<div class="muted">${esc(t(fromPlan ? 'planRestDay' : 'allClear'))}</div>`;
     ['minutes', 'qph', 'testEvery', 'reviewMin'].forEach(k => {
       const el = $('#' + SET_ID[k]);
       if (document.activeElement !== el) el.value = st[k];
@@ -7202,6 +8897,10 @@ const PlanView = (() => {
   $('#ppLog').onclick = () => openPt();
   function startPlanItem(el) {
     if (!el) return;
+    if (el.dataset.cid) {
+      toggleCheck(el.dataset.cid);
+      return;
+    }
     if (el.dataset.pt) {
       openPt();
       return;
@@ -7221,7 +8920,18 @@ const PlanView = (() => {
       l.classList.add('fresh');
     }, 250);
   });
-  $('#planList').addEventListener('click', e => startPlanItem(e.target.closest('[data-q],[data-pt]')));
+  /* the circle marks a saved plan's item done by hand; the row opens the log dialog */
+  function onCheck(e) {
+    const c = e.target.closest('[data-chk]');
+    if (!c) return false;
+    e.stopPropagation();
+    toggleCheck(c.dataset.chk);
+    return true;
+  }
+  $('#planList').addEventListener('click', e => {
+    if (!onCheck(e)) startPlanItem(e.target.closest('[data-q],[data-pt],[data-cid]'));
+  });
+  $('#sugg').addEventListener('click', e => onCheck(e), true);
   $('#openPlan').onclick = () => goView('plan');
   function openFcTop() {
     const B = blended(),
@@ -7579,7 +9289,7 @@ const PreviewCarousel = (() => {
     const seen = new Set();
     return [
       null,
-      ...buildPlan(null, null, energyMode)
+      ...todayPlan()
         .items.filter(x => x.kind === 'topic' && !x.done && !seen.has(x.i) && seen.add(x.i) && srModel(x.i).reps.length)
         .map(x => x.i),
     ];
@@ -7745,6 +9455,10 @@ const PreviewCarousel = (() => {
     if (!r) return;
     if (r.dataset.pt) {
       openPt();
+      return;
+    }
+    if (r.dataset.cid) {
+      toggleCheck(r.dataset.cid);
       return;
     }
     if (matchMedia('(hover:none),(max-width:1099px)').matches) {
@@ -7959,7 +9673,8 @@ const StatsCarousel = (() => {
       [dueLabel, dueClass] = dueText(m),
       box = $('#scChart');
     $('#scTitle').textContent = TOPICS[current].name;
-    $('#scStats').innerHTML = `${esc(t('retention'))} <b>${pct(m.R)}</b> · S <b>${fmt(m.S, 1)}d</b> · <span class="duechip ${dueClass}" style="min-width:0">${esc(dueLabel)}</span>`;
+    $('#scStats').innerHTML =
+      `${esc(t('retention'))} <b>${pct(m.R)}</b> · S <b>${fmt(m.S, 1)}d</b> · <span class="duechip ${dueClass}" style="min-width:0">${esc(dueLabel)}</span>`;
     box.innerHTML = topicChart(m, Math.round(box.clientWidth || 420), phoneMQ.matches ? 190 : 250, srCardRange);
     $('#scLegend').innerHTML = legendHTML(true);
   }
@@ -8615,7 +10330,8 @@ const VolumeView = (() => {
     $(v.dates).textContent = `${df.format(parse(d[0].w))} – ${df.format(parse(last))}`;
     if (ptot > 0) {
       const ch = Math.round(((tot - ptot) / ptot) * 100);
-      $(v.cmp).innerHTML = `<b class="${ch >= 0 ? 'up' : 'down'}">${ch >= 0 ? '▲' : '▼'} ${Math.abs(ch)}%</b><br>${esc(t('vsPrior'))}`;
+      $(v.cmp).innerHTML =
+        `<b class="${ch >= 0 ? 'up' : 'down'}">${ch >= 0 ? '▲' : '▼'} ${Math.abs(ch)}%</b><br>${esc(t('vsPrior'))}`;
     } else $(v.cmp).innerHTML = '';
     box.innerHTML = volSVG(d, Math.round(box.clientWidth || 700), Math.round(box.clientHeight || 280), true);
     document.querySelectorAll(v.range + ' button').forEach(b => b.classList.toggle('on', b.dataset.r === volRange));
@@ -8969,8 +10685,10 @@ const PracticeTestsView = (() => {
       : `<span class="few">${esc(t('ovNoTests'))}</span>`;
     $('#tsTrendTxt2').innerHTML = trendText();
     const b2 = $('#tsChart2');
-    b2.innerHTML = tsSVG(Math.round(b2.clientWidth || 900), phoneMQ.matches ? 220 : 280, true);
+    const trendH = phoneMQ.matches ? 220 : 280;
+    b2.innerHTML = tsSVG(Math.round(b2.clientWidth || 900), trendH, true);
     $('#tsLegend2').innerHTML = tsLegendHTML();
+    requestAnimationFrame(() => fillTrendCard(b2, trendH));
     const sc = scoredTests(),
       st = distStats(sc);
     $('#distTxt').innerHTML = sc.length
@@ -8987,6 +10705,15 @@ const PracticeTestsView = (() => {
       : t('tsFew').replace('{n}', 2);
     $('#regFormula').textContent = t('regFormula');
     renderFcFull();
+  }
+  /* side by side with the histogram, the trend chart grows into the card's empty space so the card has no gap below */
+  function fillTrendCard(box, baseH) {
+    const card = box.closest('section');
+    if (!card || !card.offsetParent || window.innerWidth < 1100) return;
+    const last = card.lastElementChild.getBoundingClientRect().bottom,
+      pad = parseFloat(getComputedStyle(card).paddingBottom) || 0,
+      free = Math.floor(card.getBoundingClientRect().bottom - pad - last);
+    if (free > 4) box.innerHTML = tsSVG(Math.round(box.clientWidth || 900), baseH + free, true);
   }
   function renderCal() {
     const C = calibration();
@@ -9434,6 +11161,1017 @@ const HistogramCalibration = (() => {
 })();
 const { distStats, histBins, histSVG, binomQuantile, renderFcFull, calSVG } = HistogramCalibration;
 
+/* ===== module PlanWeek (js/views/plan-week.js) =====
+   public: ROWS, gridHTML, stripHTML, scrollGrid, itemName, ask, activatePlan, savePlan, renderPlanWeek, planLabel
+   The Plan tab's week view (what each day holds: daily plan → weekly plan) and the "My plans" list
+   (view, edit, activate / deactivate, copy to next week, delete). Also the week grid used by the plan wizard. */
+const PlanWeek = (() => {
+  const ROWS = (DAY_END - DAY_START) / SLOT;
+  let weekOf = mondayOf(todayISO()),
+    tab = 'week',
+    dayIdx = null;
+
+  const dayName = d => new Intl.DateTimeFormat(LOCALE[lang], { weekday: 'short', day: 'numeric' }).format(parse(d));
+  const longDay = d =>
+    new Intl.DateTimeFormat(LOCALE[lang], { weekday: 'short', month: 'short', day: 'numeric' }).format(parse(d));
+  const shortDate = d => new Intl.DateTimeFormat(LOCALE[lang], { month: 'short', day: 'numeric' }).format(parse(d));
+  const itemName = it =>
+    it.kind === 'test'
+      ? t('practiceTest')
+      : it.kind === 'custom'
+        ? it.label || t('wzCustomDefault')
+        : TOPICS[it.i].name;
+  const at = (top, rows) => `top:calc(var(--rowh) * ${top});height:calc(var(--rowh) * ${rows})`;
+  function planLabel(p) {
+    const range = p.type === 'daily' ? longDay(p.start) : `${shortDate(p.start)} – ${shortDate(addDays(p.start, 6))}`;
+    return {
+      range,
+      name: p.name || (p.type === 'daily' ? longDay(p.start) : t('pwWeekOf').replace('{d}', shortDate(p.start))),
+    };
+  }
+
+  /* ---------- week grid (view, review or time-block selection) ----------
+     data: { blocks: {date: ranges}, items: [], daily: Set of dates that come from a daily plan }
+     mode: 'view' (items, click to log) · 'select' (15-min slots you click and drag) */
+  /* view mode shows only the hours in use (30 min of margin, whole hours, at least 4 hours; 17:00–22:00 when empty) */
+  function viewHours(days, data) {
+    let lo = Infinity,
+      hi = -Infinity;
+    days.forEach(d =>
+      ((data.blocks || {})[d] || []).forEach(([s, e]) => {
+        lo = Math.min(lo, s);
+        hi = Math.max(hi, e);
+      })
+    );
+    (data.items || []).forEach(it => {
+      if (!days.includes(it.date)) return;
+      lo = Math.min(lo, it.start);
+      hi = Math.max(hi, it.start + it.min);
+    });
+    if (lo === Infinity) return [17 * 60, 22 * 60];
+    let from = Math.max(DAY_START, Math.floor((lo - 30) / 60) * 60),
+      to = Math.min(DAY_END, Math.ceil((hi + 30) / 60) * 60);
+    while (to - from < 240) {
+      if (to < DAY_END) to += 60;
+      else from -= 60;
+    }
+    return [from, to];
+  }
+  function gridHTML(days, data, mode, opts = {}) {
+    const today = todayISO(),
+      hours = [],
+      [from, to] = mode === 'select' ? [DAY_START, DAY_END] : viewHours(days, data),
+      nRows = (to - from) / SLOT,
+      rowOf = m => (Math.max(from, Math.min(to, m)) - from) / SLOT;
+    for (let m = from; m < to; m += 60)
+      hours.push(`<span class="wkh" style="top:calc(var(--rowh) * ${rowOf(m)})">${clockOf(m)}</span>`);
+    const cols = days
+      .map(d => {
+        const ranges = (data.blocks || {})[d] || [],
+          past = d < today;
+        let inner = '';
+        if (mode === 'select') {
+          const on = new Set();
+          ranges.forEach(([s, e]) => {
+            for (let m = s; m < e; m += SLOT) on.add(m);
+          });
+          for (let r = 0; r < ROWS; r++) {
+            const m = DAY_START + r * SLOT,
+              cls = [
+                'wks',
+                on.has(m) ? 'on' : '',
+                m % 60 === 0 ? 'hr' : '',
+                opts.anchor && opts.anchor.date === d && opts.anchor.s === m ? 'anchor' : '',
+              ]
+                .filter(Boolean)
+                .join(' ');
+            inner += `<i class="${cls}" data-s="${m}"></i>`;
+          }
+        } else {
+          for (let r = 0; r < nRows; r += 4) inner += `<i class="wkline" style="top:calc(var(--rowh) * ${r})"></i>`;
+          ranges.forEach(([s, e]) => (inner += `<i class="wkblk" style="${at(rowOf(s), rowOf(e) - rowOf(s))}"></i>`));
+          (data.items || [])
+            .filter(it => it.date === d)
+            .forEach(it => {
+              const done = itemDone(it),
+                missed = !done && itemMissed(it),
+                rows = Math.max(1, it.min / SLOT);
+              inner += `<button type="button" class="wki r-${it.kind === 'test' ? 'test' : it.reason || 'custom'}${done ? ' done' : ''}${missed ? ' missed' : ''}${rows < 2 ? ' tiny' : ''}" style="${at(rowOf(it.start), rows)}" data-wi="${esc(it.id)}" title="${esc(`${clockOf(it.start)} · ${itemName(it)} · ${it.kind === 'custom' ? '' : it.n + ' q · '}${fmtMin(it.min)}`)}"><b>${done ? '✓ ' : missed ? '! ' : ''}${esc(itemName(it))}</b><span>${clockOf(it.start)} · ${it.kind === 'custom' ? fmtMin(it.min) : it.n + ' q'}</span></button>`;
+            });
+          if (d === today) {
+            const now = new Date(),
+              m = now.getHours() * 60 + now.getMinutes();
+            if (m >= from && m <= to) inner += `<i class="wknow" style="top:calc(var(--rowh) * ${rowOf(m)})"></i>`;
+          }
+        }
+        const daily = data.daily && data.daily.has(d);
+        return `<div class="wkcol${past ? ' past' : ''}${d === today ? ' today' : ''}" data-d="${d}">${inner}${daily ? '<em class="wkdaily">D</em>' : ''}</div>`;
+      })
+      .join('');
+    const head = days
+      .map(d => {
+        const tot = rangesTotal((data.blocks || {})[d]);
+        return `<span class="wkd${d === today ? ' today' : ''}${d < today ? ' past' : ''}">${esc(dayName(d))}<small>${tot ? fmtMin(tot) : ''}</small></span>`;
+      })
+      .join('');
+    return `<div class="wk ${mode}" style="--days:${days.length}"><div class="wkhead"><span></span>${head}</div><div class="wkscroll" data-from="${from}"><div class="wkbody" style="height:calc(var(--rowh) * ${nRows})"><div class="wktimes">${hours.join('')}</div>${cols}</div></div></div>`;
+  }
+  /* phone: one day at a time, picked from a strip */
+  function stripHTML(days, idx, attr) {
+    return `<div class="wkstrip">${days
+      .map(
+        (d, k) =>
+          `<button type="button" ${attr}="${k}" class="${k === idx ? 'on' : ''}${d === todayISO() ? ' today' : ''}">${esc(dayName(d))}</button>`
+      )
+      .join('')}</div>`;
+  }
+  /* scroll the grid to the first planned time (or 17:00) so the evening is in view */
+  function scrollGrid(box, blocks, days) {
+    const sc = box.querySelector('.wkscroll');
+    if (!sc) return;
+    let first = Infinity;
+    days.forEach(d => ((blocks || {})[d] || []).forEach(([s]) => (first = Math.min(first, s))));
+    const m = first < Infinity ? first - 30 : 17 * 60,
+      from = +sc.dataset.from || DAY_START,
+      rowH = parseFloat(getComputedStyle(sc).getPropertyValue('--rowh')) || 12;
+    sc.scrollTop = Math.max(0, ((m - from) / SLOT) * rowH);
+  }
+
+  /* ---------- confirm dialog (in the page, never a browser pop-up) ---------- */
+  let askDone = null;
+  function ask(text, yes) {
+    $('#askText').textContent = text;
+    $('#askYes').textContent = yes;
+    $('#askbg').hidden = false;
+    $('#askYes').focus();
+    return new Promise(res => (askDone = res));
+  }
+  function answer(v) {
+    $('#askbg').hidden = true;
+    if (askDone) askDone(v);
+    askDone = null;
+  }
+  $('#askYes').onclick = () => answer(true);
+  $('#askNo').onclick = () => answer(false);
+  $('#askbg').addEventListener('pointerdown', e => {
+    if (e.target.id === 'askbg') answer(false);
+  });
+  document.addEventListener(
+    'keydown',
+    e => {
+      if (e.key === 'Escape' && !$('#askbg').hidden) {
+        e.stopImmediatePropagation();
+        answer(false);
+      }
+    },
+    true
+  );
+
+  /* ---------- saving and activating (asks before replacing another active plan) ---------- */
+  async function confirmActivation(p) {
+    const same = conflictsFor(p),
+      under = weeklyUnder(p);
+    if (same.length) {
+      const ok = await ask(
+        t(p.type === 'daily' ? 'askReplaceDaily' : 'askReplaceWeek')
+          .replace('{d}', planLabel(p).range)
+          .replace('{n}', planLabel(same[0]).name),
+        t(p.type === 'daily' ? 'askReplaceDayBtn' : 'askReplaceWeekBtn').replace('{d}', planLabel(p).range)
+      );
+      if (!ok) return null;
+    } else if (under) {
+      const ok = await ask(
+        t('askOverWeekly').replace('{w}', planLabel(under).range).replace('{d}', longDay(p.start)),
+        t('askReplaceDayBtn').replace('{d}', longDay(p.start))
+      );
+      if (!ok) return null;
+    }
+    return same;
+  }
+  async function savePlan(p, activate) {
+    let replace = [];
+    if (activate) {
+      replace = await confirmActivation(p);
+      if (replace == null) return false;
+    }
+    commit(
+      () => {
+        state.plans = (state.plans || []).filter(x => x.id !== p.id);
+        replace.forEach(x => {
+          const o = state.plans.find(y => y.id === x.id);
+          if (o) o.active = false;
+        });
+        state.plans.push({ ...p, active: !!activate, updated: Date.now() });
+      },
+      t(activate ? 'planSavedOn' : 'planSaved')
+    );
+    return true;
+  }
+  async function activatePlan(p, on) {
+    if (on) {
+      const replace = await confirmActivation(p);
+      if (replace == null) return;
+      commit(() => {
+        state.plans.forEach(x => {
+          if (replace.some(r => r.id === x.id)) x.active = false;
+          if (x.id === p.id) {
+            x.active = true;
+            x.updated = Date.now();
+          }
+        });
+      }, t('planOn'));
+    } else
+      commit(() => {
+        const x = state.plans.find(y => y.id === p.id);
+        if (x) x.active = false;
+      }, t('planOff'));
+  }
+
+  /* ---------- the Plan tab card ---------- */
+  function weekData(days) {
+    const blocks = {},
+      items = [],
+      daily = new Set();
+    days.forEach(d => {
+      const src = activeFor(d);
+      if (!src) return;
+      blocks[d] = (src.plan.blocks || {})[d] || [];
+      items.push(...(src.plan.items || []).filter(it => it.date === d));
+      if (src.kind === 'daily') daily.add(d);
+    });
+    return { blocks, items, daily };
+  }
+  function renderPlanWeek() {
+    const box = $('#planWeek');
+    if (!box) return;
+    document.querySelectorAll('#pwTabs button').forEach(b => b.classList.toggle('on', b.dataset.pw === tab));
+    $('#pwWeekBox').hidden = tab !== 'week';
+    $('#pwPlansBox').hidden = tab !== 'plans';
+    const src = activeFor(todayISO());
+    $('#pwSource').textContent = src
+      ? t('pwFrom')
+          .replace('{s}', t(src.kind === 'daily' ? 'srcDaily' : 'srcWeekly'))
+          .replace('{n}', planLabel(src.plan).name)
+      : t('pwFromSuggested');
+    const all = state.plans || [];
+    $('#pwTabs [data-pw="plans"]').textContent = `${t('pwPlans')} (${all.length})`;
+    if (tab === 'week') {
+      const days = Array.from({ length: 7 }, (_, k) => addDays(weekOf, k)),
+        data = weekData(days);
+      $('#pwRange').textContent = `${shortDate(days[0])} – ${shortDate(days[6])}`;
+      if (dayIdx == null) dayIdx = Math.max(0, days.indexOf(todayISO()));
+      const phone = phoneMQ.matches,
+        shown = phone ? [days[dayIdx]] : days;
+      $('#pwStrip').innerHTML = phone ? stripHTML(days, dayIdx, 'data-pwd') : '';
+      const onDay = $('#pwStrip .on');
+      if (onDay) onDay.parentNode.scrollLeft = onDay.offsetLeft - 40;
+      const empty = !Object.values(data.blocks).some(r => r.length);
+      /* weekly review (Cal Newport): planned vs done, so the next plan is based on what really happened */
+      const planned = data.items.reduce((a, it) => a + it.min, 0),
+        doneMin = data.items.filter(itemDone).reduce((a, it) => a + it.min, 0),
+        missed = data.items.filter(itemMissed).length;
+      $('#pwStats').innerHTML = planned
+        ? `${esc(t('pwPlanned'))} <b>${fmtMin(planned)}</b> · ${esc(t('planDone'))} <b>${fmtMin(doneMin)}</b>${missed ? ` · <span class="miss">${missed} ${esc(t('pwMissed'))}</span>` : ''}`
+        : '';
+      /* weekly planning: from Friday on, nudge to plan next week when it has no plan yet */
+      const dow = (parse(todayISO()).getDay() + 6) % 7,
+        nextMon = addDays(mondayOf(todayISO()), 7),
+        hasNext = (state.plans || []).some(p => p.active && p.type === 'weekly' && p.start === nextMon);
+      $('#pwNudge').hidden = !(dow >= 4 && !hasNext && weekOf === mondayOf(todayISO()));
+      $('#pwNudge').innerHTML =
+        `<span>${esc(t('pwNudge'))}</span><button type="button" id="pwNudgeGo">${esc(t('pwNudgeBtn'))}</button>`;
+      $('#pwGrid').innerHTML =
+        gridHTML(shown, data, 'view') + (empty ? `<div class="pwempty">${esc(t('pwEmptyWeek'))}</div>` : '');
+      scrollGrid($('#pwGrid'), data.blocks, shown);
+      $('#pwLegend').innerHTML =
+        ['due', 'weak', 'nodata', 'new', 'test']
+          .map(r => `<span><i class="r-${r}"></i>${esc(t('rs_' + r))}</span>`)
+          .join('') +
+        `<span>✓ ${esc(t('planDone'))}</span><span>! ${esc(t('pwMissed'))}</span><span><b class="wkdaily">D</b> ${esc(t('pwDailyDay'))}</span>`;
+    } else renderPlansList(all);
+  }
+  function renderPlansList(all) {
+    const sorted = all.slice().sort((a, b) => b.active - a.active || b.start.localeCompare(a.start));
+    $('#pwList').innerHTML = sorted.length
+      ? sorted
+          .map(p => {
+            const L = planLabel(p),
+              topics = new Set((p.items || []).filter(it => it.kind === 'topic').map(it => it.i)).size;
+            return `<div class="pwrow${p.active ? ' on' : ''}" data-pid="${esc(p.id)}"><span class="pwtype ${p.type}">${esc(t(p.type === 'daily' ? 'pDaily' : 'pWeekly'))}</span><span class="pwname">${esc(L.name)}<small>${esc(L.range)} · ${fmtMin(planTotal(p))} · ${esc(tf('pwTopics', topics))}</small></span><span class="pwstat">${esc(t(p.active ? 'pwActive' : 'pwInactive'))}</span><span class="pwacts"><button type="button" data-act="view">${esc(t('pwView'))}</button><button type="button" data-act="edit">${esc(t('pwEdit'))}</button><button type="button" data-act="${p.active ? 'off' : 'on'}">${esc(t(p.active ? 'pwDeactivate' : 'pwActivate'))}</button>${p.type === 'weekly' ? `<button type="button" data-act="copy">${esc(t('pwCopy'))}</button>` : ''}<button type="button" class="danger" data-act="del" aria-label="${esc(t('del'))}">×</button></span></div>`;
+          })
+          .join('')
+      : `<div class="pwempty">${esc(t('pwNoPlans'))}</div>`;
+  }
+
+  $('#pwTabs').onclick = e => {
+    const b = e.target.closest('[data-pw]');
+    if (!b) return;
+    tab = b.dataset.pw;
+    renderPlanWeek();
+  };
+  $('#pwPrev').onclick = () => {
+    weekOf = addDays(weekOf, -7);
+    dayIdx = 0;
+    renderPlanWeek();
+  };
+  $('#pwNext').onclick = () => {
+    weekOf = addDays(weekOf, 7);
+    dayIdx = 0;
+    renderPlanWeek();
+  };
+  $('#pwToday').onclick = () => {
+    weekOf = mondayOf(todayISO());
+    dayIdx = null;
+    renderPlanWeek();
+  };
+  $('#pwStrip').onclick = e => {
+    const b = e.target.closest('[data-pwd]');
+    if (!b) return;
+    dayIdx = +b.dataset.pwd;
+    renderPlanWeek();
+  };
+  $('#pwGrid').onclick = e => {
+    const b = e.target.closest('[data-wi]');
+    if (!b) return;
+    const it = weekData(Array.from({ length: 7 }, (_, k) => addDays(weekOf, k))).items.find(x => x.id === b.dataset.wi);
+    if (!it) return;
+    if (it.kind === 'test') openPt();
+    else if (it.kind === 'custom') toggleCheck(it.id);
+    else openModal(it.i, srModel(it.i).reps.length ? 'review' : 'study');
+  };
+  $('#pwNew').onclick = () => openWizard({ mode: 'new' });
+  $('#pwNudge').onclick = e => {
+    if (e.target.closest('#pwNudgeGo'))
+      openWizard({ mode: 'new', type: 'weekly', start: addDays(mondayOf(todayISO()), 7) });
+  };
+  $('#pwList').onclick = e => {
+    const b = e.target.closest('[data-act]');
+    if (!b) return;
+    const p = (state.plans || []).find(x => x.id === b.closest('[data-pid]').dataset.pid);
+    if (!p) return;
+    const act = b.dataset.act;
+    if (act === 'view') openWizard({ mode: 'view', plan: p });
+    else if (act === 'edit') openWizard({ mode: 'edit', plan: p });
+    else if (act === 'on' || act === 'off') activatePlan(p, act === 'on');
+    else if (act === 'copy') openWizard({ mode: 'copy', plan: p });
+    else if (act === 'del')
+      commit(
+        () => {
+          state.plans = state.plans.filter(x => x.id !== p.id);
+        },
+        t('planDeleted').replace('{n}', planLabel(p).name)
+      );
+  };
+
+  /* ---------- sync today's plan with the Kanban (never automatic: you review the moves and press OK) ----------
+     → Doing: topics in today's plan that are in another list
+     ← out of Doing: topics in Doing that are not in today's plan go back to the list they came from (else To Do) */
+  function kanbanMoves() {
+    const planned = [...new Set(todayPlan().items.filter(it => it.kind === 'topic').map(it => it.i))];
+    const lastFrom = i => {
+      const mv = state.events
+        .filter(e => e.kind === 'move' && e.topic === i && e.to === 'Doing' && e.from && e.from !== 'Doing')
+        .sort((a, b) => a.date.localeCompare(b.date))
+        .pop();
+      return mv ? mv.from : 'Todo';
+    };
+    const into = planned.filter(i => state.statuses[i] !== 'Doing').map(i => ({ i, from: state.statuses[i], to: 'Doing' }));
+    const out = TOPICS.map((_, i) => i)
+      .filter(i => state.statuses[i] === 'Doing' && !planned.includes(i))
+      .map(i => ({ i, from: 'Doing', to: lastFrom(i) }));
+    return [...into, ...out];
+  }
+  let kbMoves = [];
+  function openKanbanSync() {
+    kbMoves = kanbanMoves();
+    const T = todayPlan();
+    $('#kbSub').textContent =
+      T.source === 'suggested'
+        ? t('pwFromSuggested')
+        : t('pwFrom').replace('{s}', t(T.source === 'daily' ? 'srcDaily' : 'srcWeekly')).replace('{n}', planLabel(T.plan).name);
+    $('#kbList').innerHTML = kbMoves.length
+      ? kbMoves
+          .map(
+            (m, k) =>
+              `<label class="kbrow"><input type="checkbox" data-kb="${k}" checked><span class="kbn">${esc(TOPICS[m.i].name)}</span><span class="kbmv"><span style="color:${COLORS[STATUS.indexOf(m.from)]}">${esc(label(m.from))}</span> → <span style="color:${COLORS[STATUS.indexOf(m.to)]}">${esc(label(m.to))}</span></span></label>`
+          )
+          .join('')
+      : `<div class="pwempty">${esc(t('kbNothing'))}</div>`;
+    paintKbOk();
+    $('#kbbg').hidden = false;
+    $(kbMoves.length ? '#kbOk' : '#kbCancel').focus();
+  }
+  function paintKbOk() {
+    const n = document.querySelectorAll('#kbList [data-kb]:checked').length;
+    $('#kbOk').textContent = tf('kbApply', n);
+    $('#kbOk').disabled = !n;
+  }
+  const closeKb = () => ($('#kbbg').hidden = true);
+  $('#kbSync').onclick = openKanbanSync;
+  $('#kbList').addEventListener('change', paintKbOk);
+  $('#kbCancel').onclick = closeKb;
+  $('#kbClose').onclick = closeKb;
+  $('#kbbg').addEventListener('pointerdown', e => {
+    if (e.target.id === 'kbbg') closeKb();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !$('#kbbg').hidden) closeKb();
+  });
+  $('#kbOk').onclick = () => {
+    const pick = [...document.querySelectorAll('#kbList [data-kb]:checked')].map(x => kbMoves[+x.dataset.kb]);
+    closeKb();
+    if (!pick.length) return;
+    commit(() => {
+      pick.forEach(m => {
+        state.events.push({ id: uid(), date: todayISO(), topic: m.i, kind: 'move', from: m.from, to: m.to, demo: false });
+        state.statuses[m.i] = m.to;
+      });
+    }, tf('kbDone', pick.length));
+  };
+
+  return { ROWS, gridHTML, stripHTML, scrollGrid, itemName, ask, activatePlan, savePlan, renderPlanWeek, planLabel };
+})();
+const { ROWS, gridHTML, stripHTML, scrollGrid, itemName, ask, activatePlan, savePlan, renderPlanWeek, planLabel } =
+  PlanWeek;
+
+/* ===== module PlanWizard (js/views/plan-wizard.js) =====
+   public: openWizard, closeWizard, wizardState
+   Creating, editing and viewing a plan in four steps:
+     ① Type          daily (one date) or weekly (Mon–Sun of one week)
+     ② Time blocks   click and drag down a day in 15-minute steps (touch: tap a start, then tap an end).
+                     A drag stays in the day where it started, even if the pointer drifts into another day,
+                     and stops when the button is released. Undo / Redo, clear a day, copy a day to the others.
+     ③ Topics        suggested from your statistics (Schedule.suggestDays), editable: change, remove, move up,
+                     add a topic in free time; energy per day.
+     ④ Review        the week as it will look, then save (and activate, asking before replacing another plan). */
+const PlanWizard = (() => {
+  let W = null;
+  const STEPS = ['wzType', 'wzBlocks', 'wzTopics', 'wzReview'];
+  const ENERGIES = ['low', 'medium', 'high'];
+  const days = () => planDays({ type: W.type, start: W.start });
+  const longDay = d =>
+    new Intl.DateTimeFormat(LOCALE[lang], { weekday: 'short', month: 'short', day: 'numeric' }).format(parse(d));
+  const shortDate = d => new Intl.DateTimeFormat(LOCALE[lang], { month: 'short', day: 'numeric' }).format(parse(d));
+  const firstOpenWeek = () => {
+    const m = mondayOf(todayISO());
+    return addDays(m, 6) >= todayISO() ? m : addDays(m, 7);
+  };
+  const slotsOf = rs => {
+    const out = new Set();
+    (rs || []).forEach(([s, e]) => {
+      for (let m = s; m < e; m += SLOT) out.add(m);
+    });
+    return out;
+  };
+  const totalBlocked = () => days().reduce((a, d) => a + rangesTotal(W.blocks[d]), 0);
+  const snapshot = () => JSON.stringify(W.blocks);
+  /* the day the Clear / Copy buttons act on: the last one edited, else the shown day (phone), else the first open day */
+  const currentDay = () =>
+    W.lastDay || (phoneMQ.matches ? days()[W.dayIdx] : days().find(d => d >= todayISO()) || days()[0]);
+
+  /* ---------- open / close ---------- */
+  function openWizard({ mode, plan, type, start }) {
+    const base = plan ? JSON.parse(JSON.stringify(plan)) : null;
+    W = {
+      mode,
+      step: mode === 'new' ? 1 : mode === 'view' ? 4 : 2,
+      id: mode === 'edit' || mode === 'view' ? base.id : uid(),
+      type: base ? base.type : type || 'daily',
+      start: base ? (mode === 'copy' ? addDays(base.start, 7) : base.start) : start || todayISO(),
+      name: base && mode !== 'copy' ? base.name || '' : '',
+      blocks: {},
+      items: [],
+      energy: {},
+      active: base && mode !== 'copy' ? base.active : false,
+      hist: [],
+      fut: [],
+      dayIdx: 0,
+      anchor: null,
+      lastDay: null,
+      changed: new Set(),
+      editItem: null,
+      addAt: null,
+    };
+    if (base) {
+      const shift = mode === 'copy' ? 7 : 0;
+      Object.entries(base.blocks || {}).forEach(([d, rs]) => (W.blocks[addDays(d, shift)] = rs.map(r => r.slice())));
+      Object.entries(base.energy || {}).forEach(([d, e]) => (W.energy[addDays(d, shift)] = e));
+      if (mode === 'copy') days().forEach(d => W.changed.add(d));
+      else W.items = (base.items || []).map(it => ({ ...it }));
+    }
+    W.dayIdx = Math.max(0, days().indexOf(todayISO()));
+    $('#wizbg').hidden = false;
+    renderWizard();
+  }
+  function closeWizard() {
+    $('#wizbg').hidden = true;
+    W = null;
+    render();
+  }
+
+  /* ---------- rendering ---------- */
+  function renderWizard() {
+    if (!W) return;
+    const view = W.mode === 'view';
+    $('#wzTitle').textContent = t(view ? 'wzViewTitle' : W.mode === 'edit' ? 'wzEditTitle' : 'wzNewTitle');
+    $('#wzSteps').innerHTML = view
+      ? ''
+      : STEPS.map(
+          (k, j) =>
+            `<span class="${j + 1 === W.step ? 'on' : j + 1 < W.step ? 'past' : ''}"><b>${j + 1}</b>${esc(t(k))}</span>`
+        ).join('<i></i>');
+    $('#wzPresets').innerHTML = t('wzPresetList')
+      .split('|')
+      .map(x => `<option value="${esc(x)}"></option>`)
+      .join('');
+    const body = $('#wzBody');
+    if (W.step === 1) body.innerHTML = stepType();
+    if (W.step === 2) body.innerHTML = stepBlocks();
+    if (W.step === 3) body.innerHTML = stepTopics();
+    if (W.step === 4) body.innerHTML = stepReview();
+    const onDay = body.querySelector('.wkstrip .on');
+    if (onDay) onDay.parentNode.scrollLeft = onDay.offsetLeft - 40;
+    if (W.step === 2 || W.step === 4) {
+      const shown = phoneMQ.matches ? [days()[W.dayIdx]] : days();
+      scrollGrid(body, W.blocks, shown);
+    }
+    const back = $('#wzBack'),
+      next = $('#wzNext'),
+      save2 = $('#wzSaveOff');
+    back.hidden = view || W.step === 1 || (W.mode !== 'new' && W.mode !== 'copy' && W.step === 2);
+    back.textContent = t('wzBack');
+    save2.hidden = view || W.step !== 4;
+    save2.textContent = t('wzSaveOff');
+    next.textContent = view ? t('pwEdit') : W.step === 4 ? t('wzSaveOn') : t('wzNext');
+    next.disabled = !view && W.step === 2 && !totalBlocked();
+  }
+
+  function stepType() {
+    const wk = W.type === 'weekly';
+    return `<div class="wztypes">${['daily', 'weekly']
+      .map(
+        k =>
+          `<button type="button" class="wztype${W.type === k ? ' on' : ''}" data-wtype="${k}"><b>${k === 'daily' ? '☀' : '▦'} ${esc(t(k === 'daily' ? 'pDailyLong' : 'pWeeklyLong'))}</b><span>${esc(t(k === 'daily' ? 'wzDailyHint' : 'wzWeeklyHint'))}</span></button>`
+      )
+      .join('')}</div>
+      <div class="wzfields">${
+        wk
+          ? `<div class="field"><span class="flabel">${esc(t('wzWeek'))}</span><div class="wzweek"><button type="button" id="wzWkPrev" aria-label="Previous week">‹</button><b>${esc(shortDate(W.start))} – ${esc(shortDate(addDays(W.start, 6)))}</b><button type="button" id="wzWkNext" aria-label="Next week">›</button></div></div>`
+          : `<label class="field"><span class="flabel">${esc(t('date'))}</span><input type="date" id="wzDate" min="${todayISO()}" value="${W.start}"></label>`
+      }<label class="field"><span class="flabel">${esc(t('wzName'))}</span><input id="wzName" maxlength="40" placeholder="${esc(t('wzNameHint'))}" value="${esc(W.name)}"></label></div>
+      <p class="wztip">${esc(t('wzTipDeep'))}</p>`;
+  }
+
+  function blockTips() {
+    const tips = [];
+    days().forEach(d =>
+      (W.blocks[d] || []).forEach(([s, e]) => {
+        if (e - s > 120) tips.push(t('wzTipLong').replace('{d}', longDay(d)).replace('{t}', clockOf(s)));
+        else if (e - s < 30) tips.push(t('wzTipShort').replace('{d}', longDay(d)).replace('{t}', clockOf(s)));
+      })
+    );
+    return tips.slice(0, 3);
+  }
+  function stepBlocks() {
+    const ds = days(),
+      phone = phoneMQ.matches,
+      shown = phone ? [ds[W.dayIdx]] : ds,
+      cur = currentDay();
+    const tools = `<div class="wztools"><button type="button" id="wzUndo" ${W.hist.length ? '' : 'disabled'}>↶ ${esc(t('undo'))}</button><button type="button" id="wzRedo" ${W.fut.length ? '' : 'disabled'}>↷ ${esc(t('redo'))}</button><button type="button" id="wzClear" ${rangesTotal(W.blocks[cur]) ? '' : 'disabled'}>${esc(t('wzClear').replace('{d}', longDay(cur)))}</button>${W.type === 'weekly' ? `<button type="button" id="wzCopy" ${rangesTotal(W.blocks[cur]) ? '' : 'disabled'}>${esc(t('wzCopyDay').replace('{d}', longDay(cur)))}</button>` : ''}<span class="wztotal">${esc(t('wzTotal'))} <b>${fmtMin(totalBlocked())}</b></span></div>`;
+    const tips = blockTips();
+    return `<p class="wzhint">${esc(t(matchMedia('(hover:none)').matches ? 'wzHintTouch' : 'wzHintMouse'))}</p>${tools}${phone && ds.length > 1 ? stripHTML(ds, W.dayIdx, 'data-wzd') : ''}<div id="wzGrid">${gridHTML(shown, { blocks: W.blocks }, 'select', { anchor: W.anchor })}</div>${tips.length ? `<div class="wztips">${tips.map(x => `<span>${esc(x)}</span>`).join('')}</div>` : ''}`;
+  }
+
+  /* ---------- step 3: topics ---------- */
+  function fitsBlock(it, rs) {
+    return (rs || []).some(([s, e]) => it.start >= s && it.start < e);
+  }
+  function prepareTopics(force) {
+    const ds = days().filter(d => d >= todayISO());
+    W.items = W.items.filter(it => ds.includes(it.date) && fitsBlock(it, W.blocks[it.date]));
+    const todo = ds.filter(
+      d => rangesTotal(W.blocks[d]) && (force || W.changed.has(d) || !W.items.some(it => it.date === d))
+    );
+    if (!todo.length) return;
+    W.items = W.items.filter(it => !todo.includes(it.date));
+    const out = suggestDays(todo, W.blocks, Object.fromEntries(ds.map(d => [d, W.energy[d] || 'medium'])));
+    Object.values(out).forEach(list => W.items.push(...list));
+    W.changed.clear();
+  }
+  /* lay the items of one block one after the other, in their current order */
+  function repack(d, s, e) {
+    let t0 = s;
+    W.items
+      .filter(it => it.date === d && it.start >= s && it.start < e)
+      .sort((a, b) => a.start - b.start || (a.ord ?? 0) - (b.ord ?? 0))
+      .forEach(it => {
+        it.start = t0;
+        t0 += it.min;
+      });
+  }
+  const testMinutes = () => {
+    const st = settings();
+    return Math.round(TEST_Q * (60 / st.qph) * 1.1 + TEST_Q * (1 - blended().mu) * st.reviewMin);
+  };
+  function itemMinutes(kind, i, n, d) {
+    return kind === 'test' ? testMinutes() : Math.max(1, Math.round(n * perQ(i, d, W.energy[d]).per));
+  }
+  function topicOptions(sel) {
+    return (
+      `<option value="c"${sel === 'c' ? ' selected' : ''}>${esc(t('wzCustom'))}</option>` +
+      `<option value="t"${sel === 't' ? ' selected' : ''}>${esc(t('practiceTest'))}</option>` +
+      TOPICS.map((x, i) => ({ x, i }))
+        .sort((a, b) => a.x.name.localeCompare(b.x.name))
+        .map(
+          ({ x, i }) => `<option value="${i}"${String(sel) === String(i) ? ' selected' : ''}>${esc(x.name)}</option>`
+        )
+        .join('')
+    );
+  }
+  /* one editor for a topic, the practice test or your own activity ("Review the material", "Simulator" …):
+     for your own activity the number is minutes and you type a name; for a topic it is questions */
+  function editorHTML(attrs, it, okAct, cancelAct) {
+    const kind = it ? (it.kind === 'test' ? 't' : it.kind === 'custom' ? 'c' : String(it.i)) : '',
+      isC = kind === 'c';
+    return `<div class="wzit edit" ${attrs} data-kind="${isC ? 'c' : kind === 't' ? 't' : 'q'}"><select data-f="topic">${topicOptions(kind)}</select><input data-f="label" list="wzPresets" maxlength="60" placeholder="${esc(t('wzCustomHint'))}" value="${esc(it && it.label ? it.label : '')}"><input type="number" data-f="n" min="1" max="600" value="${it ? (isC ? it.min : it.n) : 10}" aria-label="${esc(t('wzAmount'))}"><span class="wzunit">${esc(isC ? 'min' : 'q')}</span><button type="button" class="primary" data-wact="${okAct}">✓</button><button type="button" data-wact="${cancelAct}">✕</button></div>`;
+  }
+  function readEditor(box, d) {
+    const sel = box.querySelector('[data-f="topic"]').value,
+      num = Math.max(1, Math.min(600, Math.round(+box.querySelector('[data-f="n"]').value || 10)));
+    if (sel === 'c') {
+      const label = box.querySelector('[data-f="label"]').value.trim() || t('wzCustomDefault');
+      return { kind: 'custom', i: null, n: 0, min: num, label, reason: 'custom' };
+    }
+    const kind = sel === 't' ? 'test' : 'topic',
+      i = kind === 'topic' ? +sel : null,
+      n = kind === 'test' ? TEST_Q : Math.min(200, num);
+    return { kind, i, n, min: itemMinutes(kind, i, n, d), label: undefined };
+  }
+  function stepTopics() {
+    const ds = days().filter(d => rangesTotal(W.blocks[d]));
+    if (!ds.length) return `<div class="pwempty">${esc(t('wzNoBlocks'))}</div>`;
+    const top = `<div class="wztools"><button type="button" id="wzResuggest">↻ ${esc(t('wzResuggest'))}</button><span class="wztotal">${esc(t('wzPlanned'))} <b>${fmtMin(W.items.reduce((a, it) => a + it.min, 0))}</b> / ${fmtMin(totalBlocked())}</span></div>`;
+    return (
+      top +
+      ds
+        .map(d => {
+          const rs = W.blocks[d],
+            past = d < todayISO(),
+            en = W.energy[d] || 'medium',
+            dayItems = W.items.filter(it => it.date === d);
+          const head = `<div class="wzdh"><b>${esc(longDay(d))}</b><span>${fmtMin(rangesTotal(rs))} ${esc(t('wzBlocked'))} · ${fmtMin(dayItems.reduce((a, it) => a + it.min, 0))} ${esc(t('wzPlannedLow'))}</span>${past ? '' : `<div class="seg wzen" data-wzen="${d}">${ENERGIES.map(m => `<button type="button" data-en="${m}" class="${m === en ? 'on' : ''}">${esc(t('en_' + m))}</button>`).join('')}</div>`}</div>`;
+          const blocks = rs
+            .map(([s, e]) => {
+              const its = dayItems.filter(it => it.start >= s && it.start < e).sort((a, b) => a.start - b.start),
+                used = its.reduce((a, it) => a + it.min, 0),
+                free = e - s - used;
+              const rows = its
+                .map((it, k) => {
+                  if (W.editItem === it.id) return editorHTML(`data-wid="${esc(it.id)}"`, it, 'ok', 'cancel');
+                  const r = it.kind === 'test' ? 'test' : it.reason || 'custom';
+                  return `<div class="wzit r-${r}" data-wid="${esc(it.id)}"><span class="wzt">${clockOf(it.start)}</span><span class="wzn">${esc(itemName(it))}<small>${esc(t('rs_' + r))}${it.kind === 'custom' ? '' : ' · ' + esc(t('wzGoal'))}</small></span><span class="wzq">${it.kind === 'custom' ? '' : it.n + ' q · '}${fmtMin(it.min)}</span><span class="wzacts">${k ? `<button type="button" data-wact="up" aria-label="${esc(t('wzUp'))}">↑</button>` : ''}<button type="button" data-wact="edit" aria-label="${esc(t('pwEdit'))}">✎</button><button type="button" data-wact="del" aria-label="${esc(t('del'))}">×</button></span></div>`;
+                })
+                .join('');
+              const key = `${d}|${s}`;
+              const add =
+                W.addAt === key
+                  ? editorHTML(`data-wadd="${key}"`, null, 'addok', 'addcancel')
+                  : free >= 5 && !past
+                    ? `<div class="wzfree"><span>${esc(t('wzFree').replace('{m}', fmtMin(free)))}</span><button type="button" data-wact="add" data-key="${key}">+ ${esc(t('wzAdd'))}</button></div>`
+                    : free < 0
+                      ? `<div class="wzfree over"><span>${esc(t('wzOver').replace('{m}', fmtMin(-free)))}</span></div>`
+                      : '';
+              return `<div class="wzblk"><div class="wzbh">${clockOf(s)}–${clockOf(e)} · ${fmtMin(e - s)}</div>${rows || `<div class="wzfree"><span>${esc(t('wzNothingFits'))}</span></div>`}${add}</div>`;
+            })
+            .join('');
+          return `<section class="wzday" data-d="${d}">${head}${blocks}</section>`;
+        })
+        .join('')
+    );
+  }
+
+  /* ---------- step 4: review ---------- */
+  function stepReview() {
+    const ds = days(),
+      phone = phoneMQ.matches,
+      shown = phone ? [ds[W.dayIdx]] : ds,
+      topics = new Set(W.items.filter(it => it.kind === 'topic').map(it => it.i)).size,
+      L = planLabel({ type: W.type, start: W.start, name: W.name });
+    return `<div class="wzsum"><div><b>${esc(L.name)}</b><span>${esc(t(W.type === 'daily' ? 'pDaily' : 'pWeekly'))} · ${esc(L.range)}</span></div><div><b>${fmtMin(totalBlocked())}</b><span>${esc(t('wzBlocked'))}</span></div><div><b>${fmtMin(W.items.reduce((a, it) => a + it.min, 0))}</b><span>${esc(t('wzPlannedLow'))}</span></div><div><b>${topics}</b><span>${esc(tf('pwTopics', topics).replace(/^\d+\s*/, ''))}</span></div></div>${phone && ds.length > 1 ? stripHTML(ds, W.dayIdx, 'data-wzd') : ''}<div id="wzGrid">${gridHTML(shown, { blocks: W.blocks, items: W.items }, 'view')}</div>`;
+  }
+
+  /* ---------- step navigation ---------- */
+  function buildPlanObject() {
+    const ds = days(),
+      blocks = {},
+      energy = {};
+    ds.forEach(d => {
+      if (rangesTotal(W.blocks[d])) blocks[d] = W.blocks[d];
+      if (W.energy[d] && W.energy[d] !== 'medium') energy[d] = W.energy[d];
+    });
+    return {
+      id: W.id,
+      type: W.type,
+      name: W.name.trim(),
+      start: W.start,
+      active: W.active,
+      blocks,
+      energy,
+      items: W.items.filter(it => ds.includes(it.date)).map(({ ord, ...it }) => it),
+      created: Date.now(),
+    };
+  }
+  async function next() {
+    if (W.mode === 'view') {
+      W.mode = 'edit';
+      W.step = 2;
+      return renderWizard();
+    }
+    if (W.step === 1) {
+      W.name = ($('#wzName') && $('#wzName').value) || '';
+      if (W.type === 'daily' && $('#wzDate') && $('#wzDate').value)
+        W.start = $('#wzDate').value < todayISO() ? todayISO() : $('#wzDate').value;
+      W.dayIdx = Math.max(0, days().indexOf(todayISO()));
+    }
+    if (W.step === 2) prepareTopics(false);
+    if (W.step === 4) {
+      const ok = await savePlan(buildPlanObject(), true);
+      if (ok) closeWizard();
+      return;
+    }
+    W.step++;
+    renderWizard();
+  }
+  function back() {
+    if (W.step > 1) W.step--;
+    renderWizard();
+  }
+
+  /* ---------- time-block selection ---------- */
+  function setBlocks(d, slots) {
+    const before = snapshot();
+    W.blocks[d] = normRanges([...slots]);
+    if (!W.blocks[d].length) delete W.blocks[d];
+    if (snapshot() !== before) {
+      W.changed.add(d);
+      return before;
+    }
+    return null;
+  }
+  function pushHist(before) {
+    if (before == null) return;
+    W.hist.push(before);
+    if (W.hist.length > 100) W.hist.shift();
+    W.fut = [];
+  }
+  function paintColumn(col, slots) {
+    col.querySelectorAll('.wks').forEach(el => el.classList.toggle('on', slots.has(+el.dataset.s)));
+  }
+  function slotAt(col, y) {
+    const r = col.getBoundingClientRect(),
+      row = Math.max(0, Math.min(ROWS - 1, Math.floor(((y - r.top) / r.height) * ROWS)));
+    return DAY_START + row * SLOT;
+  }
+  const rangeSlots = (a, b) => {
+    const out = [];
+    for (let m = Math.min(a, b); m <= Math.max(a, b); m += SLOT) out.push(m);
+    return out;
+  };
+  let drag = null;
+  document.addEventListener('pointerdown', e => {
+    if (!W || W.step !== 2 || e.pointerType === 'touch') return;
+    const cell = e.target.closest && e.target.closest('#wzGrid .wks');
+    if (!cell) return;
+    const col = cell.closest('.wkcol');
+    if (col.classList.contains('past')) return;
+    e.preventDefault();
+    const d = col.dataset.d,
+      base = slotsOf(W.blocks[d]),
+      s = +cell.dataset.s;
+    drag = { d, col, base, anchor: s, add: !base.has(s), before: snapshot(), cur: null };
+    dragTo(e.clientY);
+  });
+  function dragTo(y) {
+    const s = slotAt(drag.col, y);
+    if (s === drag.cur) return;
+    drag.cur = s;
+    const slots = new Set(drag.base);
+    rangeSlots(drag.anchor, s).forEach(m => (drag.add ? slots.add(m) : slots.delete(m)));
+    drag.slots = slots;
+    paintColumn(drag.col, slots);
+  }
+  document.addEventListener('pointermove', e => {
+    if (drag) dragTo(e.clientY); /* only the vertical position counts: the drag stays in the day where it started */
+  });
+  document.addEventListener('pointerup', () => {
+    if (!drag) return;
+    const d = drag;
+    drag = null;
+    W.lastDay = d.d;
+    pushHist(setBlocks(d.d, d.slots));
+    renderWizard();
+  });
+  /* touch: tap a start block, then tap an end block in the same day (a tap on the same block toggles it) */
+  let tapStart = null;
+  document.addEventListener(
+    'pointerdown',
+    e => {
+      if (W && W.step === 2 && e.pointerType === 'touch') tapStart = { x: e.clientX, y: e.clientY };
+    },
+    { passive: true }
+  );
+  document.addEventListener('pointerup', e => {
+    if (!W || W.step !== 2 || e.pointerType !== 'touch' || !tapStart) return;
+    const moved = Math.hypot(e.clientX - tapStart.x, e.clientY - tapStart.y) > 10;
+    tapStart = null;
+    if (moved) return;
+    const cell = e.target.closest && e.target.closest('#wzGrid .wks');
+    if (!cell) return;
+    const col = cell.closest('.wkcol');
+    if (col.classList.contains('past')) return;
+    const d = col.dataset.d,
+      s = +cell.dataset.s,
+      slots = slotsOf(W.blocks[d]);
+    if (W.anchor && W.anchor.date === d) {
+      rangeSlots(W.anchor.s, s).forEach(m => (W.anchor.add ? slots.add(m) : slots.delete(m)));
+      W.anchor = null;
+      W.lastDay = d;
+      pushHist(setBlocks(d, slots));
+    } else W.anchor = { date: d, s, add: !slots.has(s) };
+    renderWizard();
+  });
+  function undo() {
+    if (!W.hist.length) return;
+    W.fut.push(snapshot());
+    W.blocks = JSON.parse(W.hist.pop());
+    days().forEach(d => W.changed.add(d));
+    renderWizard();
+  }
+  function redo() {
+    if (!W.fut.length) return;
+    W.hist.push(snapshot());
+    W.blocks = JSON.parse(W.fut.pop());
+    days().forEach(d => W.changed.add(d));
+    renderWizard();
+  }
+
+  /* ---------- clicks inside the wizard ---------- */
+  $('#wzBody').addEventListener('click', e => {
+    if (!W) return;
+    const tgt = e.target;
+    const typeBtn = tgt.closest('[data-wtype]');
+    if (typeBtn) {
+      W.name = $('#wzName').value;
+      W.type = typeBtn.dataset.wtype;
+      W.start = W.type === 'weekly' ? firstOpenWeek() : todayISO();
+      W.blocks = {};
+      W.items = [];
+      return renderWizard();
+    }
+    if (tgt.closest('#wzWkPrev') || tgt.closest('#wzWkNext')) {
+      W.name = $('#wzName').value;
+      const n = addDays(W.start, tgt.closest('#wzWkPrev') ? -7 : 7);
+      if (addDays(n, 6) >= todayISO()) W.start = n;
+      return renderWizard();
+    }
+    const dayBtn = tgt.closest('[data-wzd]');
+    if (dayBtn) {
+      W.dayIdx = +dayBtn.dataset.wzd;
+      W.anchor = null;
+      return renderWizard();
+    }
+    if (tgt.closest('#wzUndo')) return undo();
+    if (tgt.closest('#wzRedo')) return redo();
+    const cur = currentDay;
+    if (tgt.closest('#wzClear')) {
+      pushHist(setBlocks(cur(), new Set()));
+      return renderWizard();
+    }
+    if (tgt.closest('#wzCopy')) {
+      const src = cur(),
+        before = snapshot();
+      days().forEach(d => {
+        if (d !== src && d >= todayISO()) {
+          W.blocks[d] = (W.blocks[src] || []).map(r => r.slice());
+          W.changed.add(d);
+        }
+      });
+      if (snapshot() !== before) pushHist(before);
+      return renderWizard();
+    }
+    if (tgt.closest('#wzResuggest')) {
+      W.editItem = W.addAt = null;
+      prepareTopics(true);
+      return renderWizard();
+    }
+    const en = tgt.closest('[data-wzen] [data-en]');
+    if (en) {
+      const d = en.closest('[data-wzen]').dataset.wzen;
+      W.energy[d] = en.dataset.en;
+      W.changed.add(d);
+      prepareTopics(false);
+      return renderWizard();
+    }
+    const act = tgt.closest('[data-wact]');
+    if (!act) return;
+    const a = act.dataset.wact,
+      row = act.closest('[data-wid]'),
+      it = row && W.items.find(x => x.id === row.dataset.wid),
+      blockOf = x => (W.blocks[x.date] || []).find(([s, e]) => x.start >= s && x.start < e);
+    if (a === 'edit') W.editItem = it.id;
+    if (a === 'cancel') W.editItem = null;
+    if (a === 'del') {
+      const b = blockOf(it);
+      W.items = W.items.filter(x => x !== it);
+      if (b) repack(it.date, b[0], b[1]);
+    }
+    if (a === 'up') {
+      const b = blockOf(it),
+        same = W.items
+          .filter(x => x.date === it.date && x.start >= b[0] && x.start < b[1])
+          .sort((p, q) => p.start - q.start),
+        k = same.indexOf(it);
+      if (k > 0) {
+        [same[k - 1], same[k]] = [same[k], same[k - 1]];
+        let t0 = b[0];
+        same.forEach(x => {
+          x.start = t0;
+          t0 += x.min;
+        });
+      }
+    }
+    if (a === 'ok') {
+      const v = readEditor(row, it.date);
+      if (v.kind !== it.kind || v.i !== it.i) {
+        it.reason = v.kind === 'test' ? 'test' : 'custom';
+        it.custom = true;
+      }
+      Object.assign(it, v, { reason: v.kind === 'custom' ? 'custom' : it.reason });
+      if (it.label === undefined) delete it.label;
+      W.editItem = null;
+      const b = blockOf(it);
+      if (b) repack(it.date, b[0], b[1]);
+    }
+    if (a === 'add') W.addAt = act.dataset.key;
+    if (a === 'addcancel') W.addAt = null;
+    if (a === 'addok') {
+      const box = act.closest('[data-wadd]'),
+        [d, s] = box.dataset.wadd.split('|'),
+        v = readEditor(box, d),
+        b = (W.blocks[d] || []).find(r => r[0] === +s);
+      const item = {
+        id: uid(),
+        date: d,
+        start: b[1] - 1,
+        ...v,
+        reason: v.kind === 'test' ? 'test' : 'custom',
+        custom: true,
+      };
+      if (item.label === undefined) delete item.label;
+      W.items.push(item);
+      repack(d, b[0], b[1]);
+      W.addAt = null;
+    }
+    renderWizard();
+  });
+  /* the editor switches between questions (topic) and minutes + name (your own activity) */
+  $('#wzBody').addEventListener('change', e => {
+    const sel = e.target.closest('.wzit.edit [data-f="topic"]');
+    if (!sel) return;
+    const row = sel.closest('.wzit'),
+      c = sel.value === 'c';
+    row.dataset.kind = c ? 'c' : sel.value === 't' ? 't' : 'q';
+    row.querySelector('.wzunit').textContent = c ? 'min' : 'q';
+    const n = row.querySelector('[data-f="n"]');
+    n.value = c ? 30 : 10;
+    if (c) row.querySelector('[data-f="label"]').focus();
+  });
+  /* step 1 inputs keep their values while the type or week changes */
+  $('#wzBody').addEventListener('input', e => {
+    if (!W) return;
+    if (e.target.id === 'wzName') W.name = e.target.value;
+    if (e.target.id === 'wzDate' && e.target.value) W.start = e.target.value < todayISO() ? todayISO() : e.target.value;
+  });
+  $('#wzNext').onclick = () => next();
+  $('#wzBack').onclick = back;
+  $('#wzSaveOff').onclick = async () => {
+    if (await savePlan(buildPlanObject(), false)) closeWizard();
+  };
+  $('#wzClose').onclick = closeWizard;
+  document.addEventListener('keydown', e => {
+    if (!W || $('#wizbg').hidden || !$('#askbg').hidden) return;
+    if (e.key === 'Escape') closeWizard();
+    if (W.step === 2 && (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
+      e.preventDefault();
+      e.shiftKey ? redo() : undo();
+    }
+  });
+
+  const wizardState = () => W;
+  return { openWizard, closeWizard, wizardState };
+})();
+const { openWizard, closeWizard, wizardState } = PlanWizard;
+
 /* ===== module ChartHover (js/ui/chart-hover.js) =====
    public: HOVER_OK, ctip */
 const ChartHover = (() => {
@@ -9688,6 +12426,7 @@ const HeaderControls = (() => {
     if (!confirm(t('demoConfirm'))) return;
     commit(() => {
       state.events = state.events.filter(e => !e.demo);
+      state.plans = (state.plans || []).filter(p => !p.demo);
     }, t('cleared'));
   };
 
@@ -10861,6 +13600,78 @@ const SelfTest = (() => {
       );
       fixture([], { settings: { minutes: 180, qph: 40, tests: 2 } });
       ok('Cadence', 'old "2 tests per week" setting becomes every 4 days', settings().testEvery === 4);
+      /* --- saved plans and the time-block scheduler --- */
+      ok(
+        'Plans',
+        '15-minute slots merge into ranges',
+        JSON.stringify(normRanges([1170, 1140, 1155, 1200])) === '[[1140,1185],[1200,1215]]',
+        JSON.stringify(normRanges([1170, 1140, 1155, 1200]))
+      );
+      {
+        const C = (key, n, per, value) => ({ key, kind: 'topic', i: key.charCodeAt(0), n, per, value });
+        const pick = knapsack([C('A', 10, 3, 10), C('B', 10, 3, 9), C('C', 20, 3, 15)], 60);
+        ok(
+          'Plans',
+          'knapsack picks the best set that fits (A+B = 19 beats C = 15 in 60 min)',
+          pick.map(x => x.key).sort().join() === 'A,B',
+          pick.map(x => x.key).join()
+        );
+        const pick2 = knapsack([C('A', 10, 3, 10), C('B', 20, 2, 8)], 40);
+        ok(
+          'Plans',
+          'time left after the knapsack gets part of the next topic (≥ 5 questions)',
+          pick2.some(x => x.key === 'A' && x.n === 10) && pick2.some(x => x.key === 'B' && x.n === 5),
+          JSON.stringify(pick2.map(x => [x.key, x.n]))
+        );
+      }
+      fixture(
+        [
+          { date: D(12), topic: 18, kind: 'study', score: 60 },
+          { date: D(9), topic: 6, kind: 'study', score: 75 },
+          { date: D(15), topic: 13, kind: 'study', score: 80 },
+        ],
+        { settings: { minutes: 180, qph: 40, testEvery: 0, reviewMin: 1.5 } }
+      );
+      {
+        const day = packDay(T, [[19 * 60, 20 * 60 + 30]], 'medium'),
+          used = day.reduce((a, it) => a + it.min, 0),
+          seq = day.every((it, k) => !k || it.start >= day[k - 1].start + day[k - 1].min - 1e-9);
+        ok('Plans', 'a 90-min block is filled without going over it', day.length && used <= 92, used);
+        ok('Plans', 'items run one after another inside the block', seq && day.every(it => it.start >= 1140 && it.start < 1230));
+        ok('Plans', 'deep work: at most one topic per ~45 min (≤ 2 in 90 min)', day.length <= 2, day.length);
+        ok('Plans', 'a topic appears once per day', new Set(day.map(it => it.i)).size === day.length);
+        const two = packDay(T, [[19 * 60, 19 * 60 + 45], [21 * 60, 21 * 60 + 45]], 'medium');
+        ok('Plans', 'two blocks on one day never repeat a topic', new Set(two.map(it => it.i)).size === two.length);
+        const wk = suggestDays([T, addDays(T, 1)], { [T]: [[1140, 1230]], [addDays(T, 1)]: [[1140, 1230]] }, {}),
+          dueDay1 = wk[T].filter(it => it.reason === 'due').map(it => it.i);
+        ok(
+          'Plans',
+          'a week assumes earlier days were done: a review placed today is not due again tomorrow',
+          !wk[addDays(T, 1)].some(it => it.reason === 'due' && dueDay1.includes(it.i)),
+          JSON.stringify(wk)
+        );
+        ok('Plans', 'simulated sessions never stay in your history', state.events.length === 3 && !state.events.some(e => String(e.id).startsWith('sim')));
+      }
+      {
+        const wkP = { id: 'w', type: 'weekly', start: mondayOf(T), active: true, blocks: {}, items: [], updated: 1 },
+          dP = { id: 'd', type: 'daily', start: T, active: true, blocks: {}, items: [{ id: 'i1', date: T, start: 1140, min: 30, kind: 'topic', i: 3, n: 10, reason: 'new' }, { id: 'i2', date: T, start: 1170, min: 20, kind: 'custom', i: null, n: 0, label: 'Simulator', reason: 'custom' }], updated: 2 };
+        fixture([], { plans: [wkP, dP] });
+        ok('Plans', 'today comes from the daily plan first', activeFor(T).kind === 'daily' && todayPlan().source === 'daily');
+        state.plans[1].active = false;
+        ok('Plans', '… then from the weekly plan', activeFor(T).kind === 'weekly' && todayPlan().source === 'weekly');
+        state.plans[0].active = false;
+        ok('Plans', '… else from the suggestion', activeFor(T) === null && todayPlan().source === 'suggested');
+        state.plans[1].active = true;
+        ok('Plans', 'a plan item is not done before you log it', !itemDone(state.plans[1].items[0]));
+        state.events.push({ id: 'x', date: T, topic: 3, kind: 'study', score: 80, from: null, to: null, partial: false, demo: false });
+        ok('Plans', 'logging a session for that topic on that day marks it done', itemDone(state.plans[1].items[0]));
+        ok('Plans', 'your own activity is done only by hand', !itemDone(state.plans[1].items[1]) && itemDone({ ...state.plans[1].items[1], check: true }));
+        state.plans[1].items.push({ id: 'i3', date: D(1), start: 1140, min: 30, kind: 'topic', i: 5, n: 10, reason: 'new' });
+        ok('Plans', 'an undone item from an earlier day is missed and boosts its topic', itemMissed(state.plans[1].items[2]) && missedTopics(T).has(5));
+        ok('Plans', 'a daily plan over an active weekly plan asks to replace only that day', (state.plans[0].active = true) && weeklyUnder(state.plans[1]) && weeklyUnder(state.plans[1]).id === 'w');
+        const n = normalize({ ...state, plans: [{ type: 'bogus' }, { type: 'daily', start: 'x' }, { ...dP, items: [{ kind: 'topic', i: 99, date: T, start: 0, min: 5 }] }] });
+        ok('Plans', 'malformed plans and items are dropped when loading', n.plans.length === 1 && n.plans[0].items.length === 0, JSON.stringify(n.plans));
+      }
       /* --- translations --- */
       const keys = Object.keys(I18N.en);
       ['pt', 'ja'].forEach(L => {
@@ -10984,7 +13795,7 @@ const GistSync = (() => {
             : 'error'
     );
   }
-  /* merge two copies: events and tests are united by id (the newer copy wins for the same id, deleted ids stay deleted);
+  /* merge two copies: events, tests and plans are united by id (the newer copy wins for the same id, deleted ids stay deleted);
    everything else (lists, scores, settings, exam date, plan of the day) comes from the newer copy */
   function mergeStates(a, b) {
     const [n, o] = a.updatedAt >= b.updatedAt ? [a, b] : [b, a],
@@ -11001,6 +13812,7 @@ const GistSync = (() => {
       ...n,
       events: un(n.events, o.events),
       tests: un(n.tests || [], o.tests || []),
+      plans: un(n.plans || [], o.plans || []),
       deleted: del,
       updatedAt: Math.max(a.updatedAt, b.updatedAt),
     });
@@ -11008,7 +13820,7 @@ const GistSync = (() => {
   const sameState = (a, b) => JSON.stringify(normalize(a)) === JSON.stringify(normalize(b));
   function adopt(remote) {
     state = remote;
-    prevIds = new Set([...state.events, ...(state.tests || [])].map(x => x.id));
+    prevIds = new Set([...state.events, ...(state.tests || []), ...(state.plans || [])].map(x => x.id));
     lang = state.lang;
     try {
       localStorage.setItem(STORE, JSON.stringify(state));
@@ -11266,6 +14078,7 @@ const { syncOn, mergeStates, syncPull, schedulePush, syncConnect, syncDisconnect
 /* ===== module Boot (js/boot.js) =====
    public: — */
 const Boot = (() => {
+  seedDemoPlan();
   save(false);
   render();
   fromHash();
