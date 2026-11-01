@@ -271,10 +271,11 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
     <figure><img src="img/en/wiz-4.jpg" alt="Step 4, review" loading="lazy"><figcaption>4 · Review</figcaption></figure>
   </div>
   <p><b>How topics are chosen.</b> Each block is filled to protect as many questions as possible on exam day, given the time each question takes (your speed, the topic's difficulty and the time to review mistakes). Inside a block, the hardest topic, or the one longest without review, comes first. To avoid switching subjects, a block holds at most one topic per ~45 minutes (deep work, configurable). In a weekly plan, each day assumes the earlier days were done: a Monday review doesn't come back on Tuesday.</p>
-  <p><b>Error review.</b> Each block ends with an <span class="ui">Error review</span> item, sized to the mistakes expected in the block: questions × (1 − chance of a right answer) × difficulty × minutes per mistake, rounded to 5. It lasts at least 10 minutes and at most a quarter of the block, and it doesn't appear when the block has fewer than 3 expected mistakes (topics you almost always get right). The item shows the expected mistakes per topic, for example "Weather 8 · NAS 4". To keep everything in the same block, the app shortens the easiest topic first. The review moves to the start of the next block only when a practice test or a topic that can't be shortened fills the whole block. If 20 minutes or more are left over, another topic is added, and no topic gets less than 10 minutes.</p>
+  <p><b>Error review.</b> Right after each topic comes an <span class="ui">Error review</span> of that topic's mistakes, the way the question bank shows the misses of a category as soon as you finish it. The block's review time is sized to the mistakes expected in it: questions × (1 − chance of a right answer) × difficulty × minutes per mistake, rounded to 5, at least 10 minutes and at most a quarter of the block, and none when the block has fewer than 3 expected mistakes. That time is then split among the block's topics in proportion to each one's expected mistakes, in 5-minute steps; a topic whose share is under 5 minutes gets no review. Each review row shows its topic's expected mistakes, for example "8 expected misses". To keep everything in the same block, the app shortens the easiest topic first. Only when a practice test or a topic that can't be shortened fills the whole block does the review move, as one item, to the start of the next block. If 20 minutes or more are left over, another topic is added, and no topic gets less than 10 minutes.</p>
   <p><b>Editing in step 3:</b></p>
   <ul>
-    <li><kbd>✎</kbd> changes the topic or the questions; <kbd>×</kbd> removes it; <kbd>↑</kbd> moves it up. The items after it rearrange themselves.</li>
+    <li><b>Drag a card</b> to move it: on a computer, grab it anywhere; on a phone or tablet, use its grip <kbd>⠿</kbd>. The other cards open a gap where it will land, between any two cards of the same day, and the times are laid out again when you let go. A topic moves together with its error review.</li>
+    <li><b>Click or tap a card</b> to edit it: change the questions, pick another category or the practice test, or type your own name (for example "Theory: weather fronts"). <kbd>×</kbd> removes it, and removing a topic also removes its error review.</li>
     <li><span class="ui">+ add</span> in free time: add a topic, the practice test, or <span class="ui">Your own activity</span>, with a name and minutes, such as "Simulator" or "Review the material".</li>
     <li>Each day's energy (low, medium, high) redoes that day's suggestion. <span class="ui">Suggest again</span> redoes everything.</li>
   </ul>
@@ -428,7 +429,8 @@ pass / goal       beta-binomial over 60 questions: P(X ≥ 42) and P(X ≥ 51)
 plan order        (1 − p on exam day) × urgency ÷ minutes per question
 blocks            knapsack per block, hardest first, 1 topic per ~45 min
 error review      expected mistakes = Σ questions × (1 − p) × difficulty
-                  minutes = mistakes × min per mistake  (≥ 10, ≤ ¼ of the block, only if ≥ 3 mistakes)</div>
+                  block minutes = mistakes × min per mistake  (≥ 10, ≤ ¼ of the block, only if ≥ 3 mistakes)
+                  each topic's review = block minutes × its mistakes ÷ the block's mistakes  (5-min steps)</div>
   <p>In the practice-test trend, the projection slows down after the last test instead of running up to 100%.</p>
 </section>
 <section class="chap" id="science">
@@ -465,7 +467,7 @@ S  stability: how many days it takes for R to fall to 90%</div>
   <p>Each topic gets a priority: how many points it can still give you on exam day, how urgent its review is, and how long its questions take.</p>
 <div class="formula">priority = (1 − p on exam day) × urgency ÷ minutes per question</div>
   <p>Filling a block is a <b>knapsack problem</b>: choose the topics whose total time fits the block and whose total value (questions protected) is as large as possible. The app solves it exactly for each block, then puts the hardest topic first, when your attention is freshest.</p>
-  <p><b>Error review.</b> Getting a question wrong and then studying why is one of the most effective ways to learn, especially when the feedback comes soon after the mistake. That is why each block ends with an error review sized to the mistakes you are expected to make in it, inside the same block rather than another day.</p>
+  <p><b>Error review.</b> Getting a question wrong and then studying why is one of the most effective ways to learn, especially when the feedback comes soon after the mistake. That is why each topic is followed right away by a review of its own mistakes, sized in proportion to the mistakes you are expected to make on it, inside the same block rather than another day.</p>
 
   <h3 id="sci-newport">Deep work and planning (Cal Newport)</h3>
   <p>The plan follows the ideas in Cal Newport's <i>Deep Work</i> and his time-block planning method:</p>

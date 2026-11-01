@@ -164,6 +164,7 @@ const AppState = (() => {
             .filter(x => x && (x.i === -1 || (Number.isInteger(x.i) && TOPICS[x.i])) && Number.isFinite(+x.m))
             .map(x => ({ i: x.i, m: Math.max(0, Math.round(+x.m)) }))
             .slice(0, 8);
+        if (it.kind === 'reflect' && typeof it.of === 'string') o.of = it.of.slice(0, 40);
         if (it.custom) o.custom = true;
         if (it.check) o.check = true;
         return o;

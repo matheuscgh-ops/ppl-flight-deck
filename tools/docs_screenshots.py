@@ -42,7 +42,7 @@ def run(b, lang):
     pg.mouse.move(b1['x'] + 5, b1['y'] + 3); pg.mouse.down(); pg.mouse.move(b1['x'] + 5, b2['y'] + 3, steps=6); pg.mouse.up(); pg.wait_for_timeout(150)
     pg.click('#wzCopy'); shot(pg, 'wiz-2', '#wizbg .modal')
     pg.click('#wzNext'); pg.wait_for_timeout(1500); shot(pg, 'wiz-3', '#wizbg .modal')
-    pg.locator('[data-wact="edit"]').first.click(); shot(pg, 'wiz-3-edit', '#wizbg .wzday >> nth=0'); pg.locator('[data-wact="cancel"]').first.click()
+    pg.locator('.wzit.editable').first.click(); shot(pg, 'wiz-3-edit', '#wizbg .wzday >> nth=0'); pg.locator('[data-wact="cancel"]').first.click()
     pg.click('#wzNext'); pg.wait_for_timeout(300); shot(pg, 'wiz-4', '#wizbg .modal')
     pg.click('#wzClose'); pg.wait_for_timeout(200)
     ev("openWizard({mode:'new',type:'daily',start:addDays(mondayOf(todayISO()),9)})"); pg.click('#wzNext')

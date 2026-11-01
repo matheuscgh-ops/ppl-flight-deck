@@ -1578,6 +1578,10 @@ const Translations = (() => {
     setReflect: '各ブロックの最後に間違いの振り返り',
     setReflectHint: 'ブロックで予想される間違いに比例（最低10分、最大でブロックの4分の1）',
   });
+  /* error review right after each topic */
+  Object.assign(I18N.en, { reflectMisses: '{n} expected misses' });
+  Object.assign(I18N.pt, { reflectMisses: '{n} erros esperados' });
+  Object.assign(I18N.ja, { reflectMisses: '予想される間違い {n} 問' });
   /* user guide (header button and tour) */
   Object.assign(I18N.en, { docsShort: 'Docs', docsTitle: 'Open the user guide (new tab)' });
   Object.assign(I18N.pt, { docsShort: 'Documentação', docsTitle: 'Abrir a documentação (nova aba)' });

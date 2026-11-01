@@ -1155,17 +1155,41 @@ const SelfTest = (() => {
           used = day.reduce((a, it) => a + it.min, 0),
           seq = day.every((it, k) => !k || it.start >= day[k - 1].start + day[k - 1].min - 1e-9);
         ok('Plans', 'a 90-min block is filled without going over it', day.length && used <= 92, used);
-        const last = day[day.length - 1];
+        const revs = day.filter(it => it.kind === 'reflect'),
+          revTotal = revs.reduce((a, it) => a + it.min, 0);
         ok(
           'Plans',
-          'the block ends with an error review sized 10 min … a quarter of the block',
-          last.kind === 'reflect' &&
-            last.min >= 10 &&
-            last.min <= 20 &&
-            last.start + last.min <= 1230 &&
-            last.parts.length,
-          JSON.stringify(last)
+          "the block's error review totals 10 min … a quarter of the block, inside it",
+          revs.length && revTotal >= 10 && revTotal <= 20 && revs.every(it => it.start + it.min <= 1230),
+          JSON.stringify(revs)
         );
+        ok(
+          'Plans',
+          'each review comes right after its own topic and covers only that topic (5-min steps)',
+          revs.every(r => {
+            const k = day.indexOf(r),
+              prev = day[k - 1];
+            return (
+              prev &&
+              prev.id === r.of &&
+              r.parts.length === 1 &&
+              r.parts[0].i === (prev.kind === 'test' ? -1 : prev.i) &&
+              r.min >= 5 &&
+              r.min % 5 === 0
+            );
+          }),
+          JSON.stringify(day.map(x => [x.kind, x.i, x.min, x.of || '', x.id]))
+        );
+        {
+          /* proportional: the topic with more expected misses never gets less review time */
+          const pairs = revs.map(r => [r.parts[0].m, r.min]).sort((a, b) => a[0] - b[0]);
+          ok(
+            'Plans',
+            'review time follows each topic’s expected misses',
+            pairs.every((x, k) => !k || x[1] >= pairs[k - 1][1]),
+            JSON.stringify(pairs)
+          );
+        }
         ok(
           'Plans',
           'items run one after another inside the block',
@@ -1211,12 +1235,10 @@ const SelfTest = (() => {
         ok('Plans', 'two blocks on one day never repeat a topic', new Set(twoT.map(it => it.i)).size === twoT.length);
         ok(
           'Plans',
-          'each block keeps its own error review at its end',
+          "each block keeps its topics' reviews inside it, each right after its topic",
           [1140, 1260].every(s0 => {
             const b = two.filter(it => it.start >= s0 && it.start < s0 + 45);
-            return (
-              !b.length || b[b.length - 1].kind === 'reflect' || b.every(it => it.kind !== 'topic' || it.n * 0 === 0)
-            );
+            return b.every((it, k) => it.kind !== 'reflect' || (k > 0 && b[k - 1].id === it.of));
           })
         );
         {
