@@ -65,9 +65,11 @@ def _(c):
 
 @T('Persistence', 'exam date change survives a reload and moves the calendar highlight')
 def _(c):
-    c.pg.fill('#examDate', '2026-11-20'); c.pg.dispatch_event('#examDate', 'change'); c.pg.wait_for_timeout(100)
+    # the 20th of next month, whatever today is
+    d = c.ev("(()=>{const t=new Date();const n=new Date(t.getFullYear(),t.getMonth()+1,20);return iso(n)})()")
+    c.pg.fill('#examDate', d); c.pg.dispatch_event('#examDate', 'change'); c.pg.wait_for_timeout(100)
     c.pg.reload(); c.pg.wait_for_timeout(300)
-    check(c.ev('state.deadline') == '2026-11-20', c.ev('state.deadline'))
+    check(c.ev('state.deadline') == d, c.ev('state.deadline'))
     c.pg.click('#next'); c.pg.wait_for_timeout(100)
     check(c.ev("[...document.querySelectorAll('.day.exam')].map(d=>d.querySelector('.dnum').textContent).join()") == '20', 'exam highlight')
 
@@ -310,13 +312,16 @@ def _(c):
 
 @T('Calendar', 'month navigation and Today button')
 def _(c):
-    c.pg.click('#prev'); check('September' in c.pg.inner_text('#month'), 'prev')
-    c.pg.click('#next'); c.pg.click('#next'); check('November' in c.pg.inner_text('#month'), 'next')
-    c.pg.click('#now'); check('October' in c.pg.inner_text('#month'), 'today')
+    m = lambda k: c.ev(f"(()=>{{const t=new Date();return new Date(t.getFullYear(),t.getMonth()+({k}),1).toLocaleString('en-US',{{month:'long'}})}})()")
+    c.pg.click('#prev'); check(m(-1) in c.pg.inner_text('#month'), 'prev')
+    c.pg.click('#next'); c.pg.click('#next'); check(m(1) in c.pg.inner_text('#month'), 'next')
+    c.pg.click('#now'); check(m(0) in c.pg.inner_text('#month'), 'today')
 
 @T('Calendar', 'exam date has the EXAM tag; countdown = days left')
 def _(c):
-    c.pg.click('#next'); check(c.ev("[...document.querySelectorAll('.day.exam .examtag')].length") == 1, 'tag')
+    k = c.ev("(()=>{const t=new Date(),d=parse(state.deadline);return (d.getFullYear()-t.getFullYear())*12+d.getMonth()-t.getMonth()})()")
+    for _ in range(max(0, k)): c.pg.click('#next')
+    check(c.ev("[...document.querySelectorAll('.day.exam .examtag')].length") == 1, 'tag')
     left = c.ev("diffDays(todayISO(),state.deadline)"); check(c.pg.inner_text('#countdown') == str(left), (c.pg.inner_text('#countdown'), left))
 
 @T('Calendar', 'past exam date shows "days since exam"')
