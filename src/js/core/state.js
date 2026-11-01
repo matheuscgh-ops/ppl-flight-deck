@@ -64,6 +64,23 @@ const AppState = (() => {
             .map(x => ({ id: x.id || uid(), date: x.date, q: +x.q || 60, score: cl(x.score) }))
         : [],
       deadline: ok(o.deadline) ? o.deadline : '2026-11-30',
+      /* error notebook: what you got wrong in a topic (topic -1 = practice test), shown again when it comes back */
+      notes: (Array.isArray(o.notes) ? o.notes : [])
+        .filter(
+          n =>
+            n &&
+            ok(n.date) &&
+            typeof n.text === 'string' &&
+            n.text.trim() &&
+            (n.topic === -1 || (Number.isInteger(n.topic) && TOPICS[n.topic]))
+        )
+        .map(n => ({
+          id: String(n.id || uid()).slice(0, 40),
+          topic: n.topic,
+          date: n.date,
+          text: n.text.trim().slice(0, 500),
+        }))
+        .slice(-2000),
       /* your own cards on the Kanban (tasks such as "Review the theory"): a title and a list, no questions or score */
       cards: normCards(o.cards),
       /* the order of the cards inside the Kanban lists (where you dropped them): topic numbers and your cards' ids */
@@ -265,7 +282,13 @@ const AppState = (() => {
   }
   function trackDeletes() {
     const now = new Set(
-      [...state.events, ...(state.tests || []), ...(state.plans || []), ...(state.cards || [])].map(x => x.id)
+      [
+        ...state.events,
+        ...(state.tests || []),
+        ...(state.plans || []),
+        ...(state.cards || []),
+        ...(state.notes || []),
+      ].map(x => x.id)
     );
     state.deleted ??= {};
     if (prevIds)

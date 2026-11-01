@@ -56,6 +56,7 @@ SCRIPTS = [
     'js/ui/navigation.js',
     'js/ui/palette.js',
     'js/ui/dialogs.js',
+    'js/views/notes.js',   # error notebook (after the dialogs it opens from)
     'js/views/volume.js',
     'js/views/practice-tests.js',
     'js/views/heatmap.js',

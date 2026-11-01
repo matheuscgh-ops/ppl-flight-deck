@@ -1578,6 +1578,43 @@ const Translations = (() => {
     setReflect: '各ブロックの最後に間違いの振り返り',
     setReflectHint: 'ブロックで予想される間違いに比例（最低10分、最大でブロックの4分の1）',
   });
+  /* error notebook */
+  Object.assign(I18N.en, {
+    notesTitle: 'Error notes',
+    notesSub: 'What you got wrong. It comes back with this topic in your plan and in its log.',
+    notesHint: 'What did you get wrong? (e.g. confused class C and D VFR minimums)',
+    notesSave: 'Add note',
+    notesEmpty: 'No notes for this topic yet.',
+    notesOpen: 'Error notes ({n})',
+    notesDone: 'Mark review done',
+    notesUndone: 'Review done ✓ (undo)',
+    noteAdded: 'Note added',
+    noteDeleted: 'Note deleted',
+  });
+  Object.assign(I18N.pt, {
+    notesTitle: 'Caderno de erros',
+    notesSub: 'O que você errou. Volta com este tópico no plano e no registro dele.',
+    notesHint: 'O que você errou? (ex.: confundi os mínimos VFR das classes C e D)',
+    notesSave: 'Adicionar nota',
+    notesEmpty: 'Nenhuma nota para este tópico ainda.',
+    notesOpen: 'Caderno de erros ({n})',
+    notesDone: 'Marcar revisão feita',
+    notesUndone: 'Revisão feita ✓ (desfazer)',
+    noteAdded: 'Nota adicionada',
+    noteDeleted: 'Nota apagada',
+  });
+  Object.assign(I18N.ja, {
+    notesTitle: '間違いノート',
+    notesSub: '間違えたこと。このトピックが計画や記録に出るたびに表示されます。',
+    notesHint: '何を間違えましたか？（例：クラスCとDのVFR最低気象条件を混同）',
+    notesSave: 'メモを追加',
+    notesEmpty: 'このトピックのメモはまだありません。',
+    notesOpen: '間違いノート（{n}）',
+    notesDone: '振り返り完了にする',
+    notesUndone: '振り返り完了 ✓（元に戻す）',
+    noteAdded: 'メモを追加しました',
+    noteDeleted: 'メモを削除しました',
+  });
   /* your own Kanban cards (tasks, not in the statistics) */
   Object.assign(I18N.en, {
     addCard: 'Add a card',

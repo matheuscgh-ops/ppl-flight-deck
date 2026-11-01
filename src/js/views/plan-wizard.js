@@ -247,7 +247,7 @@ const PlanWizard = (() => {
                       : t('rs_' + r) + (it.kind === 'custom' ? '' : ' · ' + t('wzGoal'));
                 /* drag the card (or its grip on touch screens) to move it; click or tap it to edit */
                 const editable = !past && it.kind !== 'reflect';
-                return `<div class="wzit r-${r}${child ? ' child' : ''}${editable ? ' editable' : ''}" data-wid="${esc(it.id)}"${editable ? ` role="button" tabindex="0" aria-label="${esc(t('pwEdit') + ': ' + itemName(it))}"` : ''}><span class="wzt">${child || past ? '' : `<span class="wzgrip" aria-hidden="true">⠿</span>`}${clockOf(it.start)}</span><span class="wzn">${esc(itemName(it))}<small>${esc(sub)}</small></span><span class="wzq">${minutesOnly ? '' : it.n + ' q · '}${fmtMin(it.min)}</span><span class="wzacts">${past ? '' : `<button type="button" data-wact="del" aria-label="${esc(t('del'))}">×</button>`}</span></div>`;
+                return `<div class="wzit r-${r}${child ? ' child' : ''}${editable ? ' editable' : ''}" data-wid="${esc(it.id)}"${editable ? ` role="button" tabindex="0" aria-label="${esc(t('pwEdit') + ': ' + itemName(it))}"` : ''}><span class="wzt">${child || past ? '' : `<span class="wzgrip" aria-hidden="true">⠿</span>`}${clockOf(it.start)}</span><span class="wzn">${esc(itemName(it))}${it.kind === 'topic' ? notesBadge(it.i) : ''}<small>${esc(sub)}</small></span><span class="wzq">${minutesOnly ? '' : it.n + ' q · '}${fmtMin(it.min)}</span><span class="wzacts">${past ? '' : `<button type="button" data-wact="del" aria-label="${esc(t('del'))}">×</button>`}</span></div>`;
               };
               const rows = groupsOf(its)
                 .map(g => `<div class="wzg" data-gid="${esc(g[0].id)}">${g.map(row).join('')}</div>`)
