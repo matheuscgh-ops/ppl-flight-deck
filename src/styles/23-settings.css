@@ -192,3 +192,87 @@
     margin-left: auto;
   }
 }
+
+/* ===== user guide button (header, next to the flags) ===== */
+.docsbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 11px;
+  background: var(--panel2);
+  border: 1px solid var(--line2);
+  border-radius: 8px;
+  color: var(--ink2);
+  font-weight: 650;
+  font-size: 13px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.docsbtn:hover {
+  background: #272c33;
+  border-color: #4b535e;
+  color: var(--ink);
+}
+.docsbtn:focus-visible {
+  outline: 2px solid var(--s1);
+  outline-offset: 2px;
+}
+/* tablets: icon only, so the header tools stay on one line */
+@media (max-width: 1279px) {
+  .docsbtn {
+    width: 36px;
+    padding: 0;
+    justify-content: center;
+  }
+  .docsbtn span {
+    display: none;
+  }
+}
+@media (max-width: 640px) {
+  /* phone: icon only, in the title row left of the gear */
+  .tools > .docsbtn {
+    position: absolute;
+    top: 0;
+    right: 142px;
+    width: 38px;
+    height: 29px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 7px;
+  }
+  .docsbtn span {
+    display: none;
+  }
+  .docsbtn svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+@media (max-width: 399px) {
+  .tools > .docsbtn {
+    position: static;
+    flex: 0 0 44px;
+    width: auto;
+    margin-left: auto;
+  }
+  .tools > button.gear {
+    margin-left: 0;
+  }
+}
+/* tablets and up: the header tools never wrap; the title side gives way instead */
+@media (min-width: 641px) {
+  .top > .tools {
+    flex-shrink: 0;
+  }
+}
+/* narrow phones (400–439 px): slightly smaller icon buttons so the title (with the DEMO tag) keeps its room */
+@media (min-width: 400px) and (max-width: 439px) {
+  .tools > button.gear {
+    width: 34px;
+  }
+  .tools > .docsbtn {
+    right: 138px;
+    width: 34px;
+  }
+}

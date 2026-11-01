@@ -1,4 +1,4 @@
-"""Runs every test suite for PPL Flight Deck and prints one summary.
+"""Runs every test suite for PPL Progress and prints one summary.
 
 Setup (once):   pip install playwright && python -m playwright install chromium
 Run:            python tests/run_all.py
@@ -37,6 +37,7 @@ suites = [('End-to-end (index.html)', ['test_e2e.py', os.path.join(ROOT, 'index.
           ('Saved plans, wizard & Kanban sync', ['test_plans.py']),
           ('Settings', ['test_settings.py']),
           ('Demo guided tour', ['test_tour.py']),
+          ('User guide, docs button & tour link', ['test_docs.py']),
           ('Whole-app audit (text, layout, same numbers everywhere)', ['test_audit.py']),
           ('Build (single source)', ['test_build.py'])]
 for title, args in suites:

@@ -10,6 +10,8 @@ Both are single, self-contained HTML files (GitHub Pages serves them as they are
     src/i18n/             translations (en / pt / ja)
     src/js/               the app: core, data, model, ui, views, sync, selftest, boot — order of SCRIPTS
     src/demo/             demo-only data (state.js) and the guided tour (tour.html)
+    src/docs/             the user guide: template.html + one content file per language (en, pt, ja), built into
+                          docs/index.html (English, the default), docs/pt.html and docs/ja.html; screenshots in docs/img/
 
 The demo differs from the personal app in: BUILD.demo = true (own storage key, sync off), its data module
 (demo/state.js instead of your history) and a few markup changes (title, DEMO tag, Tour button, tour script).
@@ -101,9 +103,9 @@ def demo_markup():
     """HTML-only differences of the demo (the JavaScript differences come from BUILD.demo and the data module)."""
     demo_tour = read('demo', 'tour.html')
     return [
-        ('<title>PPL Flight Deck</title>', '<title>PPL Flight Deck — Demo</title>'),
+        ('<title>PPL Progress</title>', '<title>PPL Progress — Demo</title>'),
         ('</style>', '.demotag{font-style:normal;font-size:.45em;vertical-align:middle;letter-spacing:.08em;color:#ffd08a;background:#3d2b14;border:1px solid #6b4a1c;border-radius:6px;padding:2px 7px;margin-left:6px}\n#syncChip{display:none!important}\n</style>'),
-        ('<div class="brand">PPL <span>/</span> FLIGHT DECK</div>', '<div class="brand">PPL <span>/</span> FLIGHT DECK <em class="demotag">DEMO</em></div>'),
+        ('<div class="brand">PPL <span>/</span> PROGRESS</div>', '<div class="brand">PPL <span>/</span> PROGRESS <em class="demotag">DEMO</em></div>'),
         ('<span id="tourSlot"></span>', '<button id="tourBtn" type="button">? Tour</button>'),
         ('</body>', demo_tour + '</body>'),
     ]
@@ -122,10 +124,41 @@ def apply_demo_markup(page):
     return page
 
 
+# user guide: English is the default page (index.html), each other language has its own page
+DOCS = [('en', 'index.html', 'en', 'PPL Progress — User guide', 'English'),
+        ('pt', 'pt.html', 'pt-BR', 'PPL Progress — Manual de uso', 'Português'),
+        ('ja', 'ja.html', 'ja', 'PPL Progress — ユーザーガイド', '日本語')]
+
+
+def build_docs():
+    """Returns {file name in docs/: page} for every language of the user guide."""
+    template = read('docs', 'template.html')
+    pages = {}
+    for code, name, html_lang, title, _label in DOCS:
+        langs = '<div class="langs" role="group" aria-label="Language">' + ''.join(
+            f'<a href="{n}" hreflang="{h}"' + (' aria-current="page"' if c == code else '') + f'>{lb}</a>'
+            for c, n, h, _t, lb in DOCS) + '</div>'
+        content = read('docs', code + '.html')
+        if content.count('@@LANGS@@') != 1:
+            raise SystemExit(f'build: @@LANGS@@ must appear exactly once in src/docs/{code}.html')
+        page = template
+        for marker, value in (('@@FILE@@', code), ('@@HTMLLANG@@', html_lang), ('@@TITLE@@', title),
+                              ('@@CONTENT@@', content.replace('@@LANGS@@', langs).replace('src="img/', f'src="img/{code}/'))):
+            if marker not in page:
+                raise SystemExit(f'build: {marker} missing from src/docs/template.html')
+            page = page.replace(marker, value)
+        pages[name] = page
+    return pages
+
+
 if __name__ == '__main__':
     personal = build_personal()
     with open(os.path.join(ROOT, 'index.html'), 'w', encoding='utf-8') as f:
         f.write(personal)
     with open(os.path.join(ROOT, 'demo.html'), 'w', encoding='utf-8') as f:
         f.write(build_demo())
-    print('built index.html and demo.html from src/')
+    os.makedirs(os.path.join(ROOT, 'docs'), exist_ok=True)
+    for name, page in build_docs().items():
+        with open(os.path.join(ROOT, 'docs', name), 'w', encoding='utf-8') as f:
+            f.write(page)
+    print('built index.html, demo.html and docs/ (en, pt, ja) from src/')

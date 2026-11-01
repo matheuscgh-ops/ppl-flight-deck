@@ -52,7 +52,7 @@ const Translations = (() => {
       undone: 'Undone',
       exported: 'File downloaded',
       imported: 'Backup imported',
-      invalid: 'This is not a valid PPL Flight Deck backup.',
+      invalid: 'This is not a valid PPL Progress backup.',
       inactive: 'No records yet.',
       already: 'Already in this list',
       nothing: 'Nothing to save — choose an activity or a new status',
@@ -115,7 +115,7 @@ const Translations = (() => {
       undone: 'Desfeito',
       exported: 'Arquivo baixado',
       imported: 'Backup importado',
-      invalid: 'Este arquivo não é um backup válido do PPL Flight Deck.',
+      invalid: 'Este arquivo não é um backup válido do PPL Progress.',
       inactive: 'Nenhum registro ainda.',
       already: 'Já está nesta lista',
       nothing: 'Nada a salvar — escolha uma atividade ou um novo status',
@@ -1578,6 +1578,10 @@ const Translations = (() => {
     setReflect: '各ブロックの最後に間違いの振り返り',
     setReflectHint: 'ブロックで予想される間違いに比例（最低10分、最大でブロックの4分の1）',
   });
+  /* user guide (header button and tour) */
+  Object.assign(I18N.en, { docsShort: 'Docs', docsTitle: 'Open the user guide (new tab)' });
+  Object.assign(I18N.pt, { docsShort: 'Documentação', docsTitle: 'Abrir a documentação (nova aba)' });
+  Object.assign(I18N.ja, { docsShort: 'ドキュメント', docsTitle: 'ユーザーガイドを開く（新しいタブ）' });
   return { I18N };
 })();
 const { I18N } = Translations;

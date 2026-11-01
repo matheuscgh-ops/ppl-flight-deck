@@ -16,6 +16,7 @@ const Dashboard = (() => {
       b.setAttribute('aria-pressed', on);
     });
     document.querySelectorAll('#seg button').forEach(b => (b.textContent = t(b.dataset.kind)));
+    $('#docsLink').href = docsUrl(lang);
     const hasDemo = state.events.some(e => e.demo);
     $('#demoBadge').hidden = $('#clearDemo').hidden = $('#demoSep').hidden = !hasDemo;
   }

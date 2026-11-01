@@ -1,0 +1,385 @@
+<div class="wrap">
+<nav class="toc" aria-label="Índice">
+  <div class="brand">PPL <span>/</span> Progress</div>
+  <div class="ver">Manual de uso · outubro de 2026</div>
+  @@LANGS@@
+  <a class="applink" href="../">← Abrir o app</a>
+  <ol>
+    <li><a href="#start">Comece aqui</a></li>
+    <li><a href="#dashboard">Dashboard</a>
+      <ol>
+        <li><a href="#kanban">Kanban e sessões</a></li>
+        <li><a href="#calendar">Calendário</a></li>
+        <li><a href="#side-panel">Previsão e plano de hoje</a></li>
+        <li><a href="#quick-log">Registro rápido</a></li>
+      </ol>
+    </li>
+    <li><a href="#plans">Planos</a>
+      <ol>
+        <li><a href="#week">Visão da semana</a></li>
+        <li><a href="#create-plan">Criar um plano</a></li>
+        <li><a href="#my-plans">Meus planos</a></li>
+        <li><a href="#kanban-sync">Sincronizar com o Kanban</a></li>
+      </ol>
+    </li>
+    <li><a href="#tests">Simulados</a></li>
+    <li><a href="#statistics">Estatísticas</a>
+      <ol>
+        <li><a href="#bank">Banco de questões</a></li>
+        <li><a href="#stats-tests">Simulados</a></li>
+      </ol>
+    </li>
+    <li><a href="#settings">Ajustes</a></li>
+    <li><a href="#data">Sync e seus dados</a></li>
+    <li><a href="#phone">No celular</a></li>
+    <li><a href="#math">Como os números são calculados</a></li>
+    <li><a href="#science">A ciência por trás</a>
+      <ol>
+        <li><a href="#sci-memory">Memória e revisões</a></li>
+        <li><a href="#sci-score">Nota esperada</a></li>
+        <li><a href="#sci-tests">Simulados</a></li>
+        <li><a href="#sci-plan">O plano</a></li>
+        <li><a href="#sci-newport">Deep work (Cal Newport)</a></li>
+        <li><a href="#sci-refs">Referências</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">Manual de instruções</div>
+  <h1>PPL Progress</h1>
+  <p class="lead">Um painel de estudo para o FAA Private Pilot Knowledge Test. Este manual mostra cada fluxo do app, passo a passo, com as telas da versão demo. A meta padrão é 85% na prova de 60 questões (aprovação em 70%).</p>
+</header>
+
+<section class="chap" id="start">
+  <h2><span class="n">01</span>Comece aqui</h2>
+  <p class="intro">O app é um único arquivo HTML que roda no navegador. Não tem instalação, servidor nem conta.</p>
+  <ul>
+    <li><b>Versão pessoal</b> (<code>index.html</code>): seu histórico real, com sync opcional entre aparelhos.</li>
+    <li><b>Demo</b> (<code>demo.html</code>): um ano de dados fictícios, um plano de exemplo e um tour guiado. A demo usa um armazenamento separado e nunca toca nos seus dados.</li>
+    <li><b>Abas:</b> <span class="ui">Dashboard</span> (o dia a dia), <span class="ui">Plan</span> (o calendário dos seus planos), <span class="ui">Practice tests</span> e <span class="ui">Statistics</span>.</li>
+    <li><b>No topo:</b> o chip de sync, o botão que abre esta documentação, as bandeiras de idioma (inglês, português, japonês) e a engrenagem de <a href="#settings">Ajustes</a>.</li>
+  </ul>
+  <figure>
+    <img src="img/dash.jpg" alt="Dashboard completo no desktop com progresso, Kanban, calendário e painel lateral" loading="lazy">
+    <figcaption>O Dashboard no desktop cabe em uma tela: progresso, contagem regressiva, simulados e volume no topo, o Kanban no meio, e o calendário e o painel lateral embaixo.</figcaption>
+  </figure>
+  <p class="note">Tudo fica salvo no seu navegador. Para levar os dados para outro aparelho, use o <a href="#data">sync</a> ou o backup em Ajustes.</p>
+</section>
+
+<section class="chap" id="dashboard">
+  <h2><span class="n">02</span>Dashboard</h2>
+  <p class="intro">O retrato do momento: onde você está no banco de questões, o que estudar hoje e como a memória de cada tópico está.</p>
+
+  <h3>Progresso do banco de questões</h3>
+  <p>A barra divide as 1.058 questões pelas listas do Kanban. Cada cor é uma lista, e a legenda mostra as questões e a porcentagem de cada uma.</p>
+  <figure><img src="img/dash-progress.jpg" alt="Barra de progresso do banco de questões" loading="lazy"></figure>
+
+  <h3>Contagem regressiva, simulados e volume</h3>
+  <ul>
+    <li><span class="ui">Exam countdown</span>: os dias até a prova. Mude a data no campo logo abaixo ou em Ajustes.</li>
+    <li><span class="ui">Practice tests</span>: a última nota, a melhor, a média dos 3 últimos e quando é o próximo simulado.</li>
+    <li><span class="ui">This week</span>: as questões feitas na semana, com as últimas 12 semanas. O ícone <kbd>⤢</kbd> abre o volume completo, com intervalos de 3 dias a tudo.</li>
+  </ul>
+  <figure class="mid"><img src="img/volume.jpg" alt="Diálogo de volume de estudo" loading="lazy"><figcaption>Volume de estudo: o total do período, a comparação com o período anterior e o gráfico com hover.</figcaption></figure>
+
+  <h3 id="kanban">Kanban e sessões</h3>
+  <p>Um cartão por tópico, em 5 listas: <span class="ui">To Do</span>, <span class="ui">Doing</span>, <span class="ui">Not Comfortable</span>, <span class="ui">Very Comfortable</span> e <span class="ui">To Review</span>. O número em cada cartão é a sua última nota no tópico.</p>
+  <figure><img src="img/dash-board.jpg" alt="Kanban com as cinco listas" loading="lazy"></figure>
+  <p><b>Mover um cartão:</b> arraste entre as listas, com mouse ou toque. Toda mudança mostra um aviso com <span class="ui">Undo</span>.</p>
+  <p><b>Registrar uma sessão:</b></p>
+  <ol class="steps">
+    <li>Clique no nome do cartão (ou selecione e aperte <kbd>Enter</kbd>).</li>
+    <li>Escolha <span class="ui">Studied</span> (primeira vez), <span class="ui">Reviewed</span> (revisão) ou <span class="ui">Status only</span> (só mudar a lista).</li>
+    <li>Digite a nota da sessão. Deixe em branco se ainda está em andamento: a sessão conta como iniciada, mas não entra na memória.</li>
+    <li>Ajuste a lista e a data, se precisar, e clique em <span class="ui">Save</span>.</li>
+  </ol>
+  <figure class="mid"><img src="img/log.jpg" alt="Diálogo de registro de sessão" loading="lazy"><figcaption>O histórico do tópico fica embaixo. O × apaga uma entrada, com desfazer.</figcaption></figure>
+  <p><b>Corrigir só a nota:</b> clique no número colorido do cartão, digite e aperte <kbd>Enter</kbd>. A nota da última sessão é atualizada.</p>
+
+  <h3 id="calendar">Calendário</h3>
+  <p>Cada dia mostra o que foi estudado, revisado e os simulados. A coluna <span class="ui">WK</span> marca as semanas com estudo, e o número embaixo é a sequência atual. Clique em um dia para ver o resumo dele.</p>
+  <div class="row">
+    <figure style="grid-column: span 2"><img src="img/dash-cal.jpg" alt="Calendário do mês" loading="lazy"></figure>
+    <figure><img src="img/day.jpg" alt="Resumo de um dia" loading="lazy"><figcaption>Resumo do dia.</figcaption></figure>
+  </div>
+
+  <h3 id="side-panel">Previsão, repetição espaçada e plano de hoje</h3>
+  <ul>
+    <li><span class="ui">Exam forecast</span>: a nota prevista para a prova, com as linhas de aprovação e de meta. Clique para ver os 3 tópicos que mais custam questões.</li>
+    <li><span class="ui">Spaced repetition</span>: a curva de memória de um tópico. A cada 3 segundos ela passa pelos tópicos do plano de hoje, e para quando você passa o mouse por cima. Passar o mouse por um cartão mostra a curva dele.</li>
+    <li><span class="ui">Today's plan</span>: o que estudar hoje. A etiqueta ao lado do título diz de onde vem: <span class="ui">Daily plan</span>, <span class="ui">Weekly plan</span> ou a energia da sugestão. O círculo marca um item como feito.</li>
+  </ul>
+  <div class="row">
+    <figure><img src="img/dash-side.jpg" alt="Painel lateral com previsão, curva e plano de hoje" loading="lazy"></figure>
+    <figure style="grid-column: span 2"><img src="img/fctop.jpg" alt="Onde você perde mais questões" loading="lazy"><figcaption>Clicando na previsão: onde você perde mais questões.</figcaption></figure>
+  </div>
+
+  <h3 id="quick-log">Registro rápido</h3>
+  <ol class="steps">
+    <li>Aperte <kbd>⌘K</kbd> (Mac) ou <kbd>Ctrl K</kbd>, ou <kbd>/</kbd> fora de um campo de texto.</li>
+    <li>Digite parte do nome do tópico.</li>
+    <li><kbd>Enter</kbd> registra como estudado, <kbd>⇧ Enter</kbd> como revisado e <kbd>⌥ Enter</kbd> abre o cartão. <kbd>Esc</kbd> fecha.</li>
+  </ol>
+  <figure class="mid"><img src="img/palette.jpg" alt="Paleta de registro rápido" loading="lazy"></figure>
+</section>
+
+<section class="chap" id="plans">
+  <h2><span class="n">03</span>Planos</h2>
+  <p class="intro">A aba Plan é o seu calendário de estudo: você reserva blocos de tempo, o app coloca os tópicos certos dentro deles, e você ajusta antes de salvar.</p>
+
+  <h3 id="week">Visão da semana</h3>
+  <figure><img src="img/plan-week.jpg" alt="Visão da semana na aba Plan" loading="lazy"></figure>
+  <ul>
+    <li><kbd>‹</kbd> <kbd>›</kbd> trocam de semana e <span class="ui">Today</span> volta para a atual.</li>
+    <li>À direita: o tempo planejado, o feito e quantos blocos foram perdidos na semana.</li>
+    <li>Cada bloco mostra o horário, o tópico e as questões. A cor indica o motivo: revisão, tópico fraco, sem dados, matéria nova, simulado, revisão dos erros ou atividade sua. Clicar num bloco abre o registro daquele tópico.</li>
+    <li>Um dia que vem de um plano diário ganha a marca <span class="ui">D</span>.</li>
+    <li>Quando hoje não tem plano ativo, aparece <span class="ui">Today's energy</span>: baixa, média ou alta muda o tamanho e a ordem da sugestão de hoje.</li>
+    <li>A partir de sexta, se a próxima semana não tiver plano, um aviso sugere planejá-la.</li>
+  </ul>
+  <p class="note">De onde vem o plano de hoje: primeiro o <b>plano diário</b> ativo para a data, senão o <b>plano semanal</b> ativo da semana, senão a <b>sugestão</b> das suas estatísticas.</p>
+
+  <h3 id="create-plan">Criar um plano</h3>
+  <p>Clique em <span class="ui">+ New plan</span>. São 4 passos.</p>
+  <ol class="steps">
+    <li><b>Tipo.</b> Escolha <span class="ui">Daily plan</span> (uma data) ou <span class="ui">Weekly plan</span> (segunda a domingo). Escolha a data ou a semana e, se quiser, dê um nome.</li>
+    <li><b>Blocos de tempo.</b> Clique e arraste para baixo num dia para reservar tempo, em passos de 15 minutos. O arraste fica no dia onde começou, mesmo que o mouse escorregue para outro, e para quando você solta. Arrastar sobre tempo já reservado remove. No toque: toque no início e depois no fim. Use <span class="ui">Undo</span> / <span class="ui">Redo</span>, <span class="ui">Clear</span> e <span class="ui">Copy … to the other days</span>.</li>
+    <li><b>Tópicos.</b> O app sugere o que estudar em cada bloco. Revise e ajuste (veja abaixo).</li>
+    <li><b>Revisão.</b> Veja a semana como vai ficar e clique em <span class="ui">Save &amp; activate</span> ou <span class="ui">Save without activating</span>.</li>
+  </ol>
+  <div class="row">
+    <figure><img src="img/wiz-1.jpg" alt="Passo 1, tipo do plano" loading="lazy"><figcaption>1 · Tipo</figcaption></figure>
+    <figure><img src="img/wiz-2.jpg" alt="Passo 2, blocos de tempo" loading="lazy"><figcaption>2 · Blocos de tempo</figcaption></figure>
+    <figure><img src="img/wiz-4.jpg" alt="Passo 4, revisão" loading="lazy"><figcaption>4 · Revisão</figcaption></figure>
+  </div>
+  <p><b>Como os tópicos são escolhidos.</b> Cada bloco é preenchido para proteger o máximo de questões no dia da prova, pelo tempo que cada questão leva (sua velocidade, a dificuldade do tópico e o tempo de revisar os erros). Dentro do bloco, o tópico mais difícil ou há mais tempo sem revisão vem primeiro. Para evitar trocas de assunto, um bloco tem no máximo um tópico a cada ~45 minutos (deep work, configurável). Num plano semanal, cada dia considera que os anteriores foram feitos: uma revisão de segunda não volta na terça.</p>
+  <p><b>Revisão dos erros.</b> Cada bloco termina com um item <span class="ui">Error review</span>, do tamanho dos erros esperados no bloco: questões × (1 − chance de acerto) × dificuldade × minutos por erro, arredondado para 5. Ele tem no mínimo 10 minutos e no máximo um quarto do bloco, e não aparece quando o bloco tem menos de 3 erros esperados (tópicos que você quase sempre acerta). O item mostra quantos erros se espera de cada tópico, por exemplo "Weather 8 · NAS 4". Para manter tudo no mesmo bloco, o app encurta primeiro o tópico mais fácil. A revisão só vai para o início do próximo bloco quando um simulado ou um tópico que não dá para encurtar ocupa o bloco inteiro. Se sobrarem 20 minutos ou mais, entra mais um tópico, e nenhum tópico fica com menos de 10 minutos.</p>
+  <p><b>Editar no passo 3:</b></p>
+  <ul>
+    <li><kbd>✎</kbd> troca o tópico ou as questões; <kbd>×</kbd> remove; <kbd>↑</kbd> sobe na ordem. Os itens seguintes se reorganizam sozinhos.</li>
+    <li><span class="ui">+ add</span> no tempo livre: adicione um tópico, o simulado, ou <span class="ui">Your own activity</span>, com nome e minutos, como "Simulador" ou "Revisar o material".</li>
+    <li>A energia de cada dia (baixa, média, alta) refaz a sugestão daquele dia. <span class="ui">Suggest again</span> refaz tudo.</li>
+  </ul>
+  <figure><img src="img/wiz-3.jpg" alt="Passo 3, tópicos sugeridos por bloco" loading="lazy"><figcaption>3 · Tópicos sugeridos em cada bloco, com a meta da sessão.</figcaption></figure>
+  <p><b>Substituir um plano ativo.</b> Um plano diário sobre um semanal ativo pergunta se deve substituir só aquele dia. Outro plano semanal para a mesma semana pergunta se deve substituir a semana. Cancelar não salva nada.</p>
+  <figure class="mid"><img src="img/ask-replace.jpg" alt="Pergunta antes de substituir um dia" loading="lazy"></figure>
+
+  <h3 id="my-plans">Meus planos</h3>
+  <p>Na aba <span class="ui">My plans</span> ficam todos os planos, ativos primeiro. Cada um tem:</p>
+  <ul>
+    <li><span class="ui">View</span>: abre o plano só para leitura.</li>
+    <li><span class="ui">Edit</span>: abre nos blocos de tempo, com os tópicos salvos.</li>
+    <li><span class="ui">Activate</span> / <span class="ui">Deactivate</span>: liga ou desliga, perguntando antes de substituir outro ativo.</li>
+    <li><span class="ui">Copy to next week</span> (semanal): começa um plano novo com os mesmos blocos, uma semana depois, e sugere tópicos novos.</li>
+    <li><kbd>×</kbd>: apaga, com desfazer.</li>
+  </ul>
+  <figure><img src="img/plan-myplans.jpg" alt="Lista de planos" loading="lazy"></figure>
+
+  <h3 id="kanban-sync">Sincronizar com o Kanban</h3>
+  <p>O Kanban nunca muda sozinho. <span class="ui">Sync with Kanban</span> mostra o que mudaria para o Kanban bater com o plano de hoje:</p>
+  <ul>
+    <li>Tópicos do plano de hoje que estão em outra lista vão para <span class="ui">Doing</span>.</li>
+    <li>Tópicos em Doing que não estão no plano voltam para a lista de onde vieram, ou para To Do.</li>
+  </ul>
+  <p>Desmarque o que não quiser e clique em <span class="ui">OK</span>. Um único Desfazer reverte tudo.</p>
+  <figure class="mid"><img src="img/plan-kbsync.jpg" alt="Revisão dos movimentos antes de sincronizar com o Kanban" loading="lazy"></figure>
+
+  <h3>Feito e perdido</h3>
+  <p>Um tópico do plano fica feito sozinho quando você registra uma sessão dele naquele dia. Atividades suas você marca no círculo. Um item de um dia que passou sem ser feito aparece como perdido, e esse tópico ganha prioridade na próxima sugestão. O plano não se reorganiza sozinho.</p>
+</section>
+
+<section class="chap" id="tests">
+  <h2><span class="n">04</span>Simulados</h2>
+  <p class="intro">Os simulados da FAA têm sempre 60 questões. A aba mostra os números, a tendência e a lista completa.</p>
+  <figure><img src="img/tests.jpg" alt="Aba Practice tests" loading="lazy"></figure>
+  <ol class="steps">
+    <li>Clique em <span class="ui">Log a practice test</span> (ou <span class="ui">+ Log practice test</span>).</li>
+    <li>Digite a nota. Deixe em branco se o simulado está em andamento.</li>
+    <li>Ajuste a data e salve. Para corrigir depois, use <span class="ui">Edit</span> na lista.</li>
+  </ol>
+  <figure class="mid"><img src="img/pt-log.jpg" alt="Registro de simulado" loading="lazy"></figure>
+  <ul>
+    <li><b>Próximo simulado:</b> o painel no topo diz quando é o próximo, sugerido a cada N dias (e antes, se você ficar dias sem estudar). <span class="ui">+ Add to today's plan</span> põe um simulado no plano de hoje. Com um plano ativo, ele entra no primeiro espaço livre que caiba.</li>
+    <li><b>Tendência:</b> a reta dos seus resultados, com a projeção até a prova e a data em que você chega na meta.</li>
+    <li>Simulados deixados em andamento por dias aparecem com um aviso, para você completar ou apagar.</li>
+  </ul>
+</section>
+
+<section class="chap" id="statistics">
+  <h2><span class="n">05</span>Estatísticas</h2>
+
+  <h3 id="bank">Banco de questões</h3>
+  <ul>
+    <li><span class="ui">Question-bank model</span>: a nota esperada hoje, a chance de passar, a chance de chegar na meta e a nota no dia da prova se você parar de revisar. O gráfico tem intervalos de 3 dias a tudo.</li>
+    <li><span class="ui">Where you lose the most questions</span>: os tópicos que mais custam questões numa prova de 60.</li>
+    <li><span class="ui">Needs recall</span>: a cada 3 segundos, a curva de um tópico do plano de hoje, do mais urgente para o menos. Os pontos pulam para um tópico.</li>
+  </ul>
+  <figure><img src="img/stats-top.jpg" alt="Previsão, onde você perde e precisa revisar" loading="lazy"></figure>
+  <ul>
+    <li><span class="ui">Heat map by topic</span>: um quadrado por tópico, com a chance de acertar hoje, do mais frio para o mais quente. Clique no card para ver o histórico por dia, semana ou mês, com filtros e hover.</li>
+    <li><span class="ui">Study volume</span>: sempre aberto, com o total, a comparação com o período anterior e os intervalos.</li>
+  </ul>
+  <figure><img src="img/stats-mid.jpg" alt="Mapa de calor de hoje e volume de estudo" loading="lazy"></figure>
+  <figure><img src="img/heat-history.jpg" alt="Histórico do mapa de calor" loading="lazy"><figcaption>Histórico do mapa de calor: o tópico, o período, a chance de acertar, a memória, a última nota e se esquentou ou esfriou.</figcaption></figure>
+  <p><b>Cards por tópico:</b> embaixo fica um card por tópico acompanhado, com a memória atual, a estabilidade, a próxima revisão, as sessões, a última nota e a curva. Filtre por <span class="ui">Due</span> ou por lista, escolha o intervalo dos gráficos e use <span class="ui">Log a review</span>.</p>
+  <figure class="mid"><img src="img/stats-topics.jpg" alt="Card de um tópico com a curva de memória" loading="lazy"></figure>
+
+  <h3 id="stats-tests">Simulados</h3>
+  <p>A previsão pelos simulados (média ponderada dos últimos), a tendência, o histograma das notas, a previsão completa (chance de passar e de chegar na meta, simulados aprovados, consistência) e a precisão do modelo comparado com os simulados reais.</p>
+  <figure><img src="img/stats-tests.jpg" alt="Estatísticas de simulados" loading="lazy"></figure>
+</section>
+
+<section class="chap" id="settings">
+  <h2><span class="n">06</span>Ajustes</h2>
+  <p class="intro">A engrenagem no topo abre os Ajustes. Toda mudança vale na hora, sincroniza, vai no backup e pode ser desfeita no aviso. Os padrões são o comportamento original do app.</p>
+  <div class="row">
+    <figure><img src="img/settings.jpg" alt="Ajustes, primeira parte" loading="lazy"></figure>
+    <figure><img src="img/settings-2.jpg" alt="Ajustes, segunda parte" loading="lazy"></figure>
+    <figure><img src="img/phone-settings.jpg" alt="Ajustes no celular" loading="lazy"><figcaption>No celular, os Ajustes abrem de baixo para cima.</figcaption></figure>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Ajuste</th><th>O que muda</th><th>Padrão</th></tr></thead>
+    <tbody>
+      <tr><td>Exam date</td><td>A contagem regressiva, a projeção e o fim dos gráficos.</td><td>—</td></tr>
+      <tr><td>Language</td><td>Inglês, português ou japonês.</td><td>English</td></tr>
+      <tr><td>Goal score</td><td>A linha de meta em todos os gráficos, a "chance de chegar na meta" e as questões necessárias (85% = 51 de 60).</td><td>85%</td></tr>
+      <tr><td>Review when recall falls to</td><td>Quando um tópico vence para revisão. Maior = revisões mais frequentes.</td><td>90%</td></tr>
+      <tr><td>Practice-test half-life</td><td>Quão rápido simulados antigos perdem peso na previsão.</td><td>10 dias</td></tr>
+      <tr><td>Bring a practice test forward after</td><td>Dias sem estudar que antecipam o próximo simulado.</td><td>3 dias</td></tr>
+      <tr><td>Minutes per night</td><td>O tempo do plano sugerido (usado quando não há plano ativo).</td><td>3h 00m</td></tr>
+      <tr><td>Questions per hour · Review min</td><td>A sua velocidade e o tempo para revisar cada erro.</td><td>40 · 1,5 min</td></tr>
+      <tr><td>Practice test every</td><td>O intervalo entre simulados (ou desligado).</td><td>3 dias</td></tr>
+      <tr><td>Default energy</td><td>A energia do plano sugerido quando você não escolheu uma hoje.</td><td>Medium</td></tr>
+      <tr><td>Plan grid starts at</td><td>A primeira hora da grade de blocos.</td><td>06:00</td></tr>
+      <tr><td>Deep work</td><td>Minutos de bloco por tópico (ou desligado).</td><td>45 min</td></tr>
+      <tr><td>Error review</td><td>O item de revisão dos erros no fim de cada bloco dos planos.</td><td>ligado</td></tr>
+      <tr><td>Default chart intervals</td><td>O intervalo inicial de cada gráfico.</td><td>—</td></tr>
+      <tr><td>Display</td><td>Carrosséis automáticos e números no mapa de calor.</td><td>ligados</td></tr>
+      <tr><td>Your data</td><td>Backup JSON, Import, Save HTML, Clear examples e Reset everything (pergunta antes, dá para desfazer).</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="chap" id="data">
+  <h2><span class="n">07</span>Sync e seus dados</h2>
+  <h3>Sync entre aparelhos</h3>
+  <p>Na versão pessoal, o chip de sync (ou <span class="ui">Manage sync…</span> em Ajustes) liga a sincronização por um GitHub Gist privado.</p>
+  <ol class="steps">
+    <li>Crie um token do GitHub só com a permissão "gist".</li>
+    <li>Cole o token e clique em <span class="ui">Connect</span>. Faça isso uma vez em cada aparelho, com o mesmo token.</li>
+    <li>Pronto: cada mudança sincroniza sozinha. Sessões, simulados e planos feitos offline nos dois aparelhos são juntados, e o que foi apagado não volta.</li>
+  </ol>
+  <figure class="mid"><img src="img/sync.jpg" alt="Diálogo de sync" loading="lazy"></figure>
+  <p class="note">O token fica só neste navegador. Ele nunca vai no Backup JSON, no Save HTML nem no Gist. Não compartilhe o token com ninguém.</p>
+  <p>O sync é opcional. Sem ele, os dados continuam salvos sozinhos neste navegador.</p>
+  <h3>Backup e cópia</h3>
+  <ul>
+    <li><span class="ui">Backup JSON</span>: baixa todos os seus dados, com planos e ajustes.</li>
+    <li><span class="ui">Import</span>: restaura um backup (um arquivo inválido é recusado sem mudar nada).</li>
+    <li><span class="ui">Save HTML</span>: baixa uma cópia do app já com os seus dados dentro.</li>
+  </ul>
+</section>
+
+<section class="chap" id="phone">
+  <h2><span class="n">08</span>No celular</h2>
+  <p class="intro">Tudo funciona no celular e no tablet, com estas diferenças:</p>
+  <ul>
+    <li>O Kanban rola para os lados, uma lista por vez, com pontos embaixo.</li>
+    <li>A prévia de repetição espaçada tem um seletor de tópico, e tocar num item do plano mostra a curva dele.</li>
+    <li>Na aba Plan aparece um dia por vez, escolhido na faixa de dias. A energia vira um menu simples.</li>
+    <li>Nos blocos de tempo, toque no início e depois no fim. Os diálogos abrem de baixo para cima.</li>
+    <li>Os gráficos aceitam tocar e arrastar para ver os valores, sem travar a rolagem da página.</li>
+    <li>O ícone de livro no topo abre esta documentação.</li>
+  </ul>
+  <div class="row">
+    <figure><img src="img/phone-dash.jpg" alt="Dashboard no celular" loading="lazy"><figcaption>Dashboard</figcaption></figure>
+    <figure><img src="img/phone-plan.jpg" alt="Aba Plan no celular" loading="lazy"><figcaption>Plan</figcaption></figure>
+    <figure><img src="img/phone-settings.jpg" alt="Ajustes no celular" loading="lazy"><figcaption>Ajustes</figcaption></figure>
+  </div>
+</section>
+
+<section class="chap" id="math">
+  <h2><span class="n">09</span>Como os números são calculados</h2>
+  <p class="intro">Um único motor de estatísticas alimenta todas as telas, então o mesmo número aparece igual em todo lugar. As seções "How it is calculated" do app trazem as fórmulas completas.</p>
+<div class="formula">memória         R(t) = 1 / (1 + t / 9S)        S = estabilidade, cresce após boas sessões
+próxima revisão quando R cai ao ponto de revisão  (90% → S dias)
+chance de acertar  p = nota × R + 1/3 × (1 − R)   (esquecer = chutar entre 3)
+modelo do banco    μ = Σ (questões do tópico / 1.058) × p
+previsão           μ do banco misturado com os 3 últimos simulados (meia-vida de 10 dias)
+passar / meta      beta-binomial em 60 questões: P(X ≥ 42) e P(X ≥ 51)
+ordem do plano     (1 − p no dia da prova) × urgência ÷ minutos por questão
+blocos             knapsack por bloco, mais difícil primeiro, 1 tópico a cada ~45 min
+revisão dos erros  erros esperados = Σ questões × (1 − p) × dificuldade
+                   minutos = erros × min por erro  (≥ 10, ≤ ¼ do bloco, só se ≥ 3 erros)</div>
+  <p>Na tendência dos simulados, a projeção desacelera depois do último simulado em vez de correr até 100%.</p>
+</section>
+<section class="chap" id="science">
+  <h2><span class="n">10</span>A ciência por trás</h2>
+  <p class="intro">O que cada estatística significa, a fórmula por trás dela e a pesquisa de onde ela vem. Você não precisa de nada disso para usar o app; está aqui para você poder confiar nos números (ou questioná-los).</p>
+
+  <h3 id="sci-memory">A memória decai, e as revisões freiam a queda</h3>
+  <p>Logo depois de uma sessão você lembra de quase tudo; depois a lembrança cai rápido e continua caindo cada vez mais devagar. Essa é a <b>curva do esquecimento</b>, medida pela primeira vez por Ebbinghaus em 1885. Trabalhos posteriores mostraram que ela é melhor descrita por uma <b>lei de potência</b> do que por uma exponencial simples. O app usa a curva de lei de potência do agendador FSRS:</p>
+<div class="formula">R(t) = 1 / (1 + t / 9S)
+
+R  lembrança: a chance de você ainda lembrar o tópico (0 a 1)
+t  dias desde a última sessão do tópico
+S  estabilidade: quantos dias leva para R cair a 90%</div>
+  <p>A <b>estabilidade</b> é o centro de tudo. Cada boa sessão aumenta S, então a curva fica mais plana e a próxima revisão pode esperar mais. Esse é o <b>efeito do espaçamento</b>: o mesmo tempo de estudo, distribuído, gera uma memória muito mais duradoura do que estudar tudo de uma vez. Cada sessão também é um teste, e lembrar uma resposta fortalece mais a memória do que reler (o <b>efeito de teste</b>, ou prática de recuperação).</p>
+  <p><b>Quando revisar.</b> Um tópico vence quando R cai ao ponto de revisão (90% por padrão, em Ajustes). Resolvendo R = 0,9 sai o intervalo:</p>
+<div class="formula">intervalo = 9S × (1 / ponto de revisão − 1)        em 90% → intervalo = S dias</div>
+  <p>Um ponto de revisão maior significa intervalos menores e mais revisões; um menor significa menos revisões e mais esquecimento no meio.</p>
+
+  <h3 id="sci-score">Da memória para uma nota esperada</h3>
+  <p>As questões da FAA têm 3 alternativas. Se você lembra um tópico, acerta no nível da sua última nota; se esqueceu, ainda acerta cerca de 1 em 3 no chute. Então a chance de acertar num tópico é uma mistura das duas coisas:</p>
+<div class="formula">p = nota × R + 1/3 × (1 − R)</div>
+  <p>A prova sorteia as 60 questões mais ou menos na proporção de quantas questões cada tópico tem no banco, então a nota esperada é a média ponderada:</p>
+<div class="formula">μ = Σ (questões do tópico / 1.058) × p</div>
+  <p><b>Chance de passar.</b> O número de acertos em 60 segue uma distribuição binomial se toda questão tiver a mesma chance μ. Mas μ também é uma estimativa, e o app sabe o quanto ela já errou: o erro dela contra os seus simulados reais. Por isso ele usa uma distribuição <b>beta-binomial</b>, que espalha as chances por essa incerteza em vez de fingir que μ é exato. Passar é 42 de 60 (70%), e a meta padrão é 51 de 60 (85%):</p>
+<div class="formula">chance de passar = P(X ≥ 42)        chance da meta = P(X ≥ 51)        X ~ BetaBinomial(60, μ)</div>
+  <p><b>"Se você parar de revisar"</b> faz a mesma conta no dia da prova, deixando todas as curvas caírem sem novas sessões. A distância entre a nota de hoje e essa linha é o que as suas revisões estão protegendo.</p>
+
+  <h3 id="sci-tests">Simulados e a previsão combinada</h3>
+  <p>Os simulados medem tudo de uma vez, mas cada um tem ruído. A previsão faz a média dos seus 3 últimos simulados com <b>pesos de decaimento exponencial</b>: um simulado perde metade do peso a cada 10 dias (a meia-vida, em Ajustes). Depois ela combina essa média com o modelo do banco μ, para um único dia bom ou ruim não balançar a previsão.</p>
+<div class="formula">peso de um simulado = 0,5 ^ (idade em dias / meia-vida)</div>
+  <p>A <b>tendência</b> é uma reta de mínimos quadrados pelas suas notas. A projeção desacelera depois do último simulado em vez de correr até 100%, porque as notas se estabilizam perto do seu teto. O gráfico de precisão do modelo compara o que o modelo do banco previu em cada dia de simulado com a nota que você realmente tirou.</p>
+
+  <h3 id="sci-plan">Como o plano decide o que você estuda</h3>
+  <p>Cada tópico recebe uma prioridade: quantos pontos ele ainda pode te dar no dia da prova, quão urgente é a revisão dele e quanto tempo as questões dele levam.</p>
+<div class="formula">prioridade = (1 − p no dia da prova) × urgência ÷ minutos por questão</div>
+  <p>Preencher um bloco é um <b>problema da mochila</b> (knapsack): escolher os tópicos cujo tempo total cabe no bloco e cujo valor total (questões protegidas) é o maior possível. O app resolve isso de forma exata para cada bloco e depois coloca o tópico mais difícil primeiro, quando a sua atenção está mais fresca.</p>
+  <p><b>Revisão dos erros.</b> Errar uma questão e depois estudar o porquê é uma das formas mais eficazes de aprender, principalmente quando o retorno vem logo depois do erro. Por isso cada bloco termina com uma revisão dos erros do tamanho dos erros esperados nele, dentro do mesmo bloco e não em outro dia.</p>
+
+  <h3 id="sci-newport">Deep work e planejamento (Cal Newport)</h3>
+  <p>O plano segue as ideias do livro <i>Deep Work</i>, de Cal Newport, e do método de planejamento por blocos de tempo dele:</p>
+  <ul>
+    <li><b>Planejamento por blocos de tempo.</b> Dê um trabalho a cada minuto da sessão antes de começar. A aba Plan é um planejador por blocos: primeiro você reserva os blocos, depois decide o que vai em cada um.</li>
+    <li><b>Foco em vez de trocas.</b> Cada troca de assunto deixa um "resíduo de atenção": parte da sua mente fica na tarefa anterior (Leroy, 2009). O limite de deep work deixa no máximo um tópico a cada ~45 minutos de bloco.</li>
+    <li><b>O mais difícil primeiro.</b> O tópico mais exigente fica no começo de cada bloco, e a sua energia do dia muda o tamanho e a ordem da sugestão.</li>
+    <li><b>Planejado contra feito.</b> A semana mostra o tempo planejado, o feito e os blocos perdidos. Tópicos perdidos ganham prioridade na próxima vez, mas o plano nunca se reescreve sozinho: você decide.</li>
+    <li><b>Planejamento semanal.</b> A partir de sexta, se a próxima semana não tiver plano, o app sugere planejá-la, para a semana começar com intenção e não com improviso.</li>
+    <li><b>Você no controle.</b> Nada se move no Kanban até você aprovar em Sincronizar com o Kanban.</li>
+  </ul>
+  <p>Praticar os tópicos que mais custam pontos, com uma meta clara por sessão e retorno rápido, também é o núcleo da <b>prática deliberada</b> (Ericsson et al., 1993).</p>
+
+  <h3 id="sci-refs">Referências e leituras</h3>
+  <ul class="refs">
+    <li>Ebbinghaus, H. (1885). <i>Memory: A Contribution to Experimental Psychology.</i> <a href="https://psychclassics.yorku.ca/Ebbinghaus/index.htm" target="_blank" rel="noopener">Texto completo</a></li>
+    <li>Wixted, J. T., &amp; Ebbesen, E. B. (1991). On the form of forgetting. <i>Psychological Science, 2</i>(6), 409–415. <a href="https://doi.org/10.1111/j.1467-9280.1991.tb00175.x" target="_blank" rel="noopener">doi</a></li>
+    <li>Open Spaced Repetition. <i>FSRS: the algorithm.</i> <a href="https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm" target="_blank" rel="noopener">GitHub wiki</a></li>
+    <li>Cepeda, N. J., Pashler, H., Vul, E., Wixted, J. T., &amp; Rohrer, D. (2006). Distributed practice in verbal recall tasks: A review and quantitative synthesis. <i>Psychological Bulletin, 132</i>(3), 354–380. <a href="https://doi.org/10.1037/0033-2909.132.3.354" target="_blank" rel="noopener">doi</a></li>
+    <li>Roediger, H. L., &amp; Karpicke, J. D. (2006). Test-enhanced learning: Taking memory tests improves long-term retention. <i>Psychological Science, 17</i>(3), 249–255. <a href="https://doi.org/10.1111/j.1467-9280.2006.01693.x" target="_blank" rel="noopener">doi</a></li>
+    <li>Metcalfe, J. (2017). Learning from errors. <i>Annual Review of Psychology, 68</i>, 465–489. <a href="https://doi.org/10.1146/annurev-psych-010416-044022" target="_blank" rel="noopener">doi</a></li>
+    <li>Ericsson, K. A., Krampe, R. T., &amp; Tesch-Römer, C. (1993). The role of deliberate practice in the acquisition of expert performance. <i>Psychological Review, 100</i>(3), 363–406. <a href="https://doi.org/10.1037/0033-295X.100.3.363" target="_blank" rel="noopener">doi</a></li>
+    <li>Leroy, S. (2009). Why is it so hard to do my work? The challenge of attention residue when switching between work tasks. <i>Organizational Behavior and Human Decision Processes, 109</i>(2), 168–181. <a href="https://doi.org/10.1016/j.obhdp.2009.04.002" target="_blank" rel="noopener">doi</a></li>
+    <li>Newport, C. (2016). <i>Deep Work: Rules for Focused Success in a Distracted World.</i> Grand Central. <a href="https://calnewport.com/deep-work-rules-for-focused-success-in-a-distracted-world/" target="_blank" rel="noopener">calnewport.com</a></li>
+    <li>Newport, C. <i>Time-block planning.</i> <a href="https://www.timeblockplanner.com/" target="_blank" rel="noopener">timeblockplanner.com</a></li>
+    <li>Conceitos: <a href="https://pt.wikipedia.org/wiki/Curva_do_esquecimento" target="_blank" rel="noopener">curva do esquecimento</a> · <a href="https://en.wikipedia.org/wiki/Spacing_effect" target="_blank" rel="noopener">efeito do espaçamento</a> · <a href="https://en.wikipedia.org/wiki/Testing_effect" target="_blank" rel="noopener">efeito de teste</a> · <a href="https://pt.wikipedia.org/wiki/Distribui%C3%A7%C3%A3o_binomial" target="_blank" rel="noopener">binomial</a> · <a href="https://en.wikipedia.org/wiki/Beta-binomial_distribution" target="_blank" rel="noopener">beta-binomial</a> · <a href="https://en.wikipedia.org/wiki/Exponential_smoothing" target="_blank" rel="noopener">peso exponencial</a> · <a href="https://pt.wikipedia.org/wiki/M%C3%A9todo_dos_m%C3%ADnimos_quadrados" target="_blank" rel="noopener">mínimos quadrados</a> · <a href="https://pt.wikipedia.org/wiki/Problema_da_mochila" target="_blank" rel="noopener">problema da mochila</a></li>
+    <li>FAA. <i>Private Pilot – Airplane Airman Certification Standards.</i> <a href="https://www.faa.gov/training_testing/testing/acs" target="_blank" rel="noopener">faa.gov</a></li>
+  </ul>
+  <p style="color: var(--muted); font-size: 14px; margin-top: 40px">Ferramenta pessoal de estudo, sem vínculo com a FAA nem com a Sporty's. As previsões são estimativas, não garantias.</p>
+</section>
+</main>
+</div>

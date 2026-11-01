@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PPL Flight Deck</title>
+<title>PPL Progress</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='31' fill='%23000'/%3E%3Cpath d='M32 14 L50 46 H14 Z' fill='%23fff'/%3E%3C/svg%3E">
 
 <style>:root {
@@ -5555,19 +5555,104 @@ b.wkdaily {
     margin-left: auto;
   }
 }
+
+/* ===== user guide button (header, next to the flags) ===== */
+.docsbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 11px;
+  background: var(--panel2);
+  border: 1px solid var(--line2);
+  border-radius: 8px;
+  color: var(--ink2);
+  font-weight: 650;
+  font-size: 13px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.docsbtn:hover {
+  background: #272c33;
+  border-color: #4b535e;
+  color: var(--ink);
+}
+.docsbtn:focus-visible {
+  outline: 2px solid var(--s1);
+  outline-offset: 2px;
+}
+/* tablets: icon only, so the header tools stay on one line */
+@media (max-width: 1279px) {
+  .docsbtn {
+    width: 36px;
+    padding: 0;
+    justify-content: center;
+  }
+  .docsbtn span {
+    display: none;
+  }
+}
+@media (max-width: 640px) {
+  /* phone: icon only, in the title row left of the gear */
+  .tools > .docsbtn {
+    position: absolute;
+    top: 0;
+    right: 142px;
+    width: 38px;
+    height: 29px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 7px;
+  }
+  .docsbtn span {
+    display: none;
+  }
+  .docsbtn svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+@media (max-width: 399px) {
+  .tools > .docsbtn {
+    position: static;
+    flex: 0 0 44px;
+    width: auto;
+    margin-left: auto;
+  }
+  .tools > button.gear {
+    margin-left: 0;
+  }
+}
+/* tablets and up: the header tools never wrap; the title side gives way instead */
+@media (min-width: 641px) {
+  .top > .tools {
+    flex-shrink: 0;
+  }
+}
+/* narrow phones (400–439 px): slightly smaller icon buttons so the title (with the DEMO tag) keeps its room */
+@media (min-width: 400px) and (max-width: 439px) {
+  .tools > button.gear {
+    width: 34px;
+  }
+  .tools > .docsbtn {
+    right: 138px;
+    width: 34px;
+  }
+}
 </style>
 </head>
 <body>
 <main class="app">
   <header class="top">
     <div>
-      <div class="brandrow"><div class="brand">PPL <span>/</span> FLIGHT DECK</div><nav class="tabs" role="tablist"><button type="button" role="tab" data-view="dash" data-t="tabDash"></button><button type="button" role="tab" data-view="plan" data-t="tabPlan"></button><button type="button" role="tab" data-view="tests" data-t="tabTests"></button><button type="button" role="tab" data-view="sr" data-t="tabSR"></button></nav></div>
+      <div class="brandrow"><div class="brand">PPL <span>/</span> PROGRESS</div><nav class="tabs" role="tablist"><button type="button" role="tab" data-view="dash" data-t="tabDash"></button><button type="button" role="tab" data-view="plan" data-t="tabPlan"></button><button type="button" role="tab" data-view="tests" data-t="tabTests"></button><button type="button" role="tab" data-view="sr" data-t="tabSR"></button></nav></div>
       <div class="subtitle"><span data-t="sub"></span></div>
     </div>
     <div class="tools">
       <span class="demo" id="demoBadge" data-t="demo"></span>
       <span class="sep" id="demoSep"></span>
       <button id="syncChip" class="syncchip" type="button"><i></i><span></span></button>
+      <a class="docsbtn" id="docsLink" href="https://matheuscgh-ops.github.io/ppl-flight-deck/docs/" target="_blank" rel="noopener" data-tt="docsTitle"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21 4.5c-1.6-.9-3.6-1.3-5.5-1.3-1.4 0-2.7.3-3.5.9-.8-.6-2.1-.9-3.5-.9-1.9 0-3.9.4-5.5 1.3V19c1.6-.8 3.6-1.2 5.5-1.2 1.4 0 2.7.3 3.5.9.8-.6 2.1-.9 3.5-.9 1.9 0 3.9.4 5.5 1.2V4.5zM11 17.1c-.8-.3-1.7-.4-2.5-.4-1.5 0-3 .3-4.5.8V5.6c1.3-.6 2.9-.9 4.5-.9.9 0 1.8.1 2.5.4v12zm9 .4c-1.5-.5-3-.8-4.5-.8-.8 0-1.7.1-2.5.4v-12c.7-.3 1.6-.4 2.5-.4 1.6 0 3.2.3 4.5.9v11.9z"/></svg><span data-t="docsShort"></span></a>
       <div class="flags" role="group" aria-label="Language">
         <button class="flag" data-lang="en" title="English" aria-label="English">🇺🇸</button>
         <button class="flag" data-lang="pt" title="Português" aria-label="Português">🇧🇷</button>
@@ -5893,7 +5978,7 @@ function expose(vars) {
 }
 
 /* ===== module Config (js/core/config.js) =====
-   public: TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE
+   public: TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE, DOCS_URL, docsUrl
    live values (getters on window, they follow your Settings): GOAL */
 const Config = (() => {
   const TEMPLATE = '<!doctype html>\n' + document.documentElement.outerHTML;
@@ -5961,9 +6046,12 @@ const Config = (() => {
   /* the goal follows Settings (read at the moment it is used) */
   expose({ GOAL: [() => (typeof pref === 'function' ? pref('goal') : PREF_DEF.goal), () => {}] });
   const LOCALE = { en: 'en-US', pt: 'pt-BR', ja: 'ja-JP' };
-  return { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE };
+  /* the user guide on GitHub Pages: English is index.html, the other languages have their own page */
+  const DOCS_URL = 'https://matheuscgh-ops.github.io/ppl-flight-deck/docs/';
+  const docsUrl = l => DOCS_URL + ({ pt: 'pt.html', ja: 'ja.html' }[l] || '');
+  return { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE, DOCS_URL, docsUrl };
 })();
-const { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE } = Config;
+const { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE, DOCS_URL, docsUrl } = Config;
 
 /* ===== module Translations (i18n/translations.js) =====
    public: I18N */
@@ -6019,7 +6107,7 @@ const Translations = (() => {
       undone: 'Undone',
       exported: 'File downloaded',
       imported: 'Backup imported',
-      invalid: 'This is not a valid PPL Flight Deck backup.',
+      invalid: 'This is not a valid PPL Progress backup.',
       inactive: 'No records yet.',
       already: 'Already in this list',
       nothing: 'Nothing to save — choose an activity or a new status',
@@ -6082,7 +6170,7 @@ const Translations = (() => {
       undone: 'Desfeito',
       exported: 'Arquivo baixado',
       imported: 'Backup importado',
-      invalid: 'Este arquivo não é um backup válido do PPL Flight Deck.',
+      invalid: 'Este arquivo não é um backup válido do PPL Progress.',
       inactive: 'Nenhum registro ainda.',
       already: 'Já está nesta lista',
       nothing: 'Nada a salvar — escolha uma atividade ou um novo status',
@@ -7545,6 +7633,10 @@ const Translations = (() => {
     setReflect: '各ブロックの最後に間違いの振り返り',
     setReflectHint: 'ブロックで予想される間違いに比例（最低10分、最大でブロックの4分の1）',
   });
+  /* user guide (header button and tour) */
+  Object.assign(I18N.en, { docsShort: 'Docs', docsTitle: 'Open the user guide (new tab)' });
+  Object.assign(I18N.pt, { docsShort: 'Documentação', docsTitle: 'Abrir a documentação (nova aba)' });
+  Object.assign(I18N.ja, { docsShort: 'ドキュメント', docsTitle: 'ユーザーガイドを開く（新しいタブ）' });
   return { I18N };
 })();
 const { I18N } = Translations;
@@ -8022,6 +8114,7 @@ const Dashboard = (() => {
       b.setAttribute('aria-pressed', on);
     });
     document.querySelectorAll('#seg button').forEach(b => (b.textContent = t(b.dataset.kind)));
+    $('#docsLink').href = docsUrl(lang);
     const hasDemo = state.events.some(e => e.demo);
     $('#demoBadge').hidden = $('#clearDemo').hidden = $('#demoSep').hidden = !hasDemo;
   }
