@@ -276,3 +276,83 @@
     width: 34px;
   }
 }
+
+/* ===== error notebook ===== */
+.modal.notemodal {
+  width: min(560px, 100%);
+}
+#notePick {
+  width: 100%;
+  margin: 8px 0 0;
+}
+.noteadd {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  margin: 10px 0;
+}
+.noteadd textarea {
+  flex: 1;
+  min-width: 0;
+  resize: vertical;
+  background: var(--panel2);
+  color: var(--ink);
+  border: 1px solid var(--line2);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+}
+#noteList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 46vh;
+  overflow: auto;
+}
+.noterow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+  background: #20252b;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+.notedate {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--muted);
+  white-space: nowrap;
+  padding-top: 2px;
+}
+.notetext {
+  font-size: 13.5px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.noterow .x {
+  padding: 0 7px;
+}
+.notebtn {
+  margin-left: 6px;
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 18px;
+  border-radius: 6px;
+  vertical-align: 1px;
+}
+.notebadge {
+  margin-left: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #b3a6f5;
+}
+.histhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}

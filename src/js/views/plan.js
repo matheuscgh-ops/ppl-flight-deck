@@ -32,6 +32,18 @@ const PlanView = (() => {
     it.id
       ? `<button type="button" class="pck" data-chk="${esc(it.id)}" aria-label="${esc(t('itemCheck'))}">${it.done ? '✓' : ''}</button>`
       : `<span class="pck">${it.done ? '✓' : ''}</span>`;
+  /* error notebook: a 📝 button on error-review rows (write what you got wrong), and the count on a topic that has notes */
+  function noteBtn(it) {
+    if (it.kind === 'reflect') {
+      const ts = (it.parts || []).map(x => x.i);
+      if (!ts.length) return '';
+      const n = ts.reduce((a, i) => a + notesOf(i).length, 0);
+      return `<button type="button" class="notebtn" data-note="${ts[0]}" data-ntopics="${ts.join(',')}" data-nitem="${esc(it.id || '')}" aria-label="${esc(t('notesTitle'))}">📝${n ? ' ' + n : ''}</button>`;
+    }
+    if (it.kind === 'topic' && notesOf(it.i).length)
+      return `<button type="button" class="notebtn" data-note="${it.i}" aria-label="${esc(t('notesTitle'))}">📝 ${notesOf(it.i).length}</button>`;
+    return '';
+  }
   function renderPlanMini() {
     const P = todayList(),
       fromPlan = P.source !== 'suggested';
@@ -44,7 +56,7 @@ const PlanView = (() => {
       ? P.items
           .map(
             it =>
-              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' || it.kind === 'reflect' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
+              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}${noteBtn(it)}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' || it.kind === 'reflect' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
           )
           .join('')
       : `<div class="muted">${esc(t(fromPlan ? 'planRestDay' : 'allClear'))}</div>`;
@@ -148,6 +160,15 @@ const PlanView = (() => {
   });
   /* the circle marks a saved plan's item done by hand; the row opens the log dialog */
   function onCheck(e) {
+    const nb = e.target.closest('[data-note]');
+    if (nb) {
+      e.stopPropagation();
+      openNotes(+nb.dataset.note, {
+        topics: nb.dataset.ntopics ? nb.dataset.ntopics.split(',').map(Number) : null,
+        itemId: nb.dataset.nitem || null,
+      });
+      return true;
+    }
     const c = e.target.closest('[data-chk]');
     if (!c) return false;
     e.stopPropagation();

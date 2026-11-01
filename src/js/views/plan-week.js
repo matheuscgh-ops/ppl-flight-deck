@@ -361,6 +361,9 @@ const PlanWeek = (() => {
     const it = weekData(Array.from({ length: 7 }, (_, k) => addDays(weekOf, k))).items.find(x => x.id === b.dataset.wi);
     if (!it) return;
     if (it.kind === 'test') openPt();
+    else if (it.kind === 'reflect' && (it.parts || []).length)
+      /* an error review opens the notebook of its topic(s); "Review done" is there */
+      openNotes(it.parts[0].i, { topics: it.parts.map(x => x.i), itemId: it.id });
     else if (it.kind === 'custom' || it.kind === 'reflect') toggleCheck(it.id);
     else openModal(it.i, srModel(it.i).reps.length ? 'review' : 'study');
   };

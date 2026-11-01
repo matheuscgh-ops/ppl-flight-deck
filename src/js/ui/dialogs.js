@@ -36,6 +36,7 @@ const Dialogs = (() => {
     $('#mDate').value = todayISO();
     setSeg();
     renderHist();
+    $('#mNotes').textContent = '📝 ' + t('notesOpen').replace('{n}', notesOf(i).length);
     $('#modalbg').hidden = false;
     $('#mSave').focus();
   }
@@ -45,6 +46,12 @@ const Dialogs = (() => {
     sel = -1;
     document.querySelector(`.task[data-topic="${i}"]`)?.focus();
   }
+  /* the topic's error notes, from its log dialog */
+  $('#mNotes').onclick = () => {
+    const i = sel;
+    closeModal();
+    openNotes(i);
+  };
   $('#seg').onclick = e => {
     const b = e.target.closest('button');
     if (b) {

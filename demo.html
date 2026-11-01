@@ -6005,6 +6005,86 @@ body.wzdragging * {
     width: 34px;
   }
 }
+
+/* ===== error notebook ===== */
+.modal.notemodal {
+  width: min(560px, 100%);
+}
+#notePick {
+  width: 100%;
+  margin: 8px 0 0;
+}
+.noteadd {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  margin: 10px 0;
+}
+.noteadd textarea {
+  flex: 1;
+  min-width: 0;
+  resize: vertical;
+  background: var(--panel2);
+  color: var(--ink);
+  border: 1px solid var(--line2);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+}
+#noteList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 46vh;
+  overflow: auto;
+}
+.noterow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+  background: #20252b;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+.notedate {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--muted);
+  white-space: nowrap;
+  padding-top: 2px;
+}
+.notetext {
+  font-size: 13.5px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.noterow .x {
+  padding: 0 7px;
+}
+.notebtn {
+  margin-left: 6px;
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 18px;
+  border-radius: 6px;
+  vertical-align: 1px;
+}
+.notebadge {
+  margin-left: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #b3a6f5;
+}
+.histhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
 .demotag{font-style:normal;font-size:.45em;vertical-align:middle;letter-spacing:.08em;color:#ffd08a;background:#3d2b14;border:1px solid #6b4a1c;border-radius:6px;padding:2px 7px;margin-left:6px}
 #syncChip{display:none!important}
 </style>
@@ -6207,7 +6287,16 @@ body.wzdragging * {
       <label class="field"><span class="flabel" data-t="date"></span><input type="date" id="mDate"></label>
     </div>
     <div class="mbtns"><button class="primary" id="mSave" data-t="record"></button><button id="mCancel" data-t="cancel"></button></div>
-    <div class="hist"><span class="flabel" data-t="history"></span><div id="mHist"></div></div>
+    <div class="hist"><div class="histhead"><span class="flabel" data-t="history"></span><button type="button" class="linkbtn" id="mNotes"></button></div><div id="mHist"></div></div>
+  </div>
+</div>
+<div class="modalbg" id="notebg" hidden>
+  <div class="modal notemodal" role="dialog" aria-modal="true" aria-labelledby="noteTitle">
+    <div class="mhead"><div><h3 id="noteTitle"></h3><div class="muted" id="noteSub"></div></div><button class="x" id="noteClose" aria-label="Close">×</button></div>
+    <select id="notePick" hidden></select>
+    <div class="noteadd"><textarea id="noteIn" rows="2" maxlength="500" enterkeyhint="done"></textarea><button type="button" class="primary" id="noteAdd"></button></div>
+    <div id="noteList"></div>
+    <div class="mbtns"><button type="button" id="noteDone" hidden></button></div>
   </div>
 </div>
 <div class="palbg" id="palbg" hidden>
@@ -8001,6 +8090,43 @@ const Translations = (() => {
     setReflect: '各ブロックの最後に間違いの振り返り',
     setReflectHint: 'ブロックで予想される間違いに比例（最低10分、最大でブロックの4分の1）',
   });
+  /* error notebook */
+  Object.assign(I18N.en, {
+    notesTitle: 'Error notes',
+    notesSub: 'What you got wrong. It comes back with this topic in your plan and in its log.',
+    notesHint: 'What did you get wrong? (e.g. confused class C and D VFR minimums)',
+    notesSave: 'Add note',
+    notesEmpty: 'No notes for this topic yet.',
+    notesOpen: 'Error notes ({n})',
+    notesDone: 'Mark review done',
+    notesUndone: 'Review done ✓ (undo)',
+    noteAdded: 'Note added',
+    noteDeleted: 'Note deleted',
+  });
+  Object.assign(I18N.pt, {
+    notesTitle: 'Caderno de erros',
+    notesSub: 'O que você errou. Volta com este tópico no plano e no registro dele.',
+    notesHint: 'O que você errou? (ex.: confundi os mínimos VFR das classes C e D)',
+    notesSave: 'Adicionar nota',
+    notesEmpty: 'Nenhuma nota para este tópico ainda.',
+    notesOpen: 'Caderno de erros ({n})',
+    notesDone: 'Marcar revisão feita',
+    notesUndone: 'Revisão feita ✓ (desfazer)',
+    noteAdded: 'Nota adicionada',
+    noteDeleted: 'Nota apagada',
+  });
+  Object.assign(I18N.ja, {
+    notesTitle: '間違いノート',
+    notesSub: '間違えたこと。このトピックが計画や記録に出るたびに表示されます。',
+    notesHint: '何を間違えましたか？（例：クラスCとDのVFR最低気象条件を混同）',
+    notesSave: 'メモを追加',
+    notesEmpty: 'このトピックのメモはまだありません。',
+    notesOpen: '間違いノート（{n}）',
+    notesDone: '振り返り完了にする',
+    notesUndone: '振り返り完了 ✓（元に戻す）',
+    noteAdded: 'メモを追加しました',
+    noteDeleted: 'メモを削除しました',
+  });
   /* your own Kanban cards (tasks, not in the statistics) */
   Object.assign(I18N.en, {
     addCard: 'Add a card',
@@ -8373,6 +8499,18 @@ const AppState = (() => {
             .map(x => ({ id: x.id || uid(), date: x.date, q: +x.q || 60, score: cl(x.score) }))
         : [],
       deadline: ok(o.deadline) ? o.deadline : '2026-11-30',
+      /* error notebook: what you got wrong in a topic (topic -1 = practice test), shown again when it comes back */
+      notes: (Array.isArray(o.notes) ? o.notes : [])
+        .filter(
+          n =>
+            n &&
+            ok(n.date) &&
+            typeof n.text === 'string' &&
+            n.text.trim() &&
+            (n.topic === -1 || (Number.isInteger(n.topic) && TOPICS[n.topic]))
+        )
+        .map(n => ({ id: String(n.id || uid()).slice(0, 40), topic: n.topic, date: n.date, text: n.text.trim().slice(0, 500) }))
+        .slice(-2000),
       /* your own cards on the Kanban (tasks such as "Review the theory"): a title and a list, no questions or score */
       cards: normCards(o.cards),
       /* the order of the cards inside the Kanban lists (where you dropped them): topic numbers and your cards' ids */
@@ -8574,7 +8712,13 @@ const AppState = (() => {
   }
   function trackDeletes() {
     const now = new Set(
-      [...state.events, ...(state.tests || []), ...(state.plans || []), ...(state.cards || [])].map(x => x.id)
+      [
+        ...state.events,
+        ...(state.tests || []),
+        ...(state.plans || []),
+        ...(state.cards || []),
+        ...(state.notes || []),
+      ].map(x => x.id)
     );
     state.deleted ??= {};
     if (prevIds)
@@ -10686,6 +10830,18 @@ const PlanView = (() => {
     it.id
       ? `<button type="button" class="pck" data-chk="${esc(it.id)}" aria-label="${esc(t('itemCheck'))}">${it.done ? '✓' : ''}</button>`
       : `<span class="pck">${it.done ? '✓' : ''}</span>`;
+  /* error notebook: a 📝 button on error-review rows (write what you got wrong), and the count on a topic that has notes */
+  function noteBtn(it) {
+    if (it.kind === 'reflect') {
+      const ts = (it.parts || []).map(x => x.i);
+      if (!ts.length) return '';
+      const n = ts.reduce((a, i) => a + notesOf(i).length, 0);
+      return `<button type="button" class="notebtn" data-note="${ts[0]}" data-ntopics="${ts.join(',')}" data-nitem="${esc(it.id || '')}" aria-label="${esc(t('notesTitle'))}">📝${n ? ' ' + n : ''}</button>`;
+    }
+    if (it.kind === 'topic' && notesOf(it.i).length)
+      return `<button type="button" class="notebtn" data-note="${it.i}" aria-label="${esc(t('notesTitle'))}">📝 ${notesOf(it.i).length}</button>`;
+    return '';
+  }
   function renderPlanMini() {
     const P = todayList(),
       fromPlan = P.source !== 'suggested';
@@ -10698,7 +10854,7 @@ const PlanView = (() => {
       ? P.items
           .map(
             it =>
-              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' || it.kind === 'reflect' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
+              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}${noteBtn(it)}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' || it.kind === 'reflect' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
           )
           .join('')
       : `<div class="muted">${esc(t(fromPlan ? 'planRestDay' : 'allClear'))}</div>`;
@@ -10802,6 +10958,15 @@ const PlanView = (() => {
   });
   /* the circle marks a saved plan's item done by hand; the row opens the log dialog */
   function onCheck(e) {
+    const nb = e.target.closest('[data-note]');
+    if (nb) {
+      e.stopPropagation();
+      openNotes(+nb.dataset.note, {
+        topics: nb.dataset.ntopics ? nb.dataset.ntopics.split(',').map(Number) : null,
+        itemId: nb.dataset.nitem || null,
+      });
+      return true;
+    }
     const c = e.target.closest('[data-chk]');
     if (!c) return false;
     e.stopPropagation();
@@ -11754,6 +11919,7 @@ const Dialogs = (() => {
     $('#mDate').value = todayISO();
     setSeg();
     renderHist();
+    $('#mNotes').textContent = '📝 ' + t('notesOpen').replace('{n}', notesOf(i).length);
     $('#modalbg').hidden = false;
     $('#mSave').focus();
   }
@@ -11763,6 +11929,12 @@ const Dialogs = (() => {
     sel = -1;
     document.querySelector(`.task[data-topic="${i}"]`)?.focus();
   }
+  /* the topic's error notes, from its log dialog */
+  $('#mNotes').onclick = () => {
+    const i = sel;
+    closeModal();
+    openNotes(i);
+  };
   $('#seg').onclick = e => {
     const b = e.target.closest('button');
     if (b) {
@@ -11949,6 +12121,104 @@ const Dialogs = (() => {
   return { openModal, closeModal, openPt };
 })();
 const { openModal, closeModal, openPt } = Dialogs;
+
+/* ===== module Notes (js/views/notes.js) =====
+   public: notesOf, openNotes, notesBadge
+   The error notebook. During an error review you write down what you got wrong ("confused class C and D VFR
+   minimums"); the notes are kept per topic and come back when the topic does: on its error-review rows, on the topic
+   in today's plan and in the plan wizard, and in the topic's log dialog. A practice test has its own notes (topic -1).
+   Notes are saved, backed up and synced like sessions (united by id, deletions remembered). */
+const Notes = (() => {
+  const notesOf = i =>
+    (state.notes || []).filter(n => n.topic === i).sort((a, b) => b.date.localeCompare(a.date) || 0);
+  const topicName = i => (i === -1 ? t('practiceTest') : TOPICS[i].name);
+  /* the small "📝 2" mark that tells you a topic has notes */
+  const notesBadge = i => {
+    const n = notesOf(i).length;
+    return n ? `<span class="notebadge" title="${esc(t('notesTitle'))}">📝 ${n}</span>` : '';
+  };
+
+  let cur = null; /* { topics: [i…], i, itemId } */
+  const dialog = modal('#notebg', { close: '#noteClose', onClose: () => (cur = null) });
+
+  /* open the notebook for topic i; from an error-review item, `topics` are the topics it covers and `itemId` lets
+     you mark the review done from here */
+  function openNotes(i, opts = {}) {
+    const topics = (opts.topics || [i]).filter(x => x === -1 || TOPICS[x]);
+    cur = { topics: topics.length ? topics : [i], i: topics.includes(i) ? i : topics[0] ?? i, itemId: opts.itemId || null };
+    render();
+    dialog.open('#noteIn');
+  }
+  function render() {
+    if (!cur) return;
+    const df = new Intl.DateTimeFormat(LOCALE[lang], { month: 'short', day: 'numeric' });
+    $('#noteTitle').textContent = `${t('notesTitle')} · ${topicName(cur.i)}`;
+    $('#noteSub').textContent = t('notesSub');
+    $('#notePick').hidden = cur.topics.length < 2;
+    $('#notePick').innerHTML = cur.topics
+      .map(x => `<option value="${x}"${x === cur.i ? ' selected' : ''}>${esc(topicName(x))}</option>`)
+      .join('');
+    $('#noteIn').placeholder = t('notesHint');
+    $('#noteAdd').textContent = t('notesSave');
+    const item = cur.itemId && findItem(cur.itemId);
+    $('#noteDone').hidden = !item;
+    if (item) $('#noteDone').textContent = item.check ? t('notesUndone') : t('notesDone');
+    const list = notesOf(cur.i);
+    $('#noteList').innerHTML = list.length
+      ? list
+          .map(
+            n =>
+              `<div class="noterow" data-nid="${esc(n.id)}"><span class="notedate">${esc(df.format(parse(n.date)))}</span><span class="notetext">${esc(n.text)}</span><button type="button" class="x" data-ndel="${esc(n.id)}" aria-label="${esc(t('del'))}">×</button></div>`
+          )
+          .join('')
+      : `<div class="muted">${esc(t('notesEmpty'))}</div>`;
+  }
+  const findItem = id => {
+    for (const p of state.plans || []) {
+      const it = (p.items || []).find(x => x.id === id);
+      if (it) return it;
+    }
+    return null;
+  };
+  function addNote() {
+    const text = $('#noteIn').value.trim().slice(0, 500);
+    if (!text || !cur) return;
+    const topic = cur.i;
+    commit(() => {
+      state.notes = [...(state.notes || []), { id: uid(), topic, date: todayISO(), text }];
+    }, t('noteAdded'));
+    $('#noteIn').value = '';
+    render();
+    $('#noteIn').focus();
+  }
+  $('#noteAdd').onclick = addNote;
+  $('#noteIn').addEventListener('keydown', e => {
+    /* Enter adds the note (Shift+Enter for a new line); IME composition is left alone */
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+      e.preventDefault();
+      addNote();
+    }
+  });
+  $('#notePick').onchange = e => {
+    cur.i = +e.target.value;
+    render();
+  };
+  $('#noteList').onclick = e => {
+    const b = e.target.closest('[data-ndel]');
+    if (!b) return;
+    commit(() => {
+      state.notes = (state.notes || []).filter(n => n.id !== b.dataset.ndel);
+    }, t('noteDeleted'));
+    render();
+  };
+  $('#noteDone').onclick = () => {
+    if (!cur || !cur.itemId) return;
+    toggleCheck(cur.itemId);
+    render();
+  };
+  return { notesOf, openNotes, notesBadge };
+})();
+const { notesOf, openNotes, notesBadge } = Notes;
 
 /* ===== module VolumeView (js/views/volume.js) =====
    public: weekStart, weeklyVolume, rangeSeries, renderVolume, renderVolPanel
@@ -13290,6 +13560,9 @@ const PlanWeek = (() => {
     const it = weekData(Array.from({ length: 7 }, (_, k) => addDays(weekOf, k))).items.find(x => x.id === b.dataset.wi);
     if (!it) return;
     if (it.kind === 'test') openPt();
+    else if (it.kind === 'reflect' && (it.parts || []).length)
+      /* an error review opens the notebook of its topic(s); "Review done" is there */
+      openNotes(it.parts[0].i, { topics: it.parts.map(x => x.i), itemId: it.id });
     else if (it.kind === 'custom' || it.kind === 'reflect') toggleCheck(it.id);
     else openModal(it.i, srModel(it.i).reps.length ? 'review' : 'study');
   };
@@ -13674,7 +13947,7 @@ const PlanWizard = (() => {
                       : t('rs_' + r) + (it.kind === 'custom' ? '' : ' · ' + t('wzGoal'));
                 /* drag the card (or its grip on touch screens) to move it; click or tap it to edit */
                 const editable = !past && it.kind !== 'reflect';
-                return `<div class="wzit r-${r}${child ? ' child' : ''}${editable ? ' editable' : ''}" data-wid="${esc(it.id)}"${editable ? ` role="button" tabindex="0" aria-label="${esc(t('pwEdit') + ': ' + itemName(it))}"` : ''}><span class="wzt">${child || past ? '' : `<span class="wzgrip" aria-hidden="true">⠿</span>`}${clockOf(it.start)}</span><span class="wzn">${esc(itemName(it))}<small>${esc(sub)}</small></span><span class="wzq">${minutesOnly ? '' : it.n + ' q · '}${fmtMin(it.min)}</span><span class="wzacts">${past ? '' : `<button type="button" data-wact="del" aria-label="${esc(t('del'))}">×</button>`}</span></div>`;
+                return `<div class="wzit r-${r}${child ? ' child' : ''}${editable ? ' editable' : ''}" data-wid="${esc(it.id)}"${editable ? ` role="button" tabindex="0" aria-label="${esc(t('pwEdit') + ': ' + itemName(it))}"` : ''}><span class="wzt">${child || past ? '' : `<span class="wzgrip" aria-hidden="true">⠿</span>`}${clockOf(it.start)}</span><span class="wzn">${esc(itemName(it))}${it.kind === 'topic' ? notesBadge(it.i) : ''}<small>${esc(sub)}</small></span><span class="wzq">${minutesOnly ? '' : it.n + ' q · '}${fmtMin(it.min)}</span><span class="wzacts">${past ? '' : `<button type="button" data-wact="del" aria-label="${esc(t('del'))}">×</button>`}</span></div>`;
               };
               const rows = groupsOf(its)
                 .map(g => `<div class="wzg" data-gid="${esc(g[0].id)}">${g.map(row).join('')}</div>`)
@@ -16273,7 +16546,7 @@ const GistSync = (() => {
             : 'error'
     );
   }
-  /* merge two copies: events, tests, plans and your own cards are united by id (the newer copy wins for the same id, deleted ids stay deleted);
+  /* merge two copies: events, tests, plans, your own cards and error notes are united by id (the newer copy wins for the same id, deleted ids stay deleted);
    everything else (lists, scores, settings, exam date, plan of the day) comes from the newer copy */
   function mergeStates(a, b) {
     const [n, o] = a.updatedAt >= b.updatedAt ? [a, b] : [b, a],
@@ -16292,6 +16565,7 @@ const GistSync = (() => {
       tests: un(n.tests || [], o.tests || []),
       plans: un(n.plans || [], o.plans || []),
       cards: un(n.cards || [], o.cards || []),
+      notes: un(n.notes || [], o.notes || []),
       deleted: del,
       updatedAt: Math.max(a.updatedAt, b.updatedAt),
     });
