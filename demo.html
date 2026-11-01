@@ -783,7 +783,15 @@ input[type='date']::-webkit-calendar-picker-indicator {
   border-color: #4a535d;
 }
 .task.dragging {
-  opacity: 0.3;
+  display: none;
+}
+/* where the dragged card will land: a gap that moves between the cards */
+.task-gap {
+  background: #0b0d10a8;
+  box-shadow: inset 0 0 0 1px #ffffff0d;
+  border-radius: 8px;
+  flex: none;
+  box-sizing: border-box;
 }
 .task.flash {
   animation: flash 1.1s ease;
@@ -855,6 +863,105 @@ body.dragging,
 body.dragging * {
   cursor: grabbing !important;
   user-select: none !important;
+}
+
+/* ===== your own cards and the "+ Add a card" composer (Trello style) ===== */
+.task.own .tmeta {
+  justify-content: flex-start;
+}
+.owntag {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #b3a6f5;
+  background: #2b2547;
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+.addcard {
+  flex: none;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  color: var(--ink2);
+  font-weight: 700;
+  padding: 7px 10px;
+  border-radius: 8px;
+}
+.addcard:hover {
+  background: #ffffff12;
+  color: var(--ink);
+  border: 0;
+}
+.composer,
+.task.own.editing {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: default;
+}
+.task.own.editing {
+  padding: 8px;
+}
+.cardin {
+  width: 100%;
+  box-sizing: border-box;
+  resize: none;
+  background: #22272b;
+  color: var(--ink);
+  border: 1px solid #579dff;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+.cardbtns {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cardbtns button {
+  padding: 6px 12px;
+}
+.cardbtns .cardx {
+  background: transparent;
+  border: 0;
+  font-size: 18px;
+  padding: 2px 8px;
+  color: var(--ink2);
+}
+/* the "+" in a list's header opens the same box; on a one-screen desktop it replaces the row at the bottom,
+   so the board keeps its height and the calendar below keeps its room */
+.laneadd {
+  display: none;
+  margin-left: 6px;
+  padding: 0 7px;
+  font-size: 15px;
+  line-height: 20px;
+  background: transparent;
+  border: 0;
+  color: var(--ink2);
+}
+.laneadd:hover {
+  background: #ffffff14;
+  color: var(--ink);
+  border: 0;
+}
+@media (min-width: 1100px) and (min-height: 1050px) {
+  .laneadd {
+    display: inline-block;
+  }
+  .lanecards > .addcard {
+    display: none;
+  }
+}
+.lanehead .lcount {
+  margin-left: auto;
 }
 
 /* modal */
@@ -5415,9 +5522,9 @@ b.wkdaily {
   font-size: 11px;
 }
 .wzgap {
-  border: 2px dashed #579dff88;
   border-radius: 8px;
-  background: #579dff14;
+  background: #0b0d10a8;
+  box-shadow: inset 0 0 0 1px #ffffff0d;
   margin-bottom: 4px;
   transition: height 0.12s;
 }
@@ -5426,7 +5533,7 @@ b.wkdaily {
   z-index: 10000;
   pointer-events: none;
   opacity: 0.92;
-  transform: rotate(-1deg) scale(1.02);
+  transform: rotate(3deg);
   box-shadow: 0 14px 34px #000a;
   border-radius: 8px;
 }
@@ -5579,6 +5686,10 @@ body.wzdragging * {
     grid-template-areas: none;
     align-items: center;
   }
+}
+.kbnew {
+  color: #b3a6f5;
+  font-weight: 800;
 }
 
 /* ===== Settings (gear in the header) ===== */
@@ -7855,6 +7966,50 @@ const Translations = (() => {
     setReflect: '各ブロックの最後に間違いの振り返り',
     setReflectHint: 'ブロックで予想される間違いに比例（最低10分、最大でブロックの4分の1）',
   });
+  /* your own Kanban cards (tasks, not in the statistics) */
+  Object.assign(I18N.en, {
+    addCard: 'Add a card',
+    kbNewCard: 'New card',
+    close: 'Close',
+    addCardBtn: 'Add card',
+    cardHint: 'Enter a title (e.g. Review the theory)',
+    cardSave: 'Save',
+    cardDel: 'Delete',
+    ownTag: 'Task',
+    cardAdded: 'Card added',
+    cardDeleted: 'Card deleted',
+    cardEdited: 'Card renamed',
+  });
+  Object.assign(I18N.pt, {
+    addCard: 'Adicionar um card',
+    kbNewCard: 'Card novo',
+    close: 'Fechar',
+    addCardBtn: 'Adicionar card',
+    cardHint: 'Digite um título (ex.: Revisar a teoria)',
+    cardSave: 'Salvar',
+    cardDel: 'Apagar',
+    ownTag: 'Tarefa',
+    cardAdded: 'Card adicionado',
+    cardDeleted: 'Card apagado',
+    cardEdited: 'Card renomeado',
+  });
+  Object.assign(I18N.ja, {
+    addCard: 'カードを追加',
+    kbNewCard: '新しいカード',
+    close: '閉じる',
+    addCardBtn: 'カードを追加',
+    cardHint: 'タイトルを入力（例：理論の復習）',
+    cardSave: '保存',
+    cardDel: '削除',
+    ownTag: 'タスク',
+    cardAdded: 'カードを追加しました',
+    cardDeleted: 'カードを削除しました',
+    cardEdited: 'カード名を変更しました',
+  });
+  /* Kanban: a card dropped in a new place inside its list */
+  Object.assign(I18N.en, { reordered: 'Card moved' });
+  Object.assign(I18N.pt, { reordered: 'Card movido' });
+  Object.assign(I18N.ja, { reordered: 'カードを移動しました' });
   /* error review right after each topic */
   Object.assign(I18N.en, { reflectMisses: '{n} expected misses' });
   Object.assign(I18N.pt, { reflectMisses: '{n} erros esperados' });
@@ -7868,7 +8023,7 @@ const Translations = (() => {
 const { I18N } = Translations;
 
 /* ===== module Util (js/core/util.js) =====
-   public: $, pad, iso, parse, todayISO, diffDays, esc, uid, TOTAL */
+   public: $, pad, iso, parse, todayISO, diffDays, esc, uid, TOTAL, flip */
 const Util = (() => {
   const $ = s => document.querySelector(s);
   const pad = n => String(n).padStart(2, '0');
@@ -7883,9 +8038,32 @@ const Util = (() => {
     String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4);
   const TOTAL = TOPICS.reduce((a, b) => a + b.q, 0);
-  return { $, pad, iso, parse, todayISO, diffDays, esc, uid, TOTAL };
+  /* FLIP: run mutate() (which moves elements in the page), then slide each of els from where it was to where it is
+     now, so cards glide aside to open a gap instead of jumping (the Trello feel). Skipped with reduced motion. */
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  function flip(els, mutate) {
+    if (reduceMotion.matches) return mutate();
+    const before = new Map(els.map(el => [el, el.getBoundingClientRect()]));
+    mutate();
+    els.forEach(el => {
+      const a = before.get(el);
+      if (!el.isConnected || !a) return;
+      const b = el.getBoundingClientRect(),
+        dx = a.left - b.left,
+        dy = a.top - b.top;
+      if (!dx && !dy) return;
+      el.style.transition = 'none';
+      el.style.transform = `translate(${dx}px,${dy}px)`;
+      el.getBoundingClientRect();
+      el.style.transition = 'transform .16s cubic-bezier(.2,.8,.2,1)';
+      el.style.transform = '';
+      clearTimeout(el._flipT);
+      el._flipT = setTimeout(() => (el.style.transition = ''), 200);
+    });
+  }
+  return { $, pad, iso, parse, todayISO, diffDays, esc, uid, TOTAL, flip };
 })();
-const { $, pad, iso, parse, todayISO, diffDays, esc, uid, TOTAL } = Util;
+const { $, pad, iso, parse, todayISO, diffDays, esc, uid, TOTAL, flip } = Util;
 
 /* ===== module Modal (js/ui/modal.js) =====
    public: modal, placeTip
@@ -8095,7 +8273,7 @@ const DemoData = (() => {
 const { demoState, defaultState } = DemoData;
 
 /* ===== module AppState (js/core/state.js) =====
-   public: normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs
+   public: normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs, normOrder
    shared state (getter/setter): embedded, state, loadedFromFile, lang, shown, sel, mKind, prevIds */
 const AppState = (() => {
   function normalize(o) {
@@ -8160,6 +8338,10 @@ const AppState = (() => {
             .map(x => ({ id: x.id || uid(), date: x.date, q: +x.q || 60, score: cl(x.score) }))
         : [],
       deadline: ok(o.deadline) ? o.deadline : '2026-11-30',
+      /* your own cards on the Kanban (tasks such as "Review the theory"): a title and a list, no questions or score */
+      cards: normCards(o.cards),
+      /* the order of the cards inside the Kanban lists (where you dropped them): topic numbers and your cards' ids */
+      order: normOrder(o.order, normCards(o.cards)),
       lang: I18N[o.lang] ? o.lang : 'en',
       plan:
         o.plan && ok(o.plan.date)
@@ -8334,8 +8516,31 @@ const AppState = (() => {
     new Intl.NumberFormat(LOCALE[lang], { minimumFractionDigits: d, maximumFractionDigits: d }).format(n);
   /* remember which ids existed; any that disappear (delete, undo of an add, import) become tombstones */
   var prevIds = null;
+  function normCards(list) {
+    const seen = new Set();
+    return (Array.isArray(list) ? list : [])
+      .filter(c => c && typeof c.title === 'string' && c.title.trim() && STATUS.includes(c.status))
+      .map(c => ({ id: String(c.id || uid()).slice(0, 40), title: c.title.trim().slice(0, 80), status: c.status }))
+      .filter(c => !seen.has(c.id) && seen.add(c.id))
+      .slice(0, 200);
+  }
+  /* every topic and every card once, in your order; anything missing goes to the end */
+  function normOrder(order, cards) {
+    const keys = [...TOPICS.map((_, i) => i), ...cards.map(c => c.id)],
+      valid = new Set(keys),
+      out = [];
+    (Array.isArray(order) ? order : []).forEach(k => {
+      if (valid.has(k) && !out.includes(k)) out.push(k);
+    });
+    keys.forEach(k => {
+      if (!out.includes(k)) out.push(k);
+    });
+    return out;
+  }
   function trackDeletes() {
-    const now = new Set([...state.events, ...(state.tests || []), ...(state.plans || [])].map(x => x.id));
+    const now = new Set(
+      [...state.events, ...(state.tests || []), ...(state.plans || []), ...(state.cards || [])].map(x => x.id)
+    );
     state.deleted ??= {};
     if (prevIds)
       prevIds.forEach(id => {
@@ -8431,9 +8636,9 @@ const AppState = (() => {
       },
     ],
   });
-  return { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs };
+  return { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs, normOrder };
 })();
-const { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs } = AppState;
+const { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs, normOrder } = AppState;
 
 /* ===== module Dashboard (js/views/dashboard.js) =====
    public: counts, streakInfo, renderCalendar, fitTags, renderSide, renderBoard, phoneMQ, laneInView, goLane, renderDash, render, moveCard, lanesEl
@@ -8642,10 +8847,13 @@ const Dashboard = (() => {
     const laneCols = STATUS.map(s => colsOf(state.statuses.filter(x => x === s).length));
     lanesEl.style.gridTemplateColumns = fit ? laneCols.map(c => `minmax(0,${c}fr)`).join(' ') : '';
     $('#lanes').innerHTML = STATUS.map((s, j) => {
-      const ids = TOPICS.map((_, i) => i).filter(i => state.statuses[i] === s);
+      const keys = orderOf().filter(k => (typeof k === 'number' ? state.statuses[k] === s : cardOf(k)?.status === s)),
+        ids = keys.filter(k => typeof k === 'number');
       const q = ids.reduce((a, i) => a + TOPICS[i].q, 0);
-      return `<div class="lane" data-lane="${j}" style="--accent:${COLORS[j]}"><div class="lanehead"><span class="lname">${esc(label(s))}</span><span class="lcount">${ids.length} · ${tf('qn', fmt(q))}</span></div><div class="lanecards${laneCols[j] > 1 ? ' multi' : ''}" style="${laneCols[j] > 1 ? `column-count:${laneCols[j]}` : ''}">${ids
+      const own = keys.length - ids.length;
+      return `<div class="lane" data-lane="${j}" style="--accent:${COLORS[j]}"><div class="lanehead"><span class="lname">${esc(label(s))}</span><span class="lcount">${ids.length}${own ? ' + ' + own : ''} · ${tf('qn', fmt(q))}</span><button type="button" class="laneadd" data-cact="open" data-lane-add="${j}" aria-label="${esc(t('addCard'))}" title="${esc(t('addCard'))}">+</button></div><div class="lanecards${laneCols[j] > 1 ? ' multi' : ''}" style="${laneCols[j] > 1 ? `column-count:${laneCols[j]}` : ''}">${keys
         .map(i => {
+          if (typeof i !== 'number') return ownCardHTML(cardOf(i));
           const x = TOPICS[i],
             v = state.scores[i],
             sc = v == null ? 'none' : v >= GOAL ? 'good' : v >= 70 ? 'mid' : 'low';
@@ -8653,7 +8861,7 @@ const Dashboard = (() => {
           const last = ls == null ? '' : ls <= 0 ? t('todayShort') : tf('ago', ls);
           return `<div class="task" tabindex="0" role="button" data-topic="${i}" aria-label="${esc(x.name)}" title="${esc(x.name)}"><div class="tname">${esc(x.name)}</div><div class="tmeta"><span>${tf('qn', x.q)}</span><span class="score sc-${sc}" title="${esc(t('editScore'))}">${v == null ? '—' : v + '%'}</span><span class="last">${esc(last)}</span></div></div>`;
         })
-        .join('')}</div></div>`;
+        .join('')}${composerHTML(j)}</div></div>`;
     }).join('');
     $('#cardCount').textContent = `(${TOPICS.length})`;
     $('#laneDots').innerHTML = STATUS.map(
@@ -8662,6 +8870,87 @@ const Dashboard = (() => {
     if (keepLane != null) goLane(keepLane, false);
     updateDots();
   }
+  /* ---------- your own cards (tasks such as "Review the theory"; not in the statistics) ---------- */
+  let addLane = null,
+    editCard = null;
+  const cardOf = id => (state.cards || []).find(c => c.id === id);
+  /* the saved order of every card (topics and yours), completed if anything is missing */
+  const orderOf = () => normOrder(state.order, state.cards || []);
+  function ownCardHTML(c) {
+    if (!c) return '';
+    if (editCard === c.id)
+      return `<div class="task own editing" data-card="${esc(c.id)}"><textarea class="cardin" maxlength="80" rows="2" aria-label="${esc(t('cardHint'))}">${esc(c.title)}</textarea><div class="cardbtns"><button type="button" class="primary" data-cact="save">${esc(t('cardSave'))}</button><button type="button" data-cact="del">${esc(t('cardDel'))}</button><button type="button" class="cardx" data-cact="cancel" aria-label="${esc(t('close'))}">×</button></div></div>`;
+    return `<div class="task own" tabindex="0" role="button" data-card="${esc(c.id)}" aria-label="${esc(c.title)}" title="${esc(c.title)}"><div class="tname">${esc(c.title)}</div><div class="tmeta"><span class="owntag">${esc(t('ownTag'))}</span></div></div>`;
+  }
+  function composerHTML(j) {
+    if (addLane === j)
+      return `<div class="composer" data-lane-add="${j}"><textarea class="cardin" maxlength="80" rows="2" placeholder="${esc(t('cardHint'))}" aria-label="${esc(t('cardHint'))}"></textarea><div class="cardbtns"><button type="button" class="primary" data-cact="add">${esc(t('addCardBtn'))}</button><button type="button" class="cardx" data-cact="close" aria-label="${esc(t('close'))}">×</button></div></div>`;
+    return `<button type="button" class="addcard" data-cact="open" data-lane-add="${j}">+ ${esc(t('addCard'))}</button>`;
+  }
+  function focusCardInput() {
+    const el = lanesEl.querySelector('.composer .cardin, .own.editing .cardin');
+    if (el) {
+      el.focus();
+      el.setSelectionRange(el.value.length, el.value.length);
+    }
+  }
+  function addOwnCard(j, title) {
+    title = title.trim().slice(0, 80);
+    if (!title) return;
+    const id = 'k' + uid();
+    commit(() => {
+      state.cards = [...(state.cards || []), { id, title, status: STATUS[j] }];
+      state.order = [...orderOf(), id];
+    }, t('cardAdded'));
+    /* like Trello, the composer stays open for the next card */
+    addLane = j;
+    renderBoard();
+    focusCardInput();
+  }
+  function cardAction(a, el) {
+    const box = el.closest('[data-card], [data-lane-add]'),
+      id = box && box.dataset.card,
+      j = box && box.dataset.laneAdd != null ? +box.dataset.laneAdd : null;
+    if (a === 'open') {
+      addLane = j;
+      editCard = null;
+    } else if (a === 'close') addLane = null;
+    else if (a === 'add') return addOwnCard(j, box.querySelector('.cardin').value);
+    else if (a === 'cancel') editCard = null;
+    else if (a === 'save') {
+      const title = box.querySelector('.cardin').value.trim().slice(0, 80);
+      editCard = null;
+      if (title && title !== cardOf(id).title)
+        return commit(() => {
+          cardOf(id).title = title;
+        }, t('cardEdited'));
+    } else if (a === 'del') {
+      editCard = null;
+      return commit(() => {
+        state.cards = state.cards.filter(c => c.id !== id);
+        state.order = orderOf().filter(k => k !== id);
+      }, t('cardDeleted'));
+    }
+    renderBoard();
+    focusCardInput();
+  }
+  $('#lanes').addEventListener('click', e => {
+    const b = e.target.closest('[data-cact]');
+    if (b) cardAction(b.dataset.cact, b);
+  });
+  $('#lanes').addEventListener('keydown', e => {
+    const inp = e.target.closest('.cardin');
+    if (!inp) return;
+    e.stopPropagation();
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      cardAction(inp.closest('.composer') ? 'add' : 'save', inp);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      cardAction(inp.closest('.composer') ? 'close' : 'cancel', inp);
+    }
+  });
+
   /* phone: which list is in view → dots */
   const phoneMQ = matchMedia('(max-width:640px)');
   function laneInView() {
@@ -8731,6 +9020,47 @@ const Dashboard = (() => {
       `${TOPICS[i].name} → ${label(to)}`
     );
   }
+  /* put card i right before card `before` (null = at the end of its list) in the saved card order */
+  function placeCard(order, i, before) {
+    const o = order.filter(x => x !== i),
+      k = before == null ? o.length : o.indexOf(before);
+    o.splice(k < 0 ? o.length : k, 0, i);
+    return o;
+  }
+  /* a drop: another list (a move, logged with its date) and/or a new place inside the list, one Undo for both */
+  function dropCard(i, to, before) {
+    const own = typeof i === 'string' ? cardOf(i) : null,
+      order = placeCard(orderOf(), i, before),
+      moved = own ? own.status !== to : state.statuses[i] !== to,
+      same = JSON.stringify(order) === JSON.stringify(state.order);
+    if (!moved && same) return;
+    if (own)
+      return commit(
+        () => {
+          own.status = to;
+          state.order = order;
+        },
+        moved ? `${own.title} → ${label(to)}` : t('reordered')
+      );
+    commit(
+      () => {
+        if (moved) {
+          state.events.push({
+            id: uid(),
+            date: todayISO(),
+            topic: i,
+            kind: 'move',
+            from: state.statuses[i],
+            to,
+            demo: false,
+          });
+          state.statuses[i] = to;
+        }
+        state.order = order;
+      },
+      moved ? `${TOPICS[i].name} → ${label(to)}` : t('reordered')
+    );
+  }
 
   /* pointer drag & drop: mouse drags after 5px, touch after a short press-and-hold */
   let drag = null;
@@ -8740,10 +9070,10 @@ const Dashboard = (() => {
   });
   lanesEl.addEventListener('pointerdown', e => {
     const card = e.target.closest('.task');
-    if (!card || e.button > 0 || e.target.closest('.score,.scorein')) return;
+    if (!card || e.button > 0 || e.target.closest('.score,.scorein,.editing,.cardin,[data-cact]')) return;
     drag = {
       card,
-      id: +card.dataset.topic,
+      id: card.dataset.card ?? +card.dataset.topic,
       x: e.clientX,
       y: e.clientY,
       pid: e.pointerId,
@@ -8791,12 +9121,18 @@ const Dashboard = (() => {
     drag.active = true;
     lanesEl.style.scrollSnapType = 'none';
     document.body.appendChild(g);
+    /* the card leaves a gap that follows the pointer: where the gap is, the card lands */
+    const gap = document.createElement('div');
+    gap.className = 'task-gap';
+    gap.style.height = r.height + 'px';
+    drag.card.after(gap);
+    drag.gap = gap;
     drag.card.classList.add('dragging');
     document.body.classList.add('dragging');
     moveGhost(x, y);
   }
   function moveGhost(x, y) {
-    drag.ghost.style.transform = `translate(${x - drag.ox}px,${y - drag.oy}px) rotate(2deg)`;
+    drag.ghost.style.transform = `translate(${x - drag.ox}px,${y - drag.oy}px) rotate(3deg)`;
     if (y < 70) window.scrollBy(0, -14);
     else if (y > innerHeight - 70) window.scrollBy(0, 14);
     if (lanesEl.scrollWidth > lanesEl.clientWidth + 2) {
@@ -8806,8 +9142,10 @@ const Dashboard = (() => {
     }
     let lane = document.elementFromPoint(x, y)?.closest('.lane') || null;
     if (!lane) {
-      const b = lanesEl.getBoundingClientRect();
-      if (y >= b.top - 20 && y <= b.bottom + 40)
+      /* below a short list (the board area, not just the cards) still counts as that list */
+      const b = lanesEl.getBoundingClientRect(),
+        board = (lanesEl.closest('.board') || lanesEl).getBoundingClientRect();
+      if (y >= b.top - 20 && y <= Math.max(b.bottom, board.bottom) + 120)
         lane =
           [...lanesEl.children].find(l => {
             const r = l.getBoundingClientRect();
@@ -8818,6 +9156,22 @@ const Dashboard = (() => {
       drag.lane?.classList.remove('over');
       lane?.classList.add('over');
       drag.lane = lane;
+    }
+    /* magnetic: the gap jumps to the place between the cards nearest to the pointer */
+    if (lane) {
+      const box = lane.querySelector('.lanecards'),
+        cards = [...box.querySelectorAll('.task')].filter(c => c !== drag.card),
+        next = cards.find(c => {
+          const r = c.getBoundingClientRect();
+          return y < r.top + r.height / 2;
+        });
+      const moving = next ? drag.gap.nextSibling !== next : box.lastElementChild !== drag.gap;
+      if (moving) {
+        /* the cards of both lists glide to open (and close) the gap */
+        const old = drag.gap.parentElement,
+          els = [...new Set([...box.querySelectorAll('.task'), ...(old ? old.querySelectorAll('.task') : [])])];
+        flip(els, () => (next ? next.before(drag.gap) : box.appendChild(drag.gap)));
+      }
     }
   }
   function endDrag(e, cancel) {
@@ -8831,11 +9185,22 @@ const Dashboard = (() => {
       d.card.classList.remove('dragging');
       document.body.classList.remove('dragging');
       d.lane?.classList.remove('over');
-      if (!cancel && d.lane) {
-        const to = STATUS[+d.lane.dataset.lane];
-        if (to !== state.statuses[d.id]) moveCard(d.id, to);
-      }
-    } else if (!cancel) openModal(d.id);
+      const after = d.gap.nextElementSibling,
+        before =
+          after && after.classList.contains('task') && after !== d.card
+            ? (after.dataset.card ?? +after.dataset.topic)
+            : null;
+      d.gap.remove();
+      if (!cancel && d.lane) dropCard(d.id, STATUS[+d.lane.dataset.lane], before);
+    } else if (!cancel) {
+      if (typeof d.id === 'string') {
+        /* your own card: a click renames or deletes it */
+        editCard = d.id;
+        addLane = null;
+        renderBoard();
+        focusCardInput();
+      } else openModal(d.id);
+    }
   }
   window.addEventListener('pointerup', e => endDrag(e, false));
   window.addEventListener('pointercancel', e => endDrag(e, true));
@@ -8854,7 +9219,16 @@ const Dashboard = (() => {
   phoneMQ.addEventListener?.('change', () => render());
   lanesEl.addEventListener('keydown', e => {
     const card = e.target.closest('.task');
-    if (!card) return;
+    if (!card || e.target.closest('.cardin')) return;
+    if (card.dataset.card != null) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        editCard = card.dataset.card;
+        renderBoard();
+        focusCardInput();
+      }
+      return;
+    }
     const i = +card.dataset.topic;
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -10812,7 +11186,7 @@ const PreviewCarousel = (() => {
   window.addEventListener('resize', () => requestAnimationFrame(clipSugg));
   lanesEl.addEventListener('pointerover', e => {
     if (e.pointerType !== 'mouse' || drag) return;
-    const c = e.target.closest('.task');
+    const c = e.target.closest('.task[data-topic]');
     setPreview(c ? +c.dataset.topic : null);
   });
   lanesEl.addEventListener('pointerleave', () => setPreview(null));
@@ -12903,7 +13277,21 @@ const PlanWeek = (() => {
     const out = TOPICS.map((_, i) => i)
       .filter(i => state.statuses[i] === 'Doing' && !planned.includes(i))
       .map(i => ({ i, from: 'Doing', to: lastFrom(i) }));
-    return [...into, ...out];
+    /* your own activities in today's plan become Kanban cards in Doing (an existing card with the same name moves
+       there instead). Cards made on the Kanban never go into the plan, and your cards are never moved out of Doing. */
+    const own = [];
+    todayPlan()
+      .items.filter(it => it.kind === 'custom' && (it.label || '').trim())
+      .forEach(it => {
+        const title = it.label.trim().slice(0, 80),
+          key = title.toLowerCase();
+        if (own.some(m => m.title.toLowerCase() === key)) return;
+        const card = (state.cards || []).find(c => c.title.toLowerCase() === key);
+        if (!card) own.push({ title, from: null, to: 'Doing' });
+        else if (card.status !== 'Doing')
+          own.push({ card: card.id, title: card.title, from: card.status, to: 'Doing' });
+      });
+    return [...into, ...out, ...own];
   }
   let kbMoves = [];
   function openKanbanSync() {
@@ -12919,7 +13307,7 @@ const PlanWeek = (() => {
       ? kbMoves
           .map(
             (m, k) =>
-              `<label class="kbrow"><input type="checkbox" data-kb="${k}" checked><span class="kbn">${esc(TOPICS[m.i].name)}</span><span class="kbmv"><span style="color:${COLORS[STATUS.indexOf(m.from)]}">${esc(label(m.from))}</span> → <span style="color:${COLORS[STATUS.indexOf(m.to)]}">${esc(label(m.to))}</span></span></label>`
+              `<label class="kbrow"><input type="checkbox" data-kb="${k}" checked><span class="kbn">${esc(m.title || TOPICS[m.i].name)}</span><span class="kbmv">${m.from ? `<span style="color:${COLORS[STATUS.indexOf(m.from)]}">${esc(label(m.from))}</span>` : `<span class="kbnew">${esc(t('kbNewCard'))}</span>`} → <span style="color:${COLORS[STATUS.indexOf(m.to)]}">${esc(label(m.to))}</span></span></label>`
           )
           .join('')
       : `<div class="pwempty">${esc(t('kbNothing'))}</div>`;
@@ -12943,6 +13331,16 @@ const PlanWeek = (() => {
     commit(
       () => {
         pick.forEach(m => {
+          if (m.title) {
+            /* your own card: created (or moved) without a study event */
+            if (m.card) state.cards.find(c => c.id === m.card).status = m.to;
+            else {
+              const id = 'k' + uid();
+              state.cards = [...(state.cards || []), { id, title: m.title, status: m.to }];
+              state.order = [...normOrder(state.order, state.cards.slice(0, -1)), id];
+            }
+            return;
+          }
           state.events.push({
             id: uid(),
             date: todayISO(),
@@ -13445,13 +13843,14 @@ const PlanWizard = (() => {
         const r = g.getBoundingClientRect();
         return y < r.top + r.height / 2;
       });
-    if (before) {
-      if (gap.nextSibling !== before) before.before(gap);
-    } else {
-      const last = cards[cards.length - 1],
-        anchor = last || blk.querySelector('.wzbh');
-      if (anchor.nextSibling !== gap) anchor.after(gap);
-    }
+    const last = cards[cards.length - 1],
+      anchor = last || blk.querySelector('.wzbh'),
+      moving = before ? gap.nextSibling !== before : anchor.nextSibling !== gap;
+    /* the cards of the day glide to open the gap where the dragged one will land */
+    if (moving)
+      flip([...day.querySelectorAll('.wzg:not([hidden]), .wzfree, .wzbh')], () =>
+        before ? before.before(gap) : anchor.after(gap)
+      );
     /* scroll the wizard when the card reaches its top or bottom edge */
     const body = $('#wzBody'),
       br = body.getBoundingClientRect();
@@ -15788,7 +16187,7 @@ const GistSync = (() => {
             : 'error'
     );
   }
-  /* merge two copies: events, tests and plans are united by id (the newer copy wins for the same id, deleted ids stay deleted);
+  /* merge two copies: events, tests, plans and your own cards are united by id (the newer copy wins for the same id, deleted ids stay deleted);
    everything else (lists, scores, settings, exam date, plan of the day) comes from the newer copy */
   function mergeStates(a, b) {
     const [n, o] = a.updatedAt >= b.updatedAt ? [a, b] : [b, a],
@@ -15806,6 +16205,7 @@ const GistSync = (() => {
       events: un(n.events, o.events),
       tests: un(n.tests || [], o.tests || []),
       plans: un(n.plans || [], o.plans || []),
+      cards: un(n.cards || [], o.cards || []),
       deleted: del,
       updatedAt: Math.max(a.updatedAt, b.updatedAt),
     });

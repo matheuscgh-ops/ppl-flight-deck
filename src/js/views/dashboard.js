@@ -205,10 +205,13 @@ const Dashboard = (() => {
     const laneCols = STATUS.map(s => colsOf(state.statuses.filter(x => x === s).length));
     lanesEl.style.gridTemplateColumns = fit ? laneCols.map(c => `minmax(0,${c}fr)`).join(' ') : '';
     $('#lanes').innerHTML = STATUS.map((s, j) => {
-      const ids = TOPICS.map((_, i) => i).filter(i => state.statuses[i] === s);
+      const keys = orderOf().filter(k => (typeof k === 'number' ? state.statuses[k] === s : cardOf(k)?.status === s)),
+        ids = keys.filter(k => typeof k === 'number');
       const q = ids.reduce((a, i) => a + TOPICS[i].q, 0);
-      return `<div class="lane" data-lane="${j}" style="--accent:${COLORS[j]}"><div class="lanehead"><span class="lname">${esc(label(s))}</span><span class="lcount">${ids.length} · ${tf('qn', fmt(q))}</span></div><div class="lanecards${laneCols[j] > 1 ? ' multi' : ''}" style="${laneCols[j] > 1 ? `column-count:${laneCols[j]}` : ''}">${ids
+      const own = keys.length - ids.length;
+      return `<div class="lane" data-lane="${j}" style="--accent:${COLORS[j]}"><div class="lanehead"><span class="lname">${esc(label(s))}</span><span class="lcount">${ids.length}${own ? ' + ' + own : ''} · ${tf('qn', fmt(q))}</span><button type="button" class="laneadd" data-cact="open" data-lane-add="${j}" aria-label="${esc(t('addCard'))}" title="${esc(t('addCard'))}">+</button></div><div class="lanecards${laneCols[j] > 1 ? ' multi' : ''}" style="${laneCols[j] > 1 ? `column-count:${laneCols[j]}` : ''}">${keys
         .map(i => {
+          if (typeof i !== 'number') return ownCardHTML(cardOf(i));
           const x = TOPICS[i],
             v = state.scores[i],
             sc = v == null ? 'none' : v >= GOAL ? 'good' : v >= 70 ? 'mid' : 'low';
@@ -216,7 +219,7 @@ const Dashboard = (() => {
           const last = ls == null ? '' : ls <= 0 ? t('todayShort') : tf('ago', ls);
           return `<div class="task" tabindex="0" role="button" data-topic="${i}" aria-label="${esc(x.name)}" title="${esc(x.name)}"><div class="tname">${esc(x.name)}</div><div class="tmeta"><span>${tf('qn', x.q)}</span><span class="score sc-${sc}" title="${esc(t('editScore'))}">${v == null ? '—' : v + '%'}</span><span class="last">${esc(last)}</span></div></div>`;
         })
-        .join('')}</div></div>`;
+        .join('')}${composerHTML(j)}</div></div>`;
     }).join('');
     $('#cardCount').textContent = `(${TOPICS.length})`;
     $('#laneDots').innerHTML = STATUS.map(
@@ -225,6 +228,87 @@ const Dashboard = (() => {
     if (keepLane != null) goLane(keepLane, false);
     updateDots();
   }
+  /* ---------- your own cards (tasks such as "Review the theory"; not in the statistics) ---------- */
+  let addLane = null,
+    editCard = null;
+  const cardOf = id => (state.cards || []).find(c => c.id === id);
+  /* the saved order of every card (topics and yours), completed if anything is missing */
+  const orderOf = () => normOrder(state.order, state.cards || []);
+  function ownCardHTML(c) {
+    if (!c) return '';
+    if (editCard === c.id)
+      return `<div class="task own editing" data-card="${esc(c.id)}"><textarea class="cardin" maxlength="80" rows="2" aria-label="${esc(t('cardHint'))}">${esc(c.title)}</textarea><div class="cardbtns"><button type="button" class="primary" data-cact="save">${esc(t('cardSave'))}</button><button type="button" data-cact="del">${esc(t('cardDel'))}</button><button type="button" class="cardx" data-cact="cancel" aria-label="${esc(t('close'))}">×</button></div></div>`;
+    return `<div class="task own" tabindex="0" role="button" data-card="${esc(c.id)}" aria-label="${esc(c.title)}" title="${esc(c.title)}"><div class="tname">${esc(c.title)}</div><div class="tmeta"><span class="owntag">${esc(t('ownTag'))}</span></div></div>`;
+  }
+  function composerHTML(j) {
+    if (addLane === j)
+      return `<div class="composer" data-lane-add="${j}"><textarea class="cardin" maxlength="80" rows="2" placeholder="${esc(t('cardHint'))}" aria-label="${esc(t('cardHint'))}"></textarea><div class="cardbtns"><button type="button" class="primary" data-cact="add">${esc(t('addCardBtn'))}</button><button type="button" class="cardx" data-cact="close" aria-label="${esc(t('close'))}">×</button></div></div>`;
+    return `<button type="button" class="addcard" data-cact="open" data-lane-add="${j}">+ ${esc(t('addCard'))}</button>`;
+  }
+  function focusCardInput() {
+    const el = lanesEl.querySelector('.composer .cardin, .own.editing .cardin');
+    if (el) {
+      el.focus();
+      el.setSelectionRange(el.value.length, el.value.length);
+    }
+  }
+  function addOwnCard(j, title) {
+    title = title.trim().slice(0, 80);
+    if (!title) return;
+    const id = 'k' + uid();
+    commit(() => {
+      state.cards = [...(state.cards || []), { id, title, status: STATUS[j] }];
+      state.order = [...orderOf(), id];
+    }, t('cardAdded'));
+    /* like Trello, the composer stays open for the next card */
+    addLane = j;
+    renderBoard();
+    focusCardInput();
+  }
+  function cardAction(a, el) {
+    const box = el.closest('[data-card], [data-lane-add]'),
+      id = box && box.dataset.card,
+      j = box && box.dataset.laneAdd != null ? +box.dataset.laneAdd : null;
+    if (a === 'open') {
+      addLane = j;
+      editCard = null;
+    } else if (a === 'close') addLane = null;
+    else if (a === 'add') return addOwnCard(j, box.querySelector('.cardin').value);
+    else if (a === 'cancel') editCard = null;
+    else if (a === 'save') {
+      const title = box.querySelector('.cardin').value.trim().slice(0, 80);
+      editCard = null;
+      if (title && title !== cardOf(id).title)
+        return commit(() => {
+          cardOf(id).title = title;
+        }, t('cardEdited'));
+    } else if (a === 'del') {
+      editCard = null;
+      return commit(() => {
+        state.cards = state.cards.filter(c => c.id !== id);
+        state.order = orderOf().filter(k => k !== id);
+      }, t('cardDeleted'));
+    }
+    renderBoard();
+    focusCardInput();
+  }
+  $('#lanes').addEventListener('click', e => {
+    const b = e.target.closest('[data-cact]');
+    if (b) cardAction(b.dataset.cact, b);
+  });
+  $('#lanes').addEventListener('keydown', e => {
+    const inp = e.target.closest('.cardin');
+    if (!inp) return;
+    e.stopPropagation();
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      cardAction(inp.closest('.composer') ? 'add' : 'save', inp);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      cardAction(inp.closest('.composer') ? 'close' : 'cancel', inp);
+    }
+  });
+
   /* phone: which list is in view → dots */
   const phoneMQ = matchMedia('(max-width:640px)');
   function laneInView() {
@@ -294,6 +378,47 @@ const Dashboard = (() => {
       `${TOPICS[i].name} → ${label(to)}`
     );
   }
+  /* put card i right before card `before` (null = at the end of its list) in the saved card order */
+  function placeCard(order, i, before) {
+    const o = order.filter(x => x !== i),
+      k = before == null ? o.length : o.indexOf(before);
+    o.splice(k < 0 ? o.length : k, 0, i);
+    return o;
+  }
+  /* a drop: another list (a move, logged with its date) and/or a new place inside the list, one Undo for both */
+  function dropCard(i, to, before) {
+    const own = typeof i === 'string' ? cardOf(i) : null,
+      order = placeCard(orderOf(), i, before),
+      moved = own ? own.status !== to : state.statuses[i] !== to,
+      same = JSON.stringify(order) === JSON.stringify(state.order);
+    if (!moved && same) return;
+    if (own)
+      return commit(
+        () => {
+          own.status = to;
+          state.order = order;
+        },
+        moved ? `${own.title} → ${label(to)}` : t('reordered')
+      );
+    commit(
+      () => {
+        if (moved) {
+          state.events.push({
+            id: uid(),
+            date: todayISO(),
+            topic: i,
+            kind: 'move',
+            from: state.statuses[i],
+            to,
+            demo: false,
+          });
+          state.statuses[i] = to;
+        }
+        state.order = order;
+      },
+      moved ? `${TOPICS[i].name} → ${label(to)}` : t('reordered')
+    );
+  }
 
   /* pointer drag & drop: mouse drags after 5px, touch after a short press-and-hold */
   let drag = null;
@@ -303,10 +428,10 @@ const Dashboard = (() => {
   });
   lanesEl.addEventListener('pointerdown', e => {
     const card = e.target.closest('.task');
-    if (!card || e.button > 0 || e.target.closest('.score,.scorein')) return;
+    if (!card || e.button > 0 || e.target.closest('.score,.scorein,.editing,.cardin,[data-cact]')) return;
     drag = {
       card,
-      id: +card.dataset.topic,
+      id: card.dataset.card ?? +card.dataset.topic,
       x: e.clientX,
       y: e.clientY,
       pid: e.pointerId,
@@ -354,12 +479,18 @@ const Dashboard = (() => {
     drag.active = true;
     lanesEl.style.scrollSnapType = 'none';
     document.body.appendChild(g);
+    /* the card leaves a gap that follows the pointer: where the gap is, the card lands */
+    const gap = document.createElement('div');
+    gap.className = 'task-gap';
+    gap.style.height = r.height + 'px';
+    drag.card.after(gap);
+    drag.gap = gap;
     drag.card.classList.add('dragging');
     document.body.classList.add('dragging');
     moveGhost(x, y);
   }
   function moveGhost(x, y) {
-    drag.ghost.style.transform = `translate(${x - drag.ox}px,${y - drag.oy}px) rotate(2deg)`;
+    drag.ghost.style.transform = `translate(${x - drag.ox}px,${y - drag.oy}px) rotate(3deg)`;
     if (y < 70) window.scrollBy(0, -14);
     else if (y > innerHeight - 70) window.scrollBy(0, 14);
     if (lanesEl.scrollWidth > lanesEl.clientWidth + 2) {
@@ -369,8 +500,10 @@ const Dashboard = (() => {
     }
     let lane = document.elementFromPoint(x, y)?.closest('.lane') || null;
     if (!lane) {
-      const b = lanesEl.getBoundingClientRect();
-      if (y >= b.top - 20 && y <= b.bottom + 40)
+      /* below a short list (the board area, not just the cards) still counts as that list */
+      const b = lanesEl.getBoundingClientRect(),
+        board = (lanesEl.closest('.board') || lanesEl).getBoundingClientRect();
+      if (y >= b.top - 20 && y <= Math.max(b.bottom, board.bottom) + 120)
         lane =
           [...lanesEl.children].find(l => {
             const r = l.getBoundingClientRect();
@@ -381,6 +514,22 @@ const Dashboard = (() => {
       drag.lane?.classList.remove('over');
       lane?.classList.add('over');
       drag.lane = lane;
+    }
+    /* magnetic: the gap jumps to the place between the cards nearest to the pointer */
+    if (lane) {
+      const box = lane.querySelector('.lanecards'),
+        cards = [...box.querySelectorAll('.task')].filter(c => c !== drag.card),
+        next = cards.find(c => {
+          const r = c.getBoundingClientRect();
+          return y < r.top + r.height / 2;
+        });
+      const moving = next ? drag.gap.nextSibling !== next : box.lastElementChild !== drag.gap;
+      if (moving) {
+        /* the cards of both lists glide to open (and close) the gap */
+        const old = drag.gap.parentElement,
+          els = [...new Set([...box.querySelectorAll('.task'), ...(old ? old.querySelectorAll('.task') : [])])];
+        flip(els, () => (next ? next.before(drag.gap) : box.appendChild(drag.gap)));
+      }
     }
   }
   function endDrag(e, cancel) {
@@ -394,11 +543,22 @@ const Dashboard = (() => {
       d.card.classList.remove('dragging');
       document.body.classList.remove('dragging');
       d.lane?.classList.remove('over');
-      if (!cancel && d.lane) {
-        const to = STATUS[+d.lane.dataset.lane];
-        if (to !== state.statuses[d.id]) moveCard(d.id, to);
-      }
-    } else if (!cancel) openModal(d.id);
+      const after = d.gap.nextElementSibling,
+        before =
+          after && after.classList.contains('task') && after !== d.card
+            ? (after.dataset.card ?? +after.dataset.topic)
+            : null;
+      d.gap.remove();
+      if (!cancel && d.lane) dropCard(d.id, STATUS[+d.lane.dataset.lane], before);
+    } else if (!cancel) {
+      if (typeof d.id === 'string') {
+        /* your own card: a click renames or deletes it */
+        editCard = d.id;
+        addLane = null;
+        renderBoard();
+        focusCardInput();
+      } else openModal(d.id);
+    }
   }
   window.addEventListener('pointerup', e => endDrag(e, false));
   window.addEventListener('pointercancel', e => endDrag(e, true));
@@ -417,7 +577,16 @@ const Dashboard = (() => {
   phoneMQ.addEventListener?.('change', () => render());
   lanesEl.addEventListener('keydown', e => {
     const card = e.target.closest('.task');
-    if (!card) return;
+    if (!card || e.target.closest('.cardin')) return;
+    if (card.dataset.card != null) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        editCard = card.dataset.card;
+        renderBoard();
+        focusCardInput();
+      }
+      return;
+    }
     const i = +card.dataset.topic;
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();

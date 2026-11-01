@@ -412,7 +412,21 @@ const PlanWeek = (() => {
     const out = TOPICS.map((_, i) => i)
       .filter(i => state.statuses[i] === 'Doing' && !planned.includes(i))
       .map(i => ({ i, from: 'Doing', to: lastFrom(i) }));
-    return [...into, ...out];
+    /* your own activities in today's plan become Kanban cards in Doing (an existing card with the same name moves
+       there instead). Cards made on the Kanban never go into the plan, and your cards are never moved out of Doing. */
+    const own = [];
+    todayPlan()
+      .items.filter(it => it.kind === 'custom' && (it.label || '').trim())
+      .forEach(it => {
+        const title = it.label.trim().slice(0, 80),
+          key = title.toLowerCase();
+        if (own.some(m => m.title.toLowerCase() === key)) return;
+        const card = (state.cards || []).find(c => c.title.toLowerCase() === key);
+        if (!card) own.push({ title, from: null, to: 'Doing' });
+        else if (card.status !== 'Doing')
+          own.push({ card: card.id, title: card.title, from: card.status, to: 'Doing' });
+      });
+    return [...into, ...out, ...own];
   }
   let kbMoves = [];
   function openKanbanSync() {
@@ -428,7 +442,7 @@ const PlanWeek = (() => {
       ? kbMoves
           .map(
             (m, k) =>
-              `<label class="kbrow"><input type="checkbox" data-kb="${k}" checked><span class="kbn">${esc(TOPICS[m.i].name)}</span><span class="kbmv"><span style="color:${COLORS[STATUS.indexOf(m.from)]}">${esc(label(m.from))}</span> → <span style="color:${COLORS[STATUS.indexOf(m.to)]}">${esc(label(m.to))}</span></span></label>`
+              `<label class="kbrow"><input type="checkbox" data-kb="${k}" checked><span class="kbn">${esc(m.title || TOPICS[m.i].name)}</span><span class="kbmv">${m.from ? `<span style="color:${COLORS[STATUS.indexOf(m.from)]}">${esc(label(m.from))}</span>` : `<span class="kbnew">${esc(t('kbNewCard'))}</span>`} → <span style="color:${COLORS[STATUS.indexOf(m.to)]}">${esc(label(m.to))}</span></span></label>`
           )
           .join('')
       : `<div class="pwempty">${esc(t('kbNothing'))}</div>`;
@@ -452,6 +466,16 @@ const PlanWeek = (() => {
     commit(
       () => {
         pick.forEach(m => {
+          if (m.title) {
+            /* your own card: created (or moved) without a study event */
+            if (m.card) state.cards.find(c => c.id === m.card).status = m.to;
+            else {
+              const id = 'k' + uid();
+              state.cards = [...(state.cards || []), { id, title: m.title, status: m.to }];
+              state.order = [...normOrder(state.order, state.cards.slice(0, -1)), id];
+            }
+            return;
+          }
           state.events.push({
             id: uid(),
             date: todayISO(),

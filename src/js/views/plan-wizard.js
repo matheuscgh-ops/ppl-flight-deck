@@ -480,13 +480,14 @@ const PlanWizard = (() => {
         const r = g.getBoundingClientRect();
         return y < r.top + r.height / 2;
       });
-    if (before) {
-      if (gap.nextSibling !== before) before.before(gap);
-    } else {
-      const last = cards[cards.length - 1],
-        anchor = last || blk.querySelector('.wzbh');
-      if (anchor.nextSibling !== gap) anchor.after(gap);
-    }
+    const last = cards[cards.length - 1],
+      anchor = last || blk.querySelector('.wzbh'),
+      moving = before ? gap.nextSibling !== before : anchor.nextSibling !== gap;
+    /* the cards of the day glide to open the gap where the dragged one will land */
+    if (moving)
+      flip([...day.querySelectorAll('.wzg:not([hidden]), .wzfree, .wzbh')], () =>
+        before ? before.before(gap) : anchor.after(gap)
+      );
     /* scroll the wizard when the card reaches its top or bottom edge */
     const body = $('#wzBody'),
       br = body.getBoundingClientRect();

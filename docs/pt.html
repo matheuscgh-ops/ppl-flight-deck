@@ -203,7 +203,7 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
   <h3 id="kanban">Kanban e sessões</h3>
   <p>Um cartão por tópico, em 5 listas: <span class="ui">To Do</span>, <span class="ui">Doing</span>, <span class="ui">Not Comfortable</span>, <span class="ui">Very Comfortable</span> e <span class="ui">To Review</span>. O número em cada cartão é a sua última nota no tópico.</p>
   <figure><img src="img/pt/dash-board.jpg" alt="Kanban com as cinco listas" loading="lazy"></figure>
-  <p><b>Mover um cartão:</b> arraste entre as listas, com mouse ou toque. Toda mudança mostra um aviso com <span class="ui">Undo</span>.</p>
+  <p><b>Mover um cartão:</b> arraste com o mouse, ou segure e arraste no toque. Os outros cartões deslizam para abrir um espaço, e o cartão fica exatamente onde você soltar: em outra lista ou num novo lugar da mesma lista. A ordem fica salva e sincroniza. Toda mudança mostra um aviso com <span class="ui">Undo</span>.</p>
   <p><b>Registrar uma sessão:</b></p>
   <ol class="steps">
     <li>Clique no nome do cartão (ou selecione e aperte <kbd>Enter</kbd>).</li>
@@ -212,6 +212,7 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
     <li>Ajuste a lista e a data, se precisar, e clique em <span class="ui">Save</span>.</li>
   </ol>
   <figure class="mid"><img src="img/pt/log.jpg" alt="Diálogo de registro de sessão" loading="lazy"><figcaption>O histórico do tópico fica embaixo. O × apaga uma entrada, com desfazer.</figcaption></figure>
+  <p><b>Seus cards:</b> <span class="ui">+ Add a card</span> no fim de uma lista cria uma tarefa sua, como "Revisar a teoria" ou "Fraseologia: solo". O Enter adiciona e deixa a caixa aberta para o próximo; o Esc fecha. Seus cards se arrastam como qualquer card; clique num deles para renomear ou apagar. Eles são só lembretes: nunca entram na barra de progresso, nas estatísticas nem na previsão.</p>
   <p><b>Corrigir só a nota:</b> clique no número colorido do cartão, digite e aperte <kbd>Enter</kbd>. A nota da última sessão é atualizada.</p>
 
   <h3 id="calendar">Calendário</h3>
@@ -299,6 +300,7 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
   <ul>
     <li>Tópicos do plano de hoje que estão em outra lista vão para <span class="ui">Doing</span>.</li>
     <li>Tópicos em Doing que não estão no plano voltam para a lista de onde vieram, ou para To Do.</li>
+    <li>As atividades suas do plano de hoje (por exemplo "Treinar fraseologia") viram cards em <span class="ui">Doing</span>; se você já tem um card com esse nome, ele vai para Doing. Cards criados no Kanban nunca entram no plano.</li>
   </ul>
   <p>Desmarque o que não quiser e clique em <span class="ui">OK</span>. Um único Desfazer reverte tudo.</p>
   <figure class="mid"><img src="img/pt/plan-kbsync.jpg" alt="Revisão dos movimentos antes de sincronizar com o Kanban" loading="lazy"></figure>

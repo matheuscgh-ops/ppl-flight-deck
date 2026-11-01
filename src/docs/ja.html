@@ -88,7 +88,7 @@
   <h3 id="kanban">カンバンと学習記録</h3>
   <p>トピックごとに1枚のカードがあり、5つのリストに分かれます：<span class="ui">To Do</span>、<span class="ui">Doing</span>、<span class="ui">Not Comfortable</span>、<span class="ui">Very Comfortable</span>、<span class="ui">To Review</span>。カードの数字はそのトピックの最新スコアです。</p>
   <figure><img src="img/dash-board.jpg" alt="5つのリストがあるカンバン" loading="lazy"></figure>
-  <p><b>カードを移動：</b>マウスまたはタッチでリスト間をドラッグします。変更のたびに<span class="ui">Undo</span>付きの通知が出ます。</p>
+  <p><b>カードを移動：</b>マウスでドラッグ、タッチでは長押ししてドラッグします。ほかのカードが横にずれて場所が開き、カードは離した場所にそのまま入ります：別のリストでも、同じリストの新しい位置でも。順番は保存され、同期されます。変更のたびに<span class="ui">Undo</span>付きの通知が出ます。</p>
   <p><b>学習を記録：</b></p>
   <ol class="steps">
     <li>カードの名前をクリック（または選択して<kbd>Enter</kbd>）。</li>
@@ -97,6 +97,7 @@
     <li>必要ならリストと日付を調整し、<span class="ui">Save</span>をクリック。</li>
   </ol>
   <figure class="mid"><img src="img/log.jpg" alt="学習記録のダイアログ" loading="lazy"><figcaption>下にトピックの履歴があります。×で記録を削除できます（元に戻せます）。</figcaption></figure>
+  <p><b>自分のカード：</b>リストの最後の<span class="ui">+ Add a card</span>で、「理論の復習」「無線交信：地上」のような自分のタスクを追加できます。Enterで追加して次の入力欄が開いたまま、Escで閉じます。自分のカードもほかのカードと同じようにドラッグでき、クリックすると名前の変更や削除ができます。あくまでメモなので、進捗バー・統計・予測には含まれません。</p>
   <p><b>スコアだけ直す：</b>カードの色付きの数字をクリックし、入力して<kbd>Enter</kbd>。最後の記録のスコアが更新されます。</p>
 
   <h3 id="calendar">カレンダー</h3>
@@ -184,6 +185,7 @@
   <ul>
     <li>今日の計画にあり別のリストにあるトピックは<span class="ui">Doing</span>へ移ります。</li>
     <li>Doingにあり計画にないトピックは元のリスト、またはTo Doに戻ります。</li>
+    <li>今日の計画にある自分の活動（例：「無線交信の練習」）は<span class="ui">Doing</span>のカードになります。同じ名前のカードがすでにあれば、それがDoingへ移ります。カンバンで作ったカードが計画に入ることはありません。</li>
   </ul>
   <p>不要なもののチェックを外し、<span class="ui">OK</span>をクリック。1回のUndoですべて元に戻せます。</p>
   <figure class="mid"><img src="img/plan-kbsync.jpg" alt="カンバンと同期する前の移動の確認" loading="lazy"></figure>
