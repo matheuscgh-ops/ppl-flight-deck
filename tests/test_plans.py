@@ -69,15 +69,19 @@ with sync_playwright() as p:
             revs = [x for x in items if x['k'] == 'reflect']
             check(f'{tag}: the error review is split after each topic (10 min … a quarter of the block in total)', revs and 10 <= sum(x['m'] for x in revs) <= 30 and ev("(()=>{const its=wizardState().items.slice().sort((a,b)=>a.start-b.start);return its.every((x,k)=>x.kind!=='reflect'||(k>0&&its[k-1].id===x.of&&x.parts.length===1))})()"), items)
             check(f'{tag}: each review row sits under its topic and names its expected misses', 'Error review' in pg.inner_text('#wzBody') and ev("document.querySelectorAll('.wzg .wzit.child').length") == len(revs) and 'expected misses' in pg.inner_text('.wzit.child'))
+            if touch:
+                hb = ev("(()=>{const r=document.querySelector('.wzg .wzit:not(.child) .wzt').getBoundingClientRect();return [r.width,r.height]})()")
+                check(f'{tag}: the drag handle (grip + time) is thumb-sized (≥ 44 × 44 px)', hb[0] >= 44 and hb[1] >= 44, hb)
             check(f'{tag}: cards cannot be text-selected while you press and drag them', ev("[...document.querySelectorAll('.wzg .wzn, .wzg .wzq, .wzg small')].every(e=>['none'].includes(getComputedStyle(e).userSelect||getComputedStyle(e).webkitUserSelect))"))
             check(f'{tag}: no ↑ arrows: topics are moved by dragging (grip on every topic)', ev("document.querySelectorAll('[data-wact=\"up\"]').length") == 0 and ev("[...document.querySelectorAll('.wzg')].every(g=>g.querySelector('.wzgrip'))"))
             # drag the second topic (with its review) above the first
             order0 = ev("[...document.querySelectorAll('.wzg')].map(g=>g.dataset.gid)")
             if len(order0) >= 2:
                 if touch:
-                    ev("""(()=>{const g=document.querySelectorAll('.wzg')[1],h=g.querySelector('.wzgrip'),r=h.getBoundingClientRect(),t=document.querySelector('.wzg').getBoundingClientRect();
+                    # a thumb press lands on the time, not the small grip: the whole left column must work
+                    ev("""(()=>{const g=document.querySelectorAll('.wzg')[1],h=g.querySelector('.wzt'),r0=h.getBoundingClientRect(),r={left:r0.left+r0.width*0.6,top:r0.top+r0.height*0.7},t=document.querySelector('.wzg').getBoundingClientRect();
                       const P=(type,el,x,y)=>el.dispatchEvent(new PointerEvent(type,{bubbles:true,cancelable:true,pointerId:7,pointerType:'touch',clientX:x,clientY:y,isPrimary:true}));
-                      P('pointerdown',h,r.left+3,r.top+3);P('pointermove',document,r.left+3,t.top+20);P('pointermove',document,r.left+3,t.top+4);P('pointerup',document,r.left+3,t.top+4)})()""")
+                      P('pointerdown',h,r.left,r.top);P('pointermove',document,r.left,r.top+2);P('pointermove',document,r.left+3,t.top+20);P('pointermove',document,r.left+3,t.top+4);P('pointerup',document,r.left+3,t.top+4)})()""")
                 else:
                     g1 = pg.locator('.wzg').nth(1).locator('.wzn').first.bounding_box(); g0 = pg.locator('.wzg').nth(0).bounding_box()
                     pg.mouse.move(g1['x'] + 20, g1['y'] + 6); pg.mouse.down(); pg.mouse.move(g1['x'] + 20, g0['y'] + 30, steps=5); pg.mouse.move(g1['x'] + 20, g0['y'] + 3, steps=5); pg.mouse.up()
