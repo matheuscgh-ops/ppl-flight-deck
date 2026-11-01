@@ -79,7 +79,9 @@ with sync_playwright() as p:
             # ---------- your own cards (tasks): add, rename, drag, delete; never in the statistics ----------
             stats0 = ev("JSON.stringify([counts(),TOTAL])")
             ev("document.querySelectorAll('.lane')[4].scrollIntoView({block:'center',inline:'center'})"); pg.wait_for_timeout(250)
-            (pg.tap if touch else pg.click)('.lane[data-lane="4"] .addcard'); pg.wait_for_timeout(120)
+            add_sel = '.lane[data-lane="4"] .laneadd' if pg.is_visible('.lane[data-lane="4"] .laneadd') else '.lane[data-lane="4"] .addcard'
+            check(f'{tag}: one way to add a card per list ("+" in the header on a one-screen desktop, "+ Add a card" below otherwise)', pg.is_visible('.lane[data-lane="4"] .laneadd') != pg.is_visible('.lane[data-lane="4"] .addcard'))
+            (pg.tap if touch else pg.click)(add_sel); pg.wait_for_timeout(120)
             check(f'{tag}: "+ Add a card" opens a title box at the end of the list', pg.is_visible('.composer .cardin') and ev("document.activeElement.classList.contains('cardin')"))
             pg.keyboard.type('Review the theory'); pg.keyboard.press('Enter'); pg.wait_for_timeout(150)
             check(f'{tag}: Enter adds the card to that list and keeps the box open for the next one', ev("state.cards.length===1&&state.cards[0].title==='Review the theory'&&state.cards[0].status==='To review'") and pg.is_visible('.composer .cardin'))
