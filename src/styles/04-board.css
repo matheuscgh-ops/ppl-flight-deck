@@ -253,3 +253,31 @@ body.dragging * {
   padding: 2px 8px;
   color: var(--ink2);
 }
+/* the "+" in a list's header opens the same box; on a one-screen desktop it replaces the row at the bottom,
+   so the board keeps its height and the calendar below keeps its room */
+.laneadd {
+  display: none;
+  margin-left: 6px;
+  padding: 0 7px;
+  font-size: 15px;
+  line-height: 20px;
+  background: transparent;
+  border: 0;
+  color: var(--ink2);
+}
+.laneadd:hover {
+  background: #ffffff14;
+  color: var(--ink);
+  border: 0;
+}
+@media (min-width: 1100px) and (min-height: 1050px) {
+  .laneadd {
+    display: inline-block;
+  }
+  .lanecards > .addcard {
+    display: none;
+  }
+}
+.lanehead .lcount {
+  margin-left: auto;
+}

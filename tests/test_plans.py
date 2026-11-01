@@ -134,8 +134,10 @@ with sync_playwright() as p:
             tap('#kbSync'); pg.wait_for_timeout(200)
             exp_in = [i for i in planned if before[i] != 'Doing']
             exp_out = [i for i in range(len(before)) if before[i] == 'Doing' and i not in planned]
-            rows = ev("[...document.querySelectorAll('#kbList .kbrow')].map(r=>r.innerText)")
+            allrows = ev("[...document.querySelectorAll('#kbList .kbrow')].map(r=>r.innerText)")
+            rows = [r for r in allrows if 'New card' not in r]
             check(f'{tag}: Sync with Kanban opens a review of the moves (nothing moved yet)', pg.is_visible('#kbbg') and len(rows) == len(exp_in) + len(exp_out) and ev("state.statuses.slice()") == before, (rows, exp_in, exp_out))
+            check(f'{tag}: … and your own activity in today\'s plan is offered as a new card in Doing', any('Simulator' in r and 'New card' in r for r in allrows) == ev("todayPlan().items.some(x=>x.kind==='custom'&&x.label==='Simulator')"), allrows)
             check(f'{tag}: … a card leaving Doing goes back to the list it came from', any('Very Comfortable' in r for r in rows) if 22 in exp_out else True, rows)
             tap('#kbCancel'); pg.wait_for_timeout(150)
             check(f'{tag}: Cancel changes nothing on the Kanban', ev("state.statuses.slice()") == before and not pg.is_visible('#kbbg'))

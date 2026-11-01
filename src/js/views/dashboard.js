@@ -209,7 +209,7 @@ const Dashboard = (() => {
         ids = keys.filter(k => typeof k === 'number');
       const q = ids.reduce((a, i) => a + TOPICS[i].q, 0);
       const own = keys.length - ids.length;
-      return `<div class="lane" data-lane="${j}" style="--accent:${COLORS[j]}"><div class="lanehead"><span class="lname">${esc(label(s))}</span><span class="lcount">${ids.length}${own ? ' + ' + own : ''} · ${tf('qn', fmt(q))}</span></div><div class="lanecards${laneCols[j] > 1 ? ' multi' : ''}" style="${laneCols[j] > 1 ? `column-count:${laneCols[j]}` : ''}">${keys
+      return `<div class="lane" data-lane="${j}" style="--accent:${COLORS[j]}"><div class="lanehead"><span class="lname">${esc(label(s))}</span><span class="lcount">${ids.length}${own ? ' + ' + own : ''} · ${tf('qn', fmt(q))}</span><button type="button" class="laneadd" data-cact="open" data-lane-add="${j}" aria-label="${esc(t('addCard'))}" title="${esc(t('addCard'))}">+</button></div><div class="lanecards${laneCols[j] > 1 ? ' multi' : ''}" style="${laneCols[j] > 1 ? `column-count:${laneCols[j]}` : ''}">${keys
         .map(i => {
           if (typeof i !== 'number') return ownCardHTML(cardOf(i));
           const x = TOPICS[i],
@@ -500,8 +500,10 @@ const Dashboard = (() => {
     }
     let lane = document.elementFromPoint(x, y)?.closest('.lane') || null;
     if (!lane) {
-      const b = lanesEl.getBoundingClientRect();
-      if (y >= b.top - 20 && y <= b.bottom + 40)
+      /* below a short list (the board area, not just the cards) still counts as that list */
+      const b = lanesEl.getBoundingClientRect(),
+        board = (lanesEl.closest('.board') || lanesEl).getBoundingClientRect();
+      if (y >= b.top - 20 && y <= Math.max(b.bottom, board.bottom) + 120)
         lane =
           [...lanesEl.children].find(l => {
             const r = l.getBoundingClientRect();
