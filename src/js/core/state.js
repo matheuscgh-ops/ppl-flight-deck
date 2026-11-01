@@ -1,5 +1,5 @@
 /* ===== module AppState (js/core/state.js) =====
-   public: normalize, local, t, tf, label, fmt, save, toast, commit
+   public: normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs
    shared state (getter/setter): embedded, state, loadedFromFile, lang, shown, sel, mKind, prevIds */
 const AppState = (() => {
   function normalize(o) {
@@ -55,6 +55,7 @@ const AppState = (() => {
                 Number.isFinite(+o.settings.reviewMin) && o.settings.reviewMin !== '' && o.settings.reviewMin != null
                   ? +o.settings.reviewMin
                   : DEF_SET0.reviewMin,
+              ...normPrefs(o.settings),
             }
           : { ...DEF_SET0 },
       tests: Array.isArray(o.tests)
@@ -84,6 +85,39 @@ const AppState = (() => {
           : {},
       updatedAt: +o.updatedAt || 0,
     };
+  }
+  /* the Settings values (PREF_DEF); only allowed values are kept, anything else falls back to the default */
+  const PREF_OK = {
+    goal: v => [80, 85, 90].includes(v),
+    reviewAt: v => [0.8, 0.85, 0.9, 0.95].includes(v),
+    halfLife: v => [7, 10, 14, 21].includes(v),
+    idleDays: v => [2, 3, 4, 5].includes(v),
+    energy: v => ['low', 'medium', 'high'].includes(v),
+    carousel: v => typeof v === 'boolean',
+    heatNums: v => typeof v === 'boolean',
+    gridStart: v => [5, 6, 7, 8, 9].includes(v),
+    deepMin: v => [0, 30, 45, 60, 90].includes(v),
+  };
+  const RANGE_OK = {
+    sr: ['3d', '7d', '2w', '1m', '3m', '6m', '1y', 'all'],
+    card: ['3d', '7d', '2w', '1m', '3m', '6m', '1y', 'all'],
+    vol: ['3d', '7d', '2w', '1m', '3m', '6m', '1y', 'all'],
+    ts: ['3d', '7d', '2w', '1m', '3m', '6m', '1y', 'all'],
+    heat: ['2w', '1m', '3m', '6m', '1y'],
+  };
+  function normPrefs(o) {
+    const out = {};
+    Object.keys(PREF_OK).forEach(k => {
+      if (o && o[k] != null && PREF_OK[k](o[k])) out[k] = o[k];
+    });
+    if (o && o.ranges && typeof o.ranges === 'object') {
+      const r = {};
+      Object.keys(RANGE_OK).forEach(k => {
+        if (RANGE_OK[k].includes(o.ranges[k])) r[k] = o.ranges[k];
+      });
+      if (Object.keys(r).length) out.ranges = r;
+    }
+    return out;
   }
   /* a saved study plan (see Schedule); anything malformed is dropped */
   function normPlan(p) {
@@ -175,7 +209,21 @@ const AppState = (() => {
     sel = -1,
     mKind = 'study';
 
-  const t = k => (I18N[lang] || I18N.en)[k] ?? I18N.en[k];
+  /* a Settings value, or its default */
+  const pref = k => {
+    const s = state && state.settings;
+    return s && s[k] != null ? s[k] : PREF_DEF[k];
+  };
+  /* labels can carry live values: {G} goal %, {GN} right answers needed for it, {RV} review threshold % */
+  const t = k => {
+    const v = (I18N[lang] || I18N.en)[k] ?? I18N.en[k];
+    return typeof v === 'string'
+      ? v
+          .replace(/\{G\}/g, GOAL)
+          .replace(/\{GN\}/g, GOAL_N)
+          .replace(/\{RV\}/g, Math.round(pref('reviewAt') * 100))
+      : v;
+  };
   const tf = (k, n) => t(k).replace('{n}', n);
   const label = s => t('labels')[STATUS.indexOf(s)];
   const fmt = (n, d = 0) =>
@@ -279,6 +327,6 @@ const AppState = (() => {
       },
     ],
   });
-  return { normalize, local, t, tf, label, fmt, save, toast, commit };
+  return { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs };
 })();
-const { normalize, local, t, tf, label, fmt, save, toast, commit } = AppState;
+const { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs } = AppState;

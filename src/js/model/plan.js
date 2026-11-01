@@ -212,7 +212,7 @@ const PlanModel = (() => {
   /* today's plan choices (energy mode, a test you added) live in the synced state, so phone and desktop agree */
   const planDay = () => {
     const p = state.plan;
-    return p && p.date === todayISO() ? p : { date: todayISO(), energy: 'medium', test: false };
+    return p && p.date === todayISO() ? p : { date: todayISO(), energy: pref('energy'), test: false };
   };
   let energyMode = planDay().energy;
   function setEnergy(m) {

@@ -85,7 +85,7 @@ const HeatMap = (() => {
     box.innerHTML = rows
       .map(({ i, c }) =>
         c
-          ? `<span class="hnt" data-hi="${i}" style="background:${heatColor(c.heat)};color:${inkOn(c.heat)}"><b>${c.heat}</b><em>${esc(TOPICS[i].name)}</em></span>`
+          ? `<span class="hnt" data-hi="${i}" style="background:${heatColor(c.heat)};color:${inkOn(c.heat)}"><b>${pref('heatNums') ? c.heat : ''}</b><em>${esc(TOPICS[i].name)}</em></span>`
           : `<span class="hnt empty" data-hi="${i}"><b>—</b><em>${esc(TOPICS[i].name)}</em></span>`
       )
       .join('');
@@ -97,27 +97,17 @@ const HeatMap = (() => {
   }
 
   /* history dialog: every period of the chosen interval, with filters and hover */
+  const heatDialog = modal('#heatbg', { close: '#heatClose', onClose: () => (ctip.hidden = true) });
   function openHeat() {
-    $('#heatbg').hidden = false;
+    heatDialog.open('#heatClose');
     renderHeatHistory();
-    $('#heatClose').focus();
   }
-  function closeHeat() {
-    $('#heatbg').hidden = true;
-    ctip.hidden = true;
-  }
+  const closeHeat = heatDialog.close;
   $('#heatOpen').addEventListener('click', e => {
     e.stopPropagation();
     openHeat();
   });
   $('#heatPanel').addEventListener('click', openHeat);
-  $('#heatClose').onclick = closeHeat;
-  $('#heatbg').addEventListener('pointerdown', e => {
-    if (e.target.id === 'heatbg') closeHeat();
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !$('#heatbg').hidden) closeHeat();
-  });
 
   function renderHeatHistory() {
     const box = $('#heatGrid');
@@ -126,7 +116,7 @@ const HeatMap = (() => {
     const { ends, rows, len } = heatData(),
       n = ends.length,
       cw = (box.clientWidth || 900) - (phoneMQ.matches ? 118 : 230),
-      showNum = cw / n >= 26;
+      showNum = cw / n >= 26 && pref('heatNums');
     const step = n <= 14 ? (cw / n < 22 ? 2 : 1) : n <= 13 ? 1 : n <= 26 ? (cw / n < 30 ? 2 : 1) : 1,
       head = ends
         .map((d, k) => `<span class="hmh">${(n - 1 - k) % step === 0 ? esc(heatLabel(d, len)) : ''}</span>`)
@@ -149,19 +139,12 @@ const HeatMap = (() => {
     html += c
       ? `<span><i style="background:${heatColor(c.heat)}"></i>${esc(t('heatWord'))} <b>${c.heat}</b></span><span>${esc(t('lgRecall'))} <b>${pct(c.R)}</b> · ${esc(t('lastScore'))} <b>${c.score}%</b></span>`
       : `<span class="muted">${esc(t('noHist'))}</span>`;
-    placeTip(e, html);
+    showTip(e, html);
   }
-  function placeTip(e, html) {
+  function showTip(e, html) {
     ctip.innerHTML = html;
     ctip.hidden = false;
-    const r = ctip.getBoundingClientRect(),
-      touch = e.pointerType === 'touch';
-    let x = touch ? e.clientX - r.width / 2 : e.clientX + 14,
-      y = e.clientY - r.height - (touch ? 40 : 12);
-    x = Math.max(8, Math.min(innerWidth - r.width - 8, x));
-    if (y < 8) y = e.clientY + 20;
-    ctip.style.left = x + 'px';
-    ctip.style.top = y + 'px';
+    placeTip(ctip, e);
   }
   function heatTip(e, cell) {
     const D = $('#heatGrid')._data;
@@ -186,7 +169,7 @@ const HeatMap = (() => {
     }
     document.querySelectorAll('#heatGrid .hmc.hovon').forEach(x => x.classList.remove('hovon'));
     cell.classList.add('hovon');
-    placeTip(e, html);
+    showTip(e, html);
   }
   document.addEventListener(
     'mousemove',

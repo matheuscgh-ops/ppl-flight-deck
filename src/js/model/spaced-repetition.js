@@ -8,7 +8,8 @@ const SpacedRepetition = (() => {
      p ≥ 70  →  S ← S · (1 + 1.2 · p/100 · (1.5 − R))
      60–69   →  S ← S · 1.2
      p < 60  →  S ← max(1, 0.4 · S)
-   next review = last session + S days (the moment R reaches 90 %)
+   next review = when recall falls to the review threshold r (Settings, default 90 %):
+                 last session + 9·S·(1/r − 1) days  (r = 90 % gives exactly S days)
    priority = (1 − R_now + 0.05 · min(days overdue, 10)) · √questions · list weight · (1 + max(0, 85 − score)/100)
 */
   const SR_LISTS = ['Very Comfortable', 'Not Comfortable', 'To review'];
@@ -60,7 +61,7 @@ const SpacedRepetition = (() => {
     if (reps.length) {
       const l = reps[reps.length - 1],
         tn = diffDays(l.date, today),
-        iv = Math.max(1, Math.round(l.S));
+        iv = Math.max(1, Math.round(9 * l.S * (1 / pref('reviewAt') - 1)));
       Object.assign(m, { R: recall(tn, l.S), S: l.S, last: l.date, p: l.p, next: addDays(l.date, iv), over: tn - iv });
     }
     const w = LISTW[state.statuses[i]] || 0.8,

@@ -51,7 +51,7 @@ const HistogramCalibration = (() => {
     });
     for (let v = lo; v <= 100; v += 10)
       g += `<text class="cx" x="${f(Math.min(X(v), w - R - 12))}" y="${h - 6}" text-anchor="middle">${v}%</text>`;
-    g += `<line class="c70" x1="${f(X(70))}" x2="${f(X(70))}" y1="${T}" y2="${T + ph}"/><line class="c85" x1="${f(X(85))}" x2="${f(X(85))}" y1="${T}" y2="${T + ph}"/>`;
+    g += `<line class="c70" x1="${f(X(70))}" x2="${f(X(70))}" y1="${T}" y2="${T + ph}"/><line class="c85" x1="${f(X(GOAL))}" x2="${f(X(GOAL))}" y1="${T}" y2="${T + ph}"/>`;
     g += `<line class="s-mean" x1="${f(X(st.mean))}" x2="${f(X(st.mean))}" y1="${T - 6}" y2="${T + ph}"/>`;
     return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(t('distTitle'))}"${hv({ mode: 'bars', l: L, t: T, pw, ph })}>${g}</svg>`;
   }
@@ -117,7 +117,7 @@ const HistogramCalibration = (() => {
       ['ffAvg3', k.avg3, '#ffd08a'],
     ];
     if (tr.reg) marks.push(['ffExam', Math.round(tr.exam), '#f5a524']);
-    let bar = `<i style="width:${X(k.avg3)}%"></i><em style="left:${X(70)}%;background:#c5ccd5"></em><em style="left:${X(85)}%;background:#4bce97"></em>`;
+    let bar = `<i style="width:${X(k.avg3)}%"></i><em style="left:${X(70)}%;background:#c5ccd5"></em><em style="left:${X(GOAL)}%;background:#4bce97"></em>`;
     [40, 55, 70, 85, 100].forEach(v => (bar += `<span class="ax" style="left:${X(v)}%">${v}%</span>`));
     marks.forEach(([l, v, c]) => {
       bar += `<s style="left:${X(v)}%;background:${c}" title="${esc(t(l))} ${v}%"></s>`;

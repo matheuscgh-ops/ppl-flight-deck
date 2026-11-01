@@ -10,11 +10,6 @@ const Dashboard = (() => {
       el.title = t(el.dataset.tt);
       el.setAttribute('aria-label', t(el.dataset.tt));
     });
-    if (matchMedia('(max-width:640px)').matches) {
-      $('#backup').textContent = t('backupShort');
-      $('#clearDemo').textContent = t('clearShort');
-      $('#saveHtml').textContent = t('saveShort');
-    }
     document.querySelectorAll('.flag').forEach(b => {
       const on = b.dataset.lang === lang;
       b.classList.toggle('on', on);

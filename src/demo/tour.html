@@ -72,15 +72,11 @@ const STEPS=[
   en:['Plans: block your week','Create a daily or weekly plan: select time in 15-minute blocks, get topics placed by your statistics (hardest first), edit them, save. An example plan is ready for next week (›). “Sync with Kanban” moves today’s topics to Doing after you approve.'],
   pt:['Planos: reserve sua semana','Crie um plano diário ou semanal: selecione o tempo em blocos de 15 minutos, receba os tópicos pelas suas estatísticas (os mais difíceis primeiro), edite e salve. Há um plano de exemplo para a próxima semana (›). “Sincronizar com o Kanban” move os tópicos de hoje para Doing depois que você aprova.'],
   ja:['プラン：1週間を確保','日・週のプランを作成：15分単位で時間を選び、統計に基づいてトピックを配置（難しい順）、編集して保存。来週のサンプルがあります（›）。「Kanbanと同期」で承認後に今日のトピックをDoingへ。']},
- {view:'plan',sel:'#energyPick',act:'#energyPick [data-energy="low"]',
-  en:['Pick your energy','Low, medium or high: the plan changes size and order for the night.','choose Low'],
-  pt:['Escolha sua energia','Baixa, média ou alta: o plano muda de tamanho e de ordem para a noite.','escolha Baixa'],
-  ja:['エネルギーを選ぶ','低・中・高で、その夜の計画の量と順番が変わります。','「低」を選ぶ']},
- {view:'plan',sel:'#planList',
-  en:['Ordered by impact','Topics come in order of exam-day questions at stake per minute, and each row shows how many. Tap a row to log it.'],
-  pt:['Ordenado por impacto','Os tópicos vêm na ordem de questões em jogo no dia da prova por minuto, e cada linha mostra quantas. Toque numa linha para registrar.'],
-  ja:['効果の大きい順','1分あたりの試験日の失点リスクが大きい順。各行にその数を表示。タップで記録。']},
- {view:'plan',sel:'#planPt',
+ {view:'plan',sel:'#pwEnergy',
+  en:['Pick your energy','With no plan for today, the suggestion follows your energy: low, medium or high changes its size and order for the night.'],
+  pt:['Escolha sua energia','Sem plano para hoje, a sugestão segue sua energia: baixa, média ou alta muda o tamanho e a ordem da noite.'],
+  ja:['エネルギーを選ぶ','今日のプランがないとき、提案はエネルギーに合わせます。低・中・高でその夜の量と順番が変わります。']},
+ {view:'tests',sel:'#planPt',
   en:['Practice tests in the plan','Suggested every N days, sooner if you stop studying. Add one to today’s plan or log one you just did.'],
   pt:['Simulados no plano','Sugeridos a cada N dias, antes se você parar de estudar. Adicione um ao plano de hoje ou registre um que acabou de fazer.'],
   ja:['計画の中の模試','N日ごとに提案され、学習が止まると早まります。今日の計画に追加、または記録。']},
@@ -181,9 +177,9 @@ function end(){
 }
 document.addEventListener('click',e=>{const f=e.target.closest('[data-tlang]');if(f){const h=document.querySelector(`.flag[data-lang="${f.dataset.tlang}"]`);if(h)h.click();return}const b=e.target.closest('[data-tour]');if(!b)return;const a=b.dataset.tour;if(a==='next')go(k+1);else if(a==='back')go(k-1);else if(a==='skip')end()});
 const btn=document.getElementById('tourBtn');
-const label=()=>{if(!btn)return;const narrow=matchMedia('(max-width:640px)').matches;btn.textContent=narrow?'?':'? '+tt('tour');btn.title=tt('tour');btn.setAttribute('aria-label',tt('tour'))};label();window.addEventListener('resize',label);
+const label=()=>{if(!btn)return;btn.textContent='? '+tt('tour');btn.title=tt('tour');btn.setAttribute('aria-label',tt('tour'))};label();window.addEventListener('resize',label);
 document.querySelectorAll('.flag').forEach(f=>f.addEventListener('click',()=>{setTimeout(()=>{label();if(k>=0)go(k)},0)}));
-if(btn)btn.onclick=start;
+if(btn)btn.onclick=()=>{const s=document.getElementById('setbg');if(s)s.hidden=true;start()};
 window.pplTour={start,end,step:()=>k,steps:STEPS.length,go};
 /* first visit opens the tour (not under automated testing — tests start it explicitly) */
 let seen=false;try{seen=localStorage.getItem(KEY)==='done'}catch(e){}

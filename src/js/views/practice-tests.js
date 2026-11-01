@@ -3,7 +3,7 @@
    shared state (getter/setter): statMode */
 const PracticeTestsView = (() => {
   /* ===== practice tests UI ===== */
-  const scCol = v => (v == null ? '#8590a2' : v >= 85 ? COLORS[3] : v >= 70 ? COLORS[2] : '#ff6b5e');
+  const scCol = v => (v == null ? '#8590a2' : v >= GOAL ? COLORS[3] : v >= 70 ? COLORS[2] : '#ff6b5e');
   let tsClipN = 0;
   function tsSVG(w, h, big) {
     const tr = testTrend(),
@@ -51,7 +51,7 @@ const PracticeTestsView = (() => {
       if (xE <= x1)
         g += `<line class="cexam" x1="${f(X(xE))}" x2="${f(X(xE))}" y1="${T}" y2="${T + ph}"/><text class="cx" x="${f(X(xE) - 3)}" y="${T - 3}" text-anchor="end" style="fill:var(--exam)">${esc(t('examShort'))}</text>`;
     }
-    g += `<line class="c70" x1="${L}" x2="${w - R}" y1="${f(Y(70))}" y2="${f(Y(70))}"/><line class="c85" x1="${L}" x2="${w - R}" y1="${f(Y(85))}" y2="${f(Y(85))}"/>`;
+    g += `<line class="c70" x1="${L}" x2="${w - R}" y1="${f(Y(70))}" y2="${f(Y(70))}"/><line class="c85" x1="${L}" x2="${w - R}" y1="${f(Y(GOAL))}" y2="${f(Y(GOAL))}"/>`;
     if (tr.reg && big) {
       const r = tr.reg,
         xa = pts[0][0],
@@ -121,7 +121,7 @@ const PracticeTestsView = (() => {
       best: sc.length ? Math.max(...sc.map(x => x.score)) : null,
       avg3: l3.length ? Math.round(l3.reduce((a, x) => a + x.score, 0) / l3.length) : null,
       n70: sc.filter(x => x.score >= 70).length,
-      n85: sc.filter(x => x.score >= 85).length,
+      n85: sc.filter(x => x.score >= GOAL).length,
       n: sc.length,
     };
   }
@@ -158,7 +158,7 @@ const PracticeTestsView = (() => {
     ]
       .map(
         ([l, v, c]) =>
-          `<div><b class="${c == null ? '' : c >= 85 ? 'good' : c >= 70 ? 'mid' : 'bad'}">${v}</b><span>${esc(t(l))}</span></div>`
+          `<div><b class="${c == null ? '' : c >= GOAL ? 'good' : c >= 70 ? 'mid' : 'bad'}">${v}</b><span>${esc(t(l))}</span></div>`
       )
       .join('');
     $('#tsQTrend').innerHTML = trendText();
@@ -189,6 +189,7 @@ const PracticeTestsView = (() => {
   });
   function renderTestsPage() {
     paintTsRange();
+    renderPlanPt();
     const k = testKpis();
     $('#tsKpis').innerHTML = [
       ['tsLastLbl', pctOr(k.last), k.last],
@@ -199,7 +200,7 @@ const PracticeTestsView = (() => {
     ]
       .map(
         ([l, v, c]) =>
-          `<div><b class="${c == null ? '' : c >= 85 ? 'good' : c >= 70 ? 'mid' : 'bad'}">${v}</b><span>${esc(t(l))}</span></div>`
+          `<div><b class="${c == null ? '' : c >= GOAL ? 'good' : c >= 70 ? 'mid' : 'bad'}">${v}</b><span>${esc(t(l))}</span></div>`
       )
       .join('');
     $('#tsTrendTxt').innerHTML = trendText();

@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PPL Flight Deck</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='31' fill='%23000'/%3E%3Cpath d='M32 14 L50 46 H14 Z' fill='%23fff'/%3E%3C/svg%3E">
+
 <style>@@CSS@@</style>
 </head>
 <body>
@@ -15,18 +17,14 @@
     </div>
     <div class="tools">
       <span class="demo" id="demoBadge" data-t="demo"></span>
-      <button id="clearDemo" data-t="clear"></button>
       <span class="sep" id="demoSep"></span>
       <button id="syncChip" class="syncchip" type="button"><i></i><span></span></button>
-      <button id="backup" data-t="backup"></button>
-      <button id="restore" data-t="import"></button>
-      <button id="saveHtml" data-t="save"></button>
-      <input type="file" id="file" accept="application/json,.json" hidden>
       <div class="flags" role="group" aria-label="Language">
         <button class="flag" data-lang="en" title="English" aria-label="English">🇺🇸</button>
         <button class="flag" data-lang="pt" title="Português" aria-label="Português">🇧🇷</button>
         <button class="flag" data-lang="ja" title="日本語" aria-label="日本語">🇯🇵</button>
       </div>
+      <button type="button" class="gear" id="setOpen" data-tt="setTitle"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M19.14 12.94a7.07 7.07 0 0 0 .06-.94c0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54A.48.48 0 0 0 13.92 2h-3.84a.48.48 0 0 0-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.73 8.47a.48.48 0 0 0 .12.61l2.03 1.58c-.05.3-.08.63-.08.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.48.48 0 0 0-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg></button>
     </div>
   </header>
 
@@ -88,6 +86,10 @@
   </div>
 
   <div class="view" id="viewTests" hidden>
+    <section class="panel planpt" id="planPt">
+      <div class="pphead"><div><h3 class="fch3" data-t="ppTitle"></h3><div class="muted" id="ppInfo"></div></div>
+      <div class="ppbtns"><button type="button" id="ppAdd"></button><button type="button" class="primary" id="ppLog" data-t="ppLog"></button></div></div>
+    </section>
     <div class="statduo top">
     <section class="panel tshero">
       <div class="srhead"><div><h2 class="section" data-t="tabTestsLong"></h2><div class="muted" data-t="tsSub"></div></div><button type="button" class="primary" id="tsAdd" data-t="tsAdd"></button></div>
@@ -107,36 +109,21 @@
   <div class="view" id="viewPlan" hidden>
     <section class="panel planweek" id="planWeek">
       <div class="pwhead"><div><h2 class="section" data-t="pwTitle"></h2><div class="muted" id="pwSource"></div></div>
-        <div class="pwbtns"><div class="seg pwtabs" id="pwTabs"><button type="button" data-pw="week" data-t="pwWeek"></button><button type="button" data-pw="plans" data-t="pwPlans"></button></div><button type="button" id="kbSync" data-t="kbSync"></button><button type="button" class="primary" id="pwNew" data-t="pwNew"></button></div></div>
+        <div class="pwbtns"><div class="seg pwtabs" id="pwTabs"><button type="button" data-pw="week" data-t="pwWeek"></button><button type="button" data-pw="plans" data-t="pwPlans"></button></div><button type="button" id="kbSync"><span class="lglab" data-t="kbSync"></span><span class="smlab" data-t="kbSyncShort"></span></button><button type="button" class="primary" id="pwNew"><span class="lglab" data-t="pwNew"></span><span class="smlab" data-t="pwNewShort"></span></button></div></div>
       <div id="pwWeekBox">
         <div class="pwnav"><button type="button" id="pwPrev" aria-label="Previous week">‹</button><b id="pwRange"></b><button type="button" id="pwNext" aria-label="Next week">›</button><button type="button" id="pwToday" data-t="today"></button><span class="pwstats" id="pwStats"></span></div>
+
+        <div class="pwmeta">
+        <div class="pwprog" id="pwProg"><i><b id="pwProgBar"></b></i><span id="pwProgTxt"></span></div>
+        <div class="pwenergy" id="pwEnergy"><span class="label" data-t="pwEnergy"></span><div class="energy compact" id="energyPick" role="tablist"></div><label class="pwensel"><span data-t="pwEnergyShort"></span><select id="energySel"></select></label></div>
+        </div>
         <div class="pwnudge" id="pwNudge" hidden></div>
+
         <div id="pwStrip"></div>
         <div id="pwGrid"></div>
         <div class="pwlegend" id="pwLegend"></div>
       </div>
       <div id="pwPlansBox" hidden><div id="pwList"></div></div>
-    </section>
-    <section class="panel planhero">
-      <div class="srhead"><div><h2 class="section" data-t="planTitle"></h2><div class="muted" id="planSub"></div></div><div class="srkpis" id="planKpis"></div></div>
-      <div class="energy" id="energyPick" role="tablist"></div>
-      <div id="planList" class="planlist"></div>
-      <p class="volnote" data-t="planNote"></p>
-    </section>
-    <section class="panel planpt" id="planPt">
-      <div class="pphead"><div><h3 class="fch3" data-t="ppTitle"></h3><div class="muted" id="ppInfo"></div></div>
-      <div class="ppbtns"><button type="button" id="ppAdd"></button><button type="button" class="primary" id="ppLog" data-t="ppLog"></button></div></div>
-    </section>
-    <section class="panel planset">
-      <h3 class="fch3" data-t="planSettings"></h3>
-      <div class="planinputs">
-        <label class="field"><span class="flabel" data-t="setMinutes"></span><input type="number" id="setMinutes" min="15" max="600" step="15" inputmode="numeric"></label>
-        <label class="field"><span class="flabel" data-t="setQph"></span><input type="number" id="setQph" min="5" max="200" step="5" inputmode="numeric"></label>
-        <label class="field"><span class="flabel" data-t="setReview"></span><input type="number" id="setReviewMin" min="0" max="10" step="0.5" inputmode="decimal"></label>
-        <label class="field"><span class="flabel" data-t="setTests"></span><input type="number" id="setTests" min="0" max="14" step="1" inputmode="numeric"></label>
-      </div>
-      <div class="planact"><button type="button" class="primary" id="planCalc"><span class="spin" hidden></span><span data-t="planCalc"></span></button><div class="muted" id="planCap"></div></div>
-      <p class="planweights" data-t="planWeights"></p>
     </section>
   </div>
   <div class="view" id="viewSR" hidden>
@@ -296,6 +283,19 @@
     <div class="wzbody" id="wzBody"></div>
     <div class="wzfoot"><button type="button" id="wzBack"></button><span></span><button type="button" id="wzSaveOff"></button><button type="button" class="primary" id="wzNext"></button></div>
     <datalist id="wzPresets"></datalist>
+  </div>
+</div>
+<div class="modalbg" id="setbg" hidden>
+  <div class="modal setmodal" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+    <div class="mhead"><h3 id="setTitle" data-t="setTitle"></h3><button class="x" id="setClose" aria-label="Close">×</button></div>
+    <div id="setBody"></div>
+    <section class="setsec" id="setSync"><h4 data-t="setSyncTitle"></h4><div class="setrow"><span class="setlab" id="setSyncState"></span><button type="button" id="setSyncOpen" data-t="setSyncOpen"></button></div></section>
+    <section class="setsec"><h4 data-t="setDataTitle"></h4>
+      <div class="setbtns"><button id="backup" data-t="backup"></button><button id="restore" data-t="import"></button><button id="saveHtml" data-t="save"></button><button id="clearDemo" data-t="clear"></button><button type="button" class="danger" id="setReset" data-t="setReset"></button></div>
+      <input type="file" id="file" accept="application/json,.json" hidden>
+      <p class="setnote" data-t="setDataNote"></p>
+    </section>
+    <section class="setsec" id="setDemo" hidden><h4 data-t="setDemoTitle"></h4><div class="setbtns"><span id="tourSlot"></span></div></section>
   </div>
 </div>
 <div class="modalbg" id="kbbg" hidden>

@@ -1,0 +1,194 @@
+/* ===== Settings (gear in the header) ===== */
+.gear {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 34px;
+  padding: 0;
+  color: var(--ink2);
+}
+.gear:hover {
+  color: var(--ink);
+}
+.gear svg {
+  transition: transform 0.3s;
+}
+.gear:hover svg {
+  transform: rotate(45deg);
+}
+.modal.setmodal {
+  width: min(720px, 100%);
+}
+.setsec {
+  border-top: 1px solid var(--line);
+  padding: 12px 0 6px;
+}
+.setsec[hidden] {
+  display: none;
+}
+.setsec h4 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink2);
+}
+.setrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 6px 0;
+}
+.setlab {
+  font-size: 13.5px;
+  font-weight: 700;
+  min-width: 0;
+}
+.setlab small {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 650;
+  color: var(--muted);
+  margin-top: 1px;
+}
+.setrow select,
+.setrow input[type='date'] {
+  width: 200px;
+  flex: none;
+}
+.setslider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+.setslider input {
+  width: 160px;
+  accent-color: #4bce97;
+}
+.setslider output {
+  font-weight: 850;
+  font-size: 13px;
+  min-width: 62px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  flex: none;
+  cursor: pointer;
+}
+.switch input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+.switch span {
+  position: absolute;
+  inset: 0;
+  background: #2f353d;
+  border: 1px solid var(--line2);
+  border-radius: 12px;
+  transition: background 0.15s;
+}
+.switch span::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #c5ccd5;
+  transition: transform 0.15s;
+}
+.switch input:checked + span {
+  background: #1d4835;
+  border-color: #4bce97;
+}
+.switch input:checked + span::after {
+  transform: translateX(18px);
+  background: #4bce97;
+}
+.switch input:focus-visible + span {
+  outline: 2px solid #579dff;
+  outline-offset: 2px;
+}
+.setbtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.setbtns [hidden] {
+  display: none;
+}
+.setbtns .danger {
+  color: #ff9c95;
+  border-color: #6b2b2b;
+}
+.setnote {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 650;
+  margin: 8px 0 0;
+}
+@media (max-width: 640px) {
+  #setbg {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .modal.setmodal {
+    width: 100%;
+    max-height: 92dvh;
+    border-radius: 18px 18px 0 0;
+  }
+  .setrow {
+    flex-wrap: wrap;
+    gap: 6px 10px;
+  }
+  .setrow select,
+  .setrow input[type='date'] {
+    width: 100%;
+  }
+  .setslider {
+    width: 100%;
+  }
+  .setslider input {
+    flex: 1;
+  }
+  .setbtns button {
+    flex: 1 1 45%;
+  }
+}
+@media (max-width: 640px) {
+  /* phone: the gear sits next to the flags in the title row */
+  .tools > button.gear {
+    position: absolute;
+    top: 0;
+    right: 100px;
+    width: 38px;
+    height: 29px;
+    flex: none;
+  }
+  .tools > button.gear svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+/* very narrow phones: no room next to the title, the gear goes to the end of the tools row */
+@media (max-width: 399px) {
+  .tools > button.gear {
+    position: static;
+    flex: 0 0 44px;
+    margin-left: auto;
+  }
+}

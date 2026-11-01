@@ -91,7 +91,7 @@ def _(c):
 # ---------------------------------------------------------------- JSON & HTML files
 @T('Files', 'Backup JSON downloads a valid file with every field')
 def _(c):
-    with c.pg.expect_download() as d: c.pg.click('#backup')
+    with c.pg.expect_download() as d: c.pg.evaluate("document.getElementById('backup').click()")
     data = json.load(open(d.value.path()))
     for k in ['statuses', 'scores', 'events', 'tests', 'deadline', 'lang']: check(k in data, 'missing ' + k)
     check(len(data['statuses']) == 26 and len(data['events']) == 6 and len(data['tests']) == 3, 'counts')
@@ -100,19 +100,19 @@ def _(c):
 @T('Files', 'Import restores a backup exactly (fresh browser)')
 def _(c):
     c.ev("moveCard(3,'Doing')"); c.ev("state.scores[2]=44;save();")
-    with c.pg.expect_download() as d: c.pg.click('#backup')
+    with c.pg.expect_download() as d: c.pg.evaluate("document.getElementById('backup').click()")
     path = OUT + 'bk.json'; shutil.copy(d.value.path(), path)
     c2 = Ctx(c.browser); c2.pg.set_input_files('#file', path); c2.pg.wait_for_timeout(200)
     ok = c2.ev('state.statuses[3]') == 'Doing' and c2.ev('state.scores[2]') == 44 and c2.ev('state.events.length') == 7
     c2.close(); check(ok, 'import mismatch')
 
-@T('Files', 'Import of an invalid file shows an error and changes nothing')
+@T('Files', 'Import of an invalid file shows an error (in the page, no browser pop-up) and changes nothing')
 def _(c):
     bad = OUT + 'bad.json'; open(bad, 'w').write('{"hello":1}')
     msgs = []; c.pg.on('dialog', lambda dlg: msgs.append(dlg.message))
     before = c.ev('JSON.stringify(state.statuses)')
     c.pg.set_input_files('#file', bad); c.pg.wait_for_timeout(200)
-    check(msgs and 'not a valid' in msgs[-1], msgs); check(c.ev('JSON.stringify(state.statuses)') == before, 'state changed')
+    check(not msgs and 'not a valid' in c.pg.inner_text('#toast'), (msgs, c.pg.inner_text('#toast'))); check(c.ev('JSON.stringify(state.statuses)') == before, 'state changed')
 
 @T('Files', 'Import of a broken (non-JSON) file is handled')
 def _(c):
@@ -130,7 +130,7 @@ def _(c):
 @T('Files', 'Save HTML: the saved file reopens with all data in a new browser')
 def _(c):
     c.ev("moveCard(7,'To review')"); c.pg.click('.task[data-topic="9"] .tname'); c.pg.fill('#mScore', '91'); c.pg.click('#mSave'); c.pg.wait_for_timeout(100)
-    with c.pg.expect_download() as d: c.pg.click('#saveHtml')
+    with c.pg.expect_download() as d: c.pg.evaluate("document.getElementById('saveHtml').click()")
     path = OUT + 'saved.html'; shutil.copy(d.value.path(), path)
     html = open(path).read(); check('"tests":[' in html and html.count('<script id="embedded" type="application/json">') == 1, 'embedded state')
     c2ctx = c.browser.new_context(); p2 = c2ctx.new_page(); errs = []; p2.on('pageerror', lambda e: errs.append(str(e)))
@@ -140,11 +140,11 @@ def _(c):
 
 @T('Files', 'Save HTML twice: second copy also works (no nested embedding)')
 def _(c):
-    with c.pg.expect_download() as d: c.pg.click('#saveHtml')
+    with c.pg.expect_download() as d: c.pg.evaluate("document.getElementById('saveHtml').click()")
     p1 = OUT + 's1.html'; shutil.copy(d.value.path(), p1)
     c2ctx = c.browser.new_context(accept_downloads=True); p2 = c2ctx.new_page(); p2.goto('file://' + p1); p2.wait_for_timeout(300)
     p2.evaluate("moveCard(10,'Doing')")
-    with p2.expect_download() as d2: p2.click('#saveHtml')
+    with p2.expect_download() as d2: p2.evaluate("document.getElementById('saveHtml').click()")
     p3 = OUT + 's2.html'; shutil.copy(d2.value.path(), p3); c2ctx.close()
     html = open(p3).read(); check(html.count('<script id="embedded" type="application/json">') == 1, 'nested')
     c3 = c.browser.new_context(); p = c3.new_page(); p.goto('file://' + p3); p.wait_for_timeout(300)
@@ -152,7 +152,7 @@ def _(c):
 
 @T('Files', 'a newer saved HTML wins over older browser data; older one does not')
 def _(c):
-    with c.pg.expect_download() as d: c.pg.click('#saveHtml')
+    with c.pg.expect_download() as d: c.pg.evaluate("document.getElementById('saveHtml').click()")
     path = OUT + 'older.html'; shutil.copy(d.value.path(), path)
     c.pg.goto('file://' + path); c.pg.wait_for_timeout(200)
     c.ev("moveCard(4,'Doing')")  # browser now newer than the file

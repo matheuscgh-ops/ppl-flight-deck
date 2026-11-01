@@ -1,5 +1,6 @@
 /* ===== module Forecast (js/model/forecast.js) =====
-   public: EXAM_Q, PASS_N, GOAL_N, betaBinomTail, binomTail, pRight, forecastMu, forecast */
+   live value (getter): GOAL_N = right answers needed for your goal (85% → 51 of 60)
+   public: EXAM_Q, PASS_N, betaBinomTail, binomTail, pRight, forecastMu, forecast */
 const Forecast = (() => {
   /* ================= EXAM FORECAST (mechanical) =================
    p_i  = chance of answering a question of topic i right
@@ -11,7 +12,8 @@ const Forecast = (() => {
    The chances use a beta-binomial: μ itself is uncertain by ±sd points (the model's error against your practice tests).                                   */
   const EXAM_Q = 60,
     PASS_N = 42,
-    GOAL_N = 51;
+    _goalN = () => Math.ceil((EXAM_Q * GOAL) / 100 - 1e-9);
+  expose({ GOAL_N: [_goalN, () => {}] });
   /* log-gamma (Lanczos) and the beta-binomial tail: P(X ≥ k) when the chance per question is itself uncertain
    (mean mu, standard deviation sdpp percentage points). With no uncertainty it is the plain binomial. */
   function lgamma(x) {
@@ -101,6 +103,6 @@ const Forecast = (() => {
       sd = modelSD();
     return { ...f, sd, pass: betaBinomTail(EXAM_Q, f.mu, sd, PASS_N), goal: betaBinomTail(EXAM_Q, f.mu, sd, GOAL_N) };
   }
-  return { EXAM_Q, PASS_N, GOAL_N, betaBinomTail, binomTail, pRight, forecastMu, forecast };
+  return { EXAM_Q, PASS_N, betaBinomTail, binomTail, pRight, forecastMu, forecast };
 })();
-const { EXAM_Q, PASS_N, GOAL_N, betaBinomTail, binomTail, pRight, forecastMu, forecast } = Forecast;
+const { EXAM_Q, PASS_N, betaBinomTail, binomTail, pRight, forecastMu, forecast } = Forecast;

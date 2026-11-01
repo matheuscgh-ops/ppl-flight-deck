@@ -36,6 +36,7 @@ const PreviewCarousel = (() => {
   }
   function carTick() {
     if (
+      !pref('carousel') ||
       carHold ||
       preview != null ||
       pinned != null ||

@@ -52,7 +52,7 @@ const StatsCarousel = (() => {
   }
 
   function turn() {
-    if (holding || !isVisible()) return;
+    if (!pref('carousel') || holding || !isVisible()) return;
     const { list } = topics();
     if (list.length < 2) return;
     current = list[(Math.max(0, list.indexOf(current)) + 1) % list.length];

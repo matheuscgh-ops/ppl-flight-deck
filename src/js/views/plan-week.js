@@ -1,9 +1,11 @@
 /* ===== module PlanWeek (js/views/plan-week.js) =====
-   public: ROWS, gridHTML, stripHTML, scrollGrid, itemName, ask, activatePlan, savePlan, renderPlanWeek, planLabel
+   live value (getter): ROWS
+   public: gridHTML, stripHTML, scrollGrid, itemName, ask, activatePlan, savePlan, renderPlanWeek, planLabel
    The Plan tab's week view (what each day holds: daily plan → weekly plan) and the "My plans" list
    (view, edit, activate / deactivate, copy to next week, delete). Also the week grid used by the plan wizard. */
 const PlanWeek = (() => {
-  const ROWS = (DAY_END - DAY_START) / SLOT;
+  /* rows of the time-block grid (15-min slots from the grid start hour to midnight) */
+  expose({ ROWS: [() => (DAY_END - DAY_START) / SLOT, () => {}] });
   let weekOf = mondayOf(todayISO()),
     tab = 'week',
     dayIdx = null;
@@ -30,8 +32,9 @@ const PlanWeek = (() => {
   /* ---------- week grid (view, review or time-block selection) ----------
      data: { blocks: {date: ranges}, items: [], daily: Set of dates that come from a daily plan }
      mode: 'view' (items, click to log) · 'select' (15-min slots you click and drag) */
-  /* view mode shows only the hours in use (30 min of margin, whole hours, at least 4 hours; 17:00–22:00 when empty) */
-  function viewHours(days, data) {
+  /* view mode shows only the hours in use (30 min of margin, whole hours, at least minSpan; the evening when empty).
+     The Plan tab asks for 8 hours so the calendar fills the page. */
+  function viewHours(days, data, minSpan = 240) {
     let lo = Infinity,
       hi = -Infinity;
     days.forEach(d =>
@@ -45,19 +48,21 @@ const PlanWeek = (() => {
       lo = Math.min(lo, it.start);
       hi = Math.max(hi, it.start + it.min);
     });
-    if (lo === Infinity) return [17 * 60, 22 * 60];
+    if (lo === Infinity)
+      return [Math.max(DAY_START, 22 * 60 - minSpan), Math.max(DAY_START, 22 * 60 - minSpan) + minSpan];
     let from = Math.max(DAY_START, Math.floor((lo - 30) / 60) * 60),
       to = Math.min(DAY_END, Math.ceil((hi + 30) / 60) * 60);
-    while (to - from < 240) {
+    while (to - from < minSpan) {
       if (to < DAY_END) to += 60;
-      else from -= 60;
+      else if (from > DAY_START) from -= 60;
+      else break;
     }
     return [from, to];
   }
   function gridHTML(days, data, mode, opts = {}) {
     const today = todayISO(),
       hours = [],
-      [from, to] = mode === 'select' ? [DAY_START, DAY_END] : viewHours(days, data),
+      [from, to] = mode === 'select' ? [DAY_START, DAY_END] : viewHours(days, data, opts.minSpan),
       nRows = (to - from) / SLOT,
       rowOf = m => (Math.max(from, Math.min(to, m)) - from) / SLOT;
     for (let m = from; m < to; m += 60)
@@ -111,14 +116,16 @@ const PlanWeek = (() => {
         return `<span class="wkd${d === today ? ' today' : ''}${d < today ? ' past' : ''}">${esc(dayName(d))}<small>${tot ? fmtMin(tot) : ''}</small></span>`;
       })
       .join('');
-    return `<div class="wk ${mode}" style="--days:${days.length}"><div class="wkhead"><span></span>${head}</div><div class="wkscroll" data-from="${from}"><div class="wkbody" style="height:calc(var(--rowh) * ${nRows})"><div class="wktimes">${hours.join('')}</div>${cols}</div></div></div>`;
+    return `<div class="wk ${mode}" style="--days:${days.length};--rows:${ROWS}"><div class="wkhead"><span></span>${head}</div><div class="wkscroll" data-from="${from}"><div class="wkbody" style="height:calc(var(--rowh) * ${nRows})"><div class="wktimes">${hours.join('')}</div>${cols}</div></div></div>`;
   }
   /* phone: one day at a time, picked from a strip */
-  function stripHTML(days, idx, attr) {
+  /* phone: one day at a time, picked from a 7-day strip (weekday, date, a dot when the day has planned time) */
+  function stripHTML(days, idx, attr, blocks = {}) {
+    const wd = new Intl.DateTimeFormat(LOCALE[lang], { weekday: 'narrow' });
     return `<div class="wkstrip">${days
       .map(
         (d, k) =>
-          `<button type="button" ${attr}="${k}" class="${k === idx ? 'on' : ''}${d === todayISO() ? ' today' : ''}">${esc(dayName(d))}</button>`
+          `<button type="button" ${attr}="${k}" class="${k === idx ? 'on' : ''}${d === todayISO() ? ' today' : ''}" aria-label="${esc(dayName(d))}"><small>${esc(wd.format(parse(d)))}</small><b>${parse(d).getDate()}</b><i class="${rangesTotal(blocks[d]) ? 'has' : ''}"></i></button>`
       )
       .join('')}</div>`;
   }
@@ -238,6 +245,24 @@ const PlanWeek = (() => {
     });
     return { blocks, items, daily };
   }
+  /* the calendar reaches the bottom of the screen on every device: the grid takes the height left below it
+     (minus the legend and the card's padding), and the rows stretch to fill it (never under 14 px; scrolls if more) */
+  function fitGrid() {
+    const sc = $('#pwGrid .wkscroll'),
+      body = sc && sc.querySelector('.wkbody');
+    if (!sc || !body || $('#viewPlan').hidden) return;
+    const rows = parseFloat(body.style.height.match(/\*\s*([\d.]+)/)?.[1]) || 32,
+      below = ($('#pwLegend').offsetHeight || 0) + (($('#pwGrid .pwempty') || {}).offsetHeight || 0) + 44,
+      avail = Math.max(260, Math.floor(innerHeight - (sc.getBoundingClientRect().top + window.scrollY) - below));
+    const rowh = Math.max(14, Math.floor(avail / rows));
+    sc.closest('.wk').style.setProperty('--rowh', rowh + 'px');
+    sc.style.maxHeight = sc.style.height = avail + 'px';
+  }
+  let fitTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(fitTimer);
+    fitTimer = setTimeout(() => !$('#viewPlan').hidden && renderPlanWeek(), 120);
+  });
   function renderPlanWeek() {
     const box = $('#planWeek');
     if (!box) return;
@@ -259,14 +284,17 @@ const PlanWeek = (() => {
       if (dayIdx == null) dayIdx = Math.max(0, days.indexOf(todayISO()));
       const phone = phoneMQ.matches,
         shown = phone ? [days[dayIdx]] : days;
-      $('#pwStrip').innerHTML = phone ? stripHTML(days, dayIdx, 'data-pwd') : '';
-      const onDay = $('#pwStrip .on');
-      if (onDay) onDay.parentNode.scrollLeft = onDay.offsetLeft - 40;
+      $('#pwStrip').innerHTML = phone ? stripHTML(days, dayIdx, 'data-pwd', data.blocks) : '';
       const empty = !Object.values(data.blocks).some(r => r.length);
       /* weekly review (Cal Newport): planned vs done, so the next plan is based on what really happened */
       const planned = data.items.reduce((a, it) => a + it.min, 0),
         doneMin = data.items.filter(itemDone).reduce((a, it) => a + it.min, 0),
         missed = data.items.filter(itemMissed).length;
+      $('#pwProg').hidden = !planned;
+      $('#pwProgBar').style.width = planned ? Math.round((100 * doneMin) / planned) + '%' : '0';
+      $('#pwProgTxt').textContent = planned
+        ? `${fmtMin(doneMin)} / ${fmtMin(planned)}${missed ? ` · ${missed} ${t('pwMissed')}` : ''}`
+        : '';
       $('#pwStats').innerHTML = planned
         ? `${esc(t('pwPlanned'))} <b>${fmtMin(planned)}</b> · ${esc(t('planDone'))} <b>${fmtMin(doneMin)}</b>${missed ? ` · <span class="miss">${missed} ${esc(t('pwMissed'))}</span>` : ''}`
         : '';
@@ -278,7 +306,9 @@ const PlanWeek = (() => {
       $('#pwNudge').innerHTML =
         `<span>${esc(t('pwNudge'))}</span><button type="button" id="pwNudgeGo">${esc(t('pwNudgeBtn'))}</button>`;
       $('#pwGrid').innerHTML =
-        gridHTML(shown, data, 'view') + (empty ? `<div class="pwempty">${esc(t('pwEmptyWeek'))}</div>` : '');
+        gridHTML(shown, data, 'view', { minSpan: 8 * 60 }) +
+        (empty ? `<div class="pwempty">${esc(t('pwEmptyWeek'))}</div>` : '');
+      fitGrid();
       scrollGrid($('#pwGrid'), data.blocks, shown);
       $('#pwLegend').innerHTML =
         ['due', 'weak', 'nodata', 'new', 'test']
@@ -316,6 +346,7 @@ const PlanWeek = (() => {
     dayIdx = 0;
     renderPlanWeek();
   };
+  $('#pwRange').onclick = () => $('#pwToday').click();
   $('#pwToday').onclick = () => {
     weekOf = mondayOf(todayISO());
     dayIdx = null;
@@ -364,7 +395,13 @@ const PlanWeek = (() => {
      → Doing: topics in today's plan that are in another list
      ← out of Doing: topics in Doing that are not in today's plan go back to the list they came from (else To Do) */
   function kanbanMoves() {
-    const planned = [...new Set(todayPlan().items.filter(it => it.kind === 'topic').map(it => it.i))];
+    const planned = [
+      ...new Set(
+        todayPlan()
+          .items.filter(it => it.kind === 'topic')
+          .map(it => it.i)
+      ),
+    ];
     const lastFrom = i => {
       const mv = state.events
         .filter(e => e.kind === 'move' && e.topic === i && e.to === 'Doing' && e.from && e.from !== 'Doing')
@@ -372,7 +409,9 @@ const PlanWeek = (() => {
         .pop();
       return mv ? mv.from : 'Todo';
     };
-    const into = planned.filter(i => state.statuses[i] !== 'Doing').map(i => ({ i, from: state.statuses[i], to: 'Doing' }));
+    const into = planned
+      .filter(i => state.statuses[i] !== 'Doing')
+      .map(i => ({ i, from: state.statuses[i], to: 'Doing' }));
     const out = TOPICS.map((_, i) => i)
       .filter(i => state.statuses[i] === 'Doing' && !planned.includes(i))
       .map(i => ({ i, from: 'Doing', to: lastFrom(i) }));
@@ -385,7 +424,9 @@ const PlanWeek = (() => {
     $('#kbSub').textContent =
       T.source === 'suggested'
         ? t('pwFromSuggested')
-        : t('pwFrom').replace('{s}', t(T.source === 'daily' ? 'srcDaily' : 'srcWeekly')).replace('{n}', planLabel(T.plan).name);
+        : t('pwFrom')
+            .replace('{s}', t(T.source === 'daily' ? 'srcDaily' : 'srcWeekly'))
+            .replace('{n}', planLabel(T.plan).name);
     $('#kbList').innerHTML = kbMoves.length
       ? kbMoves
           .map(
@@ -395,38 +436,41 @@ const PlanWeek = (() => {
           .join('')
       : `<div class="pwempty">${esc(t('kbNothing'))}</div>`;
     paintKbOk();
-    $('#kbbg').hidden = false;
-    $(kbMoves.length ? '#kbOk' : '#kbCancel').focus();
+    kbDialog.open(kbMoves.length ? '#kbOk' : '#kbCancel');
   }
   function paintKbOk() {
     const n = document.querySelectorAll('#kbList [data-kb]:checked').length;
     $('#kbOk').textContent = tf('kbApply', n);
     $('#kbOk').disabled = !n;
   }
-  const closeKb = () => ($('#kbbg').hidden = true);
+  const kbDialog = modal('#kbbg', { close: '#kbClose' }),
+    closeKb = kbDialog.close;
   $('#kbSync').onclick = openKanbanSync;
   $('#kbList').addEventListener('change', paintKbOk);
   $('#kbCancel').onclick = closeKb;
-  $('#kbClose').onclick = closeKb;
-  $('#kbbg').addEventListener('pointerdown', e => {
-    if (e.target.id === 'kbbg') closeKb();
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !$('#kbbg').hidden) closeKb();
-  });
   $('#kbOk').onclick = () => {
     const pick = [...document.querySelectorAll('#kbList [data-kb]:checked')].map(x => kbMoves[+x.dataset.kb]);
     closeKb();
     if (!pick.length) return;
-    commit(() => {
-      pick.forEach(m => {
-        state.events.push({ id: uid(), date: todayISO(), topic: m.i, kind: 'move', from: m.from, to: m.to, demo: false });
-        state.statuses[m.i] = m.to;
-      });
-    }, tf('kbDone', pick.length));
+    commit(
+      () => {
+        pick.forEach(m => {
+          state.events.push({
+            id: uid(),
+            date: todayISO(),
+            topic: m.i,
+            kind: 'move',
+            from: m.from,
+            to: m.to,
+            demo: false,
+          });
+          state.statuses[m.i] = m.to;
+        });
+      },
+      tf('kbDone', pick.length)
+    );
   };
 
-  return { ROWS, gridHTML, stripHTML, scrollGrid, itemName, ask, activatePlan, savePlan, renderPlanWeek, planLabel };
+  return { gridHTML, stripHTML, scrollGrid, itemName, ask, activatePlan, savePlan, renderPlanWeek, planLabel };
 })();
-const { ROWS, gridHTML, stripHTML, scrollGrid, itemName, ask, activatePlan, savePlan, renderPlanWeek, planLabel } =
-  PlanWeek;
+const { gridHTML, stripHTML, scrollGrid, itemName, ask, activatePlan, savePlan, renderPlanWeek, planLabel } = PlanWeek;

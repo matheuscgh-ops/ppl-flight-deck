@@ -1,5 +1,5 @@
 /* ===== module PlanView (js/views/plan.js) =====
-   public: renderPlanMini, renderPlanPage, manualTest, setManualTest, draftSettings */
+   public: renderPlanMini, renderPlanPage, renderPlanPt, manualTest, setManualTest */
 const PlanView = (() => {
   /* totals of today's list, whatever drives it (a saved plan or the suggestion) */
   function todayList() {
@@ -45,44 +45,22 @@ const PlanView = (() => {
           .join('')
       : `<div class="muted">${esc(t(fromPlan ? 'planRestDay' : 'allClear'))}</div>`;
   }
+  /* the Plan tab: the week view, and today's energy when today comes from the suggestion */
   function renderPlanPage() {
-    renderPlanPt();
     renderPlanWeek();
-    const P = todayList(),
-      fromPlan = P.source !== 'suggested',
-      st = settings(),
-      df = new Intl.DateTimeFormat(LOCALE[lang], { weekday: 'long', day: 'numeric', month: 'long' });
+    const fromPlan = todayPlan().source !== 'suggested';
+    $('#pwEnergy').hidden = fromPlan;
+    if (fromPlan) return;
+    $('#energySel').innerHTML = ['low', 'medium', 'high']
+      .map(m => `<option value="${m}"${m === energyMode ? ' selected' : ''}>${esc(t('en_' + m))}</option>`)
+      .join('');
     $('#energyPick').innerHTML = ['low', 'medium', 'high']
       .map(m => {
-        const Q = buildPlan(null, null, m);
-        return `<button type="button" role="tab" data-energy="${m}" class="${m === energyMode ? 'on' : ''}" aria-selected="${m === energyMode}"><span class="en">${['low', 'medium', 'high'].indexOf(m) === 0 ? '🔋' : m === 'medium' ? '⚡' : '🚀'} ${esc(t('en_' + m))}</span><span class="es">${Q.total} q · ${fmtMin(Q.minutes)}</span><span class="ew"><i style="width:${Q.workload * 10}%"></i></span><span class="es">${esc(t('workload'))} ${Q.workload}/10</span></button>`;
+        const Q = buildPlan(null, null, m),
+          icon = { low: '🔋', medium: '⚡', high: '🚀' }[m];
+        return `<button type="button" role="tab" data-energy="${m}" class="${m === energyMode ? 'on' : ''}" aria-selected="${m === energyMode}" title="${esc(t('workload'))} ${Q.workload}/10"><span class="en">${icon} ${esc(t('en_' + m))}</span><span class="es">${Q.total} q · ${fmtMin(Q.minutes)}</span></button>`;
       })
       .join('');
-    $('#energyPick').hidden = fromPlan;
-    $('#planSub').textContent =
-      df.format(parse(todayISO())) +
-      (fromPlan
-        ? ' · ' +
-          t('pwFrom')
-            .replace('{s}', t(P.source === 'daily' ? 'srcDaily' : 'srcWeekly'))
-            .replace('{n}', planLabel(P.plan).name)
-        : ' · ' + t('pwFromSuggested')) +
-      (P.final ? ' · ' + t('planFinal') : '');
-    $('#planKpis').innerHTML =
-      `<div><b>${fmtMin(P.minutes)}</b><span>${esc(t('planMinOf').replace('{b}', fmtMin(P.budget)))}</span></div><div><b>${P.total}</b><span>${esc(t('planQToday'))}</span></div><div><b>${P.done}</b><span>${esc(t('planDone'))}</span></div><div><b>${P.pace}</b><span>${esc(t('planPace'))}</span></div><div><b>${P.daysLeft}</b><span>${esc(t('toGo'))}</span></div>`;
-    $('#planList').innerHTML = P.items.length
-      ? P.items
-          .map(
-            it =>
-              `<div class="pitem2${it.done ? ' done' : ''}${it.done || it.date == null || !itemMissed(it) ? '' : ' missed'}" ${rowAttr(it)}>${checkBtn(it)}<span class="pn">${it.start != null ? `<small class="qtime">${clockOf(it.start)}–${clockOf(it.start + it.min)}</small>` : ''}${esc(rowName(it))}<small>${esc(t('reason_' + it.reason))}${it.diff > 1.05 ? ' · ' + esc(t(it.diff >= 2 ? 'diffCalc' : it.diff >= 1.5 ? 'diffNav' : 'diffChart')) : ''}${it.p != null && it.kind === 'topic' ? ' · ' + esc(t('planChance').replace('{p}', Math.round(it.p * 100))) : ''}${it.stake ? ' · ' + esc(t('planStake').replace('{x}', it.stake.toFixed(1))) : ''}</small></span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span><span class="pq">${it.n ? it.n + ' q' : ''}<small>${it.min ? '~' + fmtMin(it.min) : ''}</small></span></div>`
-          )
-          .join('')
-      : `<div class="muted">${esc(t(fromPlan ? 'planRestDay' : 'allClear'))}</div>`;
-    ['minutes', 'qph', 'testEvery', 'reviewMin'].forEach(k => {
-      const el = $('#' + SET_ID[k]);
-      if (document.activeElement !== el) el.value = st[k];
-    });
-    updateDraft();
   }
   /* a practice test the user added to today's plan by hand (per device, per day) */
   const manualTest = d => (d || todayISO()) === todayISO() && !!planDay().test;
@@ -97,8 +75,10 @@ const PlanView = (() => {
       k = testKpis(),
       df = new Intl.DateTimeFormat(LOCALE[lang], { month: 'short', day: 'numeric' }),
       last = scoredTests().at(-1);
-    const inPlan = buildPlan(null, null, energyMode).items.some(x => x.kind === 'test'),
-      man = manualTest();
+    const T = todayPlan(),
+      fromPlan = T.source !== 'suggested',
+      inPlan = T.items.some(x => x.kind === 'test'),
+      man = !fromPlan && manualTest();
     const parts = [
       !w.every
         ? t('tsOff')
@@ -117,32 +97,50 @@ const PlanView = (() => {
     b.textContent = t(man ? 'ppRemove' : inPlan ? 'ppInPlan' : 'ppAdd');
     b.disabled = inPlan && !man;
   }
-  $('#ppAdd').onclick = () => setManualTest(!manualTest());
-  $('#ppLog').onclick = () => openPt();
-  function startPlanItem(el) {
-    if (!el) return;
-    if (el.dataset.cid) {
-      toggleCheck(el.dataset.cid);
+  /* with a saved plan driving today, the test goes into that plan: the first free time in today's blocks that fits it;
+     no room → offer to open the plan and make some */
+  async function addTestToPlan(plan) {
+    const today = todayISO(),
+      need = testMinutes(),
+      items = (plan.items || []).filter(it => it.date === today);
+    const slot = ((plan.blocks || {})[today] || [])
+      .map(([s, e]) => {
+        const end = items
+          .filter(it => it.start >= s && it.start < e)
+          .reduce((a, it) => Math.max(a, it.start + it.min), s);
+        return { start: end, free: e - end };
+      })
+      .find(x => x.free >= need);
+    if (!slot) {
+      if (await ask(t('ppNoRoom').replace('{m}', fmtMin(need)), t('pwEdit'))) openWizard({ mode: 'edit', plan });
       return;
     }
-    if (el.dataset.pt) {
-      openPt();
-      return;
-    }
-    const i = +el.dataset.q;
-    openModal(i, srModel(i).reps.length ? 'review' : 'study');
+    commit(() => {
+      const p = state.plans.find(x => x.id === plan.id);
+      p.items.push({
+        id: uid(),
+        date: today,
+        start: slot.start,
+        min: need,
+        kind: 'test',
+        i: null,
+        n: TEST_Q,
+        reason: 'test',
+        custom: true,
+      });
+      p.updated = Date.now();
+    }, t('ppAddedToPlan'));
   }
+  $('#ppAdd').onclick = () => {
+    const T = todayPlan();
+    if (T.source === 'suggested') setManualTest(!manualTest());
+    else addTestToPlan(T.plan);
+  };
+  $('#ppLog').onclick = () => openPt();
+  $('#energySel').addEventListener('change', e => setEnergy(e.target.value));
   $('#energyPick').addEventListener('click', e => {
     const b = e.target.closest('[data-energy]');
-    if (!b) return;
-    const l = $('#planList');
-    l.classList.add('loading');
-    setTimeout(() => {
-      setEnergy(b.dataset.energy);
-      l.classList.remove('loading');
-      void l.offsetWidth;
-      l.classList.add('fresh');
-    }, 250);
+    if (b) setEnergy(b.dataset.energy);
   });
   /* the circle marks a saved plan's item done by hand; the row opens the log dialog */
   function onCheck(e) {
@@ -152,9 +150,6 @@ const PlanView = (() => {
     toggleCheck(c.dataset.chk);
     return true;
   }
-  $('#planList').addEventListener('click', e => {
-    if (!onCheck(e)) startPlanItem(e.target.closest('[data-q],[data-pt],[data-cid]'));
-  });
   $('#sugg').addEventListener('click', e => onCheck(e), true);
   $('#openPlan').onclick = () => goView('plan');
   function openFcTop() {
@@ -174,83 +169,15 @@ const PlanView = (() => {
           `<div class="lostrow" data-q="${x.i}"><span class="n">${esc(TOPICS[x.i].name)}</span><span class="bar"><i style="width:${(x.lost / mx) * 100}%"></i></span><span class="v">−${x.lost.toFixed(1)} q</span><span class="pp">${x.known ? Math.round(x.p * 100) + '%' : '?'}</span></div>`
       )
       .join('');
-    $('#fcTopBg').hidden = false;
-    $('#fcTopFull').focus();
+    fcTopDialog.open('#fcTopFull');
   }
-  const closeFcTop = () => {
-    $('#fcTopBg').hidden = true;
-  };
+  const fcTopDialog = modal('#fcTopBg', { close: '#fcTopClose' }),
+    closeFcTop = fcTopDialog.close;
   $('#fcMini').onclick = openFcTop;
-  $('#fcTopClose').onclick = closeFcTop;
-  $('#fcTopBg').addEventListener('pointerdown', e => {
-    if (e.target.id === 'fcTopBg') closeFcTop();
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !$('#fcTopBg').hidden) closeFcTop();
-  });
   $('#fcTopFull').onclick = () => {
     closeFcTop();
     goView('sr', 'fc');
   };
-  const SET_LIM = { minutes: [15, 600], qph: [5, 200], testEvery: [0, 14], reviewMin: [0, 10] };
-  const SET_ID = { minutes: 'setMinutes', qph: 'setQph', testEvery: 'setTests', reviewMin: 'setReviewMin' };
-  function draftSettings() {
-    const d = { ...settings() };
-    ['minutes', 'qph', 'testEvery', 'reviewMin'].forEach(k => {
-      const el = $('#' + SET_ID[k]);
-      const raw = +el.value,
-        v = k === 'reviewMin' ? Math.round(raw * 2) / 2 : Math.round(raw);
-      if (el.value !== '' && isFinite(v)) d[k] = Math.max(SET_LIM[k][0], Math.min(SET_LIM[k][1], v));
-    });
-    return d;
-  }
-  function updateDraft() {
-    const d = draftSettings(),
-      P = buildPlan(null, d, energyMode),
-      ch = JSON.stringify(d) !== JSON.stringify(settings());
-    $('#planCap').textContent = t(ch ? 'planCapNew' : 'planCapTxt')
-      .replace('{c}', P.total)
-      .replace('{m}', fmtMin(d.minutes));
-    $('#planCap').classList.toggle('changed', ch);
-  }
-  ['Minutes', 'Qph', 'Tests', 'ReviewMin'].forEach(k => {
-    const el = $('#set' + k);
-    el.addEventListener('input', updateDraft);
-    el.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        calcPlan();
-      }
-    });
-  });
-  let calcBusy = false;
-  function calcPlan() {
-    if (calcBusy) return;
-    calcBusy = true;
-    const d = draftSettings(),
-      btn = $('#planCalc'),
-      list = $('#planList');
-    btn.disabled = true;
-    btn.querySelector('.spin').hidden = false;
-    list.classList.add('loading');
-    list.classList.remove('fresh');
-    setTimeout(() => {
-      const changed = JSON.stringify(d) !== JSON.stringify(settings());
-      if (changed)
-        commit(() => {
-          state.settings = d;
-        }, t('planUpdated'));
-      else renderPlanPage();
-      list.classList.remove('loading');
-      void list.offsetWidth;
-      list.classList.add('fresh');
-      btn.disabled = false;
-      btn.querySelector('.spin').hidden = true;
-      calcBusy = false;
-      $('#viewPlan').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 450);
-  }
-  $('#planCalc').onclick = calcPlan;
-  return { renderPlanMini, renderPlanPage, manualTest, setManualTest, draftSettings };
+  return { renderPlanMini, renderPlanPage, renderPlanPt, manualTest, setManualTest };
 })();
-const { renderPlanMini, renderPlanPage, manualTest, setManualTest, draftSettings } = PlanView;
+const { renderPlanMini, renderPlanPage, renderPlanPt, manualTest, setManualTest } = PlanView;

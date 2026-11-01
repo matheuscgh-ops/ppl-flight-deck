@@ -4,7 +4,7 @@
 const PracticeTestModel = (() => {
   /* ===== practice tests: blended score, regression, calibration, cadence =====
    blended score = (1 − w) × question-bank model + w × age-weighted average of the last 3 scored practice tests
-                   test weight 0.5^(age/10 days),  W = sum of the weights,  w = W / (W + 2)
+                   test weight 0.5^(age / half-life), half-life from Settings (default 10 days),  W = sum of the weights,  w = W / (W + 2)
    pass / 85% chances: beta-binomial around the blended score (model error and test spread combined).
    trend         = least-squares line  score = a + b × day   (R² = 1 − SSres / SStot), shown from 4 scored tests
                    after the last test the projection slows: extra = b × 14 × (1 − e^(−days/14))
@@ -17,7 +17,6 @@ const PracticeTestModel = (() => {
       .slice()
       .sort((a, b) => a.date.localeCompare(b.date));
   }
-  const HALF_LIFE = 10;
   const stdev = v => {
     const n = v.length;
     if (n < 2) return 0;
@@ -38,7 +37,7 @@ const PracticeTestModel = (() => {
       n = last.length;
     if (!n) return { ...f, model: f.mu, testsAvg: null, n: 0, w: 0, W: 0 };
     /* each of the last 3 tests weighs 0.5^(age in days / 10): yesterday ≈ 0.93, three weeks ago ≈ 0.23 */
-    const om = last.map(x => Math.pow(0.5, Math.max(0, diffDays(x.date, asOf)) / HALF_LIFE)),
+    const om = last.map(x => Math.pow(0.5, Math.max(0, diffDays(x.date, asOf)) / pref('halfLife'))),
       W = om.reduce((a, x) => a + x, 0);
     const avg = last.reduce((a, x, k) => a + om[k] * x.score, 0) / W / 100,
       w = W / (W + 2),
@@ -157,7 +156,7 @@ const PracticeTestModel = (() => {
       nDue = ms.filter(m => m.reps.length && m.over >= 0).length;
     let reason = null;
     if (!last || since >= ev) reason = ev < every ? 'testFinal' : 'test';
-    else if (idle >= 3 && since >= 2) reason = 'testIdle';
+    else if (idle >= pref('idleDays') && since >= 2) reason = 'testIdle';
     else if (((avgR != null && avgR < 0.75) || nDue >= 5) && since >= 2) reason = 'testRecall';
     return {
       due: !!reason,

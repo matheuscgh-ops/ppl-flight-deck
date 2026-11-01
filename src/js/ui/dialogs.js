@@ -126,12 +126,10 @@ const Dialogs = (() => {
     $('#ptDate').value = x ? x.date : todayISO();
     $('#ptDesc').textContent = t('ptDesc');
     renderPtHist();
-    $('#ptbg').hidden = false;
-    $('#ptScore').focus();
+    ptDialog.open('#ptScore');
   }
-  const closePt = () => {
-    $('#ptbg').hidden = true;
-  };
+  const ptDialog = modal('#ptbg', { close: '#ptClose' }),
+    closePt = ptDialog.close;
   $('#ptStat').onclick = () => openPt();
   $('#ptStat').onkeydown = e => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -139,13 +137,7 @@ const Dialogs = (() => {
       openPt();
     }
   };
-  $('#ptClose').onclick = $('#ptCancel').onclick = closePt;
-  $('#ptbg').addEventListener('pointerdown', e => {
-    if (e.target.id === 'ptbg') closePt();
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !$('#ptbg').hidden) closePt();
-  });
+  $('#ptCancel').onclick = closePt;
   $('#ptSave').onclick = () => {
     const d = $('#ptDate').value;
     if (!d) return;
@@ -229,22 +221,12 @@ const Dialogs = (() => {
         )
       ) +
       (ev.length || tests.length ? '' : `<p class="muted" style="margin:16px 0 4px">${esc(t('dayNone'))}</p>`);
-    $('#daybg').hidden = false;
-    $('#dayClose').focus();
+    dayDialog.open('#dayClose');
   }
-  const closeDay = () => {
-    $('#daybg').hidden = true;
-  };
+  const dayDialog = modal('#daybg', { close: '#dayClose' });
   $('#calgrid').addEventListener('click', e => {
     const d = e.target.closest('.day[data-date]');
     if (d) openDay(d.dataset.date);
-  });
-  $('#dayClose').onclick = closeDay;
-  $('#daybg').addEventListener('pointerdown', e => {
-    if (e.target.id === 'daybg') closeDay();
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !$('#daybg').hidden) closeDay();
   });
   return { openModal, closeModal, openPt };
 })();

@@ -1,5 +1,6 @@
 /* ===== module Config (js/core/config.js) =====
-   public: TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, GOAL, DEF_SET0, LOCALE */
+   public: TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE
+   live values (getters on window, they follow your Settings): GOAL */
 const Config = (() => {
   const TEMPLATE = '<!doctype html>\n' + document.documentElement.outerHTML;
   /* the demo keeps its own storage so it never touches the personal app */
@@ -48,9 +49,23 @@ const Config = (() => {
     review: '#7158dc',
     move: ['#5f6b7e', '#2f7de1', '#c98200', '#16935e', '#7158dc'],
   };
-  const GOAL = 85;
   const DEF_SET0 = { minutes: 180, qph: 40, testEvery: 3, reviewMin: 1.5 };
+  /* everything else in Settings, with the values the app always used (so nothing changes until you change it) */
+  const PREF_DEF = {
+    goal: 85, // target score (%), drawn as the goal line and used for the "chance of reaching your goal"
+    reviewAt: 0.9, // a topic is due for review when its recall falls to this level
+    halfLife: 10, // days for a practice test to weigh half as much in the blended forecast
+    idleDays: 3, // days without studying that bring the next practice test forward
+    energy: 'medium', // default energy of the suggested daily plan
+    carousel: true, // carousels move on their own every 3 s
+    heatNums: true, // numbers on the heat-map squares
+    gridStart: 6, // first hour of the plan grid
+    deepMin: 45, // minutes of block per topic (deep work); 0 = no limit
+    ranges: {}, // default chart intervals
+  };
+  /* the goal follows Settings (read at the moment it is used) */
+  expose({ GOAL: [() => (typeof pref === 'function' ? pref('goal') : PREF_DEF.goal), () => {}] });
   const LOCALE = { en: 'en-US', pt: 'pt-BR', ja: 'ja-JP' };
-  return { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, GOAL, DEF_SET0, LOCALE };
+  return { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE };
 })();
-const { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, GOAL, DEF_SET0, LOCALE } = Config;
+const { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE } = Config;

@@ -27,7 +27,7 @@ STYLES = [
     '06-top-row-and-fit.css', '07-tabs-and-sr-panel.css', '08-statistics.css', '09-small-widgets.css',
     '10-responsive-mid.css', '11-streak.css', '12-phone.css', '13-tablet.css', '14-phone-header.css', '15-volume.css',
     '16-exam-date.css', '17-forecast.css', '18-plan.css', '19-heatmap-hover-carousel.css', '20-practice-tests.css',
-    '21-statistics-layout.css', '22-plans.css',
+    '21-statistics-layout.css', '22-plans.css', '23-settings.css',
 ]
 
 # load order matters: config and helpers first, the boot sequence last
@@ -36,6 +36,7 @@ SCRIPTS = [
     'js/core/config.js',
     'i18n/translations.js',
     'js/core/util.js',
+    'js/ui/modal.js',   # shared dialog wiring and tooltip placement
     '@@DATA@@',   # js/data/personal.js (your history) or demo/state.js (fictional) — see DATA
     'js/core/state.js',
     'js/views/dashboard.js',
@@ -61,6 +62,7 @@ SCRIPTS = [
     'js/views/plan-wizard.js',
     'js/ui/chart-hover.js',
     'js/ui/header-controls.js',
+    'js/ui/settings.js',
     'js/selftest.js',
     'js/sync/gist.js',
     'js/boot.js',
@@ -102,7 +104,7 @@ def demo_markup():
         ('<title>PPL Flight Deck</title>', '<title>PPL Flight Deck — Demo</title>'),
         ('</style>', '.demotag{font-style:normal;font-size:.45em;vertical-align:middle;letter-spacing:.08em;color:#ffd08a;background:#3d2b14;border:1px solid #6b4a1c;border-radius:6px;padding:2px 7px;margin-left:6px}\n#syncChip{display:none!important}\n</style>'),
         ('<div class="brand">PPL <span>/</span> FLIGHT DECK</div>', '<div class="brand">PPL <span>/</span> FLIGHT DECK <em class="demotag">DEMO</em></div>'),
-        ('<button id="clearDemo" data-t="clear"></button>', '<button id="clearDemo" data-t="clear"></button>\n      <button id="tourBtn" type="button">? Tour</button>'),
+        ('<span id="tourSlot"></span>', '<button id="tourBtn" type="button">? Tour</button>'),
         ('</body>', demo_tour + '</body>'),
     ]
 

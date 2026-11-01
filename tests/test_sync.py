@@ -164,9 +164,9 @@ with sync_playwright() as p:
     a.evaluate("commit(()=>{state.plans=state.plans.filter(p=>!['planA','planB'].includes(p.id))},'x')"); a.wait_for_timeout(1500)
 
     # ---- secrets never leave the browser ----
-    with a.expect_download() as d: a.click('#backup')
+    with a.expect_download() as d: a.evaluate("document.getElementById('backup').click()")
     bk = open(d.value.path()).read()
-    with a.expect_download() as d2: a.click('#saveHtml')
+    with a.expect_download() as d2: a.evaluate("document.getElementById('saveHtml').click()")
     html = open(d2.value.path()).read()
     check('token is NOT in the Backup JSON', GOOD not in bk and 'ppl-flight-deck-sync' not in bk)
     check('token is NOT in the Save HTML file', GOOD not in html)

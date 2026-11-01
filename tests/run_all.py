@@ -35,7 +35,9 @@ suites = [('End-to-end (index.html)', ['test_e2e.py', os.path.join(ROOT, 'index.
           ('Dashboard preview carousel', ['test_carousel.py']),
           ('Statistics layout, heat map, needs-recall carousel', ['test_heatmap.py']),
           ('Saved plans, wizard & Kanban sync', ['test_plans.py']),
+          ('Settings', ['test_settings.py']),
           ('Demo guided tour', ['test_tour.py']),
+          ('Whole-app audit (text, layout, same numbers everywhere)', ['test_audit.py']),
           ('Build (single source)', ['test_build.py'])]
 for title, args in suites:
     out = subprocess.run([sys.executable, os.path.join(HERE, args[0]), *args[1:]], capture_output=True, text=True, cwd=ROOT).stdout

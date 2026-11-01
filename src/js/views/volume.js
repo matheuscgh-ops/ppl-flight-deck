@@ -180,24 +180,14 @@ const VolumeView = (() => {
   function renderVolPanel() {
     if ($('#volPanel') && $('#volPanel').offsetParent) paintBig(BIG_VIEWS.page);
   }
+  const volDialog = modal('#volbg', { close: '#volClose' });
   function openVol() {
-    $('#volbg').hidden = false;
+    volDialog.open('#volClose');
     renderVolBig();
-    $('#volClose').focus();
   }
-  const closeVol = () => {
-    $('#volbg').hidden = true;
-  };
   $('#volOpen').addEventListener('click', e => {
     e.stopPropagation();
     openVol();
-  });
-  $('#volClose').onclick = closeVol;
-  $('#volbg').addEventListener('pointerdown', e => {
-    if (e.target.id === 'volbg') closeVol();
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !$('#volbg').hidden) closeVol();
   });
   const pickRange = e => {
     const b = e.target.closest('button');

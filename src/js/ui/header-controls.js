@@ -30,8 +30,8 @@ const HeaderControls = (() => {
       state.deadline = v;
     }, t('saved'));
   };
-  $('#clearDemo').onclick = () => {
-    if (!confirm(t('demoConfirm'))) return;
+  $('#clearDemo').onclick = async () => {
+    if (!(await ask(t('demoConfirm'), t('clear')))) return;
     commit(() => {
       state.events = state.events.filter(e => !e.demo);
       state.plans = (state.plans || []).filter(p => !p.demo);
@@ -72,7 +72,7 @@ const HeaderControls = (() => {
         lang = o.lang;
       }, t('imported'));
     } catch (err) {
-      alert(t('invalid'));
+      toast(t('invalid'));
     }
   };
 

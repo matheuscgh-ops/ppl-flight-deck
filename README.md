@@ -47,7 +47,8 @@ The *How it is calculated* sections in the app list every formula.
 - Practice tests count as 60 questions in the weekly volume.
 - English, Português and 日本語.
 - Layouts for desktop (one-screen dashboard), laptop, iPad and phone.
-- **Your data stays in your browser** (localStorage). Backup JSON / Import / Save HTML keep a copy.
+- **Settings (⚙ in the header):** exam date and language; goal score (80 / 85 / 90 %, followed by every goal line, chance and label); review threshold (when a topic falls due); practice-test half-life and the idle days that bring a test forward; the suggested daily plan (minutes slider, questions per hour, review minutes, test cadence, default energy); plan grid start hour and deep-work minutes per topic; default chart intervals; carousels and heat-map numbers on/off; sync; Backup / Import / Save HTML / Clear examples / Reset everything (asks first, can be undone); the demo tour. Every setting syncs and goes into the backup; the defaults are the original behaviour.
+- **Your data stays in your browser** (localStorage). Backup JSON / Import / Save HTML (in Settings) keep a copy.
 - **Optional sync** between devices through a *private* GitHub Gist. Copies are merged by item and deletions are remembered. The token stays in your browser only: it never goes into backups, Save HTML or the Gist.
 - The **demo** is fully isolated from the personal app (separate storage, sync off) and has a guided tour.
 
@@ -64,7 +65,7 @@ src/js/core/            config, helpers, state and saving
 src/js/data/            your study history (personal app only)
 src/js/model/           spaced repetition, forecast, practice tests, plan
 src/js/views/           dashboard, plan, statistics, heat map, volume, carousels …
-src/js/ui/              charts, hover, dialogs, navigation, header
+src/js/ui/              charts, hover, dialogs (shared modal wiring), navigation, header, settings
 src/js/sync/            GitHub Gist sync
 src/demo/               fictional data and the guided tour (demo only)
 tests/                  Playwright suites + run_all.py
@@ -87,7 +88,7 @@ cd tests
 python3 run_all.py      # every suite on desktop, laptop, iPad mini and iPhone sizes
 ```
 
-The suites cover the built-in unit tests (formulas checked against independent calculations and scipy), end to end, sync with a mocked GitHub API, demo/personal isolation, layouts, calendar, volume, spaced repetition everywhere, forecast and plan, practice tests, chart hover, the Statistics layout and heat map, the carousels, the guided tour and the build itself.
+The suites cover the built-in unit tests (formulas checked against independent calculations and scipy), end to end, sync with a mocked GitHub API, demo/personal isolation, layouts, calendar, volume, spaced repetition everywhere, forecast and plan, practice tests, chart hover, the Statistics layout and heat map, the carousels, saved plans and the Kanban sync, Settings, the guided tour and the build itself.
 
 ## Publishing on GitHub Pages
 

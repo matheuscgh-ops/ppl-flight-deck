@@ -1,14 +1,16 @@
 /* ===== module ForecastView (js/views/forecast.js) =====
    public: fcCls, renderFcMini, renderForecast */
 const ForecastView = (() => {
-  const fcCls = v => (v >= 0.85 ? 'good' : v >= 0.7 ? 'mid' : 'bad');
+  const fcCls = v => (v >= GOAL / 100 ? 'good' : v >= 0.7 ? 'mid' : 'bad');
   function renderFcMini() {
     const f = blended();
     const b = $('#fcMiniBar');
     if (!b) return;
     $('#fcMiniVal').textContent = Math.round(f.mu * 100) + '%';
     b.style.width = Math.round(f.mu * 100) + '%';
-    b.style.background = f.mu >= 0.85 ? COLORS[3] : f.mu >= 0.7 ? COLORS[2] : '#ff6b5e';
+    b.style.background = f.mu >= GOAL / 100 ? COLORS[3] : f.mu >= 0.7 ? COLORS[2] : '#ff6b5e';
+    const goalMark = document.querySelector('#fcMini .m85');
+    if (goalMark) goalMark.style.left = GOAL + '%';
     $('#fcMiniSub').innerHTML = t('fcMiniSub')
       .replace('{p}', `<b>${Math.round(f.pass * 100)}%</b>`)
       .replace('{g}', `<b>${Math.round(f.goal * 100)}%</b>`);
@@ -48,7 +50,7 @@ const ForecastView = (() => {
       v =>
         (g += `<line class="cg" x1="${L}" x2="${w - R}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="cy" x="${L - 5}" y="${f(Y(v) + 3.5)}" text-anchor="end">${Math.round(v * 100)}%</text>`)
     );
-    g += `<line class="c70" x1="${L}" x2="${w - R}" y1="${f(Y(0.7))}" y2="${f(Y(0.7))}"/><line class="c85" x1="${L}" x2="${w - R}" y1="${f(Y(0.85))}" y2="${f(Y(0.85))}"/>`;
+    g += `<line class="c70" x1="${L}" x2="${w - R}" y1="${f(Y(0.7))}" y2="${f(Y(0.7))}"/><line class="c85" x1="${L}" x2="${w - R}" y1="${f(Y(GOAL / 100))}" y2="${f(Y(GOAL / 100))}"/>`;
     const df = new Intl.DateTimeFormat(LOCALE[lang], { month: 'short', day: 'numeric' }),
       stp = x1 <= 10 ? 1 : x1 <= 24 ? 3 : x1 <= 60 ? 7 : x1 <= 130 ? 14 : 30;
     let lx = -99;

@@ -1,7 +1,8 @@
 /* ===== module Schedule (js/model/schedule.js) =====
-   public: SLOT, DAY_START, DAY_END, mondayOf, planDays, planTotal, rangesTotal, normRanges, activeFor, todayPlan,
+   live value (getter): DAY_START (first hour of the plan grid, from Settings)
+   public: SLOT, DAY_END, mondayOf, planDays, planTotal, rangesTotal, normRanges, activeFor, todayPlan,
            itemDone, itemMissed, missedTopics, suggestDays, packDay, perQ, conflictsFor, weeklyUnder, clockOf,
-           knapsack, toggleCheck
+           knapsack, toggleCheck, seedDemoPlan, testMinutes
    Saved study plans (state.plans) and the scheduler that fills selected time blocks with topics.
 
    A plan: { id, type: 'daily' | 'weekly', name, start (the date, or the Monday of the week), active,
@@ -21,7 +22,7 @@
      2. each continuous block is a knapsack: pick the chunks that protect the most exam-day questions
         (n × (1 − p on exam day) × urgency) within the block's minutes (dynamic programming, 1-minute steps); any
         time left is filled with part of the best remaining topic (at least 5 questions).
-        Deep work (Cal Newport): few context switches, so a block holds at most one topic per ~45 minutes; the
+        Deep work (Cal Newport): few context switches, so a block holds at most one topic per ~45 minutes (Settings); the
         topics kept grow into the freed time (up to the topic's question count).
      3. inside a block the hardest work goes first, while you are fresh: practice test, then
         (1 − p now) × difficulty, plus a boost for overdue reviews and for topics not seen in a long time.
@@ -29,11 +30,9 @@
         so a topic reviewed on Monday is not due again on Tuesday. A topic appears at most once per day. */
 const Schedule = (() => {
   const SLOT = 15,
-    DAY_START = 6 * 60,
     DAY_END = 24 * 60,
     MIN_CHUNK_Q = 5,
     MISSED_BOOST = 1.25,
-    DEEP_MIN = 45,
     URGENCY = { due: 1.3, weak: 1.15, nodata: 1.1, new: 1, light: 0.8, test: 1.4, testDue: 1.4, custom: 1 };
 
   const plans = () => state.plans || (state.plans = []);
@@ -186,7 +185,8 @@ const Schedule = (() => {
       const cap = e - s;
       let pick = knapsack(cands, cap);
       /* deep work: few topic switches — at most one topic per ~45 min; the kept topics grow into the freed time */
-      const maxTopics = Math.max(1, Math.round(cap / DEEP_MIN));
+      const deep = pref('deepMin'),
+        maxTopics = deep ? Math.max(1, Math.round(cap / deep)) : Infinity;
       if (pick.length > maxTopics) {
         pick = pick.sort((a, b) => b.value - a.value).slice(0, maxTopics);
         let left = cap - pick.reduce((a, c) => a + Math.ceil(c.n * c.per), 0);
@@ -259,6 +259,11 @@ const Schedule = (() => {
     return out;
   }
 
+  /* minutes a practice test takes: answering 60 questions (×1.1) plus reviewing the expected misses */
+  function testMinutes() {
+    const st = settings();
+    return Math.round(TEST_Q * (60 / st.qph) * 1.1 + TEST_Q * (1 - blended().mu) * st.reviewMin);
+  }
   /* demo only: an example weekly plan for next week (evenings 19:30–21:00 on weekdays — Newport's deep-work block —,
      Saturday morning with room for a practice test, Sunday weekly review), created once. It starts next week so
      today's list still shows the suggestion and the energy choice; the week view's › shows the example. */
@@ -354,9 +359,10 @@ const Schedule = (() => {
       ? plans().find(p => p.active && p.type === 'weekly' && plan.start >= p.start && plan.start <= addDays(p.start, 6))
       : null;
 
+  /* the plan grid starts at the hour chosen in Settings (default 6:00) */
+  expose({ DAY_START: [() => pref('gridStart') * 60, () => {}] });
   return {
     SLOT,
-    DAY_START,
     DAY_END,
     mondayOf,
     planDays,
@@ -377,11 +383,11 @@ const Schedule = (() => {
     knapsack,
     toggleCheck,
     seedDemoPlan,
+    testMinutes,
   };
 })();
 const {
   SLOT,
-  DAY_START,
   DAY_END,
   mondayOf,
   planDays,
@@ -402,4 +408,5 @@ const {
   knapsack,
   toggleCheck,
   seedDemoPlan,
+  testMinutes,
 } = Schedule;

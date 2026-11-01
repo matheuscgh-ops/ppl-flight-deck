@@ -1128,7 +1128,10 @@ const SelfTest = (() => {
         ok(
           'Plans',
           'knapsack picks the best set that fits (A+B = 19 beats C = 15 in 60 min)',
-          pick.map(x => x.key).sort().join() === 'A,B',
+          pick
+            .map(x => x.key)
+            .sort()
+            .join() === 'A,B',
           pick.map(x => x.key).join()
         );
         const pick2 = knapsack([C('A', 10, 3, 10), C('B', 20, 2, 8)], 40);
@@ -1152,10 +1155,21 @@ const SelfTest = (() => {
           used = day.reduce((a, it) => a + it.min, 0),
           seq = day.every((it, k) => !k || it.start >= day[k - 1].start + day[k - 1].min - 1e-9);
         ok('Plans', 'a 90-min block is filled without going over it', day.length && used <= 92, used);
-        ok('Plans', 'items run one after another inside the block', seq && day.every(it => it.start >= 1140 && it.start < 1230));
+        ok(
+          'Plans',
+          'items run one after another inside the block',
+          seq && day.every(it => it.start >= 1140 && it.start < 1230)
+        );
         ok('Plans', 'deep work: at most one topic per ~45 min (≤ 2 in 90 min)', day.length <= 2, day.length);
         ok('Plans', 'a topic appears once per day', new Set(day.map(it => it.i)).size === day.length);
-        const two = packDay(T, [[19 * 60, 19 * 60 + 45], [21 * 60, 21 * 60 + 45]], 'medium');
+        const two = packDay(
+          T,
+          [
+            [19 * 60, 19 * 60 + 45],
+            [21 * 60, 21 * 60 + 45],
+          ],
+          'medium'
+        );
         ok('Plans', 'two blocks on one day never repeat a topic', new Set(two.map(it => it.i)).size === two.length);
         const wk = suggestDays([T, addDays(T, 1)], { [T]: [[1140, 1230]], [addDays(T, 1)]: [[1140, 1230]] }, {}),
           dueDay1 = wk[T].filter(it => it.reason === 'due').map(it => it.i);
@@ -1165,27 +1179,99 @@ const SelfTest = (() => {
           !wk[addDays(T, 1)].some(it => it.reason === 'due' && dueDay1.includes(it.i)),
           JSON.stringify(wk)
         );
-        ok('Plans', 'simulated sessions never stay in your history', state.events.length === 3 && !state.events.some(e => String(e.id).startsWith('sim')));
+        ok(
+          'Plans',
+          'simulated sessions never stay in your history',
+          state.events.length === 3 && !state.events.some(e => String(e.id).startsWith('sim'))
+        );
       }
       {
         const wkP = { id: 'w', type: 'weekly', start: mondayOf(T), active: true, blocks: {}, items: [], updated: 1 },
-          dP = { id: 'd', type: 'daily', start: T, active: true, blocks: {}, items: [{ id: 'i1', date: T, start: 1140, min: 30, kind: 'topic', i: 3, n: 10, reason: 'new' }, { id: 'i2', date: T, start: 1170, min: 20, kind: 'custom', i: null, n: 0, label: 'Simulator', reason: 'custom' }], updated: 2 };
+          dP = {
+            id: 'd',
+            type: 'daily',
+            start: T,
+            active: true,
+            blocks: {},
+            items: [
+              { id: 'i1', date: T, start: 1140, min: 30, kind: 'topic', i: 3, n: 10, reason: 'new' },
+              {
+                id: 'i2',
+                date: T,
+                start: 1170,
+                min: 20,
+                kind: 'custom',
+                i: null,
+                n: 0,
+                label: 'Simulator',
+                reason: 'custom',
+              },
+            ],
+            updated: 2,
+          };
         fixture([], { plans: [wkP, dP] });
-        ok('Plans', 'today comes from the daily plan first', activeFor(T).kind === 'daily' && todayPlan().source === 'daily');
+        ok(
+          'Plans',
+          'today comes from the daily plan first',
+          activeFor(T).kind === 'daily' && todayPlan().source === 'daily'
+        );
         state.plans[1].active = false;
         ok('Plans', '… then from the weekly plan', activeFor(T).kind === 'weekly' && todayPlan().source === 'weekly');
         state.plans[0].active = false;
         ok('Plans', '… else from the suggestion', activeFor(T) === null && todayPlan().source === 'suggested');
         state.plans[1].active = true;
         ok('Plans', 'a plan item is not done before you log it', !itemDone(state.plans[1].items[0]));
-        state.events.push({ id: 'x', date: T, topic: 3, kind: 'study', score: 80, from: null, to: null, partial: false, demo: false });
+        state.events.push({
+          id: 'x',
+          date: T,
+          topic: 3,
+          kind: 'study',
+          score: 80,
+          from: null,
+          to: null,
+          partial: false,
+          demo: false,
+        });
         ok('Plans', 'logging a session for that topic on that day marks it done', itemDone(state.plans[1].items[0]));
-        ok('Plans', 'your own activity is done only by hand', !itemDone(state.plans[1].items[1]) && itemDone({ ...state.plans[1].items[1], check: true }));
-        state.plans[1].items.push({ id: 'i3', date: D(1), start: 1140, min: 30, kind: 'topic', i: 5, n: 10, reason: 'new' });
-        ok('Plans', 'an undone item from an earlier day is missed and boosts its topic', itemMissed(state.plans[1].items[2]) && missedTopics(T).has(5));
-        ok('Plans', 'a daily plan over an active weekly plan asks to replace only that day', (state.plans[0].active = true) && weeklyUnder(state.plans[1]) && weeklyUnder(state.plans[1]).id === 'w');
-        const n = normalize({ ...state, plans: [{ type: 'bogus' }, { type: 'daily', start: 'x' }, { ...dP, items: [{ kind: 'topic', i: 99, date: T, start: 0, min: 5 }] }] });
-        ok('Plans', 'malformed plans and items are dropped when loading', n.plans.length === 1 && n.plans[0].items.length === 0, JSON.stringify(n.plans));
+        ok(
+          'Plans',
+          'your own activity is done only by hand',
+          !itemDone(state.plans[1].items[1]) && itemDone({ ...state.plans[1].items[1], check: true })
+        );
+        state.plans[1].items.push({
+          id: 'i3',
+          date: D(1),
+          start: 1140,
+          min: 30,
+          kind: 'topic',
+          i: 5,
+          n: 10,
+          reason: 'new',
+        });
+        ok(
+          'Plans',
+          'an undone item from an earlier day is missed and boosts its topic',
+          itemMissed(state.plans[1].items[2]) && missedTopics(T).has(5)
+        );
+        ok(
+          'Plans',
+          'a daily plan over an active weekly plan asks to replace only that day',
+          (state.plans[0].active = true) && weeklyUnder(state.plans[1]) && weeklyUnder(state.plans[1]).id === 'w'
+        );
+        const n = normalize({
+          ...state,
+          plans: [
+            { type: 'bogus' },
+            { type: 'daily', start: 'x' },
+            { ...dP, items: [{ kind: 'topic', i: 99, date: T, start: 0, min: 5 }] },
+          ],
+        });
+        ok(
+          'Plans',
+          'malformed plans and items are dropped when loading',
+          n.plans.length === 1 && n.plans[0].items.length === 0,
+          JSON.stringify(n.plans)
+        );
       }
       /* --- translations --- */
       const keys = Object.keys(I18N.en);

@@ -93,8 +93,6 @@ const PlanWizard = (() => {
     if (W.step === 2) body.innerHTML = stepBlocks();
     if (W.step === 3) body.innerHTML = stepTopics();
     if (W.step === 4) body.innerHTML = stepReview();
-    const onDay = body.querySelector('.wkstrip .on');
-    if (onDay) onDay.parentNode.scrollLeft = onDay.offsetLeft - 40;
     if (W.step === 2 || W.step === 4) {
       const shown = phoneMQ.matches ? [days()[W.dayIdx]] : days();
       scrollGrid(body, W.blocks, shown);
@@ -143,7 +141,7 @@ const PlanWizard = (() => {
       cur = currentDay();
     const tools = `<div class="wztools"><button type="button" id="wzUndo" ${W.hist.length ? '' : 'disabled'}>↶ ${esc(t('undo'))}</button><button type="button" id="wzRedo" ${W.fut.length ? '' : 'disabled'}>↷ ${esc(t('redo'))}</button><button type="button" id="wzClear" ${rangesTotal(W.blocks[cur]) ? '' : 'disabled'}>${esc(t('wzClear').replace('{d}', longDay(cur)))}</button>${W.type === 'weekly' ? `<button type="button" id="wzCopy" ${rangesTotal(W.blocks[cur]) ? '' : 'disabled'}>${esc(t('wzCopyDay').replace('{d}', longDay(cur)))}</button>` : ''}<span class="wztotal">${esc(t('wzTotal'))} <b>${fmtMin(totalBlocked())}</b></span></div>`;
     const tips = blockTips();
-    return `<p class="wzhint">${esc(t(matchMedia('(hover:none)').matches ? 'wzHintTouch' : 'wzHintMouse'))}</p>${tools}${phone && ds.length > 1 ? stripHTML(ds, W.dayIdx, 'data-wzd') : ''}<div id="wzGrid">${gridHTML(shown, { blocks: W.blocks }, 'select', { anchor: W.anchor })}</div>${tips.length ? `<div class="wztips">${tips.map(x => `<span>${esc(x)}</span>`).join('')}</div>` : ''}`;
+    return `<p class="wzhint">${esc(t(matchMedia('(hover:none)').matches ? 'wzHintTouch' : 'wzHintMouse'))}</p>${tools}${phone && ds.length > 1 ? stripHTML(ds, W.dayIdx, 'data-wzd', W.blocks) : ''}<div id="wzGrid">${gridHTML(shown, { blocks: W.blocks }, 'select', { anchor: W.anchor })}</div>${tips.length ? `<div class="wztips">${tips.map(x => `<span>${esc(x)}</span>`).join('')}</div>` : ''}`;
   }
 
   /* ---------- step 3: topics ---------- */
@@ -173,10 +171,6 @@ const PlanWizard = (() => {
         t0 += it.min;
       });
   }
-  const testMinutes = () => {
-    const st = settings();
-    return Math.round(TEST_Q * (60 / st.qph) * 1.1 + TEST_Q * (1 - blended().mu) * st.reviewMin);
-  };
   function itemMinutes(kind, i, n, d) {
     return kind === 'test' ? testMinutes() : Math.max(1, Math.round(n * perQ(i, d, W.energy[d]).per));
   }
@@ -261,7 +255,7 @@ const PlanWizard = (() => {
       shown = phone ? [ds[W.dayIdx]] : ds,
       topics = new Set(W.items.filter(it => it.kind === 'topic').map(it => it.i)).size,
       L = planLabel({ type: W.type, start: W.start, name: W.name });
-    return `<div class="wzsum"><div><b>${esc(L.name)}</b><span>${esc(t(W.type === 'daily' ? 'pDaily' : 'pWeekly'))} · ${esc(L.range)}</span></div><div><b>${fmtMin(totalBlocked())}</b><span>${esc(t('wzBlocked'))}</span></div><div><b>${fmtMin(W.items.reduce((a, it) => a + it.min, 0))}</b><span>${esc(t('wzPlannedLow'))}</span></div><div><b>${topics}</b><span>${esc(tf('pwTopics', topics).replace(/^\d+\s*/, ''))}</span></div></div>${phone && ds.length > 1 ? stripHTML(ds, W.dayIdx, 'data-wzd') : ''}<div id="wzGrid">${gridHTML(shown, { blocks: W.blocks, items: W.items }, 'view')}</div>`;
+    return `<div class="wzsum"><div><b>${esc(L.name)}</b><span>${esc(t(W.type === 'daily' ? 'pDaily' : 'pWeekly'))} · ${esc(L.range)}</span></div><div><b>${fmtMin(totalBlocked())}</b><span>${esc(t('wzBlocked'))}</span></div><div><b>${fmtMin(W.items.reduce((a, it) => a + it.min, 0))}</b><span>${esc(t('wzPlannedLow'))}</span></div><div><b>${topics}</b><span>${esc(tf('pwTopics', topics).replace(/^\d+\s*/, ''))}</span></div></div>${phone && ds.length > 1 ? stripHTML(ds, W.dayIdx, 'data-wzd', W.blocks) : ''}<div id="wzGrid">${gridHTML(shown, { blocks: W.blocks, items: W.items }, 'view')}</div>`;
   }
 
   /* ---------- step navigation ---------- */

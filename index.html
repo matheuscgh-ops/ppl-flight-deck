@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PPL Flight Deck</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='31' fill='%23000'/%3E%3Cpath d='M32 14 L50 46 H14 Z' fill='%23fff'/%3E%3C/svg%3E">
+
 <style>:root {
   --bg: #0d0f12;
   --panel: #16191d;
@@ -4479,7 +4481,7 @@ b.wkdaily {
 /* time-block selection */
 .wk.select .wkcol {
   display: grid;
-  grid-template-rows: repeat(72, var(--rowh));
+  grid-template-rows: repeat(var(--rows, 72), var(--rowh));
   touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
@@ -5006,6 +5008,525 @@ b.wkdaily {
     grid-column: 2;
   }
 }
+
+/* the Plan tab is the calendar: its height is set to reach the bottom of the screen (fitGrid) */
+.planweek .wk {
+  --rowh: 18px;
+}
+.pwenergy {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0 0 10px;
+}
+.pwenergy[hidden] {
+  display: none;
+}
+.energy.compact {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+}
+.energy.compact button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 5px 12px;
+  min-width: 0;
+}
+.energy.compact .en {
+  font-size: 12.5px;
+  font-weight: 800;
+}
+.energy.compact .es {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 700;
+}
+#viewTests > .planpt {
+  margin-bottom: 12px;
+}
+@media (max-width: 640px) {
+  .energy.compact {
+    width: 100%;
+  }
+  .energy.compact button {
+    flex: 1;
+  }
+}
+/* very short items (under 30 min): one tight line so neighbours never overlap */
+.wki.tiny {
+  padding: 0 6px;
+  justify-content: center;
+}
+.wki.tiny b {
+  font-size: 10px;
+  line-height: 1;
+}
+@media (max-width: 640px) {
+  .energy.compact button {
+    min-width: 0;
+    padding: 5px 6px;
+  }
+  .energy.compact .en {
+    font-size: 11.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  .energy.compact .es {
+    font-size: 10px;
+  }
+}
+
+/* ===== Plan tab on phones: one header row, no repeated labels, the calendar first ===== */
+.smlab,
+.pwensel,
+#pwProg {
+  display: none;
+}
+.pwmeta {
+  display: contents;
+}
+@media (max-width: 640px) {
+  .lglab,
+  #pwSource,
+  .pwhead > div:first-child,
+  #pwToday,
+  #pwStats,
+  .pwenergy > .label,
+  #energyPick,
+  .pwlegend,
+  .planweek .wkhead,
+  #wzGrid .wkhead {
+    display: none !important;
+  }
+  .smlab {
+    display: inline;
+  }
+  .planweek {
+    padding: 12px;
+  }
+  .pwhead {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+  .pwbtns {
+    width: 100%;
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+  .pwbtns .pwtabs {
+    flex: 1 1 auto;
+    min-width: 0;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    gap: 2px;
+    justify-content: flex-start;
+  }
+  .pwtabs button {
+    flex: 0 0 auto !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 6px 8px !important;
+    font-size: 15px !important;
+    font-weight: 800;
+    color: var(--muted);
+    border-radius: 0 !important;
+  }
+  .pwtabs button.on {
+    color: var(--ink);
+    box-shadow: inset 0 -2px 0 #579dff !important;
+  }
+  .pwbtns #kbSync,
+  .pwbtns #pwNew {
+    flex: 0 0 auto;
+    padding: 6px 11px;
+    font-size: 13px;
+  }
+  .pwnav {
+    margin: 8px 0 2px;
+    gap: 4px;
+  }
+  .pwnav b {
+    flex: 1;
+    min-width: 0;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  .pwnav button {
+    padding: 4px 12px;
+  }
+  #pwProg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 2px 0 8px;
+    font-size: 11.5px;
+    font-weight: 650;
+    color: var(--muted);
+  }
+  #pwProg[hidden] {
+    display: none;
+  }
+  #pwProg i {
+    position: relative;
+    flex: 0 0 72px;
+    height: 4px;
+    border-radius: 2px;
+    background: #2a3038;
+    overflow: hidden;
+  }
+  #pwProg b {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: #4bce97;
+  }
+  .pwmeta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 2px 0 8px;
+  }
+  .pwmeta #pwProg {
+    margin: 0;
+    min-width: 0;
+  }
+  .pwenergy {
+    margin: 0 0 0 auto;
+    flex: none;
+  }
+  .pwensel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .pwensel select {
+    width: auto;
+    padding: 3px 28px 3px 10px;
+  }
+  .pwnudge {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+  /* 7-day strip: weekday, date, a dot when the day has planned time */
+  .wkstrip {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 2px;
+    overflow: visible;
+    margin: 0 0 6px;
+  }
+  .wkstrip button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 4px 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    color: var(--ink2) !important;
+    border-radius: 10px;
+  }
+  .wkstrip small {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .wkstrip b {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 15px;
+    font-weight: 800;
+  }
+  .wkstrip .today small,
+  .wkstrip .today b {
+    color: #579dff;
+  }
+  .wkstrip button.on b {
+    background: #579dff;
+    color: #0d0f12;
+  }
+  .wkstrip i {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+  }
+  .wkstrip i.has {
+    background: #8f99a6;
+  }
+  /* calendar items: a light tint and a thin colour bar instead of solid blocks */
+  .wki {
+    background: color-mix(in srgb, currentColor 15%, #15181c) !important;
+    border-left-width: 2px;
+    border-radius: 5px;
+  }
+  .wki b {
+    font-size: 12px;
+  }
+  .wki span {
+    color: var(--muted);
+  }
+}
+@media (max-width: 640px) {
+  #pwProgTxt {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pwmeta #pwProg i {
+    flex-basis: 40px;
+  }
+  .pwensel {
+    flex: none;
+    gap: 6px;
+  }
+  .pwensel select {
+    width: auto !important;
+    max-width: 130px;
+    flex: none;
+    min-width: 0;
+    height: 30px;
+    padding: 0 26px 0 8px !important;
+    font-size: 16px;
+  }
+}
+/* day strip in the Google Calendar style: light numbers, the chosen day in a soft blue circle */
+@media (max-width: 640px) {
+  .wkstrip b {
+    width: 36px;
+    height: 36px;
+    font-size: 19px;
+    font-weight: 500;
+    color: #a8b0ba;
+  }
+  .wkstrip small {
+    font-size: 11px;
+    font-weight: 600;
+    color: #a8b0ba;
+  }
+  .wkstrip button.on b {
+    background: #8ab4f8;
+    color: #1d2125;
+  }
+  .wkstrip button.on small,
+  .wkstrip .today small,
+  .wkstrip .today:not(.on) b {
+    color: #8ab4f8;
+  }
+  .wkstrip i.has {
+    background: #5f6670;
+  }
+}
+
+/* ===== Settings (gear in the header) ===== */
+.gear {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 34px;
+  padding: 0;
+  color: var(--ink2);
+}
+.gear:hover {
+  color: var(--ink);
+}
+.gear svg {
+  transition: transform 0.3s;
+}
+.gear:hover svg {
+  transform: rotate(45deg);
+}
+.modal.setmodal {
+  width: min(720px, 100%);
+}
+.setsec {
+  border-top: 1px solid var(--line);
+  padding: 12px 0 6px;
+}
+.setsec[hidden] {
+  display: none;
+}
+.setsec h4 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink2);
+}
+.setrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 6px 0;
+}
+.setlab {
+  font-size: 13.5px;
+  font-weight: 700;
+  min-width: 0;
+}
+.setlab small {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 650;
+  color: var(--muted);
+  margin-top: 1px;
+}
+.setrow select,
+.setrow input[type='date'] {
+  width: 200px;
+  flex: none;
+}
+.setslider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+.setslider input {
+  width: 160px;
+  accent-color: #4bce97;
+}
+.setslider output {
+  font-weight: 850;
+  font-size: 13px;
+  min-width: 62px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  flex: none;
+  cursor: pointer;
+}
+.switch input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+.switch span {
+  position: absolute;
+  inset: 0;
+  background: #2f353d;
+  border: 1px solid var(--line2);
+  border-radius: 12px;
+  transition: background 0.15s;
+}
+.switch span::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #c5ccd5;
+  transition: transform 0.15s;
+}
+.switch input:checked + span {
+  background: #1d4835;
+  border-color: #4bce97;
+}
+.switch input:checked + span::after {
+  transform: translateX(18px);
+  background: #4bce97;
+}
+.switch input:focus-visible + span {
+  outline: 2px solid #579dff;
+  outline-offset: 2px;
+}
+.setbtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.setbtns [hidden] {
+  display: none;
+}
+.setbtns .danger {
+  color: #ff9c95;
+  border-color: #6b2b2b;
+}
+.setnote {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 650;
+  margin: 8px 0 0;
+}
+@media (max-width: 640px) {
+  #setbg {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .modal.setmodal {
+    width: 100%;
+    max-height: 92dvh;
+    border-radius: 18px 18px 0 0;
+  }
+  .setrow {
+    flex-wrap: wrap;
+    gap: 6px 10px;
+  }
+  .setrow select,
+  .setrow input[type='date'] {
+    width: 100%;
+  }
+  .setslider {
+    width: 100%;
+  }
+  .setslider input {
+    flex: 1;
+  }
+  .setbtns button {
+    flex: 1 1 45%;
+  }
+}
+@media (max-width: 640px) {
+  /* phone: the gear sits next to the flags in the title row */
+  .tools > button.gear {
+    position: absolute;
+    top: 0;
+    right: 100px;
+    width: 38px;
+    height: 29px;
+    flex: none;
+  }
+  .tools > button.gear svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+/* very narrow phones: no room next to the title, the gear goes to the end of the tools row */
+@media (max-width: 399px) {
+  .tools > button.gear {
+    position: static;
+    flex: 0 0 44px;
+    margin-left: auto;
+  }
+}
 </style>
 </head>
 <body>
@@ -5017,18 +5538,14 @@ b.wkdaily {
     </div>
     <div class="tools">
       <span class="demo" id="demoBadge" data-t="demo"></span>
-      <button id="clearDemo" data-t="clear"></button>
       <span class="sep" id="demoSep"></span>
       <button id="syncChip" class="syncchip" type="button"><i></i><span></span></button>
-      <button id="backup" data-t="backup"></button>
-      <button id="restore" data-t="import"></button>
-      <button id="saveHtml" data-t="save"></button>
-      <input type="file" id="file" accept="application/json,.json" hidden>
       <div class="flags" role="group" aria-label="Language">
         <button class="flag" data-lang="en" title="English" aria-label="English">🇺🇸</button>
         <button class="flag" data-lang="pt" title="Português" aria-label="Português">🇧🇷</button>
         <button class="flag" data-lang="ja" title="日本語" aria-label="日本語">🇯🇵</button>
       </div>
+      <button type="button" class="gear" id="setOpen" data-tt="setTitle"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M19.14 12.94a7.07 7.07 0 0 0 .06-.94c0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54A.48.48 0 0 0 13.92 2h-3.84a.48.48 0 0 0-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.73 8.47a.48.48 0 0 0 .12.61l2.03 1.58c-.05.3-.08.63-.08.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.48.48 0 0 0-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg></button>
     </div>
   </header>
 
@@ -5090,6 +5607,10 @@ b.wkdaily {
   </div>
 
   <div class="view" id="viewTests" hidden>
+    <section class="panel planpt" id="planPt">
+      <div class="pphead"><div><h3 class="fch3" data-t="ppTitle"></h3><div class="muted" id="ppInfo"></div></div>
+      <div class="ppbtns"><button type="button" id="ppAdd"></button><button type="button" class="primary" id="ppLog" data-t="ppLog"></button></div></div>
+    </section>
     <div class="statduo top">
     <section class="panel tshero">
       <div class="srhead"><div><h2 class="section" data-t="tabTestsLong"></h2><div class="muted" data-t="tsSub"></div></div><button type="button" class="primary" id="tsAdd" data-t="tsAdd"></button></div>
@@ -5109,36 +5630,21 @@ b.wkdaily {
   <div class="view" id="viewPlan" hidden>
     <section class="panel planweek" id="planWeek">
       <div class="pwhead"><div><h2 class="section" data-t="pwTitle"></h2><div class="muted" id="pwSource"></div></div>
-        <div class="pwbtns"><div class="seg pwtabs" id="pwTabs"><button type="button" data-pw="week" data-t="pwWeek"></button><button type="button" data-pw="plans" data-t="pwPlans"></button></div><button type="button" id="kbSync" data-t="kbSync"></button><button type="button" class="primary" id="pwNew" data-t="pwNew"></button></div></div>
+        <div class="pwbtns"><div class="seg pwtabs" id="pwTabs"><button type="button" data-pw="week" data-t="pwWeek"></button><button type="button" data-pw="plans" data-t="pwPlans"></button></div><button type="button" id="kbSync"><span class="lglab" data-t="kbSync"></span><span class="smlab" data-t="kbSyncShort"></span></button><button type="button" class="primary" id="pwNew"><span class="lglab" data-t="pwNew"></span><span class="smlab" data-t="pwNewShort"></span></button></div></div>
       <div id="pwWeekBox">
         <div class="pwnav"><button type="button" id="pwPrev" aria-label="Previous week">‹</button><b id="pwRange"></b><button type="button" id="pwNext" aria-label="Next week">›</button><button type="button" id="pwToday" data-t="today"></button><span class="pwstats" id="pwStats"></span></div>
+
+        <div class="pwmeta">
+        <div class="pwprog" id="pwProg"><i><b id="pwProgBar"></b></i><span id="pwProgTxt"></span></div>
+        <div class="pwenergy" id="pwEnergy"><span class="label" data-t="pwEnergy"></span><div class="energy compact" id="energyPick" role="tablist"></div><label class="pwensel"><span data-t="pwEnergyShort"></span><select id="energySel"></select></label></div>
+        </div>
         <div class="pwnudge" id="pwNudge" hidden></div>
+
         <div id="pwStrip"></div>
         <div id="pwGrid"></div>
         <div class="pwlegend" id="pwLegend"></div>
       </div>
       <div id="pwPlansBox" hidden><div id="pwList"></div></div>
-    </section>
-    <section class="panel planhero">
-      <div class="srhead"><div><h2 class="section" data-t="planTitle"></h2><div class="muted" id="planSub"></div></div><div class="srkpis" id="planKpis"></div></div>
-      <div class="energy" id="energyPick" role="tablist"></div>
-      <div id="planList" class="planlist"></div>
-      <p class="volnote" data-t="planNote"></p>
-    </section>
-    <section class="panel planpt" id="planPt">
-      <div class="pphead"><div><h3 class="fch3" data-t="ppTitle"></h3><div class="muted" id="ppInfo"></div></div>
-      <div class="ppbtns"><button type="button" id="ppAdd"></button><button type="button" class="primary" id="ppLog" data-t="ppLog"></button></div></div>
-    </section>
-    <section class="panel planset">
-      <h3 class="fch3" data-t="planSettings"></h3>
-      <div class="planinputs">
-        <label class="field"><span class="flabel" data-t="setMinutes"></span><input type="number" id="setMinutes" min="15" max="600" step="15" inputmode="numeric"></label>
-        <label class="field"><span class="flabel" data-t="setQph"></span><input type="number" id="setQph" min="5" max="200" step="5" inputmode="numeric"></label>
-        <label class="field"><span class="flabel" data-t="setReview"></span><input type="number" id="setReviewMin" min="0" max="10" step="0.5" inputmode="decimal"></label>
-        <label class="field"><span class="flabel" data-t="setTests"></span><input type="number" id="setTests" min="0" max="14" step="1" inputmode="numeric"></label>
-      </div>
-      <div class="planact"><button type="button" class="primary" id="planCalc"><span class="spin" hidden></span><span data-t="planCalc"></span></button><div class="muted" id="planCap"></div></div>
-      <p class="planweights" data-t="planWeights"></p>
     </section>
   </div>
   <div class="view" id="viewSR" hidden>
@@ -5300,6 +5806,19 @@ b.wkdaily {
     <datalist id="wzPresets"></datalist>
   </div>
 </div>
+<div class="modalbg" id="setbg" hidden>
+  <div class="modal setmodal" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+    <div class="mhead"><h3 id="setTitle" data-t="setTitle"></h3><button class="x" id="setClose" aria-label="Close">×</button></div>
+    <div id="setBody"></div>
+    <section class="setsec" id="setSync"><h4 data-t="setSyncTitle"></h4><div class="setrow"><span class="setlab" id="setSyncState"></span><button type="button" id="setSyncOpen" data-t="setSyncOpen"></button></div></section>
+    <section class="setsec"><h4 data-t="setDataTitle"></h4>
+      <div class="setbtns"><button id="backup" data-t="backup"></button><button id="restore" data-t="import"></button><button id="saveHtml" data-t="save"></button><button id="clearDemo" data-t="clear"></button><button type="button" class="danger" id="setReset" data-t="setReset"></button></div>
+      <input type="file" id="file" accept="application/json,.json" hidden>
+      <p class="setnote" data-t="setDataNote"></p>
+    </section>
+    <section class="setsec" id="setDemo" hidden><h4 data-t="setDemoTitle"></h4><div class="setbtns"><span id="tourSlot"></span></div></section>
+  </div>
+</div>
 <div class="modalbg" id="kbbg" hidden>
   <div class="modal kbsheet" role="dialog" aria-modal="true" aria-labelledby="kbTitle">
     <div class="mhead"><div><h3 id="kbTitle" data-t="kbTitle"></h3><div class="muted" id="kbSub"></div></div><button class="x" id="kbClose" aria-label="Close">×</button></div>
@@ -5346,7 +5865,8 @@ function expose(vars) {
 }
 
 /* ===== module Config (js/core/config.js) =====
-   public: TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, GOAL, DEF_SET0, LOCALE */
+   public: TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE
+   live values (getters on window, they follow your Settings): GOAL */
 const Config = (() => {
   const TEMPLATE = '<!doctype html>\n' + document.documentElement.outerHTML;
   /* the demo keeps its own storage so it never touches the personal app */
@@ -5395,12 +5915,26 @@ const Config = (() => {
     review: '#7158dc',
     move: ['#5f6b7e', '#2f7de1', '#c98200', '#16935e', '#7158dc'],
   };
-  const GOAL = 85;
   const DEF_SET0 = { minutes: 180, qph: 40, testEvery: 3, reviewMin: 1.5 };
+  /* everything else in Settings, with the values the app always used (so nothing changes until you change it) */
+  const PREF_DEF = {
+    goal: 85, // target score (%), drawn as the goal line and used for the "chance of reaching your goal"
+    reviewAt: 0.9, // a topic is due for review when its recall falls to this level
+    halfLife: 10, // days for a practice test to weigh half as much in the blended forecast
+    idleDays: 3, // days without studying that bring the next practice test forward
+    energy: 'medium', // default energy of the suggested daily plan
+    carousel: true, // carousels move on their own every 3 s
+    heatNums: true, // numbers on the heat-map squares
+    gridStart: 6, // first hour of the plan grid
+    deepMin: 45, // minutes of block per topic (deep work); 0 = no limit
+    ranges: {}, // default chart intervals
+  };
+  /* the goal follows Settings (read at the moment it is used) */
+  expose({ GOAL: [() => (typeof pref === 'function' ? pref('goal') : PREF_DEF.goal), () => {}] });
   const LOCALE = { en: 'en-US', pt: 'pt-BR', ja: 'ja-JP' };
-  return { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, GOAL, DEF_SET0, LOCALE };
+  return { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE };
 })();
-const { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, GOAL, DEF_SET0, LOCALE } = Config;
+const { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE } = Config;
 
 /* ===== module Translations (i18n/translations.js) =====
    public: I18N */
@@ -5427,7 +5961,7 @@ const Translations = (() => {
       examToday: 'Exam day — good luck!',
       examShort: 'EXAM',
       avg: 'Avg score',
-      avgTip: 'Weighted average of your Sporty’s scores (goal ≥ 85%). Moving cards does not change it.',
+      avgTip: 'Weighted average of your Sporty’s scores (goal ≥ {G}%). Moving cards does not change it.',
       pace: 'Pace / day',
       paceTip: 'Questions per day to get every topic into Very Comfortable before the exam',
       active: 'Active days',
@@ -5490,7 +6024,7 @@ const Translations = (() => {
       examToday: 'Dia da prova — boa sorte!',
       examShort: 'PROVA',
       avg: 'Média',
-      avgTip: 'Média ponderada das notas do Sporty’s (meta ≥ 85%). Mover cards não a altera.',
+      avgTip: 'Média ponderada das notas do Sporty’s (meta ≥ {G}%). Mover cards não a altera.',
       pace: 'Ritmo / dia',
       paceTip: 'Questões por dia para deixar todos os tópicos em Muito confortável antes da prova',
       active: 'Dias ativos',
@@ -5553,7 +6087,7 @@ const Translations = (() => {
       examToday: '試験当日 — 頑張って！',
       examShort: '試験',
       avg: '平均正答率',
-      avgTip: 'Sporty’sの加重平均正答率（目標85%以上）。カード移動では変わりません。',
+      avgTip: 'Sporty’sの加重平均正答率（目標{G}%以上）。カード移動では変わりません。',
       pace: '必要ペース',
       paceTip: '試験までに全トピックを「十分理解」にするための1日あたりの問題数',
       active: '学習した日',
@@ -5621,7 +6155,7 @@ const Translations = (() => {
     lgProj: 'Projection',
     lgGhost: 'If you stop reviewing',
     lgExam: 'Recall on exam day',
-    lgThresh: 'Review at 90%',
+    lgThresh: 'Review at {RV}%',
     howCalc: 'How it is calculated',
     fAll: 'All',
     fDue: 'Due',
@@ -5631,7 +6165,7 @@ const Translations = (() => {
     editScore: 'Click to edit your latest score',
     scoreSaved: '{t} — score {n}%',
     formula:
-      '<p>A simplified model inspired by FSRS / SM-2, built for this <b>demo</b>. It uses the score you log for each study or review session (or edit on the card). Moving a card is not a session.</p><pre>Recall after t days:     R(t) = 1 / (1 + t / (9·S))\nS (stability) = days until recall falls to 90%\n\nFirst session:           S = 1 day (score &lt; 70%) · 1.5 (70–84%) · 2 (≥ 85%)\nEach later session, score p, recall R at that moment:\n  p ≥ 70%   →  S ← S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  S ← S × 1.2\n  p &lt; 60%   →  S ← max(1, 0.4 × S)      (lapse)\n\nNext review  = last session + S days   (when R reaches 90%)\nPriority     = (1 − R_now + 0.05 × min(days overdue, 10))\n               × √questions × list weight × (1 + max(0, 85 − score)/100)\nList weight: Not Comfortable 1.4 · To review 1.3 · Very Comfortable 1.0</pre><p>Reviewing a little later, once recall has dropped, grows S more than reviewing right away — that is the spacing effect in the chart. The white line is the recall you would still have on exam day if you stopped reviewing at that point.</p>',
+      '<p>A simplified model inspired by FSRS / SM-2, built for this <b>demo</b>. It uses the score you log for each study or review session (or edit on the card). Moving a card is not a session.</p><pre>Recall after t days:     R(t) = 1 / (1 + t / (9·S))\nS (stability) = days until recall falls to 90%\n\nFirst session:           S = 1 day (score &lt; 70%) · 1.5 (70–84%) · 2 (≥ 85%)\nEach later session, score p, recall R at that moment:\n  p ≥ 70%   →  S ← S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  S ← S × 1.2\n  p &lt; 60%   →  S ← max(1, 0.4 × S)      (lapse)\n\nNext review  = when R falls to {RV}% (Settings): last session + 9·S·(1/r − 1) days, = S days at 90%\nPriority     = (1 − R_now + 0.05 × min(days overdue, 10))\n               × √questions × list weight × (1 + max(0, 85 − score)/100)\nList weight: Not Comfortable 1.4 · To review 1.3 · Very Comfortable 1.0</pre><p>Reviewing a little later, once recall has dropped, grows S more than reviewing right away — that is the spacing effect in the chart. The white line is the recall you would still have on exam day if you stopped reviewing at that point.</p>',
   });
   Object.assign(I18N.pt, {
     tabDash: 'Painel',
@@ -5657,7 +6191,7 @@ const Translations = (() => {
     lgProj: 'Projeção',
     lgGhost: 'Se parar de revisar',
     lgExam: 'Retenção no dia da prova',
-    lgThresh: 'Revisar em 90%',
+    lgThresh: 'Revisar em {RV}%',
     howCalc: 'Como é calculado',
     fAll: 'Todos',
     fDue: 'Vencidos',
@@ -5667,7 +6201,7 @@ const Translations = (() => {
     editScore: 'Clique para editar sua última nota',
     scoreSaved: '{t} — nota {n}%',
     formula:
-      '<p>Modelo simplificado inspirado em FSRS / SM-2, feito para esta <b>demo</b>. Usa a nota registrada em cada sessão de estudo ou revisão (ou editada no card). Mover um card não conta como sessão.</p><pre>Retenção após t dias:    R(t) = 1 / (1 + t / (9·S))\nS (estabilidade) = dias até a retenção cair para 90%\n\nPrimeira sessão:         S = 1 dia (nota &lt; 70%) · 1,5 (70–84%) · 2 (≥ 85%)\nCada sessão seguinte, nota p, retenção R naquele momento:\n  p ≥ 70%   →  S ← S × (1 + 1,2 × p/100 × (1,5 − R))\n  60–69%    →  S ← S × 1,2\n  p &lt; 60%   →  S ← max(1; 0,4 × S)      (esquecimento)\n\nPróxima revisão = última sessão + S dias   (quando R chega a 90%)\nPrioridade      = (1 − R_hoje + 0,05 × min(dias de atraso; 10))\n                  × √questões × peso da lista × (1 + max(0; 85 − nota)/100)\nPeso: Pouco confortável 1,4 · Para revisar 1,3 · Muito confortável 1,0</pre><p>Revisar um pouco depois, quando a retenção já caiu, aumenta mais o S do que revisar logo em seguida — é o efeito de espaçamento no gráfico. A linha branca é a retenção que você ainda teria no dia da prova se parasse de revisar naquele ponto.</p>',
+      '<p>Modelo simplificado inspirado em FSRS / SM-2, feito para esta <b>demo</b>. Usa a nota registrada em cada sessão de estudo ou revisão (ou editada no card). Mover um card não conta como sessão.</p><pre>Retenção após t dias:    R(t) = 1 / (1 + t / (9·S))\nS (estabilidade) = dias até a retenção cair para 90%\n\nPrimeira sessão:         S = 1 dia (nota &lt; 70%) · 1,5 (70–84%) · 2 (≥ 85%)\nCada sessão seguinte, nota p, retenção R naquele momento:\n  p ≥ 70%   →  S ← S × (1 + 1,2 × p/100 × (1,5 − R))\n  60–69%    →  S ← S × 1,2\n  p &lt; 60%   →  S ← max(1; 0,4 × S)      (esquecimento)\n\nPróxima revisão = quando R cai para {RV}% (Ajustes): última sessão + 9·S·(1/r − 1) dias, = S dias em 90%\nPrioridade      = (1 − R_hoje + 0,05 × min(dias de atraso; 10))\n                  × √questões × peso da lista × (1 + max(0; 85 − nota)/100)\nPeso: Pouco confortável 1,4 · Para revisar 1,3 · Muito confortável 1,0</pre><p>Revisar um pouco depois, quando a retenção já caiu, aumenta mais o S do que revisar logo em seguida — é o efeito de espaçamento no gráfico. A linha branca é a retenção que você ainda teria no dia da prova se parasse de revisar naquele ponto.</p>',
   });
   Object.assign(I18N.ja, {
     tabDash: 'ダッシュボード',
@@ -5693,7 +6227,7 @@ const Translations = (() => {
     lgProj: '予測',
     lgGhost: '復習をやめた場合',
     lgExam: '試験当日の保持率',
-    lgThresh: '90%で復習',
+    lgThresh: '{RV}%で復習',
     howCalc: '計算方法',
     fAll: 'すべて',
     fDue: '期限切れ・今日',
@@ -5703,7 +6237,7 @@ const Translations = (() => {
     editScore: 'クリックして最新の正答率を編集',
     scoreSaved: '{t} — 正答率 {n}%',
     formula:
-      '<p>このデモ用に作った、FSRS／SM-2を参考にした簡易モデルです。学習・復習ごとに記録した正答率（またはカード上で編集した値）を使います。カードの移動はセッションに数えません。</p><pre>t日後の記憶保持率:   R(t) = 1 / (1 + t / (9·S))\nS（安定度）= 保持率が90%まで下がるまでの日数\n\n初回:                S = 1日（70%未満）· 1.5（70–84%）· 2（85%以上）\n2回目以降（正答率p、その時点の保持率R）:\n  p ≥ 70%   →  S ← S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  S ← S × 1.2\n  p &lt; 60%   →  S ← max(1, 0.4 × S)     （忘却）\n\n次の復習 = 最終セッション + S日（Rが90%になる時点）\n優先度   = (1 − 今日のR + 0.05 × min(超過日数, 10))\n           × √問題数 × リスト重み × (1 + max(0, 85 − 正答率)/100)\n重み: 要強化 1.4 · 要復習 1.3 · 十分理解 1.0</pre><p>少し忘れかけた頃に復習すると、すぐに復習するよりSが大きく伸びます（間隔効果）。白い線は、その時点で復習をやめた場合の試験当日の保持率です。</p>',
+      '<p>このデモ用に作った、FSRS／SM-2を参考にした簡易モデルです。学習・復習ごとに記録した正答率（またはカード上で編集した値）を使います。カードの移動はセッションに数えません。</p><pre>t日後の記憶保持率:   R(t) = 1 / (1 + t / (9·S))\nS（安定度）= 保持率が90%まで下がるまでの日数\n\n初回:                S = 1日（70%未満）· 1.5（70–84%）· 2（85%以上）\n2回目以降（正答率p、その時点の保持率R）:\n  p ≥ 70%   →  S ← S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  S ← S × 1.2\n  p &lt; 60%   →  S ← max(1, 0.4 × S)     （忘却）\n\n次の復習 = Rが{RV}%まで下がる時点（設定）：最終セッション + 9·S·(1/r − 1)日（90%ならS日）\n優先度   = (1 − 今日のR + 0.05 × min(超過日数, 10))\n           × √問題数 × リスト重み × (1 + max(0, 85 − 正答率)/100)\n重み: 要強化 1.4 · 要復習 1.3 · 十分理解 1.0</pre><p>少し忘れかけた頃に復習すると、すぐに復習するよりSが大きく伸びます（間隔効果）。白い線は、その時点で復習をやめた場合の試験当日の保持率です。</p>',
   });
 
   Object.assign(I18N.en, {
@@ -5925,18 +6459,18 @@ const Translations = (() => {
     tabPlan: 'Plan',
     srLabel: 'Spaced repetition',
     fcTitle: 'Exam forecast',
-    fcMiniSub: 'pass chance {p} · 85% chance {g}',
+    fcMiniSub: 'pass chance {p} · {G}% chance {g}',
     fcToday: 'Expected score today',
     fcPass: 'Chance to pass (≥ 70%)',
-    fcGoal: 'Chance of ≥ 85% (your goal)',
+    fcGoal: 'Chance of ≥ {G}% (your goal)',
     fcExamDay: 'On exam day if you stop reviewing',
     fcLine: 'Forecast',
     fcProj: 'If you stop reviewing',
     fcPassLine: 'Pass 70%',
-    fcGoalLine: 'Goal 85%',
+    fcGoalLine: 'Goal {G}%',
     fcLostTitle: 'Where you lose the most questions',
     fcFormula:
-      'p(topic) = last score × recall now      (no score yet → 50%)\nweight(topic) = topic questions / 1,058\nexpected score μ = Σ weight × p\nright answers X ~ Binomial(60, μ)\nchance to pass = P(X ≥ 42)   ·   chance of 85% = P(X ≥ 51)\nLost questions (topic) = 60 × weight × (1 − p)',
+      'p(topic) = last score × recall now      (no score yet → 50%)\nweight(topic) = topic questions / 1,058\nexpected score μ = Σ weight × p\nright answers X ~ Binomial(60, μ)\nchance to pass = P(X ≥ 42)   ·   chance of {G}% = P(X ≥ {GN})\nLost questions (topic) = 60 × weight × (1 − p)',
     planToday: "Today's plan",
     planOpen: 'Plan →',
     planTitle: "Today's plan",
@@ -5969,18 +6503,18 @@ const Translations = (() => {
     tabPlan: 'Plano',
     srLabel: 'Repetição espaçada',
     fcTitle: 'Previsão da prova',
-    fcMiniSub: 'chance de passar {p} · chance de 85% {g}',
+    fcMiniSub: 'chance de passar {p} · chance de {G}% {g}',
     fcToday: 'Nota esperada hoje',
     fcPass: 'Chance de passar (≥ 70%)',
-    fcGoal: 'Chance de ≥ 85% (sua meta)',
+    fcGoal: 'Chance de ≥ {G}% (sua meta)',
     fcExamDay: 'No dia da prova se parar de revisar',
     fcLine: 'Previsão',
     fcProj: 'Se parar de revisar',
     fcPassLine: 'Aprovação 70%',
-    fcGoalLine: 'Meta 85%',
+    fcGoalLine: 'Meta {G}%',
     fcLostTitle: 'Onde você perde mais questões',
     fcFormula:
-      'p(tópico) = última nota × retenção hoje      (sem nota → 50%)\npeso(tópico) = questões do tópico / 1.058\nnota esperada μ = Σ peso × p\nacertos X ~ Binomial(60, μ)\nchance de passar = P(X ≥ 42)   ·   chance de 85% = P(X ≥ 51)\nQuestões perdidas (tópico) = 60 × peso × (1 − p)',
+      'p(tópico) = última nota × retenção hoje      (sem nota → 50%)\npeso(tópico) = questões do tópico / 1.058\nnota esperada μ = Σ peso × p\nacertos X ~ Binomial(60, μ)\nchance de passar = P(X ≥ 42)   ·   chance de {G}% = P(X ≥ {GN})\nQuestões perdidas (tópico) = 60 × peso × (1 − p)',
     planToday: 'Plano de hoje',
     planOpen: 'Plano →',
     planTitle: 'Plano de hoje',
@@ -6013,18 +6547,18 @@ const Translations = (() => {
     tabPlan: 'プラン',
     srLabel: '間隔反復',
     fcTitle: '試験予測',
-    fcMiniSub: '合格確率 {p} · 85%以上の確率 {g}',
+    fcMiniSub: '合格確率 {p} · {G}%以上の確率 {g}',
     fcToday: '今日の予想正答率',
     fcPass: '合格確率（70%以上）',
-    fcGoal: '85%以上の確率（目標）',
+    fcGoal: '{G}%以上の確率（目標）',
     fcExamDay: '復習をやめた場合の試験日',
     fcLine: '予測',
     fcProj: '復習をやめた場合',
     fcPassLine: '合格 70%',
-    fcGoalLine: '目標 85%',
+    fcGoalLine: '目標 {G}%',
     fcLostTitle: '失点が多いトピック',
     fcFormula:
-      'p(トピック) = 最新の正答率 × 現在の保持率   （正答率なし → 50%）\n重み = トピックの問題数 / 1,058\n予想正答率 μ = Σ 重み × p\n正解数 X ~ 二項分布(60, μ)\n合格確率 = P(X ≥ 42) · 85%以上 = P(X ≥ 51)\n失点（トピック）= 60 × 重み × (1 − p)',
+      'p(トピック) = 最新の正答率 × 現在の保持率   （正答率なし → 50%）\n重み = トピックの問題数 / 1,058\n予想正答率 μ = Σ 重み × p\n正解数 X ~ 二項分布(60, μ)\n合格確率 = P(X ≥ 42) · {G}%以上 = P(X ≥ {GN})\n失点（トピック）= 60 × 重み × (1 − p)',
     planToday: '今日のプラン',
     planOpen: 'プラン →',
     planTitle: '今日のプラン',
@@ -6153,7 +6687,8 @@ const Translations = (() => {
     distMean: 'Mean',
     distSd: 'Std dev',
     distRange: 'Range',
-    fcTopDesc: 'Overall {s}% · pass {p}% · 85% {g}% — these 3 topics cost you the most questions on a 60-question exam',
+    fcTopDesc:
+      'Overall {s}% · pass {p}% · {G}% {g}% — these 3 topics cost you the most questions on a 60-question exam',
     calPerfect: 'Perfect model (predicted = real)',
     calFit: 'Fitted line',
     tabTests: 'Tests',
@@ -6164,14 +6699,14 @@ const Translations = (() => {
     tsBest: 'Best',
     tsAvg3: 'Avg last 3',
     ts70: 'tests ≥ 70%',
-    ts85: 'tests ≥ 85%',
+    ts85: 'tests ≥ {G}%',
     tsFew: 'Log {n} more scored practice tests to see the trend',
     tsCons: 'consistent progress',
     tsMod: 'moderate',
     tsNoisy: 'scores jump around',
-    tsCross: 'reaches 85% on {d}',
-    tsAlready: 'already above 85%',
-    tsNever: 'not on track to reach 85% before the exam',
+    tsCross: 'reaches {G}% on {d}',
+    tsAlready: 'already above {G}%',
+    tsNever: 'not on track to reach {G}% before the exam',
     tsExam: '≈ {s}% on exam day',
     tsNextToday: 'Next practice test: today',
     tsNextIn: 'Next practice test: in {n} d',
@@ -6243,7 +6778,7 @@ const Translations = (() => {
     distMean: 'Média',
     distSd: 'Desvio padrão',
     distRange: 'Faixa',
-    fcTopDesc: 'Nota geral {s}% · passar {p}% · 85% {g}% — estes 3 tópicos custam mais questões numa prova de 60',
+    fcTopDesc: 'Nota geral {s}% · passar {p}% · {G}% {g}% — estes 3 tópicos custam mais questões numa prova de 60',
     calPerfect: 'Modelo perfeito (previsto = real)',
     calFit: 'Reta ajustada',
     tabTests: 'Simulados',
@@ -6254,14 +6789,14 @@ const Translations = (() => {
     tsBest: 'Melhor',
     tsAvg3: 'Média últimos 3',
     ts70: 'simulados ≥ 70%',
-    ts85: 'simulados ≥ 85%',
+    ts85: 'simulados ≥ {G}%',
     tsFew: 'Registre mais {n} simulados com nota para ver a tendência',
     tsCons: 'progresso consistente',
     tsMod: 'moderado',
     tsNoisy: 'notas oscilando',
-    tsCross: 'chega a 85% em {d}',
-    tsAlready: 'já acima de 85%',
-    tsNever: 'no ritmo atual não chega a 85% antes da prova',
+    tsCross: 'chega a {G}% em {d}',
+    tsAlready: 'já acima de {G}%',
+    tsNever: 'no ritmo atual não chega a {G}% antes da prova',
     tsExam: '≈ {s}% no dia da prova',
     tsNextToday: 'Próximo simulado: hoje',
     tsNextIn: 'Próximo simulado: em {n} d',
@@ -6333,7 +6868,7 @@ const Translations = (() => {
     distMean: '平均',
     distSd: '標準偏差',
     distRange: '範囲',
-    fcTopDesc: '総合 {s}% · 合格 {p}% · 85% {g}% — 60問の試験で最も失点が多い3トピック',
+    fcTopDesc: '総合 {s}% · 合格 {p}% · {G}% {g}% — 60問の試験で最も失点が多い3トピック',
     calPerfect: '完全なモデル（予測＝実際）',
     calFit: '回帰直線',
     tabTests: '模試',
@@ -6344,14 +6879,14 @@ const Translations = (() => {
     tsBest: '最高',
     tsAvg3: '直近3回平均',
     ts70: '70%以上の回数',
-    ts85: '85%以上の回数',
+    ts85: '{G}%以上の回数',
     tsFew: '傾向を見るには正答率付きの模試をあと{n}回記録',
     tsCons: '安定した伸び',
     tsMod: '普通',
     tsNoisy: 'ばらつき大',
-    tsCross: '{d}に85%到達',
-    tsAlready: 'すでに85%以上',
-    tsNever: 'このペースでは試験前に85%に届かない',
+    tsCross: '{d}に{G}%到達',
+    tsAlready: 'すでに{G}%以上',
+    tsNever: 'このペースでは試験前に{G}%に届かない',
     tsExam: '試験日 約{s}%',
     tsNextToday: '次の模試：今日',
     tsNextIn: '次の模試：{n}日後',
@@ -6572,7 +7107,7 @@ const Translations = (() => {
     wzPlanned: 'Planned',
     wzBlocked: 'blocked',
     wzPlannedLow: 'planned',
-    wzGoal: 'goal ≥ 85% and review every miss',
+    wzGoal: 'goal ≥ {G}% and review every miss',
     wzUp: 'Move up',
     wzFree: '{m} free',
     wzAdd: 'add',
@@ -6664,7 +7199,7 @@ const Translations = (() => {
     wzPlanned: 'Planejado',
     wzBlocked: 'reservado',
     wzPlannedLow: 'planejado',
-    wzGoal: 'meta ≥ 85% e revisar cada erro',
+    wzGoal: 'meta ≥ {G}% e revisar cada erro',
     wzUp: 'Subir',
     wzFree: '{m} livre',
     wzAdd: 'adicionar',
@@ -6755,7 +7290,7 @@ const Translations = (() => {
     wzPlanned: '予定',
     wzBlocked: '確保',
     wzPlannedLow: '予定',
-    wzGoal: '目標85%以上・間違いはすべて復習',
+    wzGoal: '目標{G}%以上・間違いはすべて復習',
     wzUp: '上へ',
     wzFree: '空き{m}',
     wzAdd: '追加',
@@ -6779,26 +7314,187 @@ const Translations = (() => {
     demoPlanName: 'サンプルの週',
   });
   Object.assign(I18N.en, {
-    kbSync: '⇄ Sync with Kanban',
+    kbSync: 'Sync with Kanban',
     kbTitle: "Sync today's plan with the Kanban",
     kbNothing: "The Kanban already matches today's plan.",
     kbApply: 'OK · move {n}',
     kbDone: '{n} card(s) moved',
   });
   Object.assign(I18N.pt, {
-    kbSync: '⇄ Sincronizar com o Kanban',
+    kbSync: 'Sincronizar com o Kanban',
     kbTitle: 'Sincronizar o plano de hoje com o Kanban',
     kbNothing: 'O Kanban já corresponde ao plano de hoje.',
     kbApply: 'OK · mover {n}',
     kbDone: '{n} cartão(ões) movido(s)',
   });
   Object.assign(I18N.ja, {
-    kbSync: '⇄ Kanbanと同期',
+    kbSync: 'Kanbanと同期',
     kbTitle: '今日のプランをKanbanと同期',
     kbNothing: 'Kanbanはすでに今日のプランと一致しています。',
     kbApply: 'OK · {n}件移動',
     kbDone: '{n}枚のカードを移動',
   });
+  Object.assign(I18N.en, {
+    setTitle: 'Settings',
+    setTestsS: 'Practice test every',
+    setSaved: 'Settings saved',
+    setDays: '{n} days',
+    setOff: 'Off',
+    setExamTitle: 'Exam',
+    setExamDate: 'Exam date',
+    setLang: 'Language',
+    setGoalTitle: 'Goal and memory',
+    setGoal: 'Goal score',
+    setGoalHint: 'Goal line on every chart and the “chance of reaching your goal”',
+    setReviewAt: 'Review when recall falls to',
+    setReviewAtHint: 'Higher = more frequent reviews',
+    setHalfLife: 'Practice-test half-life',
+    setHalfLifeHint: 'How fast older practice tests lose weight in the forecast',
+    setIdle: 'Bring a practice test forward after',
+    setIdleHint: 'Days without studying',
+    setPlanTitle: 'Suggested daily plan',
+    setEnergy: 'Default energy',
+    setEnergyHint: 'Used when you have not picked one today',
+    setPlansTitle: 'Plans',
+    setGridStart: 'Plan grid starts at',
+    setDeep: 'Deep work: one topic per',
+    setDeepN: '{n} min of block',
+    setDeepHint: 'Fewer topic switches inside a block (Cal Newport)',
+    setChartsTitle: 'Default chart intervals',
+    setRangeSr: 'Spaced repetition (dashboard, forecast)',
+    setRangeCard: 'Topic charts',
+    setRangeVol: 'Study volume',
+    setRangeTs: 'Practice tests',
+    setRangeHeat: 'Heat-map history',
+    setDisplayTitle: 'Display',
+    setCarousel: 'Carousels move on their own',
+    setCarouselHint: 'Dashboard preview and “Needs recall”, every 3 s',
+    setHeatNums: 'Numbers on the heat-map squares',
+    setSyncTitle: 'Sync between devices',
+    setSyncOpen: 'Manage sync…',
+    setDataTitle: 'Your data',
+    setReset: 'Reset everything',
+    setDataNote: 'Backup JSON and Save HTML never include your sync token.',
+    setDemoTitle: 'Demo',
+    setResetAsk:
+      'Reset everything to the starting point? Your plans, sessions and settings are replaced (you can undo right after).',
+    setResetDone: 'Everything reset',
+  });
+  Object.assign(I18N.pt, {
+    setTitle: 'Ajustes',
+    setTestsS: 'Simulado a cada',
+    setSaved: 'Ajustes salvos',
+    setDays: '{n} dias',
+    setOff: 'Desligado',
+    setExamTitle: 'Prova',
+    setExamDate: 'Data da prova',
+    setLang: 'Idioma',
+    setGoalTitle: 'Meta e memória',
+    setGoal: 'Nota-meta',
+    setGoalHint: 'Linha de meta em todos os gráficos e a “chance de atingir a meta”',
+    setReviewAt: 'Revisar quando a retenção cair para',
+    setReviewAtHint: 'Maior = revisões mais frequentes',
+    setHalfLife: 'Meia-vida dos simulados',
+    setHalfLifeHint: 'Quão rápido simulados antigos perdem peso na previsão',
+    setIdle: 'Antecipar um simulado depois de',
+    setIdleHint: 'Dias sem estudar',
+    setPlanTitle: 'Plano diário sugerido',
+    setEnergy: 'Energia padrão',
+    setEnergyHint: 'Usada quando você não escolheu uma hoje',
+    setPlansTitle: 'Planos',
+    setGridStart: 'A grade do plano começa às',
+    setDeep: 'Deep work: um tópico a cada',
+    setDeepN: '{n} min de bloco',
+    setDeepHint: 'Menos trocas de tópico dentro de um bloco (Cal Newport)',
+    setChartsTitle: 'Intervalos padrão dos gráficos',
+    setRangeSr: 'Repetição espaçada (dashboard, previsão)',
+    setRangeCard: 'Gráficos por tópico',
+    setRangeVol: 'Volume de estudo',
+    setRangeTs: 'Simulados',
+    setRangeHeat: 'Histórico do mapa de calor',
+    setDisplayTitle: 'Exibição',
+    setCarousel: 'Carrosséis passam sozinhos',
+    setCarouselHint: 'Prévia do dashboard e “Precisa revisar”, a cada 3 s',
+    setHeatNums: 'Números nos quadrados do mapa de calor',
+    setSyncTitle: 'Sync entre aparelhos',
+    setSyncOpen: 'Gerenciar sync…',
+    setDataTitle: 'Seus dados',
+    setReset: 'Restaurar tudo',
+    setDataNote: 'O Backup JSON e o Salvar HTML nunca incluem seu token de sync.',
+    setDemoTitle: 'Demo',
+    setResetAsk:
+      'Restaurar tudo para o ponto de partida? Seus planos, sessões e ajustes serão substituídos (dá para desfazer logo em seguida).',
+    setResetDone: 'Tudo restaurado',
+  });
+  Object.assign(I18N.ja, {
+    setTitle: '設定',
+    setTestsS: '模試の間隔',
+    setSaved: '設定を保存しました',
+    setDays: '{n}日',
+    setOff: 'オフ',
+    setExamTitle: '試験',
+    setExamDate: '試験日',
+    setLang: '言語',
+    setGoalTitle: '目標と記憶',
+    setGoal: '目標スコア',
+    setGoalHint: '各グラフの目標線と「目標到達の確率」',
+    setReviewAt: '保持率がこの値で復習',
+    setReviewAtHint: '高いほど復習が頻繁',
+    setHalfLife: '模試の半減期',
+    setHalfLifeHint: '古い模試が予測で重みを失う速さ',
+    setIdle: '模試を前倒しするまで',
+    setIdleHint: '学習しなかった日数',
+    setPlanTitle: '提案される日プラン',
+    setEnergy: '既定のエネルギー',
+    setEnergyHint: '今日まだ選んでいないときに使用',
+    setPlansTitle: 'プラン',
+    setGridStart: 'プラン表の開始時刻',
+    setDeep: 'ディープワーク：1トピックあたり',
+    setDeepN: 'ブロック{n}分',
+    setDeepHint: 'ブロック内のトピック切替を減らす（カル・ニューポート）',
+    setChartsTitle: 'グラフの既定期間',
+    setRangeSr: '間隔反復（ダッシュボード・予測）',
+    setRangeCard: 'トピック別グラフ',
+    setRangeVol: '学習量',
+    setRangeTs: '模試',
+    setRangeHeat: 'ヒートマップ履歴',
+    setDisplayTitle: '表示',
+    setCarousel: 'カルーセルを自動で切替',
+    setCarouselHint: 'ダッシュボードのプレビューと「復習が必要」、3秒ごと',
+    setHeatNums: 'ヒートマップに数値を表示',
+    setSyncTitle: '端末間の同期',
+    setSyncOpen: '同期を管理…',
+    setDataTitle: 'データ',
+    setReset: 'すべてリセット',
+    setDataNote: 'バックアップJSONとHTML保存に同期トークンは含まれません。',
+    setDemoTitle: 'デモ',
+    setResetAsk: 'すべてを初期状態に戻しますか？プラン・記録・設定が置き換わります（直後なら元に戻せます）。',
+    setResetDone: 'すべてリセットしました',
+  });
+  Object.assign(I18N.en, {
+    ppNoRoom:
+      "A practice test needs about {m} and today's blocks have no free time that long. Open the plan to make room?",
+    ppAddedToPlan: "Practice test added to today's plan",
+    setPlanNote: 'Used when no daily or weekly plan is active (a saved plan uses its own time blocks).',
+  });
+  Object.assign(I18N.pt, {
+    ppNoRoom:
+      'Um simulado leva cerca de {m} e os blocos de hoje não têm esse tempo livre. Abrir o plano para abrir espaço?',
+    ppAddedToPlan: 'Simulado adicionado ao plano de hoje',
+    setPlanNote:
+      'Usado quando nenhum plano diário ou semanal está ativo (um plano salvo usa os próprios blocos de tempo).',
+  });
+  Object.assign(I18N.ja, {
+    ppNoRoom: '模試には約{m}必要ですが、今日のブロックにその空きがありません。プランを開いて時間を作りますか？',
+    ppAddedToPlan: '模試を今日のプランに追加しました',
+    setPlanNote: '日・週プランが有効でないときに使用（保存したプランは自身の時間ブロックを使用）。',
+  });
+  Object.assign(I18N.en, { pwEnergy: "Today's energy (suggested plan)" });
+  Object.assign(I18N.pt, { pwEnergy: 'Energia de hoje (plano sugerido)' });
+  Object.assign(I18N.ja, { pwEnergy: '今日のエネルギー（提案プラン）' });
+  Object.assign(I18N.en, { kbSyncShort: 'Sync', pwNewShort: '+ New', pwEnergyShort: 'Energy' });
+  Object.assign(I18N.pt, { kbSyncShort: 'Sincronizar', pwNewShort: '+ Novo', pwEnergyShort: 'Energia' });
+  Object.assign(I18N.ja, { kbSyncShort: '同期', pwNewShort: '+ 新規', pwEnergyShort: 'エネルギー' });
   return { I18N };
 })();
 const { I18N } = Translations;
@@ -6822,6 +7518,52 @@ const Util = (() => {
   return { $, pad, iso, parse, todayISO, diffDays, esc, uid, TOTAL };
 })();
 const { $, pad, iso, parse, todayISO, diffDays, esc, uid, TOTAL } = Util;
+
+/* ===== module Modal (js/ui/modal.js) =====
+   public: modal, placeTip
+   Shared pieces for every dialog and tooltip:
+   modal(bg, { close, onClose })  wires a dialog backdrop the same way everywhere: the × button, a click on the
+                                  backdrop and Escape close it (Escape is left to the confirm box when it is open).
+                                  Returns { open(focusSel), close(), isOpen() }.
+   placeTip(tip, e, opts)         puts a floating tooltip next to the pointer, inside the screen
+                                  (above the finger on touch). */
+const Modal = (() => {
+  function modal(bgSel, { close: closeSel, onClose } = {}) {
+    const bg = $(bgSel);
+    const isOpen = () => !bg.hidden;
+    function close() {
+      if (!isOpen()) return;
+      bg.hidden = true;
+      if (onClose) onClose();
+    }
+    function open(focusSel) {
+      bg.hidden = false;
+      const f = focusSel && $(focusSel);
+      if (f) f.focus();
+    }
+    if (closeSel) $(closeSel).addEventListener('click', close);
+    bg.addEventListener('pointerdown', e => {
+      if (e.target === bg) close();
+    });
+    document.addEventListener('keydown', e => {
+      const ask = document.getElementById('askbg');
+      if (e.key === 'Escape' && isOpen() && (!ask || ask.hidden || bg === ask)) close();
+    });
+    return { open, close, isOpen };
+  }
+  function placeTip(tip, e, { gap = 14, touchLift = 40 } = {}) {
+    const r = tip.getBoundingClientRect(),
+      touch = e.pointerType === 'touch';
+    let x = touch ? e.clientX - r.width / 2 : e.clientX + gap,
+      y = e.clientY - r.height - (touch ? touchLift : 12);
+    x = Math.max(8, Math.min(innerWidth - r.width - 8, x));
+    if (y < 8) y = e.clientY + 20;
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  return { modal, placeTip };
+})();
+const { modal, placeTip } = Modal;
 
 /* ===== module PersonalData (js/data/personal.js) =====
    public: REAL_EVENTS, defaultState */
@@ -6873,7 +7615,7 @@ const PersonalData = (() => {
 const { REAL_EVENTS, defaultState } = PersonalData;
 
 /* ===== module AppState (js/core/state.js) =====
-   public: normalize, local, t, tf, label, fmt, save, toast, commit
+   public: normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs
    shared state (getter/setter): embedded, state, loadedFromFile, lang, shown, sel, mKind, prevIds */
 const AppState = (() => {
   function normalize(o) {
@@ -6929,6 +7671,7 @@ const AppState = (() => {
                 Number.isFinite(+o.settings.reviewMin) && o.settings.reviewMin !== '' && o.settings.reviewMin != null
                   ? +o.settings.reviewMin
                   : DEF_SET0.reviewMin,
+              ...normPrefs(o.settings),
             }
           : { ...DEF_SET0 },
       tests: Array.isArray(o.tests)
@@ -6958,6 +7701,39 @@ const AppState = (() => {
           : {},
       updatedAt: +o.updatedAt || 0,
     };
+  }
+  /* the Settings values (PREF_DEF); only allowed values are kept, anything else falls back to the default */
+  const PREF_OK = {
+    goal: v => [80, 85, 90].includes(v),
+    reviewAt: v => [0.8, 0.85, 0.9, 0.95].includes(v),
+    halfLife: v => [7, 10, 14, 21].includes(v),
+    idleDays: v => [2, 3, 4, 5].includes(v),
+    energy: v => ['low', 'medium', 'high'].includes(v),
+    carousel: v => typeof v === 'boolean',
+    heatNums: v => typeof v === 'boolean',
+    gridStart: v => [5, 6, 7, 8, 9].includes(v),
+    deepMin: v => [0, 30, 45, 60, 90].includes(v),
+  };
+  const RANGE_OK = {
+    sr: ['3d', '7d', '2w', '1m', '3m', '6m', '1y', 'all'],
+    card: ['3d', '7d', '2w', '1m', '3m', '6m', '1y', 'all'],
+    vol: ['3d', '7d', '2w', '1m', '3m', '6m', '1y', 'all'],
+    ts: ['3d', '7d', '2w', '1m', '3m', '6m', '1y', 'all'],
+    heat: ['2w', '1m', '3m', '6m', '1y'],
+  };
+  function normPrefs(o) {
+    const out = {};
+    Object.keys(PREF_OK).forEach(k => {
+      if (o && o[k] != null && PREF_OK[k](o[k])) out[k] = o[k];
+    });
+    if (o && o.ranges && typeof o.ranges === 'object') {
+      const r = {};
+      Object.keys(RANGE_OK).forEach(k => {
+        if (RANGE_OK[k].includes(o.ranges[k])) r[k] = o.ranges[k];
+      });
+      if (Object.keys(r).length) out.ranges = r;
+    }
+    return out;
   }
   /* a saved study plan (see Schedule); anything malformed is dropped */
   function normPlan(p) {
@@ -7049,7 +7825,21 @@ const AppState = (() => {
     sel = -1,
     mKind = 'study';
 
-  const t = k => (I18N[lang] || I18N.en)[k] ?? I18N.en[k];
+  /* a Settings value, or its default */
+  const pref = k => {
+    const s = state && state.settings;
+    return s && s[k] != null ? s[k] : PREF_DEF[k];
+  };
+  /* labels can carry live values: {G} goal %, {GN} right answers needed for it, {RV} review threshold % */
+  const t = k => {
+    const v = (I18N[lang] || I18N.en)[k] ?? I18N.en[k];
+    return typeof v === 'string'
+      ? v
+          .replace(/\{G\}/g, GOAL)
+          .replace(/\{GN\}/g, GOAL_N)
+          .replace(/\{RV\}/g, Math.round(pref('reviewAt') * 100))
+      : v;
+  };
   const tf = (k, n) => t(k).replace('{n}', n);
   const label = s => t('labels')[STATUS.indexOf(s)];
   const fmt = (n, d = 0) =>
@@ -7153,9 +7943,9 @@ const AppState = (() => {
       },
     ],
   });
-  return { normalize, local, t, tf, label, fmt, save, toast, commit };
+  return { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs };
 })();
-const { normalize, local, t, tf, label, fmt, save, toast, commit } = AppState;
+const { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs } = AppState;
 
 /* ===== module Dashboard (js/views/dashboard.js) =====
    public: counts, streakInfo, renderCalendar, fitTags, renderSide, renderBoard, phoneMQ, laneInView, goLane, renderDash, render, moveCard, lanesEl
@@ -7169,11 +7959,6 @@ const Dashboard = (() => {
       el.title = t(el.dataset.tt);
       el.setAttribute('aria-label', t(el.dataset.tt));
     });
-    if (matchMedia('(max-width:640px)').matches) {
-      $('#backup').textContent = t('backupShort');
-      $('#clearDemo').textContent = t('clearShort');
-      $('#saveHtml').textContent = t('saveShort');
-    }
     document.querySelectorAll('.flag').forEach(b => {
       const on = b.dataset.lang === lang;
       b.classList.toggle('on', on);
@@ -7650,7 +8435,8 @@ const SpacedRepetition = (() => {
      p ≥ 70  →  S ← S · (1 + 1.2 · p/100 · (1.5 − R))
      60–69   →  S ← S · 1.2
      p < 60  →  S ← max(1, 0.4 · S)
-   next review = last session + S days (the moment R reaches 90 %)
+   next review = when recall falls to the review threshold r (Settings, default 90 %):
+                 last session + 9·S·(1/r − 1) days  (r = 90 % gives exactly S days)
    priority = (1 − R_now + 0.05 · min(days overdue, 10)) · √questions · list weight · (1 + max(0, 85 − score)/100)
 */
   const SR_LISTS = ['Very Comfortable', 'Not Comfortable', 'To review'];
@@ -7702,7 +8488,7 @@ const SpacedRepetition = (() => {
     if (reps.length) {
       const l = reps[reps.length - 1],
         tn = diffDays(l.date, today),
-        iv = Math.max(1, Math.round(l.S));
+        iv = Math.max(1, Math.round(9 * l.S * (1 / pref('reviewAt') - 1)));
       Object.assign(m, { R: recall(tn, l.S), S: l.S, last: l.date, p: l.p, next: addDays(l.date, iv), over: tn - iv });
     }
     const w = LISTW[state.statuses[i]] || 0.8,
@@ -7732,7 +8518,8 @@ const SpacedRepetition = (() => {
 const { recall, addDays, isTracked, srModel, srAll, scoreAt } = SpacedRepetition;
 
 /* ===== module Forecast (js/model/forecast.js) =====
-   public: EXAM_Q, PASS_N, GOAL_N, betaBinomTail, binomTail, pRight, forecastMu, forecast */
+   live value (getter): GOAL_N = right answers needed for your goal (85% → 51 of 60)
+   public: EXAM_Q, PASS_N, betaBinomTail, binomTail, pRight, forecastMu, forecast */
 const Forecast = (() => {
   /* ================= EXAM FORECAST (mechanical) =================
    p_i  = chance of answering a question of topic i right
@@ -7744,7 +8531,8 @@ const Forecast = (() => {
    The chances use a beta-binomial: μ itself is uncertain by ±sd points (the model's error against your practice tests).                                   */
   const EXAM_Q = 60,
     PASS_N = 42,
-    GOAL_N = 51;
+    _goalN = () => Math.ceil((EXAM_Q * GOAL) / 100 - 1e-9);
+  expose({ GOAL_N: [_goalN, () => {}] });
   /* log-gamma (Lanczos) and the beta-binomial tail: P(X ≥ k) when the chance per question is itself uncertain
    (mean mu, standard deviation sdpp percentage points). With no uncertainty it is the plain binomial. */
   function lgamma(x) {
@@ -7834,9 +8622,9 @@ const Forecast = (() => {
       sd = modelSD();
     return { ...f, sd, pass: betaBinomTail(EXAM_Q, f.mu, sd, PASS_N), goal: betaBinomTail(EXAM_Q, f.mu, sd, GOAL_N) };
   }
-  return { EXAM_Q, PASS_N, GOAL_N, betaBinomTail, binomTail, pRight, forecastMu, forecast };
+  return { EXAM_Q, PASS_N, betaBinomTail, binomTail, pRight, forecastMu, forecast };
 })();
-const { EXAM_Q, PASS_N, GOAL_N, betaBinomTail, binomTail, pRight, forecastMu, forecast } = Forecast;
+const { EXAM_Q, PASS_N, betaBinomTail, binomTail, pRight, forecastMu, forecast } = Forecast;
 
 /* ===== module PracticeTestModel (js/model/practice-tests.js) =====
    public: TEST_Q, scoredTests, testsSD, blended, linReg, testTrend, calibration, testWhy
@@ -7844,7 +8632,7 @@ const { EXAM_Q, PASS_N, GOAL_N, betaBinomTail, binomTail, pRight, forecastMu, fo
 const PracticeTestModel = (() => {
   /* ===== practice tests: blended score, regression, calibration, cadence =====
    blended score = (1 − w) × question-bank model + w × age-weighted average of the last 3 scored practice tests
-                   test weight 0.5^(age/10 days),  W = sum of the weights,  w = W / (W + 2)
+                   test weight 0.5^(age / half-life), half-life from Settings (default 10 days),  W = sum of the weights,  w = W / (W + 2)
    pass / 85% chances: beta-binomial around the blended score (model error and test spread combined).
    trend         = least-squares line  score = a + b × day   (R² = 1 − SSres / SStot), shown from 4 scored tests
                    after the last test the projection slows: extra = b × 14 × (1 − e^(−days/14))
@@ -7857,7 +8645,6 @@ const PracticeTestModel = (() => {
       .slice()
       .sort((a, b) => a.date.localeCompare(b.date));
   }
-  const HALF_LIFE = 10;
   const stdev = v => {
     const n = v.length;
     if (n < 2) return 0;
@@ -7878,7 +8665,7 @@ const PracticeTestModel = (() => {
       n = last.length;
     if (!n) return { ...f, model: f.mu, testsAvg: null, n: 0, w: 0, W: 0 };
     /* each of the last 3 tests weighs 0.5^(age in days / 10): yesterday ≈ 0.93, three weeks ago ≈ 0.23 */
-    const om = last.map(x => Math.pow(0.5, Math.max(0, diffDays(x.date, asOf)) / HALF_LIFE)),
+    const om = last.map(x => Math.pow(0.5, Math.max(0, diffDays(x.date, asOf)) / pref('halfLife'))),
       W = om.reduce((a, x) => a + x, 0);
     const avg = last.reduce((a, x, k) => a + om[k] * x.score, 0) / W / 100,
       w = W / (W + 2),
@@ -7997,7 +8784,7 @@ const PracticeTestModel = (() => {
       nDue = ms.filter(m => m.reps.length && m.over >= 0).length;
     let reason = null;
     if (!last || since >= ev) reason = ev < every ? 'testFinal' : 'test';
-    else if (idle >= 3 && since >= 2) reason = 'testIdle';
+    else if (idle >= pref('idleDays') && since >= 2) reason = 'testIdle';
     else if (((avgR != null && avgR < 0.75) || nDue >= 5) && since >= 2) reason = 'testRecall';
     return {
       due: !!reason,
@@ -8023,14 +8810,16 @@ const { TEST_Q, scoredTests, testsSD, blended, linReg, testTrend, calibration, t
 /* ===== module ForecastView (js/views/forecast.js) =====
    public: fcCls, renderFcMini, renderForecast */
 const ForecastView = (() => {
-  const fcCls = v => (v >= 0.85 ? 'good' : v >= 0.7 ? 'mid' : 'bad');
+  const fcCls = v => (v >= GOAL / 100 ? 'good' : v >= 0.7 ? 'mid' : 'bad');
   function renderFcMini() {
     const f = blended();
     const b = $('#fcMiniBar');
     if (!b) return;
     $('#fcMiniVal').textContent = Math.round(f.mu * 100) + '%';
     b.style.width = Math.round(f.mu * 100) + '%';
-    b.style.background = f.mu >= 0.85 ? COLORS[3] : f.mu >= 0.7 ? COLORS[2] : '#ff6b5e';
+    b.style.background = f.mu >= GOAL / 100 ? COLORS[3] : f.mu >= 0.7 ? COLORS[2] : '#ff6b5e';
+    const goalMark = document.querySelector('#fcMini .m85');
+    if (goalMark) goalMark.style.left = GOAL + '%';
     $('#fcMiniSub').innerHTML = t('fcMiniSub')
       .replace('{p}', `<b>${Math.round(f.pass * 100)}%</b>`)
       .replace('{g}', `<b>${Math.round(f.goal * 100)}%</b>`);
@@ -8070,7 +8859,7 @@ const ForecastView = (() => {
       v =>
         (g += `<line class="cg" x1="${L}" x2="${w - R}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="cy" x="${L - 5}" y="${f(Y(v) + 3.5)}" text-anchor="end">${Math.round(v * 100)}%</text>`)
     );
-    g += `<line class="c70" x1="${L}" x2="${w - R}" y1="${f(Y(0.7))}" y2="${f(Y(0.7))}"/><line class="c85" x1="${L}" x2="${w - R}" y1="${f(Y(0.85))}" y2="${f(Y(0.85))}"/>`;
+    g += `<line class="c70" x1="${L}" x2="${w - R}" y1="${f(Y(0.7))}" y2="${f(Y(0.7))}"/><line class="c85" x1="${L}" x2="${w - R}" y1="${f(Y(GOAL / 100))}" y2="${f(Y(GOAL / 100))}"/>`;
     const df = new Intl.DateTimeFormat(LOCALE[lang], { month: 'short', day: 'numeric' }),
       stp = x1 <= 10 ? 1 : x1 <= 24 ? 3 : x1 <= 60 ? 7 : x1 <= 130 ? 14 : 30;
     let lx = -99;
@@ -8340,7 +9129,7 @@ const PlanModel = (() => {
   /* today's plan choices (energy mode, a test you added) live in the synced state, so phone and desktop agree */
   const planDay = () => {
     const p = state.plan;
-    return p && p.date === todayISO() ? p : { date: todayISO(), energy: 'medium', test: false };
+    return p && p.date === todayISO() ? p : { date: todayISO(), energy: pref('energy'), test: false };
   };
   let energyMode = planDay().energy;
   function setEnergy(m) {
@@ -8369,9 +9158,10 @@ const PlanModel = (() => {
 const { settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName } = PlanModel;
 
 /* ===== module Schedule (js/model/schedule.js) =====
-   public: SLOT, DAY_START, DAY_END, mondayOf, planDays, planTotal, rangesTotal, normRanges, activeFor, todayPlan,
+   live value (getter): DAY_START (first hour of the plan grid, from Settings)
+   public: SLOT, DAY_END, mondayOf, planDays, planTotal, rangesTotal, normRanges, activeFor, todayPlan,
            itemDone, itemMissed, missedTopics, suggestDays, packDay, perQ, conflictsFor, weeklyUnder, clockOf,
-           knapsack, toggleCheck
+           knapsack, toggleCheck, seedDemoPlan, testMinutes
    Saved study plans (state.plans) and the scheduler that fills selected time blocks with topics.
 
    A plan: { id, type: 'daily' | 'weekly', name, start (the date, or the Monday of the week), active,
@@ -8391,7 +9181,7 @@ const { settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, pl
      2. each continuous block is a knapsack: pick the chunks that protect the most exam-day questions
         (n × (1 − p on exam day) × urgency) within the block's minutes (dynamic programming, 1-minute steps); any
         time left is filled with part of the best remaining topic (at least 5 questions).
-        Deep work (Cal Newport): few context switches, so a block holds at most one topic per ~45 minutes; the
+        Deep work (Cal Newport): few context switches, so a block holds at most one topic per ~45 minutes (Settings); the
         topics kept grow into the freed time (up to the topic's question count).
      3. inside a block the hardest work goes first, while you are fresh: practice test, then
         (1 − p now) × difficulty, plus a boost for overdue reviews and for topics not seen in a long time.
@@ -8399,11 +9189,9 @@ const { settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, pl
         so a topic reviewed on Monday is not due again on Tuesday. A topic appears at most once per day. */
 const Schedule = (() => {
   const SLOT = 15,
-    DAY_START = 6 * 60,
     DAY_END = 24 * 60,
     MIN_CHUNK_Q = 5,
     MISSED_BOOST = 1.25,
-    DEEP_MIN = 45,
     URGENCY = { due: 1.3, weak: 1.15, nodata: 1.1, new: 1, light: 0.8, test: 1.4, testDue: 1.4, custom: 1 };
 
   const plans = () => state.plans || (state.plans = []);
@@ -8556,7 +9344,8 @@ const Schedule = (() => {
       const cap = e - s;
       let pick = knapsack(cands, cap);
       /* deep work: few topic switches — at most one topic per ~45 min; the kept topics grow into the freed time */
-      const maxTopics = Math.max(1, Math.round(cap / DEEP_MIN));
+      const deep = pref('deepMin'),
+        maxTopics = deep ? Math.max(1, Math.round(cap / deep)) : Infinity;
       if (pick.length > maxTopics) {
         pick = pick.sort((a, b) => b.value - a.value).slice(0, maxTopics);
         let left = cap - pick.reduce((a, c) => a + Math.ceil(c.n * c.per), 0);
@@ -8629,6 +9418,11 @@ const Schedule = (() => {
     return out;
   }
 
+  /* minutes a practice test takes: answering 60 questions (×1.1) plus reviewing the expected misses */
+  function testMinutes() {
+    const st = settings();
+    return Math.round(TEST_Q * (60 / st.qph) * 1.1 + TEST_Q * (1 - blended().mu) * st.reviewMin);
+  }
   /* demo only: an example weekly plan for next week (evenings 19:30–21:00 on weekdays — Newport's deep-work block —,
      Saturday morning with room for a practice test, Sunday weekly review), created once. It starts next week so
      today's list still shows the suggestion and the energy choice; the week view's › shows the example. */
@@ -8724,9 +9518,10 @@ const Schedule = (() => {
       ? plans().find(p => p.active && p.type === 'weekly' && plan.start >= p.start && plan.start <= addDays(p.start, 6))
       : null;
 
+  /* the plan grid starts at the hour chosen in Settings (default 6:00) */
+  expose({ DAY_START: [() => pref('gridStart') * 60, () => {}] });
   return {
     SLOT,
-    DAY_START,
     DAY_END,
     mondayOf,
     planDays,
@@ -8747,11 +9542,11 @@ const Schedule = (() => {
     knapsack,
     toggleCheck,
     seedDemoPlan,
+    testMinutes,
   };
 })();
 const {
   SLOT,
-  DAY_START,
   DAY_END,
   mondayOf,
   planDays,
@@ -8772,10 +9567,11 @@ const {
   knapsack,
   toggleCheck,
   seedDemoPlan,
+  testMinutes,
 } = Schedule;
 
 /* ===== module PlanView (js/views/plan.js) =====
-   public: renderPlanMini, renderPlanPage, manualTest, setManualTest, draftSettings */
+   public: renderPlanMini, renderPlanPage, renderPlanPt, manualTest, setManualTest */
 const PlanView = (() => {
   /* totals of today's list, whatever drives it (a saved plan or the suggestion) */
   function todayList() {
@@ -8821,44 +9617,22 @@ const PlanView = (() => {
           .join('')
       : `<div class="muted">${esc(t(fromPlan ? 'planRestDay' : 'allClear'))}</div>`;
   }
+  /* the Plan tab: the week view, and today's energy when today comes from the suggestion */
   function renderPlanPage() {
-    renderPlanPt();
     renderPlanWeek();
-    const P = todayList(),
-      fromPlan = P.source !== 'suggested',
-      st = settings(),
-      df = new Intl.DateTimeFormat(LOCALE[lang], { weekday: 'long', day: 'numeric', month: 'long' });
+    const fromPlan = todayPlan().source !== 'suggested';
+    $('#pwEnergy').hidden = fromPlan;
+    if (fromPlan) return;
+    $('#energySel').innerHTML = ['low', 'medium', 'high']
+      .map(m => `<option value="${m}"${m === energyMode ? ' selected' : ''}>${esc(t('en_' + m))}</option>`)
+      .join('');
     $('#energyPick').innerHTML = ['low', 'medium', 'high']
       .map(m => {
-        const Q = buildPlan(null, null, m);
-        return `<button type="button" role="tab" data-energy="${m}" class="${m === energyMode ? 'on' : ''}" aria-selected="${m === energyMode}"><span class="en">${['low', 'medium', 'high'].indexOf(m) === 0 ? '🔋' : m === 'medium' ? '⚡' : '🚀'} ${esc(t('en_' + m))}</span><span class="es">${Q.total} q · ${fmtMin(Q.minutes)}</span><span class="ew"><i style="width:${Q.workload * 10}%"></i></span><span class="es">${esc(t('workload'))} ${Q.workload}/10</span></button>`;
+        const Q = buildPlan(null, null, m),
+          icon = { low: '🔋', medium: '⚡', high: '🚀' }[m];
+        return `<button type="button" role="tab" data-energy="${m}" class="${m === energyMode ? 'on' : ''}" aria-selected="${m === energyMode}" title="${esc(t('workload'))} ${Q.workload}/10"><span class="en">${icon} ${esc(t('en_' + m))}</span><span class="es">${Q.total} q · ${fmtMin(Q.minutes)}</span></button>`;
       })
       .join('');
-    $('#energyPick').hidden = fromPlan;
-    $('#planSub').textContent =
-      df.format(parse(todayISO())) +
-      (fromPlan
-        ? ' · ' +
-          t('pwFrom')
-            .replace('{s}', t(P.source === 'daily' ? 'srcDaily' : 'srcWeekly'))
-            .replace('{n}', planLabel(P.plan).name)
-        : ' · ' + t('pwFromSuggested')) +
-      (P.final ? ' · ' + t('planFinal') : '');
-    $('#planKpis').innerHTML =
-      `<div><b>${fmtMin(P.minutes)}</b><span>${esc(t('planMinOf').replace('{b}', fmtMin(P.budget)))}</span></div><div><b>${P.total}</b><span>${esc(t('planQToday'))}</span></div><div><b>${P.done}</b><span>${esc(t('planDone'))}</span></div><div><b>${P.pace}</b><span>${esc(t('planPace'))}</span></div><div><b>${P.daysLeft}</b><span>${esc(t('toGo'))}</span></div>`;
-    $('#planList').innerHTML = P.items.length
-      ? P.items
-          .map(
-            it =>
-              `<div class="pitem2${it.done ? ' done' : ''}${it.done || it.date == null || !itemMissed(it) ? '' : ' missed'}" ${rowAttr(it)}>${checkBtn(it)}<span class="pn">${it.start != null ? `<small class="qtime">${clockOf(it.start)}–${clockOf(it.start + it.min)}</small>` : ''}${esc(rowName(it))}<small>${esc(t('reason_' + it.reason))}${it.diff > 1.05 ? ' · ' + esc(t(it.diff >= 2 ? 'diffCalc' : it.diff >= 1.5 ? 'diffNav' : 'diffChart')) : ''}${it.p != null && it.kind === 'topic' ? ' · ' + esc(t('planChance').replace('{p}', Math.round(it.p * 100))) : ''}${it.stake ? ' · ' + esc(t('planStake').replace('{x}', it.stake.toFixed(1))) : ''}</small></span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span><span class="pq">${it.n ? it.n + ' q' : ''}<small>${it.min ? '~' + fmtMin(it.min) : ''}</small></span></div>`
-          )
-          .join('')
-      : `<div class="muted">${esc(t(fromPlan ? 'planRestDay' : 'allClear'))}</div>`;
-    ['minutes', 'qph', 'testEvery', 'reviewMin'].forEach(k => {
-      const el = $('#' + SET_ID[k]);
-      if (document.activeElement !== el) el.value = st[k];
-    });
-    updateDraft();
   }
   /* a practice test the user added to today's plan by hand (per device, per day) */
   const manualTest = d => (d || todayISO()) === todayISO() && !!planDay().test;
@@ -8873,8 +9647,10 @@ const PlanView = (() => {
       k = testKpis(),
       df = new Intl.DateTimeFormat(LOCALE[lang], { month: 'short', day: 'numeric' }),
       last = scoredTests().at(-1);
-    const inPlan = buildPlan(null, null, energyMode).items.some(x => x.kind === 'test'),
-      man = manualTest();
+    const T = todayPlan(),
+      fromPlan = T.source !== 'suggested',
+      inPlan = T.items.some(x => x.kind === 'test'),
+      man = !fromPlan && manualTest();
     const parts = [
       !w.every
         ? t('tsOff')
@@ -8893,32 +9669,50 @@ const PlanView = (() => {
     b.textContent = t(man ? 'ppRemove' : inPlan ? 'ppInPlan' : 'ppAdd');
     b.disabled = inPlan && !man;
   }
-  $('#ppAdd').onclick = () => setManualTest(!manualTest());
-  $('#ppLog').onclick = () => openPt();
-  function startPlanItem(el) {
-    if (!el) return;
-    if (el.dataset.cid) {
-      toggleCheck(el.dataset.cid);
+  /* with a saved plan driving today, the test goes into that plan: the first free time in today's blocks that fits it;
+     no room → offer to open the plan and make some */
+  async function addTestToPlan(plan) {
+    const today = todayISO(),
+      need = testMinutes(),
+      items = (plan.items || []).filter(it => it.date === today);
+    const slot = ((plan.blocks || {})[today] || [])
+      .map(([s, e]) => {
+        const end = items
+          .filter(it => it.start >= s && it.start < e)
+          .reduce((a, it) => Math.max(a, it.start + it.min), s);
+        return { start: end, free: e - end };
+      })
+      .find(x => x.free >= need);
+    if (!slot) {
+      if (await ask(t('ppNoRoom').replace('{m}', fmtMin(need)), t('pwEdit'))) openWizard({ mode: 'edit', plan });
       return;
     }
-    if (el.dataset.pt) {
-      openPt();
-      return;
-    }
-    const i = +el.dataset.q;
-    openModal(i, srModel(i).reps.length ? 'review' : 'study');
+    commit(() => {
+      const p = state.plans.find(x => x.id === plan.id);
+      p.items.push({
+        id: uid(),
+        date: today,
+        start: slot.start,
+        min: need,
+        kind: 'test',
+        i: null,
+        n: TEST_Q,
+        reason: 'test',
+        custom: true,
+      });
+      p.updated = Date.now();
+    }, t('ppAddedToPlan'));
   }
+  $('#ppAdd').onclick = () => {
+    const T = todayPlan();
+    if (T.source === 'suggested') setManualTest(!manualTest());
+    else addTestToPlan(T.plan);
+  };
+  $('#ppLog').onclick = () => openPt();
+  $('#energySel').addEventListener('change', e => setEnergy(e.target.value));
   $('#energyPick').addEventListener('click', e => {
     const b = e.target.closest('[data-energy]');
-    if (!b) return;
-    const l = $('#planList');
-    l.classList.add('loading');
-    setTimeout(() => {
-      setEnergy(b.dataset.energy);
-      l.classList.remove('loading');
-      void l.offsetWidth;
-      l.classList.add('fresh');
-    }, 250);
+    if (b) setEnergy(b.dataset.energy);
   });
   /* the circle marks a saved plan's item done by hand; the row opens the log dialog */
   function onCheck(e) {
@@ -8928,9 +9722,6 @@ const PlanView = (() => {
     toggleCheck(c.dataset.chk);
     return true;
   }
-  $('#planList').addEventListener('click', e => {
-    if (!onCheck(e)) startPlanItem(e.target.closest('[data-q],[data-pt],[data-cid]'));
-  });
   $('#sugg').addEventListener('click', e => onCheck(e), true);
   $('#openPlan').onclick = () => goView('plan');
   function openFcTop() {
@@ -8950,86 +9741,18 @@ const PlanView = (() => {
           `<div class="lostrow" data-q="${x.i}"><span class="n">${esc(TOPICS[x.i].name)}</span><span class="bar"><i style="width:${(x.lost / mx) * 100}%"></i></span><span class="v">−${x.lost.toFixed(1)} q</span><span class="pp">${x.known ? Math.round(x.p * 100) + '%' : '?'}</span></div>`
       )
       .join('');
-    $('#fcTopBg').hidden = false;
-    $('#fcTopFull').focus();
+    fcTopDialog.open('#fcTopFull');
   }
-  const closeFcTop = () => {
-    $('#fcTopBg').hidden = true;
-  };
+  const fcTopDialog = modal('#fcTopBg', { close: '#fcTopClose' }),
+    closeFcTop = fcTopDialog.close;
   $('#fcMini').onclick = openFcTop;
-  $('#fcTopClose').onclick = closeFcTop;
-  $('#fcTopBg').addEventListener('pointerdown', e => {
-    if (e.target.id === 'fcTopBg') closeFcTop();
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !$('#fcTopBg').hidden) closeFcTop();
-  });
   $('#fcTopFull').onclick = () => {
     closeFcTop();
     goView('sr', 'fc');
   };
-  const SET_LIM = { minutes: [15, 600], qph: [5, 200], testEvery: [0, 14], reviewMin: [0, 10] };
-  const SET_ID = { minutes: 'setMinutes', qph: 'setQph', testEvery: 'setTests', reviewMin: 'setReviewMin' };
-  function draftSettings() {
-    const d = { ...settings() };
-    ['minutes', 'qph', 'testEvery', 'reviewMin'].forEach(k => {
-      const el = $('#' + SET_ID[k]);
-      const raw = +el.value,
-        v = k === 'reviewMin' ? Math.round(raw * 2) / 2 : Math.round(raw);
-      if (el.value !== '' && isFinite(v)) d[k] = Math.max(SET_LIM[k][0], Math.min(SET_LIM[k][1], v));
-    });
-    return d;
-  }
-  function updateDraft() {
-    const d = draftSettings(),
-      P = buildPlan(null, d, energyMode),
-      ch = JSON.stringify(d) !== JSON.stringify(settings());
-    $('#planCap').textContent = t(ch ? 'planCapNew' : 'planCapTxt')
-      .replace('{c}', P.total)
-      .replace('{m}', fmtMin(d.minutes));
-    $('#planCap').classList.toggle('changed', ch);
-  }
-  ['Minutes', 'Qph', 'Tests', 'ReviewMin'].forEach(k => {
-    const el = $('#set' + k);
-    el.addEventListener('input', updateDraft);
-    el.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        calcPlan();
-      }
-    });
-  });
-  let calcBusy = false;
-  function calcPlan() {
-    if (calcBusy) return;
-    calcBusy = true;
-    const d = draftSettings(),
-      btn = $('#planCalc'),
-      list = $('#planList');
-    btn.disabled = true;
-    btn.querySelector('.spin').hidden = false;
-    list.classList.add('loading');
-    list.classList.remove('fresh');
-    setTimeout(() => {
-      const changed = JSON.stringify(d) !== JSON.stringify(settings());
-      if (changed)
-        commit(() => {
-          state.settings = d;
-        }, t('planUpdated'));
-      else renderPlanPage();
-      list.classList.remove('loading');
-      void list.offsetWidth;
-      list.classList.add('fresh');
-      btn.disabled = false;
-      btn.querySelector('.spin').hidden = true;
-      calcBusy = false;
-      $('#viewPlan').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 450);
-  }
-  $('#planCalc').onclick = calcPlan;
-  return { renderPlanMini, renderPlanPage, manualTest, setManualTest, draftSettings };
+  return { renderPlanMini, renderPlanPage, renderPlanPt, manualTest, setManualTest };
 })();
-const { renderPlanMini, renderPlanPage, manualTest, setManualTest, draftSettings } = PlanView;
+const { renderPlanMini, renderPlanPage, renderPlanPt, manualTest, setManualTest } = PlanView;
 
 /* ===== module Charts (js/ui/charts.js) =====
    public: dueText, pct, wavg, hv, SRDAYS, setSrRange, paintSrRange, topicChart, avgChart, legendHTML
@@ -9083,7 +9806,7 @@ const Charts = (() => {
       v =>
         (g += `<line class="cg" x1="${L}" x2="${w - R}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="cy" x="${L - 5}" y="${f(Y(v) + 3.5)}" text-anchor="end">${Math.round(v * 100)}%</text>`)
     );
-    g += `<line class="cth" x1="${L}" x2="${w - R}" y1="${f(Y(0.9))}" y2="${f(Y(0.9))}"/>`;
+    g += `<line class="cth" x1="${L}" x2="${w - R}" y1="${f(Y(pref('reviewAt')))}" y2="${f(Y(pref('reviewAt')))}"/>`;
     let lastLx = -99;
     ticks.forEach(tk => {
       const x = X(tk.x);
@@ -9309,6 +10032,7 @@ const PreviewCarousel = (() => {
   }
   function carTick() {
     if (
+      !pref('carousel') ||
       carHold ||
       preview != null ||
       pinned != null ||
@@ -9680,7 +10404,7 @@ const StatsCarousel = (() => {
   }
 
   function turn() {
-    if (holding || !isVisible()) return;
+    if (!pref('carousel') || holding || !isVisible()) return;
     const { list } = topics();
     if (list.length < 2) return;
     current = list[(Math.max(0, list.indexOf(current)) + 1) % list.length];
@@ -10034,12 +10758,10 @@ const Dialogs = (() => {
     $('#ptDate').value = x ? x.date : todayISO();
     $('#ptDesc').textContent = t('ptDesc');
     renderPtHist();
-    $('#ptbg').hidden = false;
-    $('#ptScore').focus();
+    ptDialog.open('#ptScore');
   }
-  const closePt = () => {
-    $('#ptbg').hidden = true;
-  };
+  const ptDialog = modal('#ptbg', { close: '#ptClose' }),
+    closePt = ptDialog.close;
   $('#ptStat').onclick = () => openPt();
   $('#ptStat').onkeydown = e => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -10047,13 +10769,7 @@ const Dialogs = (() => {
       openPt();
     }
   };
-  $('#ptClose').onclick = $('#ptCancel').onclick = closePt;
-  $('#ptbg').addEventListener('pointerdown', e => {
-    if (e.target.id === 'ptbg') closePt();
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !$('#ptbg').hidden) closePt();
-  });
+  $('#ptCancel').onclick = closePt;
   $('#ptSave').onclick = () => {
     const d = $('#ptDate').value;
     if (!d) return;
@@ -10137,22 +10853,12 @@ const Dialogs = (() => {
         )
       ) +
       (ev.length || tests.length ? '' : `<p class="muted" style="margin:16px 0 4px">${esc(t('dayNone'))}</p>`);
-    $('#daybg').hidden = false;
-    $('#dayClose').focus();
+    dayDialog.open('#dayClose');
   }
-  const closeDay = () => {
-    $('#daybg').hidden = true;
-  };
+  const dayDialog = modal('#daybg', { close: '#dayClose' });
   $('#calgrid').addEventListener('click', e => {
     const d = e.target.closest('.day[data-date]');
     if (d) openDay(d.dataset.date);
-  });
-  $('#dayClose').onclick = closeDay;
-  $('#daybg').addEventListener('pointerdown', e => {
-    if (e.target.id === 'daybg') closeDay();
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !$('#daybg').hidden) closeDay();
   });
   return { openModal, closeModal, openPt };
 })();
@@ -10340,24 +11046,14 @@ const VolumeView = (() => {
   function renderVolPanel() {
     if ($('#volPanel') && $('#volPanel').offsetParent) paintBig(BIG_VIEWS.page);
   }
+  const volDialog = modal('#volbg', { close: '#volClose' });
   function openVol() {
-    $('#volbg').hidden = false;
+    volDialog.open('#volClose');
     renderVolBig();
-    $('#volClose').focus();
   }
-  const closeVol = () => {
-    $('#volbg').hidden = true;
-  };
   $('#volOpen').addEventListener('click', e => {
     e.stopPropagation();
     openVol();
-  });
-  $('#volClose').onclick = closeVol;
-  $('#volbg').addEventListener('pointerdown', e => {
-    if (e.target.id === 'volbg') closeVol();
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !$('#volbg').hidden) closeVol();
   });
   const pickRange = e => {
     const b = e.target.closest('button');
@@ -10390,7 +11086,7 @@ const { weekStart, weeklyVolume, rangeSeries, renderVolume, renderVolPanel } = V
    shared state (getter/setter): statMode */
 const PracticeTestsView = (() => {
   /* ===== practice tests UI ===== */
-  const scCol = v => (v == null ? '#8590a2' : v >= 85 ? COLORS[3] : v >= 70 ? COLORS[2] : '#ff6b5e');
+  const scCol = v => (v == null ? '#8590a2' : v >= GOAL ? COLORS[3] : v >= 70 ? COLORS[2] : '#ff6b5e');
   let tsClipN = 0;
   function tsSVG(w, h, big) {
     const tr = testTrend(),
@@ -10438,7 +11134,7 @@ const PracticeTestsView = (() => {
       if (xE <= x1)
         g += `<line class="cexam" x1="${f(X(xE))}" x2="${f(X(xE))}" y1="${T}" y2="${T + ph}"/><text class="cx" x="${f(X(xE) - 3)}" y="${T - 3}" text-anchor="end" style="fill:var(--exam)">${esc(t('examShort'))}</text>`;
     }
-    g += `<line class="c70" x1="${L}" x2="${w - R}" y1="${f(Y(70))}" y2="${f(Y(70))}"/><line class="c85" x1="${L}" x2="${w - R}" y1="${f(Y(85))}" y2="${f(Y(85))}"/>`;
+    g += `<line class="c70" x1="${L}" x2="${w - R}" y1="${f(Y(70))}" y2="${f(Y(70))}"/><line class="c85" x1="${L}" x2="${w - R}" y1="${f(Y(GOAL))}" y2="${f(Y(GOAL))}"/>`;
     if (tr.reg && big) {
       const r = tr.reg,
         xa = pts[0][0],
@@ -10508,7 +11204,7 @@ const PracticeTestsView = (() => {
       best: sc.length ? Math.max(...sc.map(x => x.score)) : null,
       avg3: l3.length ? Math.round(l3.reduce((a, x) => a + x.score, 0) / l3.length) : null,
       n70: sc.filter(x => x.score >= 70).length,
-      n85: sc.filter(x => x.score >= 85).length,
+      n85: sc.filter(x => x.score >= GOAL).length,
       n: sc.length,
     };
   }
@@ -10545,7 +11241,7 @@ const PracticeTestsView = (() => {
     ]
       .map(
         ([l, v, c]) =>
-          `<div><b class="${c == null ? '' : c >= 85 ? 'good' : c >= 70 ? 'mid' : 'bad'}">${v}</b><span>${esc(t(l))}</span></div>`
+          `<div><b class="${c == null ? '' : c >= GOAL ? 'good' : c >= 70 ? 'mid' : 'bad'}">${v}</b><span>${esc(t(l))}</span></div>`
       )
       .join('');
     $('#tsQTrend').innerHTML = trendText();
@@ -10576,6 +11272,7 @@ const PracticeTestsView = (() => {
   });
   function renderTestsPage() {
     paintTsRange();
+    renderPlanPt();
     const k = testKpis();
     $('#tsKpis').innerHTML = [
       ['tsLastLbl', pctOr(k.last), k.last],
@@ -10586,7 +11283,7 @@ const PracticeTestsView = (() => {
     ]
       .map(
         ([l, v, c]) =>
-          `<div><b class="${c == null ? '' : c >= 85 ? 'good' : c >= 70 ? 'mid' : 'bad'}">${v}</b><span>${esc(t(l))}</span></div>`
+          `<div><b class="${c == null ? '' : c >= GOAL ? 'good' : c >= 70 ? 'mid' : 'bad'}">${v}</b><span>${esc(t(l))}</span></div>`
       )
       .join('');
     $('#tsTrendTxt').innerHTML = trendText();
@@ -10833,7 +11530,7 @@ const HeatMap = (() => {
     box.innerHTML = rows
       .map(({ i, c }) =>
         c
-          ? `<span class="hnt" data-hi="${i}" style="background:${heatColor(c.heat)};color:${inkOn(c.heat)}"><b>${c.heat}</b><em>${esc(TOPICS[i].name)}</em></span>`
+          ? `<span class="hnt" data-hi="${i}" style="background:${heatColor(c.heat)};color:${inkOn(c.heat)}"><b>${pref('heatNums') ? c.heat : ''}</b><em>${esc(TOPICS[i].name)}</em></span>`
           : `<span class="hnt empty" data-hi="${i}"><b>—</b><em>${esc(TOPICS[i].name)}</em></span>`
       )
       .join('');
@@ -10845,27 +11542,17 @@ const HeatMap = (() => {
   }
 
   /* history dialog: every period of the chosen interval, with filters and hover */
+  const heatDialog = modal('#heatbg', { close: '#heatClose', onClose: () => (ctip.hidden = true) });
   function openHeat() {
-    $('#heatbg').hidden = false;
+    heatDialog.open('#heatClose');
     renderHeatHistory();
-    $('#heatClose').focus();
   }
-  function closeHeat() {
-    $('#heatbg').hidden = true;
-    ctip.hidden = true;
-  }
+  const closeHeat = heatDialog.close;
   $('#heatOpen').addEventListener('click', e => {
     e.stopPropagation();
     openHeat();
   });
   $('#heatPanel').addEventListener('click', openHeat);
-  $('#heatClose').onclick = closeHeat;
-  $('#heatbg').addEventListener('pointerdown', e => {
-    if (e.target.id === 'heatbg') closeHeat();
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !$('#heatbg').hidden) closeHeat();
-  });
 
   function renderHeatHistory() {
     const box = $('#heatGrid');
@@ -10874,7 +11561,7 @@ const HeatMap = (() => {
     const { ends, rows, len } = heatData(),
       n = ends.length,
       cw = (box.clientWidth || 900) - (phoneMQ.matches ? 118 : 230),
-      showNum = cw / n >= 26;
+      showNum = cw / n >= 26 && pref('heatNums');
     const step = n <= 14 ? (cw / n < 22 ? 2 : 1) : n <= 13 ? 1 : n <= 26 ? (cw / n < 30 ? 2 : 1) : 1,
       head = ends
         .map((d, k) => `<span class="hmh">${(n - 1 - k) % step === 0 ? esc(heatLabel(d, len)) : ''}</span>`)
@@ -10897,19 +11584,12 @@ const HeatMap = (() => {
     html += c
       ? `<span><i style="background:${heatColor(c.heat)}"></i>${esc(t('heatWord'))} <b>${c.heat}</b></span><span>${esc(t('lgRecall'))} <b>${pct(c.R)}</b> · ${esc(t('lastScore'))} <b>${c.score}%</b></span>`
       : `<span class="muted">${esc(t('noHist'))}</span>`;
-    placeTip(e, html);
+    showTip(e, html);
   }
-  function placeTip(e, html) {
+  function showTip(e, html) {
     ctip.innerHTML = html;
     ctip.hidden = false;
-    const r = ctip.getBoundingClientRect(),
-      touch = e.pointerType === 'touch';
-    let x = touch ? e.clientX - r.width / 2 : e.clientX + 14,
-      y = e.clientY - r.height - (touch ? 40 : 12);
-    x = Math.max(8, Math.min(innerWidth - r.width - 8, x));
-    if (y < 8) y = e.clientY + 20;
-    ctip.style.left = x + 'px';
-    ctip.style.top = y + 'px';
+    placeTip(ctip, e);
   }
   function heatTip(e, cell) {
     const D = $('#heatGrid')._data;
@@ -10934,7 +11614,7 @@ const HeatMap = (() => {
     }
     document.querySelectorAll('#heatGrid .hmc.hovon').forEach(x => x.classList.remove('hovon'));
     cell.classList.add('hovon');
-    placeTip(e, html);
+    showTip(e, html);
   }
   document.addEventListener(
     'mousemove',
@@ -11037,7 +11717,7 @@ const HistogramCalibration = (() => {
     });
     for (let v = lo; v <= 100; v += 10)
       g += `<text class="cx" x="${f(Math.min(X(v), w - R - 12))}" y="${h - 6}" text-anchor="middle">${v}%</text>`;
-    g += `<line class="c70" x1="${f(X(70))}" x2="${f(X(70))}" y1="${T}" y2="${T + ph}"/><line class="c85" x1="${f(X(85))}" x2="${f(X(85))}" y1="${T}" y2="${T + ph}"/>`;
+    g += `<line class="c70" x1="${f(X(70))}" x2="${f(X(70))}" y1="${T}" y2="${T + ph}"/><line class="c85" x1="${f(X(GOAL))}" x2="${f(X(GOAL))}" y1="${T}" y2="${T + ph}"/>`;
     g += `<line class="s-mean" x1="${f(X(st.mean))}" x2="${f(X(st.mean))}" y1="${T - 6}" y2="${T + ph}"/>`;
     return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(t('distTitle'))}"${hv({ mode: 'bars', l: L, t: T, pw, ph })}>${g}</svg>`;
   }
@@ -11103,7 +11783,7 @@ const HistogramCalibration = (() => {
       ['ffAvg3', k.avg3, '#ffd08a'],
     ];
     if (tr.reg) marks.push(['ffExam', Math.round(tr.exam), '#f5a524']);
-    let bar = `<i style="width:${X(k.avg3)}%"></i><em style="left:${X(70)}%;background:#c5ccd5"></em><em style="left:${X(85)}%;background:#4bce97"></em>`;
+    let bar = `<i style="width:${X(k.avg3)}%"></i><em style="left:${X(70)}%;background:#c5ccd5"></em><em style="left:${X(GOAL)}%;background:#4bce97"></em>`;
     [40, 55, 70, 85, 100].forEach(v => (bar += `<span class="ax" style="left:${X(v)}%">${v}%</span>`));
     marks.forEach(([l, v, c]) => {
       bar += `<s style="left:${X(v)}%;background:${c}" title="${esc(t(l))} ${v}%"></s>`;
@@ -11162,11 +11842,13 @@ const HistogramCalibration = (() => {
 const { distStats, histBins, histSVG, binomQuantile, renderFcFull, calSVG } = HistogramCalibration;
 
 /* ===== module PlanWeek (js/views/plan-week.js) =====
-   public: ROWS, gridHTML, stripHTML, scrollGrid, itemName, ask, activatePlan, savePlan, renderPlanWeek, planLabel
+   live value (getter): ROWS
+   public: gridHTML, stripHTML, scrollGrid, itemName, ask, activatePlan, savePlan, renderPlanWeek, planLabel
    The Plan tab's week view (what each day holds: daily plan → weekly plan) and the "My plans" list
    (view, edit, activate / deactivate, copy to next week, delete). Also the week grid used by the plan wizard. */
 const PlanWeek = (() => {
-  const ROWS = (DAY_END - DAY_START) / SLOT;
+  /* rows of the time-block grid (15-min slots from the grid start hour to midnight) */
+  expose({ ROWS: [() => (DAY_END - DAY_START) / SLOT, () => {}] });
   let weekOf = mondayOf(todayISO()),
     tab = 'week',
     dayIdx = null;
@@ -11193,8 +11875,9 @@ const PlanWeek = (() => {
   /* ---------- week grid (view, review or time-block selection) ----------
      data: { blocks: {date: ranges}, items: [], daily: Set of dates that come from a daily plan }
      mode: 'view' (items, click to log) · 'select' (15-min slots you click and drag) */
-  /* view mode shows only the hours in use (30 min of margin, whole hours, at least 4 hours; 17:00–22:00 when empty) */
-  function viewHours(days, data) {
+  /* view mode shows only the hours in use (30 min of margin, whole hours, at least minSpan; the evening when empty).
+     The Plan tab asks for 8 hours so the calendar fills the page. */
+  function viewHours(days, data, minSpan = 240) {
     let lo = Infinity,
       hi = -Infinity;
     days.forEach(d =>
@@ -11208,19 +11891,21 @@ const PlanWeek = (() => {
       lo = Math.min(lo, it.start);
       hi = Math.max(hi, it.start + it.min);
     });
-    if (lo === Infinity) return [17 * 60, 22 * 60];
+    if (lo === Infinity)
+      return [Math.max(DAY_START, 22 * 60 - minSpan), Math.max(DAY_START, 22 * 60 - minSpan) + minSpan];
     let from = Math.max(DAY_START, Math.floor((lo - 30) / 60) * 60),
       to = Math.min(DAY_END, Math.ceil((hi + 30) / 60) * 60);
-    while (to - from < 240) {
+    while (to - from < minSpan) {
       if (to < DAY_END) to += 60;
-      else from -= 60;
+      else if (from > DAY_START) from -= 60;
+      else break;
     }
     return [from, to];
   }
   function gridHTML(days, data, mode, opts = {}) {
     const today = todayISO(),
       hours = [],
-      [from, to] = mode === 'select' ? [DAY_START, DAY_END] : viewHours(days, data),
+      [from, to] = mode === 'select' ? [DAY_START, DAY_END] : viewHours(days, data, opts.minSpan),
       nRows = (to - from) / SLOT,
       rowOf = m => (Math.max(from, Math.min(to, m)) - from) / SLOT;
     for (let m = from; m < to; m += 60)
@@ -11274,14 +11959,16 @@ const PlanWeek = (() => {
         return `<span class="wkd${d === today ? ' today' : ''}${d < today ? ' past' : ''}">${esc(dayName(d))}<small>${tot ? fmtMin(tot) : ''}</small></span>`;
       })
       .join('');
-    return `<div class="wk ${mode}" style="--days:${days.length}"><div class="wkhead"><span></span>${head}</div><div class="wkscroll" data-from="${from}"><div class="wkbody" style="height:calc(var(--rowh) * ${nRows})"><div class="wktimes">${hours.join('')}</div>${cols}</div></div></div>`;
+    return `<div class="wk ${mode}" style="--days:${days.length};--rows:${ROWS}"><div class="wkhead"><span></span>${head}</div><div class="wkscroll" data-from="${from}"><div class="wkbody" style="height:calc(var(--rowh) * ${nRows})"><div class="wktimes">${hours.join('')}</div>${cols}</div></div></div>`;
   }
   /* phone: one day at a time, picked from a strip */
-  function stripHTML(days, idx, attr) {
+  /* phone: one day at a time, picked from a 7-day strip (weekday, date, a dot when the day has planned time) */
+  function stripHTML(days, idx, attr, blocks = {}) {
+    const wd = new Intl.DateTimeFormat(LOCALE[lang], { weekday: 'narrow' });
     return `<div class="wkstrip">${days
       .map(
         (d, k) =>
-          `<button type="button" ${attr}="${k}" class="${k === idx ? 'on' : ''}${d === todayISO() ? ' today' : ''}">${esc(dayName(d))}</button>`
+          `<button type="button" ${attr}="${k}" class="${k === idx ? 'on' : ''}${d === todayISO() ? ' today' : ''}" aria-label="${esc(dayName(d))}"><small>${esc(wd.format(parse(d)))}</small><b>${parse(d).getDate()}</b><i class="${rangesTotal(blocks[d]) ? 'has' : ''}"></i></button>`
       )
       .join('')}</div>`;
   }
@@ -11401,6 +12088,24 @@ const PlanWeek = (() => {
     });
     return { blocks, items, daily };
   }
+  /* the calendar reaches the bottom of the screen on every device: the grid takes the height left below it
+     (minus the legend and the card's padding), and the rows stretch to fill it (never under 14 px; scrolls if more) */
+  function fitGrid() {
+    const sc = $('#pwGrid .wkscroll'),
+      body = sc && sc.querySelector('.wkbody');
+    if (!sc || !body || $('#viewPlan').hidden) return;
+    const rows = parseFloat(body.style.height.match(/\*\s*([\d.]+)/)?.[1]) || 32,
+      below = ($('#pwLegend').offsetHeight || 0) + (($('#pwGrid .pwempty') || {}).offsetHeight || 0) + 44,
+      avail = Math.max(260, Math.floor(innerHeight - (sc.getBoundingClientRect().top + window.scrollY) - below));
+    const rowh = Math.max(14, Math.floor(avail / rows));
+    sc.closest('.wk').style.setProperty('--rowh', rowh + 'px');
+    sc.style.maxHeight = sc.style.height = avail + 'px';
+  }
+  let fitTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(fitTimer);
+    fitTimer = setTimeout(() => !$('#viewPlan').hidden && renderPlanWeek(), 120);
+  });
   function renderPlanWeek() {
     const box = $('#planWeek');
     if (!box) return;
@@ -11422,14 +12127,17 @@ const PlanWeek = (() => {
       if (dayIdx == null) dayIdx = Math.max(0, days.indexOf(todayISO()));
       const phone = phoneMQ.matches,
         shown = phone ? [days[dayIdx]] : days;
-      $('#pwStrip').innerHTML = phone ? stripHTML(days, dayIdx, 'data-pwd') : '';
-      const onDay = $('#pwStrip .on');
-      if (onDay) onDay.parentNode.scrollLeft = onDay.offsetLeft - 40;
+      $('#pwStrip').innerHTML = phone ? stripHTML(days, dayIdx, 'data-pwd', data.blocks) : '';
       const empty = !Object.values(data.blocks).some(r => r.length);
       /* weekly review (Cal Newport): planned vs done, so the next plan is based on what really happened */
       const planned = data.items.reduce((a, it) => a + it.min, 0),
         doneMin = data.items.filter(itemDone).reduce((a, it) => a + it.min, 0),
         missed = data.items.filter(itemMissed).length;
+      $('#pwProg').hidden = !planned;
+      $('#pwProgBar').style.width = planned ? Math.round((100 * doneMin) / planned) + '%' : '0';
+      $('#pwProgTxt').textContent = planned
+        ? `${fmtMin(doneMin)} / ${fmtMin(planned)}${missed ? ` · ${missed} ${t('pwMissed')}` : ''}`
+        : '';
       $('#pwStats').innerHTML = planned
         ? `${esc(t('pwPlanned'))} <b>${fmtMin(planned)}</b> · ${esc(t('planDone'))} <b>${fmtMin(doneMin)}</b>${missed ? ` · <span class="miss">${missed} ${esc(t('pwMissed'))}</span>` : ''}`
         : '';
@@ -11441,7 +12149,9 @@ const PlanWeek = (() => {
       $('#pwNudge').innerHTML =
         `<span>${esc(t('pwNudge'))}</span><button type="button" id="pwNudgeGo">${esc(t('pwNudgeBtn'))}</button>`;
       $('#pwGrid').innerHTML =
-        gridHTML(shown, data, 'view') + (empty ? `<div class="pwempty">${esc(t('pwEmptyWeek'))}</div>` : '');
+        gridHTML(shown, data, 'view', { minSpan: 8 * 60 }) +
+        (empty ? `<div class="pwempty">${esc(t('pwEmptyWeek'))}</div>` : '');
+      fitGrid();
       scrollGrid($('#pwGrid'), data.blocks, shown);
       $('#pwLegend').innerHTML =
         ['due', 'weak', 'nodata', 'new', 'test']
@@ -11479,6 +12189,7 @@ const PlanWeek = (() => {
     dayIdx = 0;
     renderPlanWeek();
   };
+  $('#pwRange').onclick = () => $('#pwToday').click();
   $('#pwToday').onclick = () => {
     weekOf = mondayOf(todayISO());
     dayIdx = null;
@@ -11527,7 +12238,13 @@ const PlanWeek = (() => {
      → Doing: topics in today's plan that are in another list
      ← out of Doing: topics in Doing that are not in today's plan go back to the list they came from (else To Do) */
   function kanbanMoves() {
-    const planned = [...new Set(todayPlan().items.filter(it => it.kind === 'topic').map(it => it.i))];
+    const planned = [
+      ...new Set(
+        todayPlan()
+          .items.filter(it => it.kind === 'topic')
+          .map(it => it.i)
+      ),
+    ];
     const lastFrom = i => {
       const mv = state.events
         .filter(e => e.kind === 'move' && e.topic === i && e.to === 'Doing' && e.from && e.from !== 'Doing')
@@ -11535,7 +12252,9 @@ const PlanWeek = (() => {
         .pop();
       return mv ? mv.from : 'Todo';
     };
-    const into = planned.filter(i => state.statuses[i] !== 'Doing').map(i => ({ i, from: state.statuses[i], to: 'Doing' }));
+    const into = planned
+      .filter(i => state.statuses[i] !== 'Doing')
+      .map(i => ({ i, from: state.statuses[i], to: 'Doing' }));
     const out = TOPICS.map((_, i) => i)
       .filter(i => state.statuses[i] === 'Doing' && !planned.includes(i))
       .map(i => ({ i, from: 'Doing', to: lastFrom(i) }));
@@ -11548,7 +12267,9 @@ const PlanWeek = (() => {
     $('#kbSub').textContent =
       T.source === 'suggested'
         ? t('pwFromSuggested')
-        : t('pwFrom').replace('{s}', t(T.source === 'daily' ? 'srcDaily' : 'srcWeekly')).replace('{n}', planLabel(T.plan).name);
+        : t('pwFrom')
+            .replace('{s}', t(T.source === 'daily' ? 'srcDaily' : 'srcWeekly'))
+            .replace('{n}', planLabel(T.plan).name);
     $('#kbList').innerHTML = kbMoves.length
       ? kbMoves
           .map(
@@ -11558,41 +12279,44 @@ const PlanWeek = (() => {
           .join('')
       : `<div class="pwempty">${esc(t('kbNothing'))}</div>`;
     paintKbOk();
-    $('#kbbg').hidden = false;
-    $(kbMoves.length ? '#kbOk' : '#kbCancel').focus();
+    kbDialog.open(kbMoves.length ? '#kbOk' : '#kbCancel');
   }
   function paintKbOk() {
     const n = document.querySelectorAll('#kbList [data-kb]:checked').length;
     $('#kbOk').textContent = tf('kbApply', n);
     $('#kbOk').disabled = !n;
   }
-  const closeKb = () => ($('#kbbg').hidden = true);
+  const kbDialog = modal('#kbbg', { close: '#kbClose' }),
+    closeKb = kbDialog.close;
   $('#kbSync').onclick = openKanbanSync;
   $('#kbList').addEventListener('change', paintKbOk);
   $('#kbCancel').onclick = closeKb;
-  $('#kbClose').onclick = closeKb;
-  $('#kbbg').addEventListener('pointerdown', e => {
-    if (e.target.id === 'kbbg') closeKb();
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !$('#kbbg').hidden) closeKb();
-  });
   $('#kbOk').onclick = () => {
     const pick = [...document.querySelectorAll('#kbList [data-kb]:checked')].map(x => kbMoves[+x.dataset.kb]);
     closeKb();
     if (!pick.length) return;
-    commit(() => {
-      pick.forEach(m => {
-        state.events.push({ id: uid(), date: todayISO(), topic: m.i, kind: 'move', from: m.from, to: m.to, demo: false });
-        state.statuses[m.i] = m.to;
-      });
-    }, tf('kbDone', pick.length));
+    commit(
+      () => {
+        pick.forEach(m => {
+          state.events.push({
+            id: uid(),
+            date: todayISO(),
+            topic: m.i,
+            kind: 'move',
+            from: m.from,
+            to: m.to,
+            demo: false,
+          });
+          state.statuses[m.i] = m.to;
+        });
+      },
+      tf('kbDone', pick.length)
+    );
   };
 
-  return { ROWS, gridHTML, stripHTML, scrollGrid, itemName, ask, activatePlan, savePlan, renderPlanWeek, planLabel };
+  return { gridHTML, stripHTML, scrollGrid, itemName, ask, activatePlan, savePlan, renderPlanWeek, planLabel };
 })();
-const { ROWS, gridHTML, stripHTML, scrollGrid, itemName, ask, activatePlan, savePlan, renderPlanWeek, planLabel } =
-  PlanWeek;
+const { gridHTML, stripHTML, scrollGrid, itemName, ask, activatePlan, savePlan, renderPlanWeek, planLabel } = PlanWeek;
 
 /* ===== module PlanWizard (js/views/plan-wizard.js) =====
    public: openWizard, closeWizard, wizardState
@@ -11689,8 +12413,6 @@ const PlanWizard = (() => {
     if (W.step === 2) body.innerHTML = stepBlocks();
     if (W.step === 3) body.innerHTML = stepTopics();
     if (W.step === 4) body.innerHTML = stepReview();
-    const onDay = body.querySelector('.wkstrip .on');
-    if (onDay) onDay.parentNode.scrollLeft = onDay.offsetLeft - 40;
     if (W.step === 2 || W.step === 4) {
       const shown = phoneMQ.matches ? [days()[W.dayIdx]] : days();
       scrollGrid(body, W.blocks, shown);
@@ -11739,7 +12461,7 @@ const PlanWizard = (() => {
       cur = currentDay();
     const tools = `<div class="wztools"><button type="button" id="wzUndo" ${W.hist.length ? '' : 'disabled'}>↶ ${esc(t('undo'))}</button><button type="button" id="wzRedo" ${W.fut.length ? '' : 'disabled'}>↷ ${esc(t('redo'))}</button><button type="button" id="wzClear" ${rangesTotal(W.blocks[cur]) ? '' : 'disabled'}>${esc(t('wzClear').replace('{d}', longDay(cur)))}</button>${W.type === 'weekly' ? `<button type="button" id="wzCopy" ${rangesTotal(W.blocks[cur]) ? '' : 'disabled'}>${esc(t('wzCopyDay').replace('{d}', longDay(cur)))}</button>` : ''}<span class="wztotal">${esc(t('wzTotal'))} <b>${fmtMin(totalBlocked())}</b></span></div>`;
     const tips = blockTips();
-    return `<p class="wzhint">${esc(t(matchMedia('(hover:none)').matches ? 'wzHintTouch' : 'wzHintMouse'))}</p>${tools}${phone && ds.length > 1 ? stripHTML(ds, W.dayIdx, 'data-wzd') : ''}<div id="wzGrid">${gridHTML(shown, { blocks: W.blocks }, 'select', { anchor: W.anchor })}</div>${tips.length ? `<div class="wztips">${tips.map(x => `<span>${esc(x)}</span>`).join('')}</div>` : ''}`;
+    return `<p class="wzhint">${esc(t(matchMedia('(hover:none)').matches ? 'wzHintTouch' : 'wzHintMouse'))}</p>${tools}${phone && ds.length > 1 ? stripHTML(ds, W.dayIdx, 'data-wzd', W.blocks) : ''}<div id="wzGrid">${gridHTML(shown, { blocks: W.blocks }, 'select', { anchor: W.anchor })}</div>${tips.length ? `<div class="wztips">${tips.map(x => `<span>${esc(x)}</span>`).join('')}</div>` : ''}`;
   }
 
   /* ---------- step 3: topics ---------- */
@@ -11769,10 +12491,6 @@ const PlanWizard = (() => {
         t0 += it.min;
       });
   }
-  const testMinutes = () => {
-    const st = settings();
-    return Math.round(TEST_Q * (60 / st.qph) * 1.1 + TEST_Q * (1 - blended().mu) * st.reviewMin);
-  };
   function itemMinutes(kind, i, n, d) {
     return kind === 'test' ? testMinutes() : Math.max(1, Math.round(n * perQ(i, d, W.energy[d]).per));
   }
@@ -11857,7 +12575,7 @@ const PlanWizard = (() => {
       shown = phone ? [ds[W.dayIdx]] : ds,
       topics = new Set(W.items.filter(it => it.kind === 'topic').map(it => it.i)).size,
       L = planLabel({ type: W.type, start: W.start, name: W.name });
-    return `<div class="wzsum"><div><b>${esc(L.name)}</b><span>${esc(t(W.type === 'daily' ? 'pDaily' : 'pWeekly'))} · ${esc(L.range)}</span></div><div><b>${fmtMin(totalBlocked())}</b><span>${esc(t('wzBlocked'))}</span></div><div><b>${fmtMin(W.items.reduce((a, it) => a + it.min, 0))}</b><span>${esc(t('wzPlannedLow'))}</span></div><div><b>${topics}</b><span>${esc(tf('pwTopics', topics).replace(/^\d+\s*/, ''))}</span></div></div>${phone && ds.length > 1 ? stripHTML(ds, W.dayIdx, 'data-wzd') : ''}<div id="wzGrid">${gridHTML(shown, { blocks: W.blocks, items: W.items }, 'view')}</div>`;
+    return `<div class="wzsum"><div><b>${esc(L.name)}</b><span>${esc(t(W.type === 'daily' ? 'pDaily' : 'pWeekly'))} · ${esc(L.range)}</span></div><div><b>${fmtMin(totalBlocked())}</b><span>${esc(t('wzBlocked'))}</span></div><div><b>${fmtMin(W.items.reduce((a, it) => a + it.min, 0))}</b><span>${esc(t('wzPlannedLow'))}</span></div><div><b>${topics}</b><span>${esc(tf('pwTopics', topics).replace(/^\d+\s*/, ''))}</span></div></div>${phone && ds.length > 1 ? stripHTML(ds, W.dayIdx, 'data-wzd', W.blocks) : ''}<div id="wzGrid">${gridHTML(shown, { blocks: W.blocks, items: W.items }, 'view')}</div>`;
   }
 
   /* ---------- step navigation ---------- */
@@ -12422,8 +13140,8 @@ const HeaderControls = (() => {
       state.deadline = v;
     }, t('saved'));
   };
-  $('#clearDemo').onclick = () => {
-    if (!confirm(t('demoConfirm'))) return;
+  $('#clearDemo').onclick = async () => {
+    if (!(await ask(t('demoConfirm'), t('clear')))) return;
     commit(() => {
       state.events = state.events.filter(e => !e.demo);
       state.plans = (state.plans || []).filter(p => !p.demo);
@@ -12464,7 +13182,7 @@ const HeaderControls = (() => {
         lang = o.lang;
       }, t('imported'));
     } catch (err) {
-      alert(t('invalid'));
+      toast(t('invalid'));
     }
   };
 
@@ -12482,6 +13200,293 @@ const HeaderControls = (() => {
   }, 60000);
   return {};
 })();
+
+/* ===== module Settings (js/ui/settings.js) =====
+   public: openSettings, closeSettings, setPref
+   The gear in the header opens Settings. Every choice is applied at once, saved in your data (so it syncs and goes
+   into the backup) and can be undone from the toast. The defaults are the values the app always used.
+   Sections: exam · goal & memory · daily plan · plans · charts · display · sync · data · demo. */
+const Settings = (() => {
+  const RANGES = ['3d', '7d', '2w', '1m', '3m', '6m', '1y', 'all'];
+  const HEAT_RANGES = ['2w', '1m', '3m', '6m', '1y'];
+  const rangeLabel = r => (r === 'all' ? t('rAll') : r.toUpperCase());
+
+  /* ---------- applying a change ---------- */
+  function setPref(key, value) {
+    commit(() => {
+      state.settings = { ...(state.settings || {}), [key]: value };
+    }, t('setSaved'));
+    renderSettings();
+  }
+  /* the current interval of each chart, and how to change it */
+  const RANGE_KINDS = {
+    sr: { get: () => srRange, set: v => setSrRange(v), list: RANGES },
+    card: {
+      get: () => srCardRange,
+      set: v => {
+        srCardRange = v;
+        try {
+          localStorage.setItem(STORE + '-srcr', v);
+        } catch (e) {}
+      },
+      list: RANGES,
+    },
+    vol: { get: () => volRange, set: v => (volRange = v), list: RANGES },
+    ts: {
+      get: () => tsRange,
+      set: v => {
+        tsRange = v;
+        try {
+          localStorage.setItem(STORE + '-tsr', v);
+        } catch (e) {}
+      },
+      list: RANGES,
+    },
+    heat: {
+      get: () => heatRange,
+      set: v => {
+        heatRange = v;
+        try {
+          localStorage.setItem(STORE + '-heatr', v);
+        } catch (e) {}
+      },
+      list: HEAT_RANGES,
+    },
+  };
+  function setRange(kind, v) {
+    RANGE_KINDS[kind].set(v);
+    setPref('ranges', { ...pref('ranges'), [kind]: v });
+  }
+  /* default intervals chosen in Settings win over this device's last choice when the app opens */
+  function applyRanges() {
+    const r = pref('ranges') || {};
+    Object.entries(r).forEach(([k, v]) => {
+      if (!RANGE_KINDS[k]) return;
+      if (k === 'sr') srRange = v;
+      else RANGE_KINDS[k].set(v);
+    });
+  }
+  applyRanges();
+
+  /* ---------- building the form ---------- */
+  const opt = (v, label, cur) =>
+    `<option value="${esc(String(v))}"${String(v) === String(cur) ? ' selected' : ''}>${esc(label)}</option>`;
+  const select = (id, options, cur) =>
+    `<select id="${id}" data-set="${id}">${options.map(([v, l]) => opt(v, l, cur)).join('')}</select>`;
+  const row = (labelKey, control, hintKey) =>
+    `<div class="setrow"><span class="setlab">${esc(t(labelKey))}${hintKey ? `<small>${esc(t(hintKey))}</small>` : ''}</span>${control}</div>`;
+  const toggle = (id, on) =>
+    `<label class="switch"><input type="checkbox" id="${id}" data-set="${id}"${on ? ' checked' : ''}><span></span></label>`;
+  const section = (titleKey, rows) => `<section class="setsec"><h4>${esc(t(titleKey))}</h4>${rows.join('')}</section>`;
+
+  function renderSettings() {
+    if ($('#setbg').hidden) return;
+    const st = settings(),
+      days = n => tf('setDays', n);
+    $('#setBody').innerHTML = [
+      section('setExamTitle', [
+        row('setExamDate', `<input type="date" id="setExam" data-set="setExam" value="${state.deadline}">`),
+        row(
+          'setLang',
+          select(
+            'setLang',
+            [
+              ['en', 'English'],
+              ['pt', 'Português'],
+              ['ja', '日本語'],
+            ],
+            lang
+          )
+        ),
+      ]),
+      section('setGoalTitle', [
+        row(
+          'setGoal',
+          select(
+            'setGoal',
+            [80, 85, 90].map(v => [v, v + '%']),
+            pref('goal')
+          ),
+          'setGoalHint'
+        ),
+        row(
+          'setReviewAt',
+          select(
+            'setReviewAt',
+            [0.8, 0.85, 0.9, 0.95].map(v => [v, Math.round(v * 100) + '%']),
+            pref('reviewAt')
+          ),
+          'setReviewAtHint'
+        ),
+        row(
+          'setHalfLife',
+          select(
+            'setHalfLife',
+            [7, 10, 14, 21].map(v => [v, days(v)]),
+            pref('halfLife')
+          ),
+          'setHalfLifeHint'
+        ),
+        row(
+          'setIdle',
+          select(
+            'setIdle',
+            [2, 3, 4, 5].map(v => [v, days(v)]),
+            pref('idleDays')
+          ),
+          'setIdleHint'
+        ),
+      ]),
+      section('setPlanTitle', [
+        row(
+          'setMinutes',
+          `<span class="setslider"><input type="range" id="setMin" data-set="setMin" min="30" max="360" step="15" value="${st.minutes}"><output id="setMinOut">${fmtMin(st.minutes)}</output></span>`
+        ),
+        row(
+          'setQph',
+          select(
+            'setQphSel',
+            [20, 25, 30, 35, 40, 45, 50, 60, 70, 80]
+              .map(v => [v, String(v)])
+              .concat([20, 25, 30, 35, 40, 45, 50, 60, 70, 80].includes(st.qph) ? [] : [[st.qph, String(st.qph)]]),
+            st.qph
+          )
+        ),
+        row(
+          'setReview',
+          select(
+            'setReviewSel',
+            [0, 0.5, 1, 1.5, 2, 3, 4]
+              .map(v => [v, v + ' min'])
+              .concat([0, 0.5, 1, 1.5, 2, 3, 4].includes(st.reviewMin) ? [] : [[st.reviewMin, st.reviewMin + ' min']]),
+            st.reviewMin
+          )
+        ),
+        row(
+          'setTestsS',
+          select(
+            'setTestsSel',
+            [[0, t('setOff')], ...[1, 2, 3, 4, 5, 6, 7, 10, 14].map(v => [v, days(v)])].concat(
+              [0, 1, 2, 3, 4, 5, 6, 7, 10, 14].includes(st.testEvery) ? [] : [[st.testEvery, days(st.testEvery)]]
+            ),
+            st.testEvery
+          )
+        ),
+        row(
+          'setEnergy',
+          select(
+            'setEnergy',
+            ['low', 'medium', 'high'].map(v => [v, t('en_' + v)]),
+            pref('energy')
+          ),
+          'setEnergyHint'
+        ),
+        `<p class="setnote">${esc(t('setPlanNote'))} ${esc(t('planWeights'))}</p>`,
+      ]),
+      section('setPlansTitle', [
+        row(
+          'setGridStart',
+          select(
+            'setGridStart',
+            [5, 6, 7, 8, 9].map(v => [v, clockOf(v * 60)]),
+            pref('gridStart')
+          )
+        ),
+        row(
+          'setDeep',
+          select('setDeep', [[0, t('setOff')], ...[30, 45, 60, 90].map(v => [v, tf('setDeepN', v)])], pref('deepMin')),
+          'setDeepHint'
+        ),
+      ]),
+      section(
+        'setChartsTitle',
+        [
+          ['sr', 'setRangeSr'],
+          ['card', 'setRangeCard'],
+          ['vol', 'setRangeVol'],
+          ['ts', 'setRangeTs'],
+          ['heat', 'setRangeHeat'],
+        ].map(([k, lk]) =>
+          row(
+            lk,
+            select(
+              'setRange_' + k,
+              RANGE_KINDS[k].list.map(v => [v, rangeLabel(v)]),
+              RANGE_KINDS[k].get()
+            )
+          )
+        )
+      ),
+      section('setDisplayTitle', [
+        row('setCarousel', toggle('setCarousel', pref('carousel')), 'setCarouselHint'),
+        row('setHeatNums', toggle('setHeatNums', pref('heatNums'))),
+      ]),
+    ].join('');
+    $('#setSync').hidden = BUILD.demo;
+    $('#setDemo').hidden = !BUILD.demo;
+    $('#setSyncState').textContent = ($('#syncChip span') && $('#syncChip span').textContent) || '';
+    $('#clearDemo').hidden = !state.events.some(e => e.demo);
+  }
+
+  /* ---------- reading the form ---------- */
+  $('#setBody').addEventListener('input', e => {
+    if (e.target.id === 'setMin') $('#setMinOut').textContent = fmtMin(+e.target.value);
+  });
+  $('#setBody').addEventListener('change', e => {
+    const el = e.target,
+      id = el.dataset.set;
+    if (!id) return;
+    const v = el.type === 'checkbox' ? el.checked : el.value;
+    const plan = k =>
+      commit(() => (state.settings = { ...settings(), ...(state.settings || {}), [k]: +v }), t('setSaved'));
+    if (id === 'setExam') {
+      if (v) commit(() => (state.deadline = v), t('saved'));
+    } else if (id === 'setLang') document.querySelector(`.flag[data-lang="${v}"]`).click();
+    else if (id === 'setGoal') setPref('goal', +v);
+    else if (id === 'setReviewAt') setPref('reviewAt', +v);
+    else if (id === 'setHalfLife') setPref('halfLife', +v);
+    else if (id === 'setIdle') setPref('idleDays', +v);
+    else if (id === 'setMin') plan('minutes');
+    else if (id === 'setQphSel') plan('qph');
+    else if (id === 'setReviewSel') plan('reviewMin');
+    else if (id === 'setTestsSel') plan('testEvery');
+    else if (id === 'setEnergy') {
+      setPref('energy', v);
+      if (!state.plan || state.plan.date !== todayISO()) energyMode = v;
+    } else if (id === 'setGridStart') setPref('gridStart', +v);
+    else if (id === 'setDeep') setPref('deepMin', +v);
+    else if (id.startsWith('setRange_')) setRange(id.slice(9), v);
+    else if (id === 'setCarousel') setPref('carousel', v);
+    else if (id === 'setHeatNums') setPref('heatNums', v);
+    renderSettings();
+  });
+
+  /* ---------- open / close, sync, reset ---------- */
+  const setDialog = modal('#setbg', { close: '#setClose' }),
+    closeSettings = setDialog.close;
+  function openSettings() {
+    setDialog.open('#setClose');
+    renderSettings();
+  }
+  $('#setOpen').onclick = openSettings;
+  $('#setSyncOpen').onclick = () => {
+    closeSettings();
+    $('#syncChip').click();
+  };
+  $('#setReset').onclick = async () => {
+    if (!(await ask(t('setResetAsk'), t('setReset')))) return;
+    const keepLang = lang;
+    commit(() => {
+      state = normalize(defaultState()) || defaultState();
+      state.lang = keepLang;
+      state.plans = state.plans || [];
+    }, t('setResetDone'));
+    renderSettings();
+  };
+
+  return { openSettings, closeSettings, setPref };
+})();
+const { openSettings, closeSettings, setPref } = Settings;
 
 /* ===== module SelfTest (js/selftest.js) =====
    public: selfTest, showSelfTest */
@@ -13613,7 +14618,10 @@ const SelfTest = (() => {
         ok(
           'Plans',
           'knapsack picks the best set that fits (A+B = 19 beats C = 15 in 60 min)',
-          pick.map(x => x.key).sort().join() === 'A,B',
+          pick
+            .map(x => x.key)
+            .sort()
+            .join() === 'A,B',
           pick.map(x => x.key).join()
         );
         const pick2 = knapsack([C('A', 10, 3, 10), C('B', 20, 2, 8)], 40);
@@ -13637,10 +14645,21 @@ const SelfTest = (() => {
           used = day.reduce((a, it) => a + it.min, 0),
           seq = day.every((it, k) => !k || it.start >= day[k - 1].start + day[k - 1].min - 1e-9);
         ok('Plans', 'a 90-min block is filled without going over it', day.length && used <= 92, used);
-        ok('Plans', 'items run one after another inside the block', seq && day.every(it => it.start >= 1140 && it.start < 1230));
+        ok(
+          'Plans',
+          'items run one after another inside the block',
+          seq && day.every(it => it.start >= 1140 && it.start < 1230)
+        );
         ok('Plans', 'deep work: at most one topic per ~45 min (≤ 2 in 90 min)', day.length <= 2, day.length);
         ok('Plans', 'a topic appears once per day', new Set(day.map(it => it.i)).size === day.length);
-        const two = packDay(T, [[19 * 60, 19 * 60 + 45], [21 * 60, 21 * 60 + 45]], 'medium');
+        const two = packDay(
+          T,
+          [
+            [19 * 60, 19 * 60 + 45],
+            [21 * 60, 21 * 60 + 45],
+          ],
+          'medium'
+        );
         ok('Plans', 'two blocks on one day never repeat a topic', new Set(two.map(it => it.i)).size === two.length);
         const wk = suggestDays([T, addDays(T, 1)], { [T]: [[1140, 1230]], [addDays(T, 1)]: [[1140, 1230]] }, {}),
           dueDay1 = wk[T].filter(it => it.reason === 'due').map(it => it.i);
@@ -13650,27 +14669,99 @@ const SelfTest = (() => {
           !wk[addDays(T, 1)].some(it => it.reason === 'due' && dueDay1.includes(it.i)),
           JSON.stringify(wk)
         );
-        ok('Plans', 'simulated sessions never stay in your history', state.events.length === 3 && !state.events.some(e => String(e.id).startsWith('sim')));
+        ok(
+          'Plans',
+          'simulated sessions never stay in your history',
+          state.events.length === 3 && !state.events.some(e => String(e.id).startsWith('sim'))
+        );
       }
       {
         const wkP = { id: 'w', type: 'weekly', start: mondayOf(T), active: true, blocks: {}, items: [], updated: 1 },
-          dP = { id: 'd', type: 'daily', start: T, active: true, blocks: {}, items: [{ id: 'i1', date: T, start: 1140, min: 30, kind: 'topic', i: 3, n: 10, reason: 'new' }, { id: 'i2', date: T, start: 1170, min: 20, kind: 'custom', i: null, n: 0, label: 'Simulator', reason: 'custom' }], updated: 2 };
+          dP = {
+            id: 'd',
+            type: 'daily',
+            start: T,
+            active: true,
+            blocks: {},
+            items: [
+              { id: 'i1', date: T, start: 1140, min: 30, kind: 'topic', i: 3, n: 10, reason: 'new' },
+              {
+                id: 'i2',
+                date: T,
+                start: 1170,
+                min: 20,
+                kind: 'custom',
+                i: null,
+                n: 0,
+                label: 'Simulator',
+                reason: 'custom',
+              },
+            ],
+            updated: 2,
+          };
         fixture([], { plans: [wkP, dP] });
-        ok('Plans', 'today comes from the daily plan first', activeFor(T).kind === 'daily' && todayPlan().source === 'daily');
+        ok(
+          'Plans',
+          'today comes from the daily plan first',
+          activeFor(T).kind === 'daily' && todayPlan().source === 'daily'
+        );
         state.plans[1].active = false;
         ok('Plans', '… then from the weekly plan', activeFor(T).kind === 'weekly' && todayPlan().source === 'weekly');
         state.plans[0].active = false;
         ok('Plans', '… else from the suggestion', activeFor(T) === null && todayPlan().source === 'suggested');
         state.plans[1].active = true;
         ok('Plans', 'a plan item is not done before you log it', !itemDone(state.plans[1].items[0]));
-        state.events.push({ id: 'x', date: T, topic: 3, kind: 'study', score: 80, from: null, to: null, partial: false, demo: false });
+        state.events.push({
+          id: 'x',
+          date: T,
+          topic: 3,
+          kind: 'study',
+          score: 80,
+          from: null,
+          to: null,
+          partial: false,
+          demo: false,
+        });
         ok('Plans', 'logging a session for that topic on that day marks it done', itemDone(state.plans[1].items[0]));
-        ok('Plans', 'your own activity is done only by hand', !itemDone(state.plans[1].items[1]) && itemDone({ ...state.plans[1].items[1], check: true }));
-        state.plans[1].items.push({ id: 'i3', date: D(1), start: 1140, min: 30, kind: 'topic', i: 5, n: 10, reason: 'new' });
-        ok('Plans', 'an undone item from an earlier day is missed and boosts its topic', itemMissed(state.plans[1].items[2]) && missedTopics(T).has(5));
-        ok('Plans', 'a daily plan over an active weekly plan asks to replace only that day', (state.plans[0].active = true) && weeklyUnder(state.plans[1]) && weeklyUnder(state.plans[1]).id === 'w');
-        const n = normalize({ ...state, plans: [{ type: 'bogus' }, { type: 'daily', start: 'x' }, { ...dP, items: [{ kind: 'topic', i: 99, date: T, start: 0, min: 5 }] }] });
-        ok('Plans', 'malformed plans and items are dropped when loading', n.plans.length === 1 && n.plans[0].items.length === 0, JSON.stringify(n.plans));
+        ok(
+          'Plans',
+          'your own activity is done only by hand',
+          !itemDone(state.plans[1].items[1]) && itemDone({ ...state.plans[1].items[1], check: true })
+        );
+        state.plans[1].items.push({
+          id: 'i3',
+          date: D(1),
+          start: 1140,
+          min: 30,
+          kind: 'topic',
+          i: 5,
+          n: 10,
+          reason: 'new',
+        });
+        ok(
+          'Plans',
+          'an undone item from an earlier day is missed and boosts its topic',
+          itemMissed(state.plans[1].items[2]) && missedTopics(T).has(5)
+        );
+        ok(
+          'Plans',
+          'a daily plan over an active weekly plan asks to replace only that day',
+          (state.plans[0].active = true) && weeklyUnder(state.plans[1]) && weeklyUnder(state.plans[1]).id === 'w'
+        );
+        const n = normalize({
+          ...state,
+          plans: [
+            { type: 'bogus' },
+            { type: 'daily', start: 'x' },
+            { ...dP, items: [{ kind: 'topic', i: 99, date: T, start: 0, min: 5 }] },
+          ],
+        });
+        ok(
+          'Plans',
+          'malformed plans and items are dropped when loading',
+          n.plans.length === 1 && n.plans[0].items.length === 0,
+          JSON.stringify(n.plans)
+        );
       }
       /* --- translations --- */
       const keys = Object.keys(I18N.en);

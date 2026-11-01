@@ -50,7 +50,7 @@ const Charts = (() => {
       v =>
         (g += `<line class="cg" x1="${L}" x2="${w - R}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="cy" x="${L - 5}" y="${f(Y(v) + 3.5)}" text-anchor="end">${Math.round(v * 100)}%</text>`)
     );
-    g += `<line class="cth" x1="${L}" x2="${w - R}" y1="${f(Y(0.9))}" y2="${f(Y(0.9))}"/>`;
+    g += `<line class="cth" x1="${L}" x2="${w - R}" y1="${f(Y(pref('reviewAt')))}" y2="${f(Y(pref('reviewAt')))}"/>`;
     let lastLx = -99;
     ticks.forEach(tk => {
       const x = X(tk.x);

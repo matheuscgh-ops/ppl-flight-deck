@@ -38,7 +38,7 @@ with sync_playwright() as p:
             # ---------- empty week view ----------
             ev("goView('plan')"); pg.wait_for_timeout(300)
             check(f'{tag}: the Plan tab starts with the week view', pg.is_visible('#planWeek') and pg.is_visible('#pwWeekBox') and ev("document.querySelector('#viewPlan > section').id") == 'planWeek')
-            check(f'{tag}: no active plan → blank days and today comes from the suggestion', ev("document.querySelectorAll('#pwGrid .wki').length") == 0 and 'suggestion' in pg.inner_text('#pwSource') and pg.is_visible('#energyPick'))
+            check(f'{tag}: no active plan → blank days and today comes from the suggestion', ev("document.querySelectorAll('#pwGrid .wki').length") == 0 and 'suggestion' in pg.inner_text('#pwSource') and pg.is_visible('#pwEnergy'))
             check(f'{tag}: {"phone shows one day with a day strip" if phone else "7 day columns"}', ev("document.querySelectorAll('#pwGrid .wkcol').length") == (1 if phone else 7) and (not phone or ev("document.querySelectorAll('#pwStrip button').length") == 7))
 
             # ---------- wizard: daily plan ----------
@@ -80,17 +80,30 @@ with sync_playwright() as p:
             check(f'{tag}: step 4 reviews the plan before saving', ev("wizardState().step") == 4 and ev("document.querySelectorAll('#wzGrid .wki').length") >= 2 and pg.is_visible('#wzSaveOff'))
             tap('#wzNext'); pg.wait_for_timeout(300)
             check(f'{tag}: Save & activate (nothing to replace → no question)', not pg.is_visible('#askbg') and not pg.is_visible('#wizbg') and ev("state.plans.length===1&&state.plans[0].active&&state.plans[0].type==='daily'"))
-            check(f'{tag}: today now comes from the daily plan (Plan tab, energy picker hidden)', ev("todayPlan().source") == 'daily' and not pg.is_visible('#energyPick') and 'Daily plan' in pg.inner_text('#planSub'))
-            check(f'{tag}: today\'s list shows the planned times', ev("document.querySelectorAll('#planList .qtime').length") >= 2)
+            check(f'{tag}: today now comes from the daily plan (energy choice hidden)', ev("todayPlan().source") == 'daily' and not pg.is_visible('#energyPick') and 'Daily plan' in pg.inner_text('#pwSource'))
+            check(f'{tag}: today\'s list (dashboard) shows the planned times', ev("(goView('dash'),document.querySelectorAll('#sugg .qtime').length)") >= 2)
+            ev("goView('plan')"); pg.wait_for_timeout(150)
+
+            # ---------- practice test card follows the plan that drives today ----------
+            ev("goView('tests')"); pg.wait_for_timeout(250)
+            check(f'{tag}: with a daily plan active, the practice-test card offers to add it to that plan', pg.inner_text('#ppAdd') == "+ Add to today’s plan" or 'Add' in pg.inner_text('#ppAdd'), pg.inner_text('#ppAdd'))
+            tap('#ppAdd'); pg.wait_for_timeout(250)
+            if pg.is_visible('#askbg'):
+                check(f'{tag}: no free time for a 60-question test → asks to open the plan', 'practice test needs' in pg.inner_text('#askText'))
+                tap('#askNo'); pg.wait_for_timeout(150)
+            ev("state.plans[0].blocks[todayISO()]=[[1140,1260],[1260+15,1260+15+Math.max(150,testMinutes()+15)]];save();render()"); pg.wait_for_timeout(150)
+            tap('#ppAdd'); pg.wait_for_timeout(250)
+            check(f'{tag}: … with room it goes into the first free time and the card says it is in the plan', ev("todayPlan().items.some(x=>x.kind==='test'&&x.start>=1275)") and ev("document.getElementById('ppAdd').disabled"), ev("todayPlan().items.map(x=>x.kind+'@'+x.start)"))
+            ev("state.plans[0].items=state.plans[0].items.filter(x=>x.kind!=='test');state.plans[0].blocks[todayISO()]=[[1140,1260]];save();render()"); pg.wait_for_timeout(150)
+            ev("goView('dash')"); pg.wait_for_timeout(250)
 
             # ---------- done marks ----------
             first = ev("todayPlan().items.find(x=>x.kind==='topic')")
             ev(f"commit(()=>state.events.push({{id:'done1',date:todayISO(),topic:{first['i']},kind:'review',score:88,from:null,to:null,partial:false,demo:false}}),'x')"); pg.wait_for_timeout(200)
-            check(f'{tag}: logging a session for a planned topic marks it done (✓)', ev(f"todayPlan().items.find(x=>x.id==='{first['id']}').done") and '✓' in pg.inner_text(f'#planList [data-chk="{first["id"]}"]'))
+            check(f'{tag}: logging a session for a planned topic marks it done (✓)', ev(f"todayPlan().items.find(x=>x.id==='{first['id']}').done") and '✓' in pg.inner_text(f'#sugg [data-chk="{first["id"]}"]'))
             cid = ev("todayPlan().items.find(x=>x.kind==='custom').id")
-            tap(f'#planList [data-chk="{cid}"]'); pg.wait_for_timeout(200)
+            ev(f"document.querySelector('#sugg [data-chk=\"{cid}\"]').click()"); pg.wait_for_timeout(200)
             check(f'{tag}: your own activity is marked done with its circle', ev(f"todayPlan().items.find(x=>x.id==='{cid}').done"))
-            ev("goView('dash')"); pg.wait_for_timeout(300)
             check(f'{tag}: dashboard: today\'s plan shows where it comes from', ev("document.getElementById('planMiniMode').textContent") == 'Daily plan' and ev("document.querySelectorAll('#sugg .qrow').length") >= 2)
             ev("goView('plan')"); pg.wait_for_timeout(200)
 
@@ -159,7 +172,7 @@ with sync_playwright() as p:
             # week view follows the plans
             tap('#pwNext'); pg.wait_for_timeout(250)
             check(f'{tag}: the week view shows next week\'s plan', ev("document.querySelectorAll('#pwGrid .wki').length") >= (1 if phone else 7))
-            tap('#pwToday'); pg.wait_for_timeout(150)
+            tap('#pwRange' if phone else '#pwToday'); pg.wait_for_timeout(150)
             # a daily plan for next Wednesday over the weekly plan → asks to replace only that day
             ev(f"openWizard({{mode:'new',type:'daily',start:addDays('{wk}',2)}})"); pg.wait_for_timeout(150)
             tap('#wzNext'); pg.wait_for_timeout(150)
@@ -177,7 +190,7 @@ with sync_playwright() as p:
             tap('#pwNext'); pg.wait_for_timeout(250)
             if phone: tap('#pwStrip [data-pwd="2"]'); pg.wait_for_timeout(150)
             check(f'{tag}: the week view marks that day "D" (from a daily plan)', ev("document.querySelectorAll('#pwGrid .wkdaily').length") == 1)
-            tap('#pwToday'); pg.wait_for_timeout(150)
+            tap('#pwRange' if phone else '#pwToday'); pg.wait_for_timeout(150)
 
             # ---------- a second weekly plan for the same week → replace the week ----------
             ev(f"openWizard({{mode:'copy',plan:state.plans.find(p=>p.type==='weekly')}})"); pg.wait_for_timeout(200)
