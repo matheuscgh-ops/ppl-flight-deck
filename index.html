@@ -5700,6 +5700,32 @@ body.wzdragging * {
   -webkit-user-select: none;
   -webkit-touch-callout: none;
 }
+/* touch: the whole left column (grip + time) is the drag handle — wide and tall enough for a thumb */
+.wzg .wzt {
+  touch-action: none;
+  cursor: grab;
+}
+@media (max-width: 640px) {
+  .wzit .wzt {
+    align-self: stretch;
+    min-height: 44px;
+    margin: -7px 0 -7px -9px;
+    padding: 7px 4px 7px 9px;
+  }
+  .wzit.child .wzt {
+    min-height: 32px;
+    margin: -4px 0 -4px -9px;
+    padding: 4px 4px 4px 9px;
+    justify-content: center;
+  }
+}
+/* any touch screen (tablets too): the handle is at least 44 px tall */
+@media (pointer: coarse) {
+  .wzit:not(.child):not(.edit) .wzt {
+    align-self: stretch;
+    min-height: 44px;
+  }
+}
 
 /* ===== Settings (gear in the header) ===== */
 .gear {
@@ -13815,16 +13841,16 @@ const PlanWizard = (() => {
   }
   $('#wzBody').addEventListener('pointerdown', e => {
     if (!W || W.step !== 3 || W.mode === 'view' || e.button > 0) return;
-    const grip = e.target.closest('.wzgrip'),
+    /* the handle is the whole left column of a card (grip + time), on the topic and on its review row,
+       so a thumb finds it as easily as a fingertip */
+    const grip = e.target.closest('.wzg .wzt'),
       card = e.target.closest('.wzg');
     if (!card || e.target.closest('button, input, select, .wzit.edit')) return;
     if (e.pointerType !== 'mouse' && !grip) return;
     if (!card.querySelector('.wzgrip')) return;
-    mv = { group: card, x: e.clientX, y: e.clientY, on: false, id: e.pointerId };
-    if (grip) {
-      e.preventDefault();
-      dragStart(e, card);
-    }
+    mv = { group: card, x: e.clientX, y: e.clientY, on: false, id: e.pointerId, touch: e.pointerType !== 'mouse' };
+    /* the drag starts once the finger moves a few pixels, so a tap on the column still opens the editor */
+    if (grip) e.preventDefault();
   });
   /* while a card is dragged by touch, the page must not scroll or select text under the finger */
   document.addEventListener(
@@ -13838,17 +13864,18 @@ const PlanWizard = (() => {
   $('#wzBody').addEventListener(
     'touchstart',
     e => {
-      if (e.target.closest && e.target.closest('.wzgrip')) e.preventDefault();
+      if (e.target.closest && e.target.closest('.wzg .wzt') && e.target.closest('.wzg').querySelector('.wzgrip'))
+        e.preventDefault();
     },
     { passive: false }
   );
   document.addEventListener('selectstart', e => {
-    if (mv || e.target.closest?.('.wzg .wzgrip')) e.preventDefault();
+    if (mv || e.target.closest?.('.wzg .wzt')) e.preventDefault();
   });
   document.addEventListener('pointermove', e => {
     if (!mv || e.pointerId !== mv.id) return;
     if (!mv.on) {
-      if (Math.hypot(e.clientX - mv.x, e.clientY - mv.y) < 6) return;
+      if (Math.hypot(e.clientX - mv.x, e.clientY - mv.y) < (mv.touch ? 4 : 6)) return;
       dragStart(e, mv.group);
     }
     e.preventDefault();

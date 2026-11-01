@@ -528,16 +528,16 @@ const PlanWizard = (() => {
   }
   $('#wzBody').addEventListener('pointerdown', e => {
     if (!W || W.step !== 3 || W.mode === 'view' || e.button > 0) return;
-    const grip = e.target.closest('.wzgrip'),
+    /* the handle is the whole left column of a card (grip + time), on the topic and on its review row,
+       so a thumb finds it as easily as a fingertip */
+    const grip = e.target.closest('.wzg .wzt'),
       card = e.target.closest('.wzg');
     if (!card || e.target.closest('button, input, select, .wzit.edit')) return;
     if (e.pointerType !== 'mouse' && !grip) return;
     if (!card.querySelector('.wzgrip')) return;
-    mv = { group: card, x: e.clientX, y: e.clientY, on: false, id: e.pointerId };
-    if (grip) {
-      e.preventDefault();
-      dragStart(e, card);
-    }
+    mv = { group: card, x: e.clientX, y: e.clientY, on: false, id: e.pointerId, touch: e.pointerType !== 'mouse' };
+    /* the drag starts once the finger moves a few pixels, so a tap on the column still opens the editor */
+    if (grip) e.preventDefault();
   });
   /* while a card is dragged by touch, the page must not scroll or select text under the finger */
   document.addEventListener(
@@ -551,17 +551,18 @@ const PlanWizard = (() => {
   $('#wzBody').addEventListener(
     'touchstart',
     e => {
-      if (e.target.closest && e.target.closest('.wzgrip')) e.preventDefault();
+      if (e.target.closest && e.target.closest('.wzg .wzt') && e.target.closest('.wzg').querySelector('.wzgrip'))
+        e.preventDefault();
     },
     { passive: false }
   );
   document.addEventListener('selectstart', e => {
-    if (mv || e.target.closest?.('.wzg .wzgrip')) e.preventDefault();
+    if (mv || e.target.closest?.('.wzg .wzt')) e.preventDefault();
   });
   document.addEventListener('pointermove', e => {
     if (!mv || e.pointerId !== mv.id) return;
     if (!mv.on) {
-      if (Math.hypot(e.clientX - mv.x, e.clientY - mv.y) < 6) return;
+      if (Math.hypot(e.clientX - mv.x, e.clientY - mv.y) < (mv.touch ? 4 : 6)) return;
       dragStart(e, mv.group);
     }
     e.preventDefault();
