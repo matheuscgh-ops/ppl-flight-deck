@@ -5,8 +5,7 @@
    in today's plan and in the plan wizard, and in the topic's log dialog. A practice test has its own notes (topic -1).
    Notes are saved, backed up and synced like sessions (united by id, deletions remembered). */
 const Notes = (() => {
-  const notesOf = i =>
-    (state.notes || []).filter(n => n.topic === i).sort((a, b) => b.date.localeCompare(a.date) || 0);
+  const notesOf = i => (state.notes || []).filter(n => n.topic === i).sort((a, b) => b.date.localeCompare(a.date) || 0);
   const topicName = i => (i === -1 ? t('practiceTest') : TOPICS[i].name);
   /* the small "📝 2" mark that tells you a topic has notes */
   const notesBadge = i => {
@@ -21,7 +20,11 @@ const Notes = (() => {
      you mark the review done from here */
   function openNotes(i, opts = {}) {
     const topics = (opts.topics || [i]).filter(x => x === -1 || TOPICS[x]);
-    cur = { topics: topics.length ? topics : [i], i: topics.includes(i) ? i : topics[0] ?? i, itemId: opts.itemId || null };
+    cur = {
+      topics: topics.length ? topics : [i],
+      i: topics.includes(i) ? i : (topics[0] ?? i),
+      itemId: opts.itemId || null,
+    };
     render();
     dialog.open('#noteIn');
   }

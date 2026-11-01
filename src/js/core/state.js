@@ -74,7 +74,12 @@ const AppState = (() => {
             n.text.trim() &&
             (n.topic === -1 || (Number.isInteger(n.topic) && TOPICS[n.topic]))
         )
-        .map(n => ({ id: String(n.id || uid()).slice(0, 40), topic: n.topic, date: n.date, text: n.text.trim().slice(0, 500) }))
+        .map(n => ({
+          id: String(n.id || uid()).slice(0, 40),
+          topic: n.topic,
+          date: n.date,
+          text: n.text.trim().slice(0, 500),
+        }))
         .slice(-2000),
       /* your own cards on the Kanban (tasks such as "Review the theory"): a title and a list, no questions or score */
       cards: normCards(o.cards),
