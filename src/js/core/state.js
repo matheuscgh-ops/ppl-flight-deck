@@ -64,6 +64,14 @@ const AppState = (() => {
             .map(x => ({ id: x.id || uid(), date: x.date, q: +x.q || 60, score: cl(x.score) }))
         : [],
       deadline: ok(o.deadline) ? o.deadline : '2026-11-30',
+      /* the order of the cards inside the Kanban lists (where you dropped them); a permutation of the topics */
+      order:
+        Array.isArray(o.order) &&
+        o.order.length === TOPICS.length &&
+        new Set(o.order).size === TOPICS.length &&
+        o.order.every(i => Number.isInteger(i) && TOPICS[i])
+          ? o.order.slice()
+          : TOPICS.map((_, i) => i),
       lang: I18N[o.lang] ? o.lang : 'en',
       plan:
         o.plan && ok(o.plan.date)

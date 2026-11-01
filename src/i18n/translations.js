@@ -1578,6 +1578,10 @@ const Translations = (() => {
     setReflect: '各ブロックの最後に間違いの振り返り',
     setReflectHint: 'ブロックで予想される間違いに比例（最低10分、最大でブロックの4分の1）',
   });
+  /* Kanban: a card dropped in a new place inside its list */
+  Object.assign(I18N.en, { reordered: 'Card moved' });
+  Object.assign(I18N.pt, { reordered: 'Card movido' });
+  Object.assign(I18N.ja, { reordered: 'カードを移動しました' });
   /* error review right after each topic */
   Object.assign(I18N.en, { reflectMisses: '{n} expected misses' });
   Object.assign(I18N.pt, { reflectMisses: '{n} erros esperados' });

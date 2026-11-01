@@ -205,7 +205,7 @@ const Dashboard = (() => {
     const laneCols = STATUS.map(s => colsOf(state.statuses.filter(x => x === s).length));
     lanesEl.style.gridTemplateColumns = fit ? laneCols.map(c => `minmax(0,${c}fr)`).join(' ') : '';
     $('#lanes').innerHTML = STATUS.map((s, j) => {
-      const ids = TOPICS.map((_, i) => i).filter(i => state.statuses[i] === s);
+      const ids = (state.order || TOPICS.map((_, i) => i)).filter(i => state.statuses[i] === s);
       const q = ids.reduce((a, i) => a + TOPICS[i].q, 0);
       return `<div class="lane" data-lane="${j}" style="--accent:${COLORS[j]}"><div class="lanehead"><span class="lname">${esc(label(s))}</span><span class="lcount">${ids.length} · ${tf('qn', fmt(q))}</span></div><div class="lanecards${laneCols[j] > 1 ? ' multi' : ''}" style="${laneCols[j] > 1 ? `column-count:${laneCols[j]}` : ''}">${ids
         .map(i => {
@@ -294,6 +294,38 @@ const Dashboard = (() => {
       `${TOPICS[i].name} → ${label(to)}`
     );
   }
+  /* put card i right before card `before` (null = at the end of its list) in the saved card order */
+  function placeCard(order, i, before) {
+    const o = order.filter(x => x !== i),
+      k = before == null ? o.length : o.indexOf(before);
+    o.splice(k < 0 ? o.length : k, 0, i);
+    return o;
+  }
+  /* a drop: another list (a move, logged with its date) and/or a new place inside the list, one Undo for both */
+  function dropCard(i, to, before) {
+    const order = placeCard(state.order || TOPICS.map((_, k) => k), i, before),
+      moved = state.statuses[i] !== to,
+      same = JSON.stringify(order) === JSON.stringify(state.order);
+    if (!moved && same) return;
+    commit(
+      () => {
+        if (moved) {
+          state.events.push({
+            id: uid(),
+            date: todayISO(),
+            topic: i,
+            kind: 'move',
+            from: state.statuses[i],
+            to,
+            demo: false,
+          });
+          state.statuses[i] = to;
+        }
+        state.order = order;
+      },
+      moved ? `${TOPICS[i].name} → ${label(to)}` : t('reordered')
+    );
+  }
 
   /* pointer drag & drop: mouse drags after 5px, touch after a short press-and-hold */
   let drag = null;
@@ -354,12 +386,18 @@ const Dashboard = (() => {
     drag.active = true;
     lanesEl.style.scrollSnapType = 'none';
     document.body.appendChild(g);
+    /* the card leaves a gap that follows the pointer: where the gap is, the card lands */
+    const gap = document.createElement('div');
+    gap.className = 'task-gap';
+    gap.style.height = r.height + 'px';
+    drag.card.after(gap);
+    drag.gap = gap;
     drag.card.classList.add('dragging');
     document.body.classList.add('dragging');
     moveGhost(x, y);
   }
   function moveGhost(x, y) {
-    drag.ghost.style.transform = `translate(${x - drag.ox}px,${y - drag.oy}px) rotate(2deg)`;
+    drag.ghost.style.transform = `translate(${x - drag.ox}px,${y - drag.oy}px) rotate(3deg)`;
     if (y < 70) window.scrollBy(0, -14);
     else if (y > innerHeight - 70) window.scrollBy(0, 14);
     if (lanesEl.scrollWidth > lanesEl.clientWidth + 2) {
@@ -382,6 +420,22 @@ const Dashboard = (() => {
       lane?.classList.add('over');
       drag.lane = lane;
     }
+    /* magnetic: the gap jumps to the place between the cards nearest to the pointer */
+    if (lane) {
+      const box = lane.querySelector('.lanecards'),
+        cards = [...box.querySelectorAll('.task')].filter(c => c !== drag.card),
+        next = cards.find(c => {
+          const r = c.getBoundingClientRect();
+          return y < r.top + r.height / 2;
+        });
+      const moving = next ? drag.gap.nextSibling !== next : box.lastElementChild !== drag.gap;
+      if (moving) {
+        /* the cards of both lists glide to open (and close) the gap */
+        const old = drag.gap.parentElement,
+          els = [...new Set([...box.querySelectorAll('.task'), ...(old ? old.querySelectorAll('.task') : [])])];
+        flip(els, () => (next ? next.before(drag.gap) : box.appendChild(drag.gap)));
+      }
+    }
   }
   function endDrag(e, cancel) {
     if (!drag || (e && e.pointerId !== drag.pid)) return;
@@ -394,10 +448,10 @@ const Dashboard = (() => {
       d.card.classList.remove('dragging');
       document.body.classList.remove('dragging');
       d.lane?.classList.remove('over');
-      if (!cancel && d.lane) {
-        const to = STATUS[+d.lane.dataset.lane];
-        if (to !== state.statuses[d.id]) moveCard(d.id, to);
-      }
+      const after = d.gap.nextElementSibling,
+        before = after && after.classList.contains('task') && after !== d.card ? +after.dataset.topic : null;
+      d.gap.remove();
+      if (!cancel && d.lane) dropCard(d.id, STATUS[+d.lane.dataset.lane], before);
     } else if (!cancel) openModal(d.id);
   }
   window.addEventListener('pointerup', e => endDrag(e, false));

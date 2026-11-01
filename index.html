@@ -783,7 +783,15 @@ input[type='date']::-webkit-calendar-picker-indicator {
   border-color: #4a535d;
 }
 .task.dragging {
-  opacity: 0.3;
+  display: none;
+}
+/* where the dragged card will land: a gap that moves between the cards */
+.task-gap {
+  background: #0b0d10a8;
+  box-shadow: inset 0 0 0 1px #ffffff0d;
+  border-radius: 8px;
+  flex: none;
+  box-sizing: border-box;
 }
 .task.flash {
   animation: flash 1.1s ease;
@@ -5415,9 +5423,9 @@ b.wkdaily {
   font-size: 11px;
 }
 .wzgap {
-  border: 2px dashed #579dff88;
   border-radius: 8px;
-  background: #579dff14;
+  background: #0b0d10a8;
+  box-shadow: inset 0 0 0 1px #ffffff0d;
   margin-bottom: 4px;
   transition: height 0.12s;
 }
@@ -5426,7 +5434,7 @@ b.wkdaily {
   z-index: 10000;
   pointer-events: none;
   opacity: 0.92;
-  transform: rotate(-1deg) scale(1.02);
+  transform: rotate(3deg);
   box-shadow: 0 14px 34px #000a;
   border-radius: 8px;
 }
@@ -7853,6 +7861,10 @@ const Translations = (() => {
     setReflect: '各ブロックの最後に間違いの振り返り',
     setReflectHint: 'ブロックで予想される間違いに比例（最低10分、最大でブロックの4分の1）',
   });
+  /* Kanban: a card dropped in a new place inside its list */
+  Object.assign(I18N.en, { reordered: 'Card moved' });
+  Object.assign(I18N.pt, { reordered: 'Card movido' });
+  Object.assign(I18N.ja, { reordered: 'カードを移動しました' });
   /* error review right after each topic */
   Object.assign(I18N.en, { reflectMisses: '{n} expected misses' });
   Object.assign(I18N.pt, { reflectMisses: '{n} erros esperados' });
@@ -7866,7 +7878,7 @@ const Translations = (() => {
 const { I18N } = Translations;
 
 /* ===== module Util (js/core/util.js) =====
-   public: $, pad, iso, parse, todayISO, diffDays, esc, uid, TOTAL */
+   public: $, pad, iso, parse, todayISO, diffDays, esc, uid, TOTAL, flip */
 const Util = (() => {
   const $ = s => document.querySelector(s);
   const pad = n => String(n).padStart(2, '0');
@@ -7881,9 +7893,32 @@ const Util = (() => {
     String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4);
   const TOTAL = TOPICS.reduce((a, b) => a + b.q, 0);
-  return { $, pad, iso, parse, todayISO, diffDays, esc, uid, TOTAL };
+  /* FLIP: run mutate() (which moves elements in the page), then slide each of els from where it was to where it is
+     now, so cards glide aside to open a gap instead of jumping (the Trello feel). Skipped with reduced motion. */
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  function flip(els, mutate) {
+    if (reduceMotion.matches) return mutate();
+    const before = new Map(els.map(el => [el, el.getBoundingClientRect()]));
+    mutate();
+    els.forEach(el => {
+      const a = before.get(el);
+      if (!el.isConnected || !a) return;
+      const b = el.getBoundingClientRect(),
+        dx = a.left - b.left,
+        dy = a.top - b.top;
+      if (!dx && !dy) return;
+      el.style.transition = 'none';
+      el.style.transform = `translate(${dx}px,${dy}px)`;
+      el.getBoundingClientRect();
+      el.style.transition = 'transform .16s cubic-bezier(.2,.8,.2,1)';
+      el.style.transform = '';
+      clearTimeout(el._flipT);
+      el._flipT = setTimeout(() => (el.style.transition = ''), 200);
+    });
+  }
+  return { $, pad, iso, parse, todayISO, diffDays, esc, uid, TOTAL, flip };
 })();
-const { $, pad, iso, parse, todayISO, diffDays, esc, uid, TOTAL } = Util;
+const { $, pad, iso, parse, todayISO, diffDays, esc, uid, TOTAL, flip } = Util;
 
 /* ===== module Modal (js/ui/modal.js) =====
    public: modal, placeTip
@@ -8046,6 +8081,14 @@ const AppState = (() => {
             .map(x => ({ id: x.id || uid(), date: x.date, q: +x.q || 60, score: cl(x.score) }))
         : [],
       deadline: ok(o.deadline) ? o.deadline : '2026-11-30',
+      /* the order of the cards inside the Kanban lists (where you dropped them); a permutation of the topics */
+      order:
+        Array.isArray(o.order) &&
+        o.order.length === TOPICS.length &&
+        new Set(o.order).size === TOPICS.length &&
+        o.order.every(i => Number.isInteger(i) && TOPICS[i])
+          ? o.order.slice()
+          : TOPICS.map((_, i) => i),
       lang: I18N[o.lang] ? o.lang : 'en',
       plan:
         o.plan && ok(o.plan.date)
@@ -8528,7 +8571,7 @@ const Dashboard = (() => {
     const laneCols = STATUS.map(s => colsOf(state.statuses.filter(x => x === s).length));
     lanesEl.style.gridTemplateColumns = fit ? laneCols.map(c => `minmax(0,${c}fr)`).join(' ') : '';
     $('#lanes').innerHTML = STATUS.map((s, j) => {
-      const ids = TOPICS.map((_, i) => i).filter(i => state.statuses[i] === s);
+      const ids = (state.order || TOPICS.map((_, i) => i)).filter(i => state.statuses[i] === s);
       const q = ids.reduce((a, i) => a + TOPICS[i].q, 0);
       return `<div class="lane" data-lane="${j}" style="--accent:${COLORS[j]}"><div class="lanehead"><span class="lname">${esc(label(s))}</span><span class="lcount">${ids.length} · ${tf('qn', fmt(q))}</span></div><div class="lanecards${laneCols[j] > 1 ? ' multi' : ''}" style="${laneCols[j] > 1 ? `column-count:${laneCols[j]}` : ''}">${ids
         .map(i => {
@@ -8617,6 +8660,38 @@ const Dashboard = (() => {
       `${TOPICS[i].name} → ${label(to)}`
     );
   }
+  /* put card i right before card `before` (null = at the end of its list) in the saved card order */
+  function placeCard(order, i, before) {
+    const o = order.filter(x => x !== i),
+      k = before == null ? o.length : o.indexOf(before);
+    o.splice(k < 0 ? o.length : k, 0, i);
+    return o;
+  }
+  /* a drop: another list (a move, logged with its date) and/or a new place inside the list, one Undo for both */
+  function dropCard(i, to, before) {
+    const order = placeCard(state.order || TOPICS.map((_, k) => k), i, before),
+      moved = state.statuses[i] !== to,
+      same = JSON.stringify(order) === JSON.stringify(state.order);
+    if (!moved && same) return;
+    commit(
+      () => {
+        if (moved) {
+          state.events.push({
+            id: uid(),
+            date: todayISO(),
+            topic: i,
+            kind: 'move',
+            from: state.statuses[i],
+            to,
+            demo: false,
+          });
+          state.statuses[i] = to;
+        }
+        state.order = order;
+      },
+      moved ? `${TOPICS[i].name} → ${label(to)}` : t('reordered')
+    );
+  }
 
   /* pointer drag & drop: mouse drags after 5px, touch after a short press-and-hold */
   let drag = null;
@@ -8677,12 +8752,18 @@ const Dashboard = (() => {
     drag.active = true;
     lanesEl.style.scrollSnapType = 'none';
     document.body.appendChild(g);
+    /* the card leaves a gap that follows the pointer: where the gap is, the card lands */
+    const gap = document.createElement('div');
+    gap.className = 'task-gap';
+    gap.style.height = r.height + 'px';
+    drag.card.after(gap);
+    drag.gap = gap;
     drag.card.classList.add('dragging');
     document.body.classList.add('dragging');
     moveGhost(x, y);
   }
   function moveGhost(x, y) {
-    drag.ghost.style.transform = `translate(${x - drag.ox}px,${y - drag.oy}px) rotate(2deg)`;
+    drag.ghost.style.transform = `translate(${x - drag.ox}px,${y - drag.oy}px) rotate(3deg)`;
     if (y < 70) window.scrollBy(0, -14);
     else if (y > innerHeight - 70) window.scrollBy(0, 14);
     if (lanesEl.scrollWidth > lanesEl.clientWidth + 2) {
@@ -8705,6 +8786,22 @@ const Dashboard = (() => {
       lane?.classList.add('over');
       drag.lane = lane;
     }
+    /* magnetic: the gap jumps to the place between the cards nearest to the pointer */
+    if (lane) {
+      const box = lane.querySelector('.lanecards'),
+        cards = [...box.querySelectorAll('.task')].filter(c => c !== drag.card),
+        next = cards.find(c => {
+          const r = c.getBoundingClientRect();
+          return y < r.top + r.height / 2;
+        });
+      const moving = next ? drag.gap.nextSibling !== next : box.lastElementChild !== drag.gap;
+      if (moving) {
+        /* the cards of both lists glide to open (and close) the gap */
+        const old = drag.gap.parentElement,
+          els = [...new Set([...box.querySelectorAll('.task'), ...(old ? old.querySelectorAll('.task') : [])])];
+        flip(els, () => (next ? next.before(drag.gap) : box.appendChild(drag.gap)));
+      }
+    }
   }
   function endDrag(e, cancel) {
     if (!drag || (e && e.pointerId !== drag.pid)) return;
@@ -8717,10 +8814,10 @@ const Dashboard = (() => {
       d.card.classList.remove('dragging');
       document.body.classList.remove('dragging');
       d.lane?.classList.remove('over');
-      if (!cancel && d.lane) {
-        const to = STATUS[+d.lane.dataset.lane];
-        if (to !== state.statuses[d.id]) moveCard(d.id, to);
-      }
+      const after = d.gap.nextElementSibling,
+        before = after && after.classList.contains('task') && after !== d.card ? +after.dataset.topic : null;
+      d.gap.remove();
+      if (!cancel && d.lane) dropCard(d.id, STATUS[+d.lane.dataset.lane], before);
     } else if (!cancel) openModal(d.id);
   }
   window.addEventListener('pointerup', e => endDrag(e, false));
@@ -13331,13 +13428,14 @@ const PlanWizard = (() => {
         const r = g.getBoundingClientRect();
         return y < r.top + r.height / 2;
       });
-    if (before) {
-      if (gap.nextSibling !== before) before.before(gap);
-    } else {
-      const last = cards[cards.length - 1],
-        anchor = last || blk.querySelector('.wzbh');
-      if (anchor.nextSibling !== gap) anchor.after(gap);
-    }
+    const last = cards[cards.length - 1],
+      anchor = last || blk.querySelector('.wzbh'),
+      moving = before ? gap.nextSibling !== before : anchor.nextSibling !== gap;
+    /* the cards of the day glide to open the gap where the dragged one will land */
+    if (moving)
+      flip([...day.querySelectorAll('.wzg:not([hidden]), .wzfree, .wzbh')], () =>
+        before ? before.before(gap) : anchor.after(gap)
+      );
     /* scroll the wizard when the card reaches its top or bottom edge */
     const body = $('#wzBody'),
       br = body.getBoundingClientRect();

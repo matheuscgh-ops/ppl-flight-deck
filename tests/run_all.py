@@ -35,6 +35,7 @@ suites = [('End-to-end (index.html)', ['test_e2e.py', os.path.join(ROOT, 'index.
           ('Dashboard preview carousel', ['test_carousel.py']),
           ('Statistics layout, heat map, needs-recall carousel', ['test_heatmap.py']),
           ('Saved plans, wizard & Kanban sync', ['test_plans.py']),
+          ('Kanban: drop a card where you want it', ['test_board_order.py']),
           ('Settings', ['test_settings.py']),
           ('Demo guided tour', ['test_tour.py']),
           ('User guide, docs button & tour link', ['test_docs.py']),
