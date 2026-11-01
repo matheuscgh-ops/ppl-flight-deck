@@ -18,6 +18,7 @@
 .tour-dots{display:flex;gap:4px;flex-wrap:wrap}.tour-dots i{width:6px;height:6px;border-radius:3px;background:#3a424c}.tour-dots i.on{background:#f5a524;width:14px}
 .tour-btns{display:flex;gap:6px}
 .tour-card button{padding:6px 12px;font-size:13px}
+.tour-card .tdocs{display:inline-block;margin-top:10px;font-size:13px;font-weight:700;color:#8ab4f8;text-decoration:none}.tour-card .tdocs:hover{text-decoration:underline}
 .tour-skip{background:none!important;border:0!important;color:#8f99a6!important;padding:6px 4px!important;font-weight:700}
 #tourBtn{white-space:nowrap}
 @media (max-width:640px){#tourBtn{flex:0 0 auto;min-width:36px;padding-left:10px;padding-right:10px}}
@@ -27,15 +28,15 @@
 (()=>{
 const KEY='ppl-flight-deck-demo-tour';
 const T={
-  en:{next:'Next',back:'Back',skip:'Skip tour',done:'Finish',step:'Step {i} of {n}',tour:'Tour',doIt:'Try it: {a}'},
-  pt:{next:'Próximo',back:'Voltar',skip:'Pular tour',done:'Concluir',step:'Passo {i} de {n}',tour:'Tour',doIt:'Faça: {a}'},
-  ja:{next:'次へ',back:'戻る',skip:'スキップ',done:'完了',step:'{n}中{i}',tour:'ツアー',doIt:'やってみる：{a}'}};
+  en:{next:'Next',back:'Back',skip:'Skip tour',done:'Finish',step:'Step {i} of {n}',tour:'Tour',doIt:'Try it: {a}',docs:'Want to know more? Read the user guide ↗'},
+  pt:{next:'Próximo',back:'Voltar',skip:'Pular tour',done:'Concluir',step:'Passo {i} de {n}',tour:'Tour',doIt:'Faça: {a}',docs:'Quer saber mais? Veja a documentação ↗'},
+  ja:{next:'次へ',back:'戻る',skip:'スキップ',done:'完了',step:'{n}中{i}',tour:'ツアー',doIt:'やってみる：{a}',docs:'もっと知りたい？ユーザーガイドを見る ↗'}};
 /* view: which tab to show · sel: element to highlight · act: a click on this selector moves the tour forward */
 const STEPS=[
  {view:'dash',sel:null,
-  en:['Welcome to PPL Flight Deck','A one-minute tour of the demo. All data here is fictional. Use Next, the arrow keys, or Esc to leave.'],
-  pt:['Bem-vindo ao PPL Flight Deck','Um tour de um minuto pela demo. Todos os dados aqui são fictícios. Use Próximo, as setas do teclado ou Esc para sair.'],
-  ja:['PPL Flight Deckへようこそ','デモの1分ツアーです。データはすべて架空です。「次へ」、矢印キー、Escで終了。']},
+  en:['Welcome to PPL Progress','A one-minute tour of the demo. All data here is fictional. Use Next, the arrow keys, or Esc to leave.'],
+  pt:['Bem-vindo ao PPL Progress','Um tour de um minuto pela demo. Todos os dados aqui são fictícios. Use Próximo, as setas do teclado ou Esc para sair.'],
+  ja:['PPL Progressへようこそ','デモの1分ツアーです。データはすべて架空です。「次へ」、矢印キー、Escで終了。']},
  {view:'dash',sel:'.board',
   en:['The Kanban drives your study','Each card is one of the 26 Sporty’s topics. Drag it from To Do toward Very Comfortable as you progress, and tap a card to log a session and its score.'],
   pt:['O Kanban guia seus estudos','Cada card é um dos 26 tópicos do Sporty’s. Arraste de A fazer até Muito confortável conforme avança e toque num card para registrar uma sessão e a nota.'],
@@ -96,7 +97,7 @@ const STEPS=[
   en:['Your data, your language','English, Português or 日本語. Everything stays in your browser; Backup JSON and Save HTML keep a copy.'],
   pt:['Seus dados, seu idioma','English, Português ou 日本語. Tudo fica no seu navegador; Backup JSON e Save HTML guardam uma cópia.'],
   ja:['データも言語も自由に','English・Português・日本語。データはブラウザ内に保存。Backup JSONとSave HTMLでコピーを保存。']},
- {view:'dash',sel:null,
+ {view:'dash',sel:null,docs:true,
   en:['You’re ready','Explore freely. Restart this tour anytime with the Tour button at the top.'],
   pt:['Pronto!','Explore à vontade. Reinicie este tour quando quiser pelo botão Tour no topo.'],
   ja:['準備完了','自由に操作してみてください。上部の「ツアー」ボタンでいつでも再開できます。']}];
@@ -142,7 +143,7 @@ function go(n){
   if(typeof curView!=='undefined'&&curView!==s.view)goView(s.view);
   if(s.view==='sr'&&typeof setStat==='function'){const want=s.stat||'bank';if(statMode!==want)setStat(want)}
   const [title,body,act]=sx(s);
-  els.card.innerHTML=`<div class="thead"><div class="tstep">${esc(tt('step').replace('{i}',k+1).replace('{n}',STEPS.length))}</div><div class="tflags" role="group" aria-label="Language">${[['en','🇺🇸','English'],['pt','🇧🇷','Português'],['ja','🇯🇵','日本語']].map(([c,f,n])=>`<button type="button" data-tlang="${c}" class="${L()===c?'on':''}" title="${n}" aria-label="${n}" aria-pressed="${L()===c}">${f}</button>`).join('')}</div></div><h4>${esc(title)}</h4><p>${esc(body)}</p>${act?`<div class="tdo">👉 ${esc(tt('doIt').replace('{a}',act))}</div>`:''}
+  els.card.innerHTML=`<div class="thead"><div class="tstep">${esc(tt('step').replace('{i}',k+1).replace('{n}',STEPS.length))}</div><div class="tflags" role="group" aria-label="Language">${[['en','🇺🇸','English'],['pt','🇧🇷','Português'],['ja','🇯🇵','日本語']].map(([c,f,n])=>`<button type="button" data-tlang="${c}" class="${L()===c?'on':''}" title="${n}" aria-label="${n}" aria-pressed="${L()===c}">${f}</button>`).join('')}</div></div><h4>${esc(title)}</h4><p>${esc(body)}</p>${act?`<div class="tdo">👉 ${esc(tt('doIt').replace('{a}',act))}</div>`:''}${s.docs&&typeof docsUrl==='function'?`<a class="tdocs" href="${esc(docsUrl(L()))}" target="_blank" rel="noopener">${esc(tt('docs'))}</a>`:''}
     <div class="tour-foot"><button type="button" class="tour-skip" data-tour="skip">${esc(tt('skip'))}</button><div class="tour-dots">${STEPS.map((_,j)=>`<i class="${j===k?'on':''}"></i>`).join('')}</div>
     <div class="tour-btns">${k?`<button type="button" data-tour="back">${esc(tt('back'))}</button>`:''}<button type="button" class="primary" data-tour="next">${esc(tt(k===STEPS.length-1?'done':'next'))}</button></div></div>`;
   els.card.querySelector('[data-tour="next"]').focus({preventScroll:true});

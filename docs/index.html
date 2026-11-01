@@ -1,0 +1,526 @@
+<!doctype html>
+<!-- Built by build.py from src/docs/ — edit src/docs/template.html and src/docs/en.html, then run python3 build.py -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PPL Progress — User guide</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23000'/%3E%3Cpath d='M32 14 50 46H14z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="alternate" hreflang="en" href="index.html">
+<link rel="alternate" hreflang="pt-BR" href="pt.html">
+<link rel="alternate" hreflang="ja" href="ja.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a pilot's operating handbook — fixed index on the left (desktop), numbered procedures, screenshots as figures. */
+:root {
+  --bg: #f6f7f8;
+  --paper: #ffffff;
+  --ink: #1b2129;
+  --ink2: #48525e;
+  --muted: #6b7682;
+  --line: #dde2e7;
+  --accent: #b86e00;        /* taxiway amber */
+  --accent-soft: #fff3df;
+  --link: #1f5fbf;
+  --code-bg: #eef1f4;
+  --display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --body: 'Source Sans 3', 'Segoe UI', system-ui, 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101317; --paper: #171b20; --ink: #e8ecf0; --ink2: #b9c2cc; --muted: #8b96a2; --line: #2a3038;
+    --accent: #f2a93b; --accent-soft: #2b2112; --link: #8ab4f8; --code-bg: #232931; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101317; --paper: #171b20; --ink: #e8ecf0; --ink2: #b9c2cc; --muted: #8b96a2; --line: #2a3038;
+  --accent: #f2a93b; --accent-soft: #2b2112; --link: #8ab4f8; --code-bg: #232931; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 17px/1.6 var(--body); }
+a { color: var(--link); }
+.wrap {
+  display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 40px; max-width: 1240px; margin: 0 auto;
+  padding-block: 32px 80px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; max-height: calc(100vh - 48px); overflow: auto; font-size: 14.5px; }
+.toc .brand { font: 700 22px/1.1 var(--display); letter-spacing: .02em; text-transform: uppercase; margin-bottom: 4px; }
+.toc .brand span { color: var(--accent); }
+.toc .ver { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.toc ol ol { padding-left: 14px; margin: 2px 0 8px; }
+.toc a { display: block; color: var(--ink2); text-decoration: none; padding: 3px 8px; border-radius: 6px; }
+.toc a:hover, .toc a:focus-visible { background: var(--code-bg); color: var(--ink); outline: none; }
+.toc > ol > li > a { font-weight: 700; color: var(--ink); }
+main { min-width: 0; }
+header.hero { padding-bottom: 24px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+.eyebrow { font: 600 13px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 700 clamp(38px, 6vw, 58px)/1.02 var(--display); text-transform: uppercase; letter-spacing: .01em; margin: 10px 0 12px; text-wrap: balance; }
+.lead { font-size: 19px; color: var(--ink2); max-width: 66ch; margin: 0; }
+section.chap { padding-top: 40px; scroll-margin-top: 16px; }
+h2 { font: 700 34px/1.1 var(--display); text-transform: uppercase; letter-spacing: .02em; margin: 0 0 6px; display: flex; gap: 12px; align-items: baseline; }
+h2 .n { color: var(--accent); font-family: var(--mono); font-size: 18px; letter-spacing: 0; }
+h3 { font: 700 23px/1.2 var(--display); letter-spacing: .02em; margin: 30px 0 6px; scroll-margin-top: 16px; text-transform: uppercase; }
+p, li { max-width: 70ch; }
+.chap > p.intro { color: var(--ink2); margin-top: 0; }
+ol.steps { counter-reset: s; list-style: none; padding: 0; margin: 12px 0; display: grid; gap: 8px; }
+ol.steps > li { counter-increment: s; position: relative; padding-left: 38px; }
+ol.steps > li::before {
+  content: counter(s); position: absolute; left: 0; top: 2px; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent); font: 700 13px/24px var(--mono); text-align: center;
+}
+ul { padding-left: 20px; }
+figure { margin: 18px 0 22px; }
+figure img {
+  display: block; max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 8px; cursor: zoom-in;
+  background: #0d0f12;
+}
+figure.narrow img { max-width: 420px; width: 100%; }
+figure.mid img { max-width: 640px; width: 100%; }
+figcaption { font-size: 14px; color: var(--muted); margin-top: 6px; }
+.row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.row figure { margin: 0; }
+kbd, code { font: 500 13.5px var(--mono); background: var(--code-bg); border-radius: 4px; padding: 1px 6px; border: 1px solid var(--line); }
+.ui { font-weight: 700; color: var(--ink); }
+.note { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 10px 14px; border-radius: 0 6px 6px 0; margin: 14px 0; max-width: 70ch; font-size: 16px; }
+.tbl { overflow-x: auto; margin: 12px 0 18px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 15.5px; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 13px var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--code-bg); }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 700; white-space: nowrap; }
+.formula { font: 500 14px/1.7 var(--mono); background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow-x: auto; white-space: pre; }
+.zoom { position: fixed; inset: 0; background: rgba(8, 10, 13, .88); display: grid; place-items: center; z-index: 20; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); cursor: zoom-out; }
+.zoom img { max-width: 100%; max-height: 100%; border-radius: 8px; }
+ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
+.formula + p, p + .formula { margin-top: 10px; }
+.langs { display: flex; gap: 4px; margin: 0 0 16px; flex-wrap: wrap; }
+.langs a { font-size: 13px; font-weight: 600; text-decoration: none; color: var(--ink2); border: 1px solid var(--line); border-radius: 6px; padding: 2px 9px; }
+.langs a[aria-current] { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+.applink { display: inline-block; font-size: 14px; margin-bottom: 18px; }
+:lang(ja) h1, :lang(ja) h2, :lang(ja) h3 { text-transform: none; letter-spacing: 0; }
+@media (max-width: 900px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  nav.toc { position: static; max-height: none; border-bottom: 1px solid var(--line); padding-bottom: 16px; margin-bottom: 8px; }
+  nav.toc ol ol { display: none; }
+  nav.toc > ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .row { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc" aria-label="Contents">
+  <div class="brand">PPL <span>/</span> Progress</div>
+  <div class="ver">User guide · October 2026</div>
+  <div class="langs" role="group" aria-label="Language"><a href="index.html" hreflang="en" aria-current="page">English</a><a href="pt.html" hreflang="pt-BR">Português</a><a href="ja.html" hreflang="ja">日本語</a></div>
+  <a class="applink" href="../">← Open the app</a>
+  <ol>
+    <li><a href="#start">Start here</a></li>
+    <li><a href="#dashboard">Dashboard</a>
+      <ol>
+        <li><a href="#kanban">Kanban and sessions</a></li>
+        <li><a href="#calendar">Calendar</a></li>
+        <li><a href="#side-panel">Forecast and today's plan</a></li>
+        <li><a href="#quick-log">Quick log</a></li>
+      </ol>
+    </li>
+    <li><a href="#plans">Plans</a>
+      <ol>
+        <li><a href="#week">Week view</a></li>
+        <li><a href="#create-plan">Create a plan</a></li>
+        <li><a href="#my-plans">My plans</a></li>
+        <li><a href="#kanban-sync">Sync with Kanban</a></li>
+      </ol>
+    </li>
+    <li><a href="#tests">Practice tests</a></li>
+    <li><a href="#statistics">Statistics</a>
+      <ol>
+        <li><a href="#bank">Question bank</a></li>
+        <li><a href="#stats-tests">Practice tests</a></li>
+      </ol>
+    </li>
+    <li><a href="#settings">Settings</a></li>
+    <li><a href="#data">Sync and your data</a></li>
+    <li><a href="#phone">On your phone</a></li>
+    <li><a href="#math">How the numbers are calculated</a></li>
+    <li><a href="#science">The science behind it</a>
+      <ol>
+        <li><a href="#sci-memory">Memory and reviews</a></li>
+        <li><a href="#sci-score">Expected score</a></li>
+        <li><a href="#sci-tests">Practice tests</a></li>
+        <li><a href="#sci-plan">The plan</a></li>
+        <li><a href="#sci-newport">Deep work (Cal Newport)</a></li>
+        <li><a href="#sci-refs">References</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">User guide</div>
+  <h1>PPL Progress</h1>
+  <p class="lead">A study dashboard for the FAA Private Pilot Knowledge Test. This guide walks through every workflow in the app, step by step, with screens from the demo. The default goal is 85% on the 60-question test (passing is 70%).</p>
+</header>
+
+<section class="chap" id="start">
+  <h2><span class="n">01</span>Start here</h2>
+  <p class="intro">The app is a single HTML file that runs in your browser. There is no install, no server and no account.</p>
+  <ul>
+    <li><b>Personal version</b> (<code>index.html</code>): your real history, with optional sync between devices.</li>
+    <li><b>Demo</b> (<code>demo.html</code>): a year of fictional data, a sample plan and a guided tour. The demo uses separate storage and never touches your data.</li>
+    <li><b>Tabs:</b> <span class="ui">Dashboard</span> (day to day), <span class="ui">Plan</span> (the calendar of your plans), <span class="ui">Practice tests</span> and <span class="ui">Statistics</span>.</li>
+    <li><b>At the top:</b> the sync chip, the button that opens this guide, the language flags (English, Portuguese, Japanese) and the gear for <a href="#settings">Settings</a>.</li>
+  </ul>
+  <figure>
+    <img src="img/en/dash.jpg" alt="Full desktop dashboard with progress, Kanban, calendar and side panel" loading="lazy">
+    <figcaption>On desktop the Dashboard fits on one screen: progress, countdown, practice tests and volume at the top, the Kanban in the middle, and the calendar and side panel at the bottom.</figcaption>
+  </figure>
+  <p class="note">Everything is saved in your browser. To take your data to another device, use <a href="#data">sync</a> or the backup in Settings.</p>
+</section>
+
+<section class="chap" id="dashboard">
+  <h2><span class="n">02</span>Dashboard</h2>
+  <p class="intro">A snapshot of right now: where you are in the question bank, what to study today and how each topic's memory is holding up.</p>
+
+  <h3>Question bank progress</h3>
+  <p>The bar splits the 1,058 questions across the Kanban lists. Each color is a list, and the legend shows the questions and percentage in each one.</p>
+  <figure><img src="img/en/dash-progress.jpg" alt="Question bank progress bar" loading="lazy"></figure>
+
+  <h3>Countdown, practice tests and volume</h3>
+  <ul>
+    <li><span class="ui">Exam countdown</span>: the days until the exam. Change the date in the field right below it or in Settings.</li>
+    <li><span class="ui">Practice tests</span>: the last score, the best, the average of the last 3 and when the next test is due.</li>
+    <li><span class="ui">This week</span>: questions done this week, with the last 12 weeks. The <kbd>⤢</kbd> icon opens the full volume view, with intervals from 3 days to all time.</li>
+  </ul>
+  <figure class="mid"><img src="img/en/volume.jpg" alt="Study volume dialog" loading="lazy"><figcaption>Study volume: the total for the period, the comparison with the previous period and the chart with hover.</figcaption></figure>
+
+  <h3 id="kanban">Kanban and sessions</h3>
+  <p>One card per topic, in 5 lists: <span class="ui">To Do</span>, <span class="ui">Doing</span>, <span class="ui">Not Comfortable</span>, <span class="ui">Very Comfortable</span> and <span class="ui">To Review</span>. The number on each card is your last score on that topic.</p>
+  <figure><img src="img/en/dash-board.jpg" alt="Kanban with the five lists" loading="lazy"></figure>
+  <p><b>Move a card:</b> drag it between lists, with mouse or touch. Every change shows a notice with <span class="ui">Undo</span>.</p>
+  <p><b>Log a session:</b></p>
+  <ol class="steps">
+    <li>Click the card's name (or select it and press <kbd>Enter</kbd>).</li>
+    <li>Choose <span class="ui">Studied</span> (first time), <span class="ui">Reviewed</span> (a review) or <span class="ui">Status only</span> (just change the list).</li>
+    <li>Type the session's score. Leave it blank if it is still in progress: the session counts as started but doesn't feed the memory model.</li>
+    <li>Adjust the list and the date if needed, then click <span class="ui">Save</span>.</li>
+  </ol>
+  <figure class="mid"><img src="img/en/log.jpg" alt="Session log dialog" loading="lazy"><figcaption>The topic's history is at the bottom. The × deletes an entry, with undo.</figcaption></figure>
+  <p><b>Fix just the score:</b> click the colored number on the card, type and press <kbd>Enter</kbd>. The score of the last session is updated.</p>
+
+  <h3 id="calendar">Calendar</h3>
+  <p>Each day shows what was studied, reviewed and any practice tests. The <span class="ui">WK</span> column marks the weeks with study, and the number below it is the current streak. Click a day to see its summary.</p>
+  <div class="row">
+    <figure style="grid-column: span 2"><img src="img/en/dash-cal.jpg" alt="Month calendar" loading="lazy"></figure>
+    <figure><img src="img/en/day.jpg" alt="Summary of one day" loading="lazy"><figcaption>Day summary.</figcaption></figure>
+  </div>
+
+  <h3 id="side-panel">Forecast, spaced repetition and today's plan</h3>
+  <ul>
+    <li><span class="ui">Exam forecast</span>: your predicted exam score, with the pass and goal lines. Click it to see the 3 topics that cost you the most questions.</li>
+    <li><span class="ui">Spaced repetition</span>: the memory curve of one topic. Every 3 seconds it moves through the topics in today's plan, and it stops while you hover over it. Hovering over a card shows that card's curve.</li>
+    <li><span class="ui">Today's plan</span>: what to study today. The tag next to the title says where it comes from: <span class="ui">Daily plan</span>, <span class="ui">Weekly plan</span> or the energy of the suggestion. The circle marks an item as done.</li>
+  </ul>
+  <div class="row">
+    <figure><img src="img/en/dash-side.jpg" alt="Side panel with forecast, curve and today's plan" loading="lazy"></figure>
+    <figure style="grid-column: span 2"><img src="img/en/fctop.jpg" alt="Where you lose the most questions" loading="lazy"><figcaption>Clicking the forecast: where you lose the most questions.</figcaption></figure>
+  </div>
+
+  <h3 id="quick-log">Quick log</h3>
+  <ol class="steps">
+    <li>Press <kbd>⌘K</kbd> (Mac) or <kbd>Ctrl K</kbd>, or <kbd>/</kbd> outside a text field.</li>
+    <li>Type part of the topic's name.</li>
+    <li><kbd>Enter</kbd> logs it as studied, <kbd>⇧ Enter</kbd> as reviewed and <kbd>⌥ Enter</kbd> opens the card. <kbd>Esc</kbd> closes.</li>
+  </ol>
+  <figure class="mid"><img src="img/en/palette.jpg" alt="Quick log palette" loading="lazy"></figure>
+</section>
+
+<section class="chap" id="plans">
+  <h2><span class="n">03</span>Plans</h2>
+  <p class="intro">The Plan tab is your study calendar: you book blocks of time, the app puts the right topics in them, and you adjust before saving.</p>
+
+  <h3 id="week">Week view</h3>
+  <figure><img src="img/en/plan-week.jpg" alt="Week view in the Plan tab" loading="lazy"></figure>
+  <ul>
+    <li><kbd>‹</kbd> <kbd>›</kbd> change the week and <span class="ui">Today</span> goes back to the current one.</li>
+    <li>On the right: the time planned, the time done and how many blocks were missed this week.</li>
+    <li>Each block shows the time, the topic and the questions. The color tells the reason: review, weak topic, no data, new material, practice test, error review or your own activity. Clicking a block opens that topic's log.</li>
+    <li>A day that comes from a daily plan gets a <span class="ui">D</span> mark.</li>
+    <li>When today has no active plan, <span class="ui">Today's energy</span> appears: low, medium or high changes the size and order of today's suggestion.</li>
+    <li>From Friday on, if next week has no plan, a notice suggests planning it.</li>
+  </ul>
+  <p class="note">Where today's plan comes from: first the active <b>daily plan</b> for the date, otherwise the active <b>weekly plan</b> for the week, otherwise the <b>suggestion</b> from your statistics.</p>
+
+  <h3 id="create-plan">Create a plan</h3>
+  <p>Click <span class="ui">+ New plan</span>. There are 4 steps.</p>
+  <ol class="steps">
+    <li><b>Type.</b> Choose <span class="ui">Daily plan</span> (one date) or <span class="ui">Weekly plan</span> (Monday to Sunday). Pick the date or week and, if you like, give it a name.</li>
+    <li><b>Time blocks.</b> Click and drag down on a day to book time, in 15-minute steps. The drag stays on the day where it started, even if the mouse slips onto another, and stops when you let go. Dragging over booked time removes it. On touch: tap the start, then the end. Use <span class="ui">Undo</span> / <span class="ui">Redo</span>, <span class="ui">Clear</span> and <span class="ui">Copy … to the other days</span>.</li>
+    <li><b>Topics.</b> The app suggests what to study in each block. Review and adjust (see below).</li>
+    <li><b>Review.</b> See how the week will look and click <span class="ui">Save &amp; activate</span> or <span class="ui">Save without activating</span>.</li>
+  </ol>
+  <div class="row">
+    <figure><img src="img/en/wiz-1.jpg" alt="Step 1, plan type" loading="lazy"><figcaption>1 · Type</figcaption></figure>
+    <figure><img src="img/en/wiz-2.jpg" alt="Step 2, time blocks" loading="lazy"><figcaption>2 · Time blocks</figcaption></figure>
+    <figure><img src="img/en/wiz-4.jpg" alt="Step 4, review" loading="lazy"><figcaption>4 · Review</figcaption></figure>
+  </div>
+  <p><b>How topics are chosen.</b> Each block is filled to protect as many questions as possible on exam day, given the time each question takes (your speed, the topic's difficulty and the time to review mistakes). Inside a block, the hardest topic, or the one longest without review, comes first. To avoid switching subjects, a block holds at most one topic per ~45 minutes (deep work, configurable). In a weekly plan, each day assumes the earlier days were done: a Monday review doesn't come back on Tuesday.</p>
+  <p><b>Error review.</b> Each block ends with an <span class="ui">Error review</span> item, sized to the mistakes expected in the block: questions × (1 − chance of a right answer) × difficulty × minutes per mistake, rounded to 5. It lasts at least 10 minutes and at most a quarter of the block, and it doesn't appear when the block has fewer than 3 expected mistakes (topics you almost always get right). The item shows the expected mistakes per topic, for example "Weather 8 · NAS 4". To keep everything in the same block, the app shortens the easiest topic first. The review moves to the start of the next block only when a practice test or a topic that can't be shortened fills the whole block. If 20 minutes or more are left over, another topic is added, and no topic gets less than 10 minutes.</p>
+  <p><b>Editing in step 3:</b></p>
+  <ul>
+    <li><kbd>✎</kbd> changes the topic or the questions; <kbd>×</kbd> removes it; <kbd>↑</kbd> moves it up. The items after it rearrange themselves.</li>
+    <li><span class="ui">+ add</span> in free time: add a topic, the practice test, or <span class="ui">Your own activity</span>, with a name and minutes, such as "Simulator" or "Review the material".</li>
+    <li>Each day's energy (low, medium, high) redoes that day's suggestion. <span class="ui">Suggest again</span> redoes everything.</li>
+  </ul>
+  <figure><img src="img/en/wiz-3.jpg" alt="Step 3, suggested topics per block" loading="lazy"><figcaption>3 · Suggested topics in each block, with the session goal.</figcaption></figure>
+  <p><b>Replacing an active plan.</b> A daily plan over an active weekly plan asks whether to replace just that day. Another weekly plan for the same week asks whether to replace the week. Cancel saves nothing.</p>
+  <figure class="mid"><img src="img/en/ask-replace.jpg" alt="Question before replacing a day" loading="lazy"></figure>
+
+  <h3 id="my-plans">My plans</h3>
+  <p>The <span class="ui">My plans</span> tab lists every plan, active ones first. Each has:</p>
+  <ul>
+    <li><span class="ui">View</span>: opens the plan read-only.</li>
+    <li><span class="ui">Edit</span>: opens it at the time blocks, with the saved topics.</li>
+    <li><span class="ui">Activate</span> / <span class="ui">Deactivate</span>: turns it on or off, asking before replacing another active plan.</li>
+    <li><span class="ui">Copy to next week</span> (weekly): starts a new plan with the same blocks one week later and suggests new topics.</li>
+    <li><kbd>×</kbd>: deletes it, with undo.</li>
+  </ul>
+  <figure><img src="img/en/plan-myplans.jpg" alt="List of plans" loading="lazy"></figure>
+
+  <h3 id="kanban-sync">Sync with Kanban</h3>
+  <p>The Kanban never changes on its own. <span class="ui">Sync with Kanban</span> shows what would change for the Kanban to match today's plan:</p>
+  <ul>
+    <li>Topics in today's plan that sit in another list move to <span class="ui">Doing</span>.</li>
+    <li>Topics in Doing that aren't in the plan go back to the list they came from, or to To Do.</li>
+  </ul>
+  <p>Uncheck anything you don't want and click <span class="ui">OK</span>. A single Undo reverts everything.</p>
+  <figure class="mid"><img src="img/en/plan-kbsync.jpg" alt="Review of the moves before syncing with the Kanban" loading="lazy"></figure>
+
+  <h3>Done and missed</h3>
+  <p>A topic in the plan is marked done automatically when you log a session for it on that day. You tick your own activities in the circle. An item from a past day that wasn't done shows as missed, and that topic gets priority in the next suggestion. The plan doesn't rearrange itself.</p>
+</section>
+
+<section class="chap" id="tests">
+  <h2><span class="n">04</span>Practice tests</h2>
+  <p class="intro">FAA practice tests always have 60 questions. The tab shows the numbers, the trend and the full list.</p>
+  <figure><img src="img/en/tests.jpg" alt="Practice tests tab" loading="lazy"></figure>
+  <ol class="steps">
+    <li>Click <span class="ui">Log a practice test</span> (or <span class="ui">+ Log practice test</span>).</li>
+    <li>Type the score. Leave it blank if the test is in progress.</li>
+    <li>Adjust the date and save. To fix it later, use <span class="ui">Edit</span> in the list.</li>
+  </ol>
+  <figure class="mid"><img src="img/en/pt-log.jpg" alt="Logging a practice test" loading="lazy"></figure>
+  <ul>
+    <li><b>Next test:</b> the panel at the top says when the next one is due, suggested every N days (and sooner if you go days without studying). <span class="ui">+ Add to today's plan</span> puts a practice test in today's plan. With an active plan, it goes into the first free slot that fits.</li>
+    <li><b>Trend:</b> the line through your results, with the projection to the exam and the date you reach your goal.</li>
+    <li>Tests left in progress for days show a notice, so you can complete or delete them.</li>
+  </ul>
+</section>
+
+<section class="chap" id="statistics">
+  <h2><span class="n">05</span>Statistics</h2>
+
+  <h3 id="bank">Question bank</h3>
+  <ul>
+    <li><span class="ui">Question-bank model</span>: the expected score today, the chance to pass, the chance to reach your goal and the score on exam day if you stop reviewing. The chart has intervals from 3 days to all time.</li>
+    <li><span class="ui">Where you lose the most questions</span>: the topics that cost you the most questions on a 60-question test.</li>
+    <li><span class="ui">Needs recall</span>: every 3 seconds, the curve of a topic in today's plan, from most to least urgent. The dots jump to a topic.</li>
+  </ul>
+  <figure><img src="img/en/stats-top.jpg" alt="Forecast, where you lose and needs recall" loading="lazy"></figure>
+  <ul>
+    <li><span class="ui">Heat map by topic</span>: one square per topic, with the chance of a right answer today, from coldest to hottest. Click the card to see the history by day, week or month, with filters and hover.</li>
+    <li><span class="ui">Study volume</span>: always open, with the total, the comparison with the previous period and the intervals.</li>
+  </ul>
+  <figure><img src="img/en/stats-mid.jpg" alt="Today's heat map and study volume" loading="lazy"></figure>
+  <figure><img src="img/en/heat-history.jpg" alt="Heat map history" loading="lazy"><figcaption>Heat map history: the topic, the period, the chance of a right answer, the memory, the last score and whether it warmed up or cooled down.</figcaption></figure>
+  <p><b>Topic cards:</b> below is one card per tracked topic, with the current memory, the stability, the next review, the sessions, the last score and the curve. Filter by <span class="ui">Due</span> or by list, pick the chart interval and use <span class="ui">Log a review</span>.</p>
+  <figure class="mid"><img src="img/en/stats-topics.jpg" alt="Topic card with the memory curve" loading="lazy"></figure>
+
+  <h3 id="stats-tests">Practice tests</h3>
+  <p>The forecast from practice tests (weighted average of the latest ones), the trend, the score histogram, the full forecast (chance to pass and to reach your goal, tests passed, consistency) and the model's accuracy compared with your real tests.</p>
+  <figure><img src="img/en/stats-tests.jpg" alt="Practice test statistics" loading="lazy"></figure>
+</section>
+
+<section class="chap" id="settings">
+  <h2><span class="n">06</span>Settings</h2>
+  <p class="intro">The gear at the top opens Settings. Every change applies at once, syncs, goes into the backup and can be undone from the notice. The defaults are the app's original behavior.</p>
+  <div class="row">
+    <figure><img src="img/en/settings.jpg" alt="Settings, first part" loading="lazy"></figure>
+    <figure><img src="img/en/settings-2.jpg" alt="Settings, second part" loading="lazy"></figure>
+    <figure><img src="img/en/phone-settings.jpg" alt="Settings on a phone" loading="lazy"><figcaption>On a phone, Settings open from the bottom.</figcaption></figure>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Setting</th><th>What it changes</th><th>Default</th></tr></thead>
+    <tbody>
+      <tr><td>Exam date</td><td>The countdown, the projection and where the charts end.</td><td>—</td></tr>
+      <tr><td>Language</td><td>English, Portuguese or Japanese.</td><td>English</td></tr>
+      <tr><td>Goal score</td><td>The goal line on every chart, the "chance to reach your goal" and the questions needed (85% = 51 of 60).</td><td>85%</td></tr>
+      <tr><td>Review when recall falls to</td><td>When a topic is due for review. Higher = more frequent reviews.</td><td>90%</td></tr>
+      <tr><td>Practice-test half-life</td><td>How fast older practice tests lose weight in the forecast.</td><td>10 days</td></tr>
+      <tr><td>Bring a practice test forward after</td><td>Days without studying that bring the next practice test forward.</td><td>3 days</td></tr>
+      <tr><td>Minutes per night</td><td>The length of the suggested plan (used when no plan is active).</td><td>3h 00m</td></tr>
+      <tr><td>Questions per hour · Review min</td><td>Your speed and the time to review each mistake.</td><td>40 · 1.5 min</td></tr>
+      <tr><td>Practice test every</td><td>The interval between practice tests (or off).</td><td>3 days</td></tr>
+      <tr><td>Default energy</td><td>The energy of the suggested plan when you haven't picked one today.</td><td>Medium</td></tr>
+      <tr><td>Plan grid starts at</td><td>The first hour of the block grid.</td><td>06:00</td></tr>
+      <tr><td>Deep work</td><td>Block minutes per topic (or off).</td><td>45 min</td></tr>
+      <tr><td>Error review</td><td>The error-review item at the end of each plan block.</td><td>on</td></tr>
+      <tr><td>Default chart intervals</td><td>The starting interval of each chart.</td><td>—</td></tr>
+      <tr><td>Display</td><td>Automatic carousels and numbers on the heat map.</td><td>on</td></tr>
+      <tr><td>Your data</td><td>Backup JSON, Import, Save HTML, Clear examples and Reset everything (asks first, can be undone).</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="chap" id="data">
+  <h2><span class="n">07</span>Sync and your data</h2>
+  <h3>Sync between devices</h3>
+  <p>In the personal version, the sync chip (or <span class="ui">Manage sync…</span> in Settings) turns on syncing through a private GitHub Gist.</p>
+  <ol class="steps">
+    <li>Create a GitHub token with only the "gist" permission.</li>
+    <li>Paste the token and click <span class="ui">Connect</span>. Do this once on each device, with the same token.</li>
+    <li>Done: every change syncs on its own. Sessions, tests and plans made offline on both devices are merged, and deleted items don't come back.</li>
+  </ol>
+  <figure class="mid"><img src="img/en/sync.jpg" alt="Sync dialog" loading="lazy"></figure>
+  <p class="note">The token stays only in this browser. It never goes into Backup JSON, Save HTML or the Gist. Don't share the token with anyone.</p>
+  <p>Sync is optional. Without it, your data is still saved in this browser on its own.</p>
+  <h3>Backup and copy</h3>
+  <ul>
+    <li><span class="ui">Backup JSON</span>: downloads all your data, including plans and settings.</li>
+    <li><span class="ui">Import</span>: restores a backup (an invalid file is refused without changing anything).</li>
+    <li><span class="ui">Save HTML</span>: downloads a copy of the app with your data already inside.</li>
+  </ul>
+</section>
+
+<section class="chap" id="phone">
+  <h2><span class="n">08</span>On your phone</h2>
+  <p class="intro">Everything works on phones and tablets, with these differences:</p>
+  <ul>
+    <li>The Kanban scrolls sideways, one list at a time, with dots below.</li>
+    <li>The spaced-repetition preview has a topic picker, and tapping a plan item shows its curve.</li>
+    <li>The Plan tab shows one day at a time, picked from the day strip. Energy becomes a simple menu.</li>
+    <li>In time blocks, tap the start and then the end. Dialogs open from the bottom.</li>
+    <li>Charts accept tap and drag to read values without locking page scrolling.</li>
+    <li>The book icon at the top opens this guide.</li>
+  </ul>
+  <div class="row">
+    <figure><img src="img/en/phone-dash.jpg" alt="Dashboard on a phone" loading="lazy"><figcaption>Dashboard</figcaption></figure>
+    <figure><img src="img/en/phone-plan.jpg" alt="Plan tab on a phone" loading="lazy"><figcaption>Plan</figcaption></figure>
+    <figure><img src="img/en/phone-settings.jpg" alt="Settings on a phone" loading="lazy"><figcaption>Settings</figcaption></figure>
+  </div>
+</section>
+
+<section class="chap" id="math">
+  <h2><span class="n">09</span>How the numbers are calculated</h2>
+  <p class="intro">A single statistics engine feeds every screen, so the same number reads the same everywhere. The "How it is calculated" sections in the app have the full formulas.</p>
+<div class="formula">memory            R(t) = 1 / (1 + t / 9S)        S = stability, grows after good sessions
+next review       when R falls to the review point  (90% → S days)
+right answer      p = score × R + 1/3 × (1 − R)   (forgetting = guessing among 3)
+bank model        μ = Σ (topic questions / 1,058) × p
+forecast          bank μ blended with the last 3 practice tests (10-day half-life)
+pass / goal       beta-binomial over 60 questions: P(X ≥ 42) and P(X ≥ 51)
+plan order        (1 − p on exam day) × urgency ÷ minutes per question
+blocks            knapsack per block, hardest first, 1 topic per ~45 min
+error review      expected mistakes = Σ questions × (1 − p) × difficulty
+                  minutes = mistakes × min per mistake  (≥ 10, ≤ ¼ of the block, only if ≥ 3 mistakes)</div>
+  <p>In the practice-test trend, the projection slows down after the last test instead of running up to 100%.</p>
+</section>
+<section class="chap" id="science">
+  <h2><span class="n">10</span>The science behind it</h2>
+  <p class="intro">What each statistic means, the formula behind it, and the research it comes from. You don't need any of this to use the app; it is here so you can trust (or question) the numbers.</p>
+
+  <h3 id="sci-memory">Memory decays, and reviews slow the decay</h3>
+  <p>Right after a session you remember almost everything; then recall drops fast and keeps dropping more slowly. This is the <b>forgetting curve</b>, first measured by Ebbinghaus in 1885. Later work showed it is better described by a <b>power law</b> than by a plain exponential. The app uses the power-law curve from the FSRS scheduler:</p>
+<div class="formula">R(t) = 1 / (1 + t / 9S)
+
+R  recall: the chance you still remember the topic (0 to 1)
+t  days since your last session on the topic
+S  stability: how many days it takes for R to fall to 90%</div>
+  <p><b>Stability</b> is the heart of it. Each good session increases S, so the curve gets flatter and the next review can wait longer. That is the <b>spacing effect</b>: the same study time, spread out, gives much longer-lasting memory than cramming. Each session is also a test, and recalling an answer strengthens memory more than rereading it (the <b>testing effect</b>, or retrieval practice).</p>
+  <p><b>When to review.</b> A topic is due when R falls to the review point (90% by default, in Settings). Solving R = 0.9 gives the interval:</p>
+<div class="formula">interval = 9S × (1 / review point − 1)        at 90% → interval = S days</div>
+  <p>A higher review point means shorter intervals and more reviews; a lower one means fewer reviews and more forgetting in between.</p>
+
+  <h3 id="sci-score">From memory to an expected score</h3>
+  <p>FAA questions have 3 options. If you remember a topic you answer at your last score's level; if you have forgotten it, you still get about 1 in 3 right by guessing. So the chance of a right answer on a topic is a mix of the two:</p>
+<div class="formula">p = score × R + 1/3 × (1 − R)</div>
+  <p>The test draws its 60 questions roughly in proportion to how many questions each topic has in the bank, so the expected score is the weighted average:</p>
+<div class="formula">μ = Σ (questions in topic / 1,058) × p</div>
+  <p><b>Chance to pass.</b> The number of right answers out of 60 follows a binomial distribution if every question has the same chance μ. But μ is itself an estimate, and the app knows how far off it has been: its error against your real practice tests. So it uses a <b>beta-binomial</b> distribution, which spreads the chances by that uncertainty instead of pretending μ is exact. Passing is 42 of 60 (70%), and the default goal is 51 of 60 (85%):</p>
+<div class="formula">chance to pass = P(X ≥ 42)        chance of the goal = P(X ≥ 51)        X ~ BetaBinomial(60, μ)</div>
+  <p><b>"If you stop reviewing"</b> runs the same calculation on exam day, letting every curve decay with no more sessions. The gap between today's score and that line is what your reviews are protecting.</p>
+
+  <h3 id="sci-tests">Practice tests and the blended forecast</h3>
+  <p>Practice tests measure the whole thing directly, but each one is noisy. The forecast averages your last 3 tests with <b>exponential decay weights</b>: a test loses half its weight every 10 days (the half-life, in Settings). It then blends that average with the question-bank model μ, so a single good or bad day doesn't swing the forecast.</p>
+<div class="formula">weight of a test = 0.5 ^ (age in days / half-life)</div>
+  <p>The <b>trend</b> is a least-squares line through your scores. Its projection slows down after the last test instead of running to 100%, because scores level off as you approach your ceiling. The model's accuracy chart compares what the bank model predicted on each test day with the score you actually got.</p>
+
+  <h3 id="sci-plan">How the plan decides what you study</h3>
+  <p>Each topic gets a priority: how many points it can still give you on exam day, how urgent its review is, and how long its questions take.</p>
+<div class="formula">priority = (1 − p on exam day) × urgency ÷ minutes per question</div>
+  <p>Filling a block is a <b>knapsack problem</b>: choose the topics whose total time fits the block and whose total value (questions protected) is as large as possible. The app solves it exactly for each block, then puts the hardest topic first, when your attention is freshest.</p>
+  <p><b>Error review.</b> Getting a question wrong and then studying why is one of the most effective ways to learn, especially when the feedback comes soon after the mistake. That is why each block ends with an error review sized to the mistakes you are expected to make in it, inside the same block rather than another day.</p>
+
+  <h3 id="sci-newport">Deep work and planning (Cal Newport)</h3>
+  <p>The plan follows the ideas in Cal Newport's <i>Deep Work</i> and his time-block planning method:</p>
+  <ul>
+    <li><b>Time-block planning.</b> Give every minute of a study session a job before it starts. The Plan tab is a time-block planner: you book blocks first, then decide what goes in each one.</li>
+    <li><b>Deep work over switching.</b> Each switch between subjects leaves "attention residue": part of your mind stays on the previous task (Leroy, 2009). The deep-work limit keeps at most one topic per ~45 minutes of a block.</li>
+    <li><b>Hardest work first.</b> The most demanding topic takes the start of each block, and your energy for the day changes the size and order of the suggestion.</li>
+    <li><b>Planned versus done.</b> The week shows the time you planned, the time you did and the blocks you missed. Missed topics get priority next time, but the plan never rewrites itself: you decide.</li>
+    <li><b>Weekly planning.</b> From Friday on, if next week has no plan, the app nudges you to plan it, so the week starts with intention instead of improvisation.</li>
+    <li><b>You stay in control.</b> Nothing moves on the Kanban until you approve it with Sync with Kanban.</li>
+  </ul>
+  <p>Practicing the topics that cost you the most, with a clear goal per session and fast feedback, is also the core of <b>deliberate practice</b> (Ericsson et al., 1993).</p>
+
+  <h3 id="sci-refs">References and further reading</h3>
+  <ul class="refs">
+    <li>Ebbinghaus, H. (1885). <i>Memory: A Contribution to Experimental Psychology.</i> <a href="https://psychclassics.yorku.ca/Ebbinghaus/index.htm" target="_blank" rel="noopener">Full text</a></li>
+    <li>Wixted, J. T., &amp; Ebbesen, E. B. (1991). On the form of forgetting. <i>Psychological Science, 2</i>(6), 409–415. <a href="https://doi.org/10.1111/j.1467-9280.1991.tb00175.x" target="_blank" rel="noopener">doi</a></li>
+    <li>Open Spaced Repetition. <i>FSRS: the algorithm.</i> <a href="https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm" target="_blank" rel="noopener">GitHub wiki</a></li>
+    <li>Cepeda, N. J., Pashler, H., Vul, E., Wixted, J. T., &amp; Rohrer, D. (2006). Distributed practice in verbal recall tasks: A review and quantitative synthesis. <i>Psychological Bulletin, 132</i>(3), 354–380. <a href="https://doi.org/10.1037/0033-2909.132.3.354" target="_blank" rel="noopener">doi</a></li>
+    <li>Roediger, H. L., &amp; Karpicke, J. D. (2006). Test-enhanced learning: Taking memory tests improves long-term retention. <i>Psychological Science, 17</i>(3), 249–255. <a href="https://doi.org/10.1111/j.1467-9280.2006.01693.x" target="_blank" rel="noopener">doi</a></li>
+    <li>Metcalfe, J. (2017). Learning from errors. <i>Annual Review of Psychology, 68</i>, 465–489. <a href="https://doi.org/10.1146/annurev-psych-010416-044022" target="_blank" rel="noopener">doi</a></li>
+    <li>Ericsson, K. A., Krampe, R. T., &amp; Tesch-Römer, C. (1993). The role of deliberate practice in the acquisition of expert performance. <i>Psychological Review, 100</i>(3), 363–406. <a href="https://doi.org/10.1037/0033-295X.100.3.363" target="_blank" rel="noopener">doi</a></li>
+    <li>Leroy, S. (2009). Why is it so hard to do my work? The challenge of attention residue when switching between work tasks. <i>Organizational Behavior and Human Decision Processes, 109</i>(2), 168–181. <a href="https://doi.org/10.1016/j.obhdp.2009.04.002" target="_blank" rel="noopener">doi</a></li>
+    <li>Newport, C. (2016). <i>Deep Work: Rules for Focused Success in a Distracted World.</i> Grand Central. <a href="https://calnewport.com/deep-work-rules-for-focused-success-in-a-distracted-world/" target="_blank" rel="noopener">calnewport.com</a></li>
+    <li>Newport, C. <i>Time-block planning.</i> <a href="https://www.timeblockplanner.com/" target="_blank" rel="noopener">timeblockplanner.com</a></li>
+    <li>Concepts: <a href="https://en.wikipedia.org/wiki/Forgetting_curve" target="_blank" rel="noopener">forgetting curve</a> · <a href="https://en.wikipedia.org/wiki/Spacing_effect" target="_blank" rel="noopener">spacing effect</a> · <a href="https://en.wikipedia.org/wiki/Testing_effect" target="_blank" rel="noopener">testing effect</a> · <a href="https://en.wikipedia.org/wiki/Binomial_distribution" target="_blank" rel="noopener">binomial</a> · <a href="https://en.wikipedia.org/wiki/Beta-binomial_distribution" target="_blank" rel="noopener">beta-binomial</a> · <a href="https://en.wikipedia.org/wiki/Exponential_smoothing" target="_blank" rel="noopener">exponential weighting</a> · <a href="https://en.wikipedia.org/wiki/Least_squares" target="_blank" rel="noopener">least squares</a> · <a href="https://en.wikipedia.org/wiki/Knapsack_problem" target="_blank" rel="noopener">knapsack problem</a></li>
+    <li>FAA. <i>Private Pilot – Airplane Airman Certification Standards.</i> <a href="https://www.faa.gov/training_testing/testing/acs" target="_blank" rel="noopener">faa.gov</a></li>
+  </ul>
+  <p style="color: var(--muted); font-size: 14px; margin-top: 40px">A personal study tool, not affiliated with the FAA or Sporty's. Forecasts are estimates, not guarantees.</p>
+</section>
+</main>
+</div>
+
+<script>
+/* language links keep the section you are reading */
+document.querySelectorAll('.langs a').forEach(a => a.addEventListener('click', () => { a.href = a.getAttribute('href').split('#')[0] + location.hash; }));
+/* click a screenshot to see it full size; click again or press Esc to close */
+(() => {
+  let box = null;
+  const close = () => { if (box) { box.remove(); box = null; } };
+  document.addEventListener('click', e => {
+    const img = e.target.closest('figure img');
+    if (box) { close(); return; }
+    if (!img) return;
+    box = document.createElement('div');
+    box.className = 'zoom';
+    box.setAttribute('role', 'dialog');
+    box.setAttribute('aria-label', img.alt);
+    const big = document.createElement('img');
+    big.src = img.src; big.alt = img.alt;
+    box.appendChild(big);
+    document.body.appendChild(box);
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+})();
+</script>
+</body>
+</html>

@@ -1,9 +1,10 @@
-# PPL Flight Deck ✈️
+# PPL Progress ✈️
 
 A study tracker for the **FAA Private Pilot (PPL) Knowledge Test**. It is a single HTML file that runs entirely in the browser: no install, no server, no account.
 
 **Live app:** https://matheuscgh-ops.github.io/ppl-flight-deck/
-**Demo with fictional data and a guided tour:** https://matheuscgh-ops.github.io/ppl-flight-deck/demo.html
+**Demo with fictional data and a guided tour:** https://matheuscgh-ops.github.io/ppl-flight-deck/demo.html  
+**User guide (English, Português, 日本語):** https://matheuscgh-ops.github.io/ppl-flight-deck/docs/
 
 The app follows the 26 topics of the Sporty's question bank (1,058 questions). It turns your study history into a plan and an exam forecast, with a target of **85%** on the 60-question test (passing is 70%).
 
@@ -48,6 +49,7 @@ The *How it is calculated* sections in the app list every formula.
 - English, Português and 日本語.
 - Layouts for desktop (one-screen dashboard), laptop, iPad and phone.
 - **Settings (⚙ in the header):** exam date and language; goal score (80 / 85 / 90 %, followed by every goal line, chance and label); review threshold (when a topic falls due); practice-test half-life and the idle days that bring a test forward; the suggested daily plan (minutes slider, questions per hour, review minutes, test cadence, default energy); plan grid start hour and deep-work minutes per topic; default chart intervals; carousels and heat-map numbers on/off; sync; Backup / Import / Save HTML / Clear examples / Reset everything (asks first, can be undone); the demo tour. Every setting syncs and goes into the backup; the defaults are the original behaviour.
+- **User guide:** the book button in the header opens the guide in the app's language (English by default, Portuguese and Japanese), with screenshots in each language and a chapter on the science behind the numbers (formulas, papers, Cal Newport's principles). The tour's last step links to it too.
 - **Your data stays in your browser** (localStorage). Backup JSON / Import / Save HTML (in Settings) keep a copy.
 - **Optional sync** between devices through a *private* GitHub Gist. Copies are merged by item and deletions are remembered. The token stays in your browser only: it never goes into backups, Save HTML or the Gist.
 - The **demo** is fully isolated from the personal app (separate storage, sync off) and has a guided tour.
@@ -57,7 +59,8 @@ The *How it is calculated* sections in the app list every formula.
 ```
 index.html              personal app (generated, publish this)
 demo.html               demo with fictional data and a guided tour (generated, publish this)
-build.py                builds both files from src/
+build.py                builds both files and the user guide from src/
+docs/                   user guide (generated): index.html (English), pt.html, ja.html; screenshots in docs/img/<lang>/
 src/index.html          page markup (placeholders @@CSS@@ and @@JS@@)
 src/styles/             CSS, one file per component, concatenated in order
 src/i18n/               translations (English, Português, 日本語)
@@ -68,6 +71,8 @@ src/js/views/           dashboard, plan, statistics, heat map, volume, carousels
 src/js/ui/              charts, hover, dialogs (shared modal wiring), navigation, header, settings
 src/js/sync/            GitHub Gist sync
 src/demo/               fictional data and the guided tour (demo only)
+src/docs/               user guide source: template.html + en.html, pt.html, ja.html
+tools/                  docs_screenshots.py: retakes the guide's screenshots in every language
 tests/                  Playwright suites + run_all.py
 ```
 
@@ -78,7 +83,13 @@ Each JavaScript file is one module (an IIFE) that keeps its internals private an
 Edit the files in `src/`, then rebuild:
 
 ```bash
-python3 build.py        # writes index.html and demo.html
+python3 build.py        # writes index.html, demo.html and docs/
+```
+
+After a UI change that shows in the user guide, retake its screenshots (all languages, or one: `pt`):
+
+```bash
+python3 tools/docs_screenshots.py
 ```
 
 Run the tests. They need Python 3, Playwright and Chromium (`pip install playwright && playwright install chromium`):
@@ -88,7 +99,7 @@ cd tests
 python3 run_all.py      # every suite on desktop, laptop, iPad mini and iPhone sizes
 ```
 
-The suites cover the built-in unit tests (formulas checked against independent calculations and scipy), end to end, sync with a mocked GitHub API, demo/personal isolation, layouts, calendar, volume, spaced repetition everywhere, forecast and plan, practice tests, chart hover, the Statistics layout and heat map, the carousels, saved plans and the Kanban sync, Settings, the guided tour and the build itself.
+The suites cover the built-in unit tests (formulas checked against independent calculations and scipy), end to end, sync with a mocked GitHub API, demo/personal isolation, layouts, calendar, volume, spaced repetition everywhere, forecast and plan, practice tests, chart hover, the Statistics layout and heat map, the carousels, saved plans and the Kanban sync, Settings, the guided tour, the user guide and its links, and the build itself.
 
 ## Publishing on GitHub Pages
 

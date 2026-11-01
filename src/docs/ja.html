@@ -1,0 +1,385 @@
+<div class="wrap">
+<nav class="toc" aria-label="目次">
+  <div class="brand">PPL <span>/</span> Progress</div>
+  <div class="ver">ユーザーガイド · 2026年10月</div>
+  @@LANGS@@
+  <a class="applink" href="../">← アプリを開く</a>
+  <ol>
+    <li><a href="#start">はじめに</a></li>
+    <li><a href="#dashboard">ダッシュボード</a>
+      <ol>
+        <li><a href="#kanban">カンバンと学習記録</a></li>
+        <li><a href="#calendar">カレンダー</a></li>
+        <li><a href="#side-panel">予測と今日の計画</a></li>
+        <li><a href="#quick-log">クイック記録</a></li>
+      </ol>
+    </li>
+    <li><a href="#plans">プラン</a>
+      <ol>
+        <li><a href="#week">週の表示</a></li>
+        <li><a href="#create-plan">プランを作る</a></li>
+        <li><a href="#my-plans">マイプラン</a></li>
+        <li><a href="#kanban-sync">カンバンと同期</a></li>
+      </ol>
+    </li>
+    <li><a href="#tests">模試</a></li>
+    <li><a href="#statistics">統計</a>
+      <ol>
+        <li><a href="#bank">問題バンク</a></li>
+        <li><a href="#stats-tests">模試</a></li>
+      </ol>
+    </li>
+    <li><a href="#settings">設定</a></li>
+    <li><a href="#data">同期とデータ</a></li>
+    <li><a href="#phone">スマートフォンで</a></li>
+    <li><a href="#math">数値の計算方法</a></li>
+    <li><a href="#science">背景にある科学</a>
+      <ol>
+        <li><a href="#sci-memory">記憶と復習</a></li>
+        <li><a href="#sci-score">予想スコア</a></li>
+        <li><a href="#sci-tests">模試</a></li>
+        <li><a href="#sci-plan">プラン</a></li>
+        <li><a href="#sci-newport">ディープワーク（ニューポート）</a></li>
+        <li><a href="#sci-refs">参考文献</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">ユーザーガイド</div>
+  <h1>PPL Progress</h1>
+  <p class="lead">FAA自家用操縦士（Private Pilot）学科試験のための学習ダッシュボードです。このガイドでは、アプリのすべての操作をデモ版の画面とともに順を追って説明します。初期設定の目標は60問の試験で85%です（合格ラインは70%）。</p>
+</header>
+
+<section class="chap" id="start">
+  <h2><span class="n">01</span>はじめに</h2>
+  <p class="intro">アプリはブラウザで動く1つのHTMLファイルです。インストールもサーバーもアカウントも不要です。</p>
+  <ul>
+    <li><b>個人版</b>（<code>index.html</code>）：実際の学習履歴。端末間の同期は任意です。</li>
+    <li><b>デモ</b>（<code>demo.html</code>）：1年分の架空データ、サンプルのプラン、ガイドツアー付き。デモは別の保存領域を使い、あなたのデータには一切触れません。</li>
+    <li><b>タブ：</b><span class="ui">Dashboard</span>（日々の学習）、<span class="ui">Plan</span>（プランのカレンダー）、<span class="ui">Practice tests</span>、<span class="ui">Statistics</span>。</li>
+    <li><b>上部：</b>同期チップ、言語の旗（英語・ポルトガル語・日本語）、<a href="#settings">設定</a>の歯車、そしてこのガイドを開くボタン。</li>
+  </ul>
+  <figure>
+    <img src="img/dash.jpg" alt="進捗、カンバン、カレンダー、サイドパネルを含むデスクトップのダッシュボード" loading="lazy">
+    <figcaption>デスクトップではダッシュボードが1画面に収まります。上に進捗・カウントダウン・模試・学習量、中央にカンバン、下にカレンダーとサイドパネル。</figcaption>
+  </figure>
+  <p class="note">データはすべてブラウザに保存されます。別の端末に移すには<a href="#data">同期</a>か、設定のバックアップを使ってください。</p>
+</section>
+
+<section class="chap" id="dashboard">
+  <h2><span class="n">02</span>ダッシュボード</h2>
+  <p class="intro">今の状態をひと目で：問題バンクのどこにいるか、今日何を学ぶか、各トピックの記憶がどれだけ残っているか。</p>
+
+  <h3>問題バンクの進捗</h3>
+  <p>バーは1,058問をカンバンのリストごとに分けて表示します。色ごとに1つのリストで、凡例に各リストの問題数と割合が出ます。</p>
+  <figure><img src="img/dash-progress.jpg" alt="問題バンクの進捗バー" loading="lazy"></figure>
+
+  <h3>カウントダウン、模試、学習量</h3>
+  <ul>
+    <li><span class="ui">Exam countdown</span>：試験までの日数。すぐ下の欄か設定で日付を変更できます。</li>
+    <li><span class="ui">Practice tests</span>：最新スコア、最高スコア、直近3回の平均、次の模試の予定。</li>
+    <li><span class="ui">This week</span>：今週解いた問題数と直近12週。<kbd>⤢</kbd>で3日から全期間までの詳しい学習量を表示します。</li>
+  </ul>
+  <figure class="mid"><img src="img/volume.jpg" alt="学習量のダイアログ" loading="lazy"><figcaption>学習量：期間の合計、前の期間との比較、ホバーできるグラフ。</figcaption></figure>
+
+  <h3 id="kanban">カンバンと学習記録</h3>
+  <p>トピックごとに1枚のカードがあり、5つのリストに分かれます：<span class="ui">To Do</span>、<span class="ui">Doing</span>、<span class="ui">Not Comfortable</span>、<span class="ui">Very Comfortable</span>、<span class="ui">To Review</span>。カードの数字はそのトピックの最新スコアです。</p>
+  <figure><img src="img/dash-board.jpg" alt="5つのリストがあるカンバン" loading="lazy"></figure>
+  <p><b>カードを移動：</b>マウスまたはタッチでリスト間をドラッグします。変更のたびに<span class="ui">Undo</span>付きの通知が出ます。</p>
+  <p><b>学習を記録：</b></p>
+  <ol class="steps">
+    <li>カードの名前をクリック（または選択して<kbd>Enter</kbd>）。</li>
+    <li><span class="ui">Studied</span>（初回）、<span class="ui">Reviewed</span>（復習）、<span class="ui">Status only</span>（リストの変更のみ）を選びます。</li>
+    <li>スコアを入力します。まだ途中なら空欄のままで：開始として数えますが、記憶モデルには入りません。</li>
+    <li>必要ならリストと日付を調整し、<span class="ui">Save</span>をクリック。</li>
+  </ol>
+  <figure class="mid"><img src="img/log.jpg" alt="学習記録のダイアログ" loading="lazy"><figcaption>下にトピックの履歴があります。×で記録を削除できます（元に戻せます）。</figcaption></figure>
+  <p><b>スコアだけ直す：</b>カードの色付きの数字をクリックし、入力して<kbd>Enter</kbd>。最後の記録のスコアが更新されます。</p>
+
+  <h3 id="calendar">カレンダー</h3>
+  <p>各日に学習・復習・模試が表示されます。<span class="ui">WK</span>の列は学習した週を示し、下の数字は現在の連続記録です。日をクリックするとその日のまとめが出ます。</p>
+  <div class="row">
+    <figure style="grid-column: span 2"><img src="img/dash-cal.jpg" alt="月のカレンダー" loading="lazy"></figure>
+    <figure><img src="img/day.jpg" alt="1日のまとめ" loading="lazy"><figcaption>1日のまとめ。</figcaption></figure>
+  </div>
+
+  <h3 id="side-panel">予測、間隔反復、今日の計画</h3>
+  <ul>
+    <li><span class="ui">Exam forecast</span>：試験の予想スコアと、合格・目標のライン。クリックすると最も失点の多い3トピックが出ます。</li>
+    <li><span class="ui">Spaced repetition</span>：1つのトピックの記憶曲線。3秒ごとに今日の計画のトピックを順に表示し、マウスを乗せると止まります。カードにマウスを乗せるとそのカードの曲線が出ます。</li>
+    <li><span class="ui">Today's plan</span>：今日学ぶこと。タイトル横のタグが出どころを示します：<span class="ui">Daily plan</span>、<span class="ui">Weekly plan</span>、または提案のエネルギー。丸をクリックすると完了になります。</li>
+  </ul>
+  <div class="row">
+    <figure><img src="img/dash-side.jpg" alt="予測、曲線、今日の計画があるサイドパネル" loading="lazy"></figure>
+    <figure style="grid-column: span 2"><img src="img/fctop.jpg" alt="最も失点の多いトピック" loading="lazy"><figcaption>予測をクリック：最も失点の多いトピック。</figcaption></figure>
+  </div>
+
+  <h3 id="quick-log">クイック記録</h3>
+  <ol class="steps">
+    <li><kbd>⌘K</kbd>（Mac）か<kbd>Ctrl K</kbd>、またはテキスト欄の外で<kbd>/</kbd>を押します。</li>
+    <li>トピック名の一部を入力します。</li>
+    <li><kbd>Enter</kbd>で学習、<kbd>⇧ Enter</kbd>で復習として記録、<kbd>⌥ Enter</kbd>でカードを開きます。<kbd>Esc</kbd>で閉じます。</li>
+  </ol>
+  <figure class="mid"><img src="img/palette.jpg" alt="クイック記録のパレット" loading="lazy"></figure>
+</section>
+
+<section class="chap" id="plans">
+  <h2><span class="n">03</span>プラン</h2>
+  <p class="intro">Planタブは学習カレンダーです。時間のブロックを確保すると、アプリが適切なトピックを入れ、保存前に調整できます。</p>
+
+  <h3 id="week">週の表示</h3>
+  <figure><img src="img/plan-week.jpg" alt="Planタブの週の表示" loading="lazy"></figure>
+  <ul>
+    <li><kbd>‹</kbd> <kbd>›</kbd>で週を切り替え、<span class="ui">Today</span>で今週に戻ります。</li>
+    <li>右側：その週の計画時間、実績、逃したブロックの数。</li>
+    <li>各ブロックには時刻、トピック、問題数が出ます。色は理由を示します：復習、苦手、データなし、新しい内容、模試、間違いの振り返り、自分の活動。ブロックをクリックするとそのトピックの記録が開きます。</li>
+    <li>日のプランから来た日には<span class="ui">D</span>の印が付きます。</li>
+    <li>今日に有効なプランがないときは<span class="ui">Today's energy</span>が出ます：低・中・高で今日の提案の量と順番が変わります。</li>
+    <li>金曜日以降、来週のプランがなければ計画を促す通知が出ます。</li>
+  </ul>
+  <p class="note">今日の計画の出どころ：まずその日に有効な<b>日のプラン</b>、なければその週の有効な<b>週のプラン</b>、それもなければ統計からの<b>提案</b>。</p>
+
+  <h3 id="create-plan">プランを作る</h3>
+  <p><span class="ui">+ New plan</span>をクリックします。4つのステップがあります。</p>
+  <ol class="steps">
+    <li><b>種類。</b><span class="ui">Daily plan</span>（1日）か<span class="ui">Weekly plan</span>（月曜〜日曜）を選びます。日付か週を選び、必要なら名前を付けます。</li>
+    <li><b>時間ブロック。</b>日の上でクリックして下にドラッグすると、15分単位で時間を確保します。ドラッグは始めた日にとどまり、マウスが別の日にずれても変わらず、離すと止まります。確保済みの時間の上をドラッグすると削除します。タッチでは開始、次に終了をタップ。<span class="ui">Undo</span> / <span class="ui">Redo</span>、<span class="ui">Clear</span>、<span class="ui">Copy … to the other days</span>も使えます。</li>
+    <li><b>トピック。</b>アプリが各ブロックで学ぶ内容を提案します。確認して調整します（下記参照）。</li>
+    <li><b>確認。</b>週の様子を見て<span class="ui">Save &amp; activate</span>か<span class="ui">Save without activating</span>をクリック。</li>
+  </ol>
+  <div class="row">
+    <figure><img src="img/wiz-1.jpg" alt="ステップ1、プランの種類" loading="lazy"><figcaption>1 · 種類</figcaption></figure>
+    <figure><img src="img/wiz-2.jpg" alt="ステップ2、時間ブロック" loading="lazy"><figcaption>2 · 時間ブロック</figcaption></figure>
+    <figure><img src="img/wiz-4.jpg" alt="ステップ4、確認" loading="lazy"><figcaption>4 · 確認</figcaption></figure>
+  </div>
+  <p><b>トピックの選び方。</b>各ブロックは、1問にかかる時間（あなたの速さ、トピックの難しさ、間違いを見直す時間）を考えて、試験当日にできるだけ多くの問題を守れるように埋められます。ブロック内では最も難しいトピック、または最も長く復習していないトピックが先に来ます。話題の切り替えを減らすため、1ブロックに入るのは約45分ごとに1トピックまでです（ディープワーク、変更可）。週のプランでは、各日はそれ以前の日が完了したものとして考えます：月曜の復習は火曜に戻ってきません。</p>
+  <p><b>間違いの振り返り。</b>各ブロックは<span class="ui">Error review</span>で終わり、その長さはブロックで予想される間違いに合わせます：問題数 ×（1 − 正解の確率）× 難しさ × 1問あたりの見直し時間を5分単位に丸めます。最短10分、最長でブロックの4分の1で、予想される間違いが3問未満のブロック（ほぼ毎回正解するトピック）には出ません。項目にはトピックごとの予想間違い数が出ます（例：「Weather 8 · NAS 4」）。すべてを同じブロックに収めるため、アプリはまず最もやさしいトピックを短くします。模試や短くできないトピックがブロック全体を占めるときだけ、振り返りは次のブロックの最初に移ります。20分以上余れば別のトピックを追加し、10分未満のトピックは作りません。</p>
+  <p><b>ステップ3での編集：</b></p>
+  <ul>
+    <li><kbd>✎</kbd>でトピックや問題数を変更、<kbd>×</kbd>で削除、<kbd>↑</kbd>で順番を上げます。後の項目は自動で並び直します。</li>
+    <li>空き時間の<span class="ui">+ add</span>：トピック、模試、または<span class="ui">Your own activity</span>（名前と分数、例：「シミュレーター」「教材の見直し」）を追加。</li>
+    <li>各日のエネルギー（低・中・高）でその日の提案を作り直します。<span class="ui">Suggest again</span>ですべて作り直します。</li>
+  </ul>
+  <figure><img src="img/wiz-3.jpg" alt="ステップ3、ブロックごとの提案トピック" loading="lazy"><figcaption>3 · 各ブロックの提案トピックと学習の目標。</figcaption></figure>
+  <p><b>有効なプランの置き換え。</b>有効な週のプランの上に日のプランを作ると、その日だけ置き換えるか確認します。同じ週に別の週のプランを作ると、週を置き換えるか確認します。キャンセルすると何も保存されません。</p>
+  <figure class="mid"><img src="img/ask-replace.jpg" alt="日を置き換える前の確認" loading="lazy"></figure>
+
+  <h3 id="my-plans">マイプラン</h3>
+  <p><span class="ui">My plans</span>タブにはすべてのプランが並び、有効なものが先に来ます。各プランには：</p>
+  <ul>
+    <li><span class="ui">View</span>：読み取り専用で開きます。</li>
+    <li><span class="ui">Edit</span>：保存したトピックごと、時間ブロックの画面で開きます。</li>
+    <li><span class="ui">Activate</span> / <span class="ui">Deactivate</span>：有効・無効を切り替えます。別の有効なプランを置き換える前に確認します。</li>
+    <li><span class="ui">Copy to next week</span>（週のプラン）：同じブロックで1週間後の新しいプランを作り、新しいトピックを提案します。</li>
+    <li><kbd>×</kbd>：削除（元に戻せます）。</li>
+  </ul>
+  <figure><img src="img/plan-myplans.jpg" alt="プランの一覧" loading="lazy"></figure>
+
+  <h3 id="kanban-sync">カンバンと同期</h3>
+  <p>カンバンが勝手に変わることはありません。<span class="ui">Sync with Kanban</span>は、カンバンを今日の計画に合わせるとどう変わるかを表示します：</p>
+  <ul>
+    <li>今日の計画にあり別のリストにあるトピックは<span class="ui">Doing</span>へ移ります。</li>
+    <li>Doingにあり計画にないトピックは元のリスト、またはTo Doに戻ります。</li>
+  </ul>
+  <p>不要なもののチェックを外し、<span class="ui">OK</span>をクリック。1回のUndoですべて元に戻せます。</p>
+  <figure class="mid"><img src="img/plan-kbsync.jpg" alt="カンバンと同期する前の移動の確認" loading="lazy"></figure>
+
+  <h3>完了と未実施</h3>
+  <p>計画のトピックは、その日にそのトピックを記録すると自動で完了になります。自分の活動は丸をクリックして完了にします。過ぎた日に終わらなかった項目は未実施として表示され、そのトピックは次の提案で優先されます。プランが自動で組み替わることはありません。</p>
+</section>
+
+<section class="chap" id="tests">
+  <h2><span class="n">04</span>模試</h2>
+  <p class="intro">FAAの模試は常に60問です。このタブでは数値、傾向、全一覧を表示します。</p>
+  <figure><img src="img/tests.jpg" alt="Practice testsタブ" loading="lazy"></figure>
+  <ol class="steps">
+    <li><span class="ui">Log a practice test</span>（または<span class="ui">+ Log practice test</span>）をクリック。</li>
+    <li>スコアを入力します。模試が途中なら空欄のままで。</li>
+    <li>日付を調整して保存。後で直すには一覧の<span class="ui">Edit</span>を使います。</li>
+  </ol>
+  <figure class="mid"><img src="img/pt-log.jpg" alt="模試の記録" loading="lazy"></figure>
+  <ul>
+    <li><b>次の模試：</b>上のパネルに次の予定が出ます。N日ごとに提案され、学習しない日が続くと早まります。<span class="ui">+ Add to today's plan</span>で今日の計画に模試を入れます。有効なプランがあれば、入る最初の空き時間に入ります。</li>
+    <li><b>傾向：</b>結果を通る直線、試験日までの予測、目標に届く日。</li>
+    <li>何日も途中のままの模試には通知が出るので、完了するか削除してください。</li>
+  </ul>
+</section>
+
+<section class="chap" id="statistics">
+  <h2><span class="n">05</span>統計</h2>
+
+  <h3 id="bank">問題バンク</h3>
+  <ul>
+    <li><span class="ui">Question-bank model</span>：今日の予想スコア、合格の確率、目標に届く確率、復習をやめた場合の試験日のスコア。グラフは3日から全期間まで。</li>
+    <li><span class="ui">Where you lose the most questions</span>：60問の試験で最も失点の多いトピック。</li>
+    <li><span class="ui">Needs recall</span>：3秒ごとに、今日の計画のトピックの曲線を緊急度の高い順に表示。点をタップするとそのトピックへ。</li>
+  </ul>
+  <figure><img src="img/stats-top.jpg" alt="予測、失点、要復習" loading="lazy"></figure>
+  <ul>
+    <li><span class="ui">Heat map by topic</span>：トピックごとに1マス、今日の正解の確率を冷たい順から熱い順に。カードをクリックすると日・週・月ごとの履歴がフィルターとホバー付きで出ます。</li>
+    <li><span class="ui">Study volume</span>：常に表示。合計、前の期間との比較、期間の切り替え。</li>
+  </ul>
+  <figure><img src="img/stats-mid.jpg" alt="今日のヒートマップと学習量" loading="lazy"></figure>
+  <figure><img src="img/heat-history.jpg" alt="ヒートマップの履歴" loading="lazy"><figcaption>ヒートマップの履歴：トピック、期間、正解の確率、記憶、最新スコア、上がったか下がったか。</figcaption></figure>
+  <p><b>トピックのカード：</b>下には記録のあるトピックごとにカードがあり、現在の記憶、安定度、次の復習、学習回数、最新スコア、曲線を表示します。<span class="ui">Due</span>やリストで絞り込み、グラフの期間を選び、<span class="ui">Log a review</span>を使えます。</p>
+  <figure class="mid"><img src="img/stats-topics.jpg" alt="記憶曲線付きのトピックのカード" loading="lazy"></figure>
+
+  <h3 id="stats-tests">模試</h3>
+  <p>模試からの予測（最近の模試の加重平均）、傾向、スコアのヒストグラム、詳しい予測（合格と目標到達の確率、合格回数、安定度）、そして実際の模試と比べたモデルの精度。</p>
+  <figure><img src="img/stats-tests.jpg" alt="模試の統計" loading="lazy"></figure>
+</section>
+
+<section class="chap" id="settings">
+  <h2><span class="n">06</span>設定</h2>
+  <p class="intro">上部の歯車で設定を開きます。変更はすぐに反映され、同期とバックアップに含まれ、通知から元に戻せます。初期値はアプリ本来の動作です。</p>
+  <div class="row">
+    <figure><img src="img/settings.jpg" alt="設定、前半" loading="lazy"></figure>
+    <figure><img src="img/settings-2.jpg" alt="設定、後半" loading="lazy"></figure>
+    <figure><img src="img/phone-settings.jpg" alt="スマートフォンの設定" loading="lazy"><figcaption>スマートフォンでは設定が下から開きます。</figcaption></figure>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>設定</th><th>変わること</th><th>初期値</th></tr></thead>
+    <tbody>
+      <tr><td>Exam date</td><td>カウントダウン、予測、グラフの終わり。</td><td>—</td></tr>
+      <tr><td>Language</td><td>英語、ポルトガル語、日本語。</td><td>English</td></tr>
+      <tr><td>Goal score</td><td>すべてのグラフの目標ライン、「目標に届く確率」、必要な正解数（85% = 60問中51問）。</td><td>85%</td></tr>
+      <tr><td>Review when recall falls to</td><td>トピックが復習の時期になるタイミング。高いほど復習が頻繁になります。</td><td>90%</td></tr>
+      <tr><td>Practice-test half-life</td><td>古い模試が予測の中で重みを失う速さ。</td><td>10日</td></tr>
+      <tr><td>Bring a practice test forward after</td><td>次の模試を早める、学習しなかった日数。</td><td>3日</td></tr>
+      <tr><td>Minutes per night</td><td>提案プランの長さ（有効なプランがないときに使用）。</td><td>3時間</td></tr>
+      <tr><td>Questions per hour · Review min</td><td>あなたの速さと、1問の間違いを見直す時間。</td><td>40 · 1.5分</td></tr>
+      <tr><td>Practice test every</td><td>模試の間隔（またはオフ）。</td><td>3日</td></tr>
+      <tr><td>Default energy</td><td>今日エネルギーを選んでいないときの提案プランのエネルギー。</td><td>Medium</td></tr>
+      <tr><td>Plan grid starts at</td><td>ブロックのグリッドの開始時刻。</td><td>06:00</td></tr>
+      <tr><td>Deep work</td><td>トピック1つあたりのブロックの分数（またはオフ）。</td><td>45分</td></tr>
+      <tr><td>Error review</td><td>プランの各ブロックの最後の振り返り項目。</td><td>オン</td></tr>
+      <tr><td>Default chart intervals</td><td>各グラフの最初の期間。</td><td>—</td></tr>
+      <tr><td>Display</td><td>自動カルーセルとヒートマップの数字。</td><td>オン</td></tr>
+      <tr><td>Your data</td><td>Backup JSON、Import、Save HTML、Clear examples、Reset everything（事前に確認し、元に戻せます）。</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="chap" id="data">
+  <h2><span class="n">07</span>同期とデータ</h2>
+  <h3>端末間の同期</h3>
+  <p>個人版では、同期チップ（または設定の<span class="ui">Manage sync…</span>）から、非公開のGitHub Gistを使った同期をオンにできます。</p>
+  <ol class="steps">
+    <li>「gist」の権限だけを持つGitHubトークンを作ります。</li>
+    <li>トークンを貼り付けて<span class="ui">Connect</span>をクリック。各端末で1回、同じトークンで行います。</li>
+    <li>完了：変更は自動で同期されます。両方の端末でオフライン中に記録した学習、模試、プランはまとめられ、削除したものは戻りません。</li>
+  </ol>
+  <figure class="mid"><img src="img/sync.jpg" alt="同期のダイアログ" loading="lazy"></figure>
+  <p class="note">トークンはこのブラウザにだけ保存されます。Backup JSON、Save HTML、Gistには決して含まれません。トークンは誰とも共有しないでください。</p>
+  <p>同期は任意です。使わなくても、データはこのブラウザに自動で保存されます。</p>
+  <h3>バックアップとコピー</h3>
+  <ul>
+    <li><span class="ui">Backup JSON</span>：プランと設定を含むすべてのデータをダウンロード。</li>
+    <li><span class="ui">Import</span>：バックアップを復元（無効なファイルは何も変えずに拒否されます）。</li>
+    <li><span class="ui">Save HTML</span>：データ入りのアプリのコピーをダウンロード。</li>
+  </ul>
+</section>
+
+<section class="chap" id="phone">
+  <h2><span class="n">08</span>スマートフォンで</h2>
+  <p class="intro">スマートフォンとタブレットでもすべて使えます。違いは次のとおりです：</p>
+  <ul>
+    <li>カンバンは横にスクロールし、1度に1リスト、下に点が出ます。</li>
+    <li>間隔反復のプレビューにはトピックの選択があり、計画の項目をタップするとその曲線が出ます。</li>
+    <li>Planタブは1日ずつ表示し、日付の帯から選びます。エネルギーはシンプルなメニューになります。</li>
+    <li>時間ブロックでは開始、次に終了をタップ。ダイアログは下から開きます。</li>
+    <li>グラフはタップやドラッグで値を読め、ページのスクロールを妨げません。</li>
+    <li>上部の本のアイコンでこのガイドを開きます。</li>
+  </ul>
+  <div class="row">
+    <figure><img src="img/phone-dash.jpg" alt="スマートフォンのダッシュボード" loading="lazy"><figcaption>Dashboard</figcaption></figure>
+    <figure><img src="img/phone-plan.jpg" alt="スマートフォンのPlanタブ" loading="lazy"><figcaption>Plan</figcaption></figure>
+    <figure><img src="img/phone-settings.jpg" alt="スマートフォンの設定" loading="lazy"><figcaption>設定</figcaption></figure>
+  </div>
+</section>
+
+<section class="chap" id="math">
+  <h2><span class="n">09</span>数値の計算方法</h2>
+  <p class="intro">1つの統計エンジンがすべての画面を動かしているので、同じ数値はどこでも同じです。アプリの「How it is calculated」に完全な式があります。</p>
+<div class="formula">記憶          R(t) = 1 / (1 + t / 9S)        S = 安定度、良い学習のあと増える
+次の復習      R が復習ポイントまで下がったとき  (90% → S日)
+正解の確率    p = スコア × R + 1/3 × (1 − R)   (忘れた = 3択で推測)
+バンクモデル  μ = Σ (トピックの問題数 / 1,058) × p
+予測          バンクの μ と直近3回の模試を合成 (半減期10日)
+合格 / 目標   60問のベータ二項分布: P(X ≥ 42) と P(X ≥ 51)
+プランの順番  (1 − 試験日の p) × 緊急度 ÷ 1問あたりの分数
+ブロック      ブロックごとのナップサック、難しい順、約45分ごとに1トピック
+振り返り      予想される間違い = Σ 問題数 × (1 − p) × 難しさ
+              分数 = 間違い × 1問あたりの分数  (≥ 10、≤ ブロックの¼、間違いが3以上のときのみ)</div>
+  <p>模試の傾向では、予測は100%まで伸び続けず、最後の模試のあとで緩やかになります。</p>
+</section>
+<section class="chap" id="science">
+  <h2><span class="n">10</span>背景にある科学</h2>
+  <p class="intro">各統計の意味、その式、そして根拠となる研究です。アプリを使うのに必要ではありませんが、数値を信頼する（あるいは疑う）ための材料としてまとめました。</p>
+
+  <h3 id="sci-memory">記憶は薄れ、復習がその速さを抑える</h3>
+  <p>学習直後はほぼすべて覚えていますが、その後記憶は急速に落ち、次第にゆっくり落ちていきます。これが<b>忘却曲線</b>で、1885年にエビングハウスが初めて測定しました。後の研究で、単純な指数関数よりも<b>べき乗則</b>のほうがよく当てはまることが示されています。アプリはFSRSスケジューラのべき乗則の曲線を使います：</p>
+<div class="formula">R(t) = 1 / (1 + t / 9S)
+
+R  想起率：そのトピックをまだ覚えている確率（0〜1）
+t  そのトピックの最後の学習からの日数
+S  安定度：R が90%まで下がるのにかかる日数</div>
+  <p>中心となるのは<b>安定度</b>です。良い学習のたびにSが増え、曲線がなだらかになり、次の復習まで長く待てるようになります。これが<b>間隔効果</b>です：同じ学習時間でも、分散させたほうが一夜漬けよりはるかに長く記憶に残ります。各学習はテストでもあり、答えを思い出すことは読み直すよりも記憶を強くします（<b>テスト効果</b>、検索練習）。</p>
+  <p><b>復習のタイミング。</b>Rが復習ポイント（初期値90%、設定で変更可）まで下がるとトピックは復習の時期になります。R = 0.9を解くと間隔が求まります：</p>
+<div class="formula">間隔 = 9S × (1 / 復習ポイント − 1)        90%のとき → 間隔 = S日</div>
+  <p>復習ポイントを上げると間隔が短くなり復習が増え、下げると復習が減り、その間の忘却が増えます。</p>
+
+  <h3 id="sci-score">記憶から予想スコアへ</h3>
+  <p>FAAの問題は3択です。覚えているトピックは最新スコアの水準で正解し、忘れていても推測で約3問に1問は正解します。そのため、あるトピックで正解する確率は両者の混合になります：</p>
+<div class="formula">p = スコア × R + 1/3 × (1 − R)</div>
+  <p>試験の60問は、問題バンクの各トピックの問題数にほぼ比例して出題されるので、予想スコアは加重平均です：</p>
+<div class="formula">μ = Σ (トピックの問題数 / 1,058) × p</div>
+  <p><b>合格の確率。</b>すべての問題で正解の確率が同じμなら、60問中の正解数は二項分布に従います。しかしμ自体も推定値であり、アプリはそのずれの大きさ（実際の模試との誤差）を知っています。そこで、μが正確だとみなす代わりにその不確かさで確率を広げる<b>ベータ二項分布</b>を使います。合格は60問中42問（70%）、初期設定の目標は60問中51問（85%）です：</p>
+<div class="formula">合格の確率 = P(X ≥ 42)        目標の確率 = P(X ≥ 51)        X ~ BetaBinomial(60, μ)</div>
+  <p><b>「復習をやめた場合」</b>は、それ以上学習せずにすべての曲線が下がったとして、試験日に同じ計算をします。今日のスコアとこの線との差が、復習が守っているものです。</p>
+
+  <h3 id="sci-tests">模試と組み合わせた予測</h3>
+  <p>模試は全体を直接測りますが、1回ごとにばらつきがあります。予測は直近3回の模試を<b>指数的に減衰する重み</b>で平均します：模試の重みは10日ごとに半分になります（半減期、設定で変更可）。その平均を問題バンクのモデルμと組み合わせるので、1日の好不調で予測が大きく揺れません。</p>
+<div class="formula">模試の重み = 0.5 ^ (経過日数 / 半減期)</div>
+  <p><b>傾向</b>はスコアを通る最小二乗法の直線です。上限に近づくとスコアは頭打ちになるため、予測は100%まで伸び続けず、最後の模試のあとで緩やかになります。モデルの精度のグラフは、各模試の日に問題バンクのモデルが予測した値と実際のスコアを比べます。</p>
+
+  <h3 id="sci-plan">プランが学ぶ内容を決める方法</h3>
+  <p>各トピックには優先度が付きます：試験日にまだ何点取れる余地があるか、復習がどれだけ急ぎか、問題にどれだけ時間がかかるか。</p>
+<div class="formula">優先度 = (1 − 試験日の p) × 緊急度 ÷ 1問あたりの分数</div>
+  <p>ブロックを埋めるのは<b>ナップサック問題</b>です：合計時間がブロックに収まり、合計の価値（守れる問題数）が最大になるトピックを選びます。アプリはブロックごとに厳密に解き、集中力が最も高い最初に最も難しいトピックを置きます。</p>
+  <p><b>間違いの振り返り。</b>問題を間違え、その理由を学ぶことは最も効果的な学習法の1つで、間違いの直後にフィードバックがあるとさらに効果的です。そのため各ブロックは、そのブロックで予想される間違いに合わせた長さの振り返りで終わります。別の日ではなく、同じブロックの中で行います。</p>
+
+  <h3 id="sci-newport">ディープワークと計画（カル・ニューポート）</h3>
+  <p>プランはカル・ニューポートの『Deep Work（大事なことに集中する）』と、彼のタイムブロック計画法の考え方に沿っています：</p>
+  <ul>
+    <li><b>タイムブロック計画。</b>学習を始める前に、すべての時間に役割を与えます。Planタブはタイムブロックのプランナーです：まずブロックを確保し、それから各ブロックに入れる内容を決めます。</li>
+    <li><b>切り替えより集中。</b>話題を切り替えるたびに「注意の残留」が生まれ、心の一部が前の作業に残ります（Leroy, 2009）。ディープワークの上限により、1ブロックは約45分ごとに1トピックまでです。</li>
+    <li><b>難しいことから。</b>最も負荷の高いトピックが各ブロックの最初に来て、その日のエネルギーで提案の量と順番が変わります。</li>
+    <li><b>計画と実績。</b>週の表示には計画時間、実績、逃したブロックが出ます。逃したトピックは次回優先されますが、プランが勝手に書き換わることはありません：決めるのはあなたです。</li>
+    <li><b>週の計画。</b>金曜日以降、来週のプランがなければアプリが計画を促します。週を即興ではなく意図をもって始めるためです。</li>
+    <li><b>主導権はあなたに。</b>カンバンは、Sync with Kanbanで承認するまで何も動きません。</li>
+  </ul>
+  <p>最も失点の多いトピックを、学習ごとの明確な目標と素早いフィードバックとともに練習することは、<b>意図的練習</b>（Ericsson et al., 1993）の核心でもあります。</p>
+
+  <h3 id="sci-refs">参考文献と関連資料</h3>
+  <ul class="refs">
+    <li>Ebbinghaus, H. (1885). <i>Memory: A Contribution to Experimental Psychology.</i> <a href="https://psychclassics.yorku.ca/Ebbinghaus/index.htm" target="_blank" rel="noopener">全文</a></li>
+    <li>Wixted, J. T., &amp; Ebbesen, E. B. (1991). On the form of forgetting. <i>Psychological Science, 2</i>(6), 409–415. <a href="https://doi.org/10.1111/j.1467-9280.1991.tb00175.x" target="_blank" rel="noopener">doi</a></li>
+    <li>Open Spaced Repetition. <i>FSRS: the algorithm.</i> <a href="https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm" target="_blank" rel="noopener">GitHub wiki</a></li>
+    <li>Cepeda, N. J., Pashler, H., Vul, E., Wixted, J. T., &amp; Rohrer, D. (2006). Distributed practice in verbal recall tasks: A review and quantitative synthesis. <i>Psychological Bulletin, 132</i>(3), 354–380. <a href="https://doi.org/10.1037/0033-2909.132.3.354" target="_blank" rel="noopener">doi</a></li>
+    <li>Roediger, H. L., &amp; Karpicke, J. D. (2006). Test-enhanced learning: Taking memory tests improves long-term retention. <i>Psychological Science, 17</i>(3), 249–255. <a href="https://doi.org/10.1111/j.1467-9280.2006.01693.x" target="_blank" rel="noopener">doi</a></li>
+    <li>Metcalfe, J. (2017). Learning from errors. <i>Annual Review of Psychology, 68</i>, 465–489. <a href="https://doi.org/10.1146/annurev-psych-010416-044022" target="_blank" rel="noopener">doi</a></li>
+    <li>Ericsson, K. A., Krampe, R. T., &amp; Tesch-Römer, C. (1993). The role of deliberate practice in the acquisition of expert performance. <i>Psychological Review, 100</i>(3), 363–406. <a href="https://doi.org/10.1037/0033-295X.100.3.363" target="_blank" rel="noopener">doi</a></li>
+    <li>Leroy, S. (2009). Why is it so hard to do my work? The challenge of attention residue when switching between work tasks. <i>Organizational Behavior and Human Decision Processes, 109</i>(2), 168–181. <a href="https://doi.org/10.1016/j.obhdp.2009.04.002" target="_blank" rel="noopener">doi</a></li>
+    <li>Newport, C. (2016). <i>Deep Work: Rules for Focused Success in a Distracted World.</i> Grand Central. <a href="https://calnewport.com/deep-work-rules-for-focused-success-in-a-distracted-world/" target="_blank" rel="noopener">calnewport.com</a></li>
+    <li>Newport, C. <i>Time-block planning.</i> <a href="https://www.timeblockplanner.com/" target="_blank" rel="noopener">timeblockplanner.com</a></li>
+    <li>概念：<a href="https://ja.wikipedia.org/wiki/%E5%BF%98%E5%8D%B4%E6%9B%B2%E7%B7%9A" target="_blank" rel="noopener">忘却曲線</a> · <a href="https://en.wikipedia.org/wiki/Spacing_effect" target="_blank" rel="noopener">間隔効果</a> · <a href="https://en.wikipedia.org/wiki/Testing_effect" target="_blank" rel="noopener">テスト効果</a> · <a href="https://ja.wikipedia.org/wiki/%E4%BA%8C%E9%A0%85%E5%88%86%E5%B8%83" target="_blank" rel="noopener">二項分布</a> · <a href="https://en.wikipedia.org/wiki/Beta-binomial_distribution" target="_blank" rel="noopener">ベータ二項分布</a> · <a href="https://en.wikipedia.org/wiki/Exponential_smoothing" target="_blank" rel="noopener">指数重み付け</a> · <a href="https://ja.wikipedia.org/wiki/%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%97%E6%B3%95" target="_blank" rel="noopener">最小二乗法</a> · <a href="https://ja.wikipedia.org/wiki/%E3%83%8A%E3%83%83%E3%83%97%E3%82%B5%E3%83%83%E3%82%AF%E5%95%8F%E9%A1%8C" target="_blank" rel="noopener">ナップサック問題</a></li>
+    <li>FAA. <i>Private Pilot – Airplane Airman Certification Standards.</i> <a href="https://www.faa.gov/training_testing/testing/acs" target="_blank" rel="noopener">faa.gov</a></li>
+  </ul>
+  <p style="color: var(--muted); font-size: 14px; margin-top: 40px">個人の学習ツールであり、FAAやSporty'sとは関係ありません。予測は推定であり、保証ではありません。</p>
+</section>
+</main>
+</div>

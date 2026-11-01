@@ -1,4 +1,4 @@
-# PPL Flight Deck — notes for Claude Code
+# PPL Progress — notes for Claude Code
 
 Study tracker for the FAA Private Pilot knowledge test. Two single-file apps are built from `src/`:
 `index.html` (personal data, optional GitHub Gist sync) and `demo.html` (fictional data, sync off, guided tour).
@@ -15,7 +15,8 @@ Study tracker for the FAA Private Pilot knowledge test. Two single-file apps are
 
 ## Commands
 ```bash
-python3 build.py                                  # build index.html and demo.html
+python3 build.py                                  # build index.html, demo.html and docs/ (user guide)
+python3 tools/docs_screenshots.py                 # retake the guide's screenshots (en, pt, ja) after a UI change
 cd tests && python3 run_all.py                    # all suites, desktop/laptop/iPad mini/iPhone, both files
 python3 tests/test_plans.py                       # one suite
 npx prettier --config .prettierrc.json --write "src/js/**/*.js" src/i18n/translations.js "src/styles/*.css"
@@ -26,7 +27,7 @@ The built-in unit tests run in the page: `selfTest()` (or open the app with `#se
 ## Before every commit
 1. `python3 build.py` (tests/test_build.py fails if the built files are out of date).
 2. Run the suites touched by the change, and `tests/test_audit.py` for any UI change.
-3. Commit `src/`, `tests/`, `build.py`, `README.md`, `index.html`, `demo.html` together.
+3. Commit `src/`, `tests/`, `tools/`, `build.py`, `README.md`, `index.html`, `demo.html` and `docs/` together.
 
 ## Layout
 - `src/index.html` markup (placeholders `@@CSS@@`, `@@JS@@`); `src/styles/` CSS in the order listed in `build.py`.
@@ -34,6 +35,8 @@ The built-in unit tests run in the page: `selfTest()` (or open the app with `#se
 - `src/js/views` dashboard, plan (week view, wizard), statistics, heat map, volume, carousels
 - `src/js/ui` charts, hover, dialogs/modal, navigation, header, settings · `src/js/sync` Gist sync
 - `src/demo` demo data and tour · `tests/` Playwright suites + `run_all.py`
+- `src/docs` user guide (template + en/pt/ja content, same section ids) → built into `docs/`; screenshots in `docs/img/<lang>/`.
+  A change to a workflow or the math also updates the guide in all three languages.
 
 ## Publishing
-GitHub Pages serves `main` / root: https://matheuscgh-ops.github.io/ppl-flight-deck/ (demo: `/demo.html`).
+GitHub Pages serves `main` / root: https://matheuscgh-ops.github.io/ppl-flight-deck/ (demo: `/demo.html`, guide: `/docs/`).

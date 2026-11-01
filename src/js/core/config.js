@@ -1,5 +1,5 @@
 /* ===== module Config (js/core/config.js) =====
-   public: TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE
+   public: TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE, DOCS_URL, docsUrl
    live values (getters on window, they follow your Settings): GOAL */
 const Config = (() => {
   const TEMPLATE = '<!doctype html>\n' + document.documentElement.outerHTML;
@@ -67,6 +67,9 @@ const Config = (() => {
   /* the goal follows Settings (read at the moment it is used) */
   expose({ GOAL: [() => (typeof pref === 'function' ? pref('goal') : PREF_DEF.goal), () => {}] });
   const LOCALE = { en: 'en-US', pt: 'pt-BR', ja: 'ja-JP' };
-  return { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE };
+  /* the user guide on GitHub Pages: English is index.html, the other languages have their own page */
+  const DOCS_URL = 'https://matheuscgh-ops.github.io/ppl-flight-deck/docs/';
+  const docsUrl = l => DOCS_URL + ({ pt: 'pt.html', ja: 'ja.html' }[l] || '');
+  return { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE, DOCS_URL, docsUrl };
 })();
-const { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE } = Config;
+const { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE, DOCS_URL, docsUrl } = Config;
