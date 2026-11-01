@@ -96,6 +96,8 @@
 .tsnextbig {
   font-size: 13.5px;
   margin: 6px 0 8px;
+  /* the long form ("today · Practice test due (every N days)") wraps instead of widening the page */
+  white-space: normal;
 }
 .tshero,
 .tslistp {

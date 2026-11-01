@@ -457,6 +457,8 @@ const PlanWizard = (() => {
     mv.gap = gap;
     mv.dy = e.clientY - r.top;
     document.body.classList.add('wzdragging');
+    /* clear any text selection the press may have started (iOS) */
+    window.getSelection && window.getSelection().removeAllRanges();
   }
   function dragMove(e) {
     const { group, gap, ghost } = mv;
@@ -536,6 +538,25 @@ const PlanWizard = (() => {
       e.preventDefault();
       dragStart(e, card);
     }
+  });
+  /* while a card is dragged by touch, the page must not scroll or select text under the finger */
+  document.addEventListener(
+    'touchmove',
+    e => {
+      if (mv && mv.on) e.preventDefault();
+    },
+    { passive: false }
+  );
+  /* iOS: pressing the grip must not start a text selection or the magnifier */
+  $('#wzBody').addEventListener(
+    'touchstart',
+    e => {
+      if (e.target.closest && e.target.closest('.wzgrip')) e.preventDefault();
+    },
+    { passive: false }
+  );
+  document.addEventListener('selectstart', e => {
+    if (mv || e.target.closest?.('.wzg .wzgrip')) e.preventDefault();
   });
   document.addEventListener('pointermove', e => {
     if (!mv || e.pointerId !== mv.id) return;

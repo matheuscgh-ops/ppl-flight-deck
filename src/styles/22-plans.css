@@ -1426,3 +1426,10 @@ body.wzdragging * {
   color: #b3a6f5;
   font-weight: 800;
 }
+/* no text selection or iOS callout on the cards while you press and drag them (the editor's fields still select) */
+.wzg,
+.wzg *:not(input):not(select):not(textarea) {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
