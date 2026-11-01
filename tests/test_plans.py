@@ -69,6 +69,7 @@ with sync_playwright() as p:
             revs = [x for x in items if x['k'] == 'reflect']
             check(f'{tag}: the error review is split after each topic (10 min … a quarter of the block in total)', revs and 10 <= sum(x['m'] for x in revs) <= 30 and ev("(()=>{const its=wizardState().items.slice().sort((a,b)=>a.start-b.start);return its.every((x,k)=>x.kind!=='reflect'||(k>0&&its[k-1].id===x.of&&x.parts.length===1))})()"), items)
             check(f'{tag}: each review row sits under its topic and names its expected misses', 'Error review' in pg.inner_text('#wzBody') and ev("document.querySelectorAll('.wzg .wzit.child').length") == len(revs) and 'expected misses' in pg.inner_text('.wzit.child'))
+            check(f'{tag}: cards cannot be text-selected while you press and drag them', ev("[...document.querySelectorAll('.wzg .wzn, .wzg .wzq, .wzg small')].every(e=>['none'].includes(getComputedStyle(e).userSelect||getComputedStyle(e).webkitUserSelect))"))
             check(f'{tag}: no ↑ arrows: topics are moved by dragging (grip on every topic)', ev("document.querySelectorAll('[data-wact=\"up\"]').length") == 0 and ev("[...document.querySelectorAll('.wzg')].every(g=>g.querySelector('.wzgrip'))"))
             # drag the second topic (with its review) above the first
             order0 = ev("[...document.querySelectorAll('.wzg')].map(g=>g.dataset.gid)")

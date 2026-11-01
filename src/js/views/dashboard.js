@@ -237,12 +237,12 @@ const Dashboard = (() => {
   function ownCardHTML(c) {
     if (!c) return '';
     if (editCard === c.id)
-      return `<div class="task own editing" data-card="${esc(c.id)}"><textarea class="cardin" maxlength="80" rows="2" aria-label="${esc(t('cardHint'))}">${esc(c.title)}</textarea><div class="cardbtns"><button type="button" class="primary" data-cact="save">${esc(t('cardSave'))}</button><button type="button" data-cact="del">${esc(t('cardDel'))}</button><button type="button" class="cardx" data-cact="cancel" aria-label="${esc(t('close'))}">×</button></div></div>`;
+      return `<div class="task own editing" data-card="${esc(c.id)}"><textarea class="cardin" maxlength="80" rows="2" enterkeyhint="done" aria-label="${esc(t('cardHint'))}">${esc(c.title)}</textarea><div class="cardbtns"><button type="button" class="primary" data-cact="save">${esc(t('cardSave'))}</button><button type="button" data-cact="del">${esc(t('cardDel'))}</button><button type="button" class="cardx" data-cact="cancel" aria-label="${esc(t('close'))}">×</button></div></div>`;
     return `<div class="task own" tabindex="0" role="button" data-card="${esc(c.id)}" aria-label="${esc(c.title)}" title="${esc(c.title)}"><div class="tname">${esc(c.title)}</div><div class="tmeta"><span class="owntag">${esc(t('ownTag'))}</span></div></div>`;
   }
   function composerHTML(j) {
     if (addLane === j)
-      return `<div class="composer" data-lane-add="${j}"><textarea class="cardin" maxlength="80" rows="2" placeholder="${esc(t('cardHint'))}" aria-label="${esc(t('cardHint'))}"></textarea><div class="cardbtns"><button type="button" class="primary" data-cact="add">${esc(t('addCardBtn'))}</button><button type="button" class="cardx" data-cact="close" aria-label="${esc(t('close'))}">×</button></div></div>`;
+      return `<div class="composer" data-lane-add="${j}"><textarea class="cardin" maxlength="80" rows="2" enterkeyhint="done" placeholder="${esc(t('cardHint'))}" aria-label="${esc(t('cardHint'))}"></textarea><div class="cardbtns"><button type="button" class="primary" data-cact="add">${esc(t('addCardBtn'))}</button><button type="button" class="cardx" data-cact="close" aria-label="${esc(t('close'))}">×</button></div></div>`;
     return `<button type="button" class="addcard" data-cact="open" data-lane-add="${j}">+ ${esc(t('addCard'))}</button>`;
   }
   function focusCardInput() {
@@ -252,7 +252,7 @@ const Dashboard = (() => {
       el.setSelectionRange(el.value.length, el.value.length);
     }
   }
-  function addOwnCard(j, title) {
+  function addOwnCard(j, title, keepOpen = true) {
     title = title.trim().slice(0, 80);
     if (!title) return;
     const id = 'k' + uid();
@@ -260,11 +260,33 @@ const Dashboard = (() => {
       state.cards = [...(state.cards || []), { id, title, status: STATUS[j] }];
       state.order = [...orderOf(), id];
     }, t('cardAdded'));
-    /* like Trello, the composer stays open for the next card */
-    addLane = j;
+    /* like Trello: Enter or "Add card" keeps the box open for the next card; a click outside closes it */
+    addLane = keepOpen ? j : null;
     renderBoard();
-    focusCardInput();
+    if (keepOpen) focusCardInput();
   }
+  /* a click or tap outside the open box finishes it, like Trello: the text typed so far becomes the card (or the new
+     name of the card being edited); an empty box just closes */
+  document.addEventListener(
+    'pointerdown',
+    e => {
+      if (addLane == null && editCard == null) return;
+      if (e.target.closest('.composer, .own.editing, .laneadd, .addcard')) return;
+      const inp = $('#lanes').querySelector('.composer .cardin, .own.editing .cardin');
+      if (!inp) {
+        addLane = editCard = null;
+        return;
+      }
+      if (inp.closest('.composer')) {
+        const j = addLane,
+          title = inp.value.trim();
+        addLane = null;
+        if (title) addOwnCard(j, title, false);
+        else renderBoard();
+      } else cardAction('save', inp);
+    },
+    true
+  );
   function cardAction(a, el) {
     const box = el.closest('[data-card], [data-lane-add]'),
       id = box && box.dataset.card,
@@ -296,11 +318,18 @@ const Dashboard = (() => {
     const b = e.target.closest('[data-cact]');
     if (b) cardAction(b.dataset.cact, b);
   });
+  /* phone keyboards that do not report the Enter key: a new line typed in the box counts as Enter */
+  $('#lanes').addEventListener('input', e => {
+    const inp = e.target.closest('.cardin');
+    if (!inp || e.isComposing || !inp.value.includes('\n')) return;
+    inp.value = inp.value.replace(/\n/g, ' ').trim();
+    cardAction(inp.closest('.composer') ? 'add' : 'save', inp);
+  });
   $('#lanes').addEventListener('keydown', e => {
     const inp = e.target.closest('.cardin');
     if (!inp) return;
     e.stopPropagation();
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
       e.preventDefault();
       cardAction(inp.closest('.composer') ? 'add' : 'save', inp);
     } else if (e.key === 'Escape') {

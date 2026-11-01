@@ -73,6 +73,10 @@ with sync_playwright() as p:
             check(f'{tag}: highlighted days = exactly the days with activity', act == [d for d in exp if d in shown_month], (act, exp))
             if mode == 'desktop':
                 d1 = pg.evaluate("addDays(todayISO(),-1)")
+                # early in a month, yesterday is in the previous month: show that month
+                if pg.evaluate(f"!document.querySelector('.day[data-date=\"{d1}\"]:not(.out)')"):
+                    pg.click('#prev'); pg.wait_for_timeout(200)
+                shown_month = pg.evaluate("[...document.querySelectorAll('.day[data-date]:not(.out)')].map(d=>d.dataset.date)")
                 if d1 in shown_month:
                     tags = pg.evaluate(f"[...document.querySelectorAll('.day[data-date=\"{d1}\"] .daytag')].filter(x=>!x.hidden&&x.offsetHeight).map(x=>x.textContent)")
                     names = [t for t in tags if not t.startswith('+')]; more = [t for t in tags if t.startswith('+')]

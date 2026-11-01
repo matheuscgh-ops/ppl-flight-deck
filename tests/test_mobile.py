@@ -95,7 +95,7 @@ with sync_playwright() as p:
         check(f'{f} · desktop: hovering a card shows its curve', pg.inner_text('#prevTitle') == 'Human Factors')
         pg.mouse.move(5, 5); pg.wait_for_timeout(300)
         check(f'{f} · desktop: moving away returns to the average', 'average' in pg.inner_text('#prevTitle'))
-        pg.click('#sugg .qrow >> nth=0'); pg.wait_for_timeout(200)
+        pg.click('#sugg .qrow:not([data-pt]):not([data-wi]) >> nth=0'); pg.wait_for_timeout(200)
         check(f'{f} · desktop: clicking a suggestion opens the analysis tab', pg.is_visible('#viewSR'))
         check(f'{f} · desktop: no JavaScript errors', not errs, errs)
         c.close()

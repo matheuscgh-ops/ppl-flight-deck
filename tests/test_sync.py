@@ -141,7 +141,8 @@ with sync_playwright() as p:
     check('energy mode chosen on the computer shows on the phone', bp.evaluate('energyMode') == 'high' and remote()['plan']['energy'] == 'high')
     bp.evaluate("setManualTest(true)"); bp.wait_for_timeout(1500)
     a.evaluate("lastPull=0;window.dispatchEvent(new Event('focus'))"); a.wait_for_timeout(700)
-    check('a practice test added to today\'s plan on the phone shows on the computer', a.evaluate("buildPlan(null,null,energyMode).items.some(x=>x.reason==='testManual')"))
+    # (on a day a test is already due, the plan shows it as due; the manual choice still syncs)
+    check('a practice test added to today\'s plan on the phone shows on the computer', a.evaluate("state.plan&&state.plan.test===true&&buildPlan(null,null,energyMode).items.some(x=>x.kind==='test')"))
     a.evaluate("setManualTest(false);setEnergy('medium')"); a.wait_for_timeout(1500)
 
     # ---- saved plans sync between devices (created, edited offline on both, deleted) ----
