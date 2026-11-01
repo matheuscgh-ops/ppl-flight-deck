@@ -22,8 +22,12 @@ const PlanView = (() => {
     };
   }
   const rowAttr = it =>
-    it.kind === 'test' ? 'data-pt="1"' : it.kind === 'custom' ? `data-cid="${esc(it.id)}"` : `data-q="${it.i}"`;
-  const rowName = it => (it.kind === 'custom' ? it.label || t('wzCustomDefault') : planRowName(it));
+    it.kind === 'test'
+      ? 'data-pt="1"'
+      : it.kind === 'custom' || it.kind === 'reflect'
+        ? `data-cid="${esc(it.id)}"`
+        : `data-q="${it.i}"`;
+  const rowName = it => (it.kind === 'topic' || it.kind === 'test' ? planRowName(it) : itemTitle(it));
   const checkBtn = it =>
     it.id
       ? `<button type="button" class="pck" data-chk="${esc(it.id)}" aria-label="${esc(t('itemCheck'))}">${it.done ? '✓' : ''}</button>`
@@ -40,7 +44,7 @@ const PlanView = (() => {
       ? P.items
           .map(
             it =>
-              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
+              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' || it.kind === 'reflect' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
           )
           .join('')
       : `<div class="muted">${esc(t(fromPlan ? 'planRestDay' : 'allClear'))}</div>`;

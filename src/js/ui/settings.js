@@ -194,6 +194,7 @@ const Settings = (() => {
           select('setDeep', [[0, t('setOff')], ...[30, 45, 60, 90].map(v => [v, tf('setDeepN', v)])], pref('deepMin')),
           'setDeepHint'
         ),
+        row('setReflect', toggle('setReflect', pref('reflect')), 'setReflectHint'),
       ]),
       section(
         'setChartsTitle',
@@ -255,6 +256,7 @@ const Settings = (() => {
     else if (id.startsWith('setRange_')) setRange(id.slice(9), v);
     else if (id === 'setCarousel') setPref('carousel', v);
     else if (id === 'setHeatNums') setPref('heatNums', v);
+    else if (id === 'setReflect') setPref('reflect', v);
     renderSettings();
   });
 

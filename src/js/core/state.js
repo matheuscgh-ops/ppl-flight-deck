@@ -97,6 +97,7 @@ const AppState = (() => {
     heatNums: v => typeof v === 'boolean',
     gridStart: v => [5, 6, 7, 8, 9].includes(v),
     deepMin: v => [0, 30, 45, 60, 90].includes(v),
+    reflect: v => typeof v === 'boolean',
   };
   const RANGE_OK = {
     sr: ['3d', '7d', '2w', '1m', '3m', '6m', '1y', 'all'],
@@ -143,6 +144,7 @@ const AppState = (() => {
           +it.min > 0 &&
           (it.kind === 'test' ||
             it.kind === 'custom' ||
+            it.kind === 'reflect' ||
             (it.kind === 'topic' && Number.isInteger(it.i) && TOPICS[it.i]))
       )
       .map(it => {
@@ -157,6 +159,11 @@ const AppState = (() => {
           reason: typeof it.reason === 'string' ? it.reason.slice(0, 12) : 'custom',
         };
         if (it.kind === 'custom') o.label = String(it.label || '').slice(0, 60);
+        if (it.kind === 'reflect')
+          o.parts = (Array.isArray(it.parts) ? it.parts : [])
+            .filter(x => x && (x.i === -1 || (Number.isInteger(x.i) && TOPICS[x.i])) && Number.isFinite(+x.m))
+            .map(x => ({ i: x.i, m: Math.max(0, Math.round(+x.m)) }))
+            .slice(0, 8);
         if (it.custom) o.custom = true;
         if (it.check) o.check = true;
         return o;

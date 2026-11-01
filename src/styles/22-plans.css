@@ -1174,3 +1174,31 @@ b.wkdaily {
     background: #5f6670;
   }
 }
+
+/* error review: a calm neutral tint, so it reads as part of the block rather than another topic */
+.r-reflect {
+  background: #24303a;
+  color: #9fb8cc;
+}
+.rchip.reflect {
+  background: #24303a;
+  color: #9fb8cc;
+}
+.pwlegend i.r-reflect {
+  border-left: 3px solid currentColor;
+}
+
+/* My plans on phones: the actions share full rows (no button left alone on a line); Delete is spelled out */
+@media (max-width: 640px) {
+  .pwacts {
+    gap: 6px;
+  }
+  .pwacts button {
+    flex: 1 1 auto;
+    padding: 7px 10px;
+    font-size: 13px;
+  }
+  .pwrow {
+    gap: 6px 10px;
+  }
+}

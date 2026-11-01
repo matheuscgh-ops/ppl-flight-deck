@@ -72,7 +72,7 @@ const Schedule = (() => {
 
   function itemDone(it) {
     if (it.check) return true;
-    if (it.kind === 'custom') return false;
+    if (it.kind === 'custom' || it.kind === 'reflect') return false;
     if (it.kind === 'test') return (state.tests || []).some(x => x.date === it.date && x.score != null);
     return state.events.some(
       e => e.date === it.date && e.topic === it.i && (e.kind === 'study' || e.kind === 'review')
@@ -135,8 +135,9 @@ const Schedule = (() => {
     const rest = cands.filter(x => !pick.some(p => p.key === x.key) && x.kind === 'topic');
     rest.sort((a, b) => b.value / b.n - a.value / a.n);
     for (const r of rest) {
-      const fit = Math.floor((c + 1e-9) / r.per);
-      if (fit >= MIN_CHUNK_Q) {
+      const fit = Math.floor((c + 1e-9) / r.per),
+        least = Math.min(r.full || r.n, Math.max(MIN_CHUNK_Q, Math.ceil(10 / r.per)));
+      if (fit >= least) {
         const part = { ...r, n: Math.min(r.n, fit) };
         part.value = (r.value * part.n) / r.n;
         pick.push(part);
@@ -155,52 +156,129 @@ const Schedule = (() => {
     return (1 - c.p) * (c.diff || 1) + (c.reason === 'due' ? 0.3 : 0) + idle;
   };
 
-  /* fill one day's blocks; returns items with start times */
+  /* ---------- error review (reflection) ----------
+     Expected misses of a topic chunk = questions × (1 − p) × difficulty (a test counts 60 × (1 − p)).
+     Minutes = expected misses × your review minutes per wrong answer, rounded to 5, at least 10 and at most a quarter
+     of the block; none when fewer than 3 misses are expected (topics you mostly get right). */
+  const REFLECT_MIN = 10,
+    REFLECT_SHARE = 0.25,
+    REFLECT_FROM = 3,
+    LEFTOVER_TOPIC = 20,
+    MIN_ITEM = 10;
+  const missesOf = c => c.n * (1 - (c.p ?? 0.5)) * (c.kind === 'test' ? 1 : c.diff || 1);
+  function reflectFor(pick, cap) {
+    const st = settings(),
+      parts = pick.map(c => ({ i: c.kind === 'test' ? -1 : c.i, m: Math.round(missesOf(c)) })).filter(x => x.m > 0),
+      E = pick.reduce((a, c) => a + missesOf(c), 0);
+    if (!pref('reflect') || !st.reviewMin || E < REFLECT_FROM) return { min: 0, parts: [] };
+    const max = Math.max(REFLECT_MIN, Math.floor((cap * REFLECT_SHARE) / 5) * 5),
+      min = Math.max(REFLECT_MIN, Math.min(max, Math.round((E * st.reviewMin) / 5) * 5));
+    return { min, parts: parts.sort((a, b) => b.m - a.m) };
+  }
+  const usedBy = pick => pick.reduce((a, c) => a + Math.ceil(c.n * c.per), 0);
+  /* the smallest chunk worth placing: 10 minutes (or the whole topic when it is shorter), never under 5 questions */
+  const minN = c => (c.kind === 'test' ? c.n : Math.min(c.full, Math.max(MIN_CHUNK_Q, Math.ceil(MIN_ITEM / c.per))));
+
+  /* fill one day's blocks; returns items with start times.
+     Inside a block: topics (hardest first), then the error review. Topics are trimmed (easiest first) to make room for
+     the review in the same block; only when that is impossible (a practice test or a topic that cannot shrink fills
+     the block) does the review move to the start of the day's next block. */
   function packDay(date, ranges, energy) {
     const total = rangesTotal(ranges);
     if (!total) return [];
-    const boost = missedTopics(date),
-      P = buildPlan(date, { ...settings(), minutes: total * 4 }, energy || 'medium');
+    const st = settings(),
+      speed = { low: 1.15, medium: 1, high: 0.9 }[energy || 'medium'],
+      boost = missedTopics(date),
+      P = buildPlan(date, { ...st, minutes: total * 4 }, energy || 'medium');
+    /* the review of misses is its own item, so each question here counts only the time to answer it */
     let cands = P.items
       .filter(x => !x.done && x.n > 0 && (x.kind === 'test' || x.kind === 'topic'))
-      .map((x, k) => ({
-        key: x.kind + (x.i ?? 't') + '_' + k,
-        kind: x.kind,
-        i: x.i,
-        n: x.kind === 'test' ? TEST_Q : x.n,
-        per: x.per,
-        p: x.p,
-        diff: x.diff,
-        reason: x.reason,
-        date,
-        value:
-          (x.kind === 'test' ? TEST_Q * 1.5 : x.n * (1 - (x.pExam ?? x.p ?? 0.5))) *
-          (URGENCY[x.reason] || 1) *
-          (x.kind === 'topic' && boost.has(x.i) ? MISSED_BOOST : 1),
-      }))
+      .map((x, k) => {
+        const n = x.kind === 'test' ? TEST_Q : x.n,
+          review = (1 - (x.p ?? 0.5)) * st.reviewMin * (x.kind === 'test' ? 1 : x.diff || 1) * speed;
+        return {
+          key: x.kind + (x.i ?? 't') + '_' + k,
+          kind: x.kind,
+          i: x.i,
+          n,
+          full: x.kind === 'test' ? TEST_Q : TOPICS[x.i].q,
+          per: Math.max(0.2, x.per - review),
+          p: x.p,
+          diff: x.diff,
+          reason: x.reason,
+          date,
+          value:
+            (x.kind === 'test' ? TEST_Q * 1.5 : n * (1 - (x.pExam ?? x.p ?? 0.5))) *
+            (URGENCY[x.reason] || 1) *
+            (x.kind === 'topic' && boost.has(x.i) ? MISSED_BOOST : 1),
+        };
+      })
       .filter(c => c.per > 0);
     const out = [];
-    for (const [s, e] of ranges) {
-      if (!cands.length) break;
-      const cap = e - s;
-      let pick = knapsack(cands, cap);
+    let carry = null;
+    ranges.forEach(([s, e], bi) => {
+      const cap = e - s,
+        capT = cap - (carry ? carry.min : 0);
+      let t0 = s;
+      if (carry) {
+        out.push({
+          id: uid(),
+          date,
+          start: t0,
+          min: carry.min,
+          kind: 'reflect',
+          i: null,
+          n: 0,
+          reason: 'reflect',
+          parts: carry.parts,
+        });
+        t0 += carry.min;
+        carry = null;
+      }
+      if (!cands.length || capT < MIN_ITEM) return;
+      let pick = knapsack(cands, capT);
       /* deep work: few topic switches — at most one topic per ~45 min; the kept topics grow into the freed time */
       const deep = pref('deepMin'),
         maxTopics = deep ? Math.max(1, Math.round(cap / deep)) : Infinity;
       if (pick.length > maxTopics) {
         pick = pick.sort((a, b) => b.value - a.value).slice(0, maxTopics);
-        let left = cap - pick.reduce((a, c) => a + Math.ceil(c.n * c.per), 0);
+        let left = capT - usedBy(pick);
         pick.forEach(c => {
           if (c.kind !== 'topic') return;
-          const more = Math.min(TOPICS[c.i].q - c.n, Math.floor((left + 1e-9) / c.per));
+          const more = Math.min(c.full - c.n, Math.floor((left + 1e-9) / c.per));
           if (more > 0) {
             c.n += more;
             left -= Math.ceil(more * c.per);
           }
         });
       }
+      /* 20+ minutes still free (after the review) → one more topic instead of empty time */
+      const leftAfter = () => capT - usedBy(pick) - reflectFor(pick, cap).min;
+      if (leftAfter() >= LEFTOVER_TOPIC) {
+        const next = cands
+          .filter(x => x.kind === 'topic' && !pick.some(p => p.kind === x.kind && p.i === x.i))
+          .sort((a, b) => b.value / b.n - a.value / a.n)
+          .find(x => Math.floor(leftAfter() / x.per) >= minN(x));
+        if (next) {
+          const fit = Math.floor((leftAfter() - 5) / next.per),
+            n = Math.min(next.n, Math.max(minN(next), fit));
+          pick.push({ ...next, n, value: (next.value * n) / next.n });
+        }
+      }
+      /* room for the review in the same block: trim the easiest topics first, never under their smallest chunk */
       pick.sort((a, b) => hardness(b) - hardness(a));
-      let t0 = s;
+      let R = reflectFor(pick, cap);
+      for (let guard = 0; usedBy(pick) + R.min > capT && guard < 400; guard++) {
+        const c = pick
+          .slice()
+          .reverse()
+          .find(x => x.kind === 'topic' && x.n > minN(x));
+        if (!c) break;
+        c.n -= 1;
+        R = reflectFor(pick, cap);
+      }
+      const fits = usedBy(pick) + R.min <= capT,
+        hasNext = bi < ranges.length - 1;
       pick.forEach(c => {
         const min = Math.max(1, Math.round(c.n * c.per));
         out.push({
@@ -217,7 +295,37 @@ const Schedule = (() => {
         /* a topic is used once per day: drop the whole candidate even when only part of it was placed */
         cands = cands.filter(x => !(x.kind === c.kind && x.i === c.i));
       });
-    }
+      if (R.min) {
+        if (fits)
+          out.push({
+            id: uid(),
+            date,
+            start: t0,
+            min: R.min,
+            kind: 'reflect',
+            i: null,
+            n: 0,
+            reason: 'reflect',
+            parts: R.parts,
+          });
+        else if (hasNext) carry = R;
+        else {
+          const room = Math.floor((e - t0) / 5) * 5;
+          if (room >= REFLECT_MIN)
+            out.push({
+              id: uid(),
+              date,
+              start: t0,
+              min: room,
+              kind: 'reflect',
+              i: null,
+              n: 0,
+              reason: 'reflect',
+              parts: R.parts,
+            });
+        }
+      }
+    });
     return out;
   }
 
@@ -235,6 +343,7 @@ const Schedule = (() => {
           const items = d < todayISO() ? [] : packDay(d, blocks[d] || [], (energies || {})[d]);
           out[d] = items;
           items.forEach(it => {
+            if (it.kind === 'reflect') return;
             if (it.kind === 'test')
               state.tests.push({ id: 'sim' + it.id, date: d, q: TEST_Q, score: Math.round(blended(d).mu * 100) });
             else {
@@ -327,6 +436,15 @@ const Schedule = (() => {
       },
     ];
   }
+  /* what a plan item is called, and (error review) which topics' misses it covers */
+  function itemTitle(it) {
+    if (it.kind === 'test') return t('practiceTest');
+    if (it.kind === 'custom') return it.label || t('wzCustomDefault');
+    if (it.kind === 'reflect') return t('reflectName');
+    return TOPICS[it.i].name;
+  }
+  const reflectDetail = it =>
+    (it.parts || []).map(x => `${x.i === -1 ? t('practiceTest') : TOPICS[x.i].name} ${x.m}`).join(' · ');
   /* the manual done mark on a plan item (your own activities are only done this way) */
   function toggleCheck(id) {
     const p = (state.plans || []).find(x => (x.items || []).some(it => it.id === id));
@@ -384,6 +502,8 @@ const Schedule = (() => {
     toggleCheck,
     seedDemoPlan,
     testMinutes,
+    itemTitle,
+    reflectDetail,
   };
 })();
 const {
@@ -409,4 +529,6 @@ const {
   toggleCheck,
   seedDemoPlan,
   testMinutes,
+  itemTitle,
+  reflectDetail,
 } = Schedule;

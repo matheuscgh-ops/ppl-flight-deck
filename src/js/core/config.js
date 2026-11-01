@@ -61,6 +61,7 @@ const Config = (() => {
     heatNums: true, // numbers on the heat-map squares
     gridStart: 6, // first hour of the plan grid
     deepMin: 45, // minutes of block per topic (deep work); 0 = no limit
+    reflect: true, // an error-review item closes each study block in a plan
     ranges: {}, // default chart intervals
   };
   /* the goal follows Settings (read at the moment it is used) */

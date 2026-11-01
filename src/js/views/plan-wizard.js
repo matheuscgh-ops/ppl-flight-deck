@@ -227,7 +227,12 @@ const PlanWizard = (() => {
                 .map((it, k) => {
                   if (W.editItem === it.id) return editorHTML(`data-wid="${esc(it.id)}"`, it, 'ok', 'cancel');
                   const r = it.kind === 'test' ? 'test' : it.reason || 'custom';
-                  return `<div class="wzit r-${r}" data-wid="${esc(it.id)}"><span class="wzt">${clockOf(it.start)}</span><span class="wzn">${esc(itemName(it))}<small>${esc(t('rs_' + r))}${it.kind === 'custom' ? '' : ' · ' + esc(t('wzGoal'))}</small></span><span class="wzq">${it.kind === 'custom' ? '' : it.n + ' q · '}${fmtMin(it.min)}</span><span class="wzacts">${k ? `<button type="button" data-wact="up" aria-label="${esc(t('wzUp'))}">↑</button>` : ''}<button type="button" data-wact="edit" aria-label="${esc(t('pwEdit'))}">✎</button><button type="button" data-wact="del" aria-label="${esc(t('del'))}">×</button></span></div>`;
+                  const minutesOnly = it.kind === 'custom' || it.kind === 'reflect',
+                    sub =
+                      it.kind === 'reflect'
+                        ? `${t('rs_reflect')} · ${reflectDetail(it)}`
+                        : t('rs_' + r) + (it.kind === 'custom' ? '' : ' · ' + t('wzGoal'));
+                  return `<div class="wzit r-${r}" data-wid="${esc(it.id)}"><span class="wzt">${clockOf(it.start)}</span><span class="wzn">${esc(itemName(it))}<small>${esc(sub)}</small></span><span class="wzq">${minutesOnly ? '' : it.n + ' q · '}${fmtMin(it.min)}</span><span class="wzacts">${k ? `<button type="button" data-wact="up" aria-label="${esc(t('wzUp'))}">↑</button>` : ''}${it.kind === 'reflect' ? '' : `<button type="button" data-wact="edit" aria-label="${esc(t('pwEdit'))}">✎</button>`}<button type="button" data-wact="del" aria-label="${esc(t('del'))}">×</button></span></div>`;
                 })
                 .join('');
               const key = `${d}|${s}`;

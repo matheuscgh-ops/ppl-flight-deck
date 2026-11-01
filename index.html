@@ -5333,6 +5333,34 @@ b.wkdaily {
   }
 }
 
+/* error review: a calm neutral tint, so it reads as part of the block rather than another topic */
+.r-reflect {
+  background: #24303a;
+  color: #9fb8cc;
+}
+.rchip.reflect {
+  background: #24303a;
+  color: #9fb8cc;
+}
+.pwlegend i.r-reflect {
+  border-left: 3px solid currentColor;
+}
+
+/* My plans on phones: the actions share full rows (no button left alone on a line); Delete is spelled out */
+@media (max-width: 640px) {
+  .pwacts {
+    gap: 6px;
+  }
+  .pwacts button {
+    flex: 1 1 auto;
+    padding: 7px 10px;
+    font-size: 13px;
+  }
+  .pwrow {
+    gap: 6px 10px;
+  }
+}
+
 /* ===== Settings (gear in the header) ===== */
 .gear {
   display: inline-grid;
@@ -5927,6 +5955,7 @@ const Config = (() => {
     heatNums: true, // numbers on the heat-map squares
     gridStart: 6, // first hour of the plan grid
     deepMin: 45, // minutes of block per topic (deep work); 0 = no limit
+    reflect: true, // an error-review item closes each study block in a plan
     ranges: {}, // default chart intervals
   };
   /* the goal follows Settings (read at the moment it is used) */
@@ -7495,6 +7524,27 @@ const Translations = (() => {
   Object.assign(I18N.en, { kbSyncShort: 'Sync', pwNewShort: '+ New', pwEnergyShort: 'Energy' });
   Object.assign(I18N.pt, { kbSyncShort: 'Sincronizar', pwNewShort: '+ Novo', pwEnergyShort: 'Energia' });
   Object.assign(I18N.ja, { kbSyncShort: '同期', pwNewShort: '+ 新規', pwEnergyShort: 'エネルギー' });
+  Object.assign(I18N.en, {
+    reflectName: 'Error review',
+    rs_reflect: 'error review',
+    reason_reflect: 'Review the questions you missed in this block',
+    setReflect: 'Error review at the end of each block',
+    setReflectHint: 'Sized by the misses expected in the block (at least 10 min, at most a quarter of it)',
+  });
+  Object.assign(I18N.pt, {
+    reflectName: 'Revisão dos erros',
+    rs_reflect: 'revisão dos erros',
+    reason_reflect: 'Revise as questões que errou neste bloco',
+    setReflect: 'Revisão dos erros no fim de cada bloco',
+    setReflectHint: 'Proporcional aos erros esperados no bloco (mínimo 10 min, no máximo um quarto dele)',
+  });
+  Object.assign(I18N.ja, {
+    reflectName: '間違いの振り返り',
+    rs_reflect: '振り返り',
+    reason_reflect: 'このブロックで間違えた問題を見直す',
+    setReflect: '各ブロックの最後に間違いの振り返り',
+    setReflectHint: 'ブロックで予想される間違いに比例（最低10分、最大でブロックの4分の1）',
+  });
   return { I18N };
 })();
 const { I18N } = Translations;
@@ -7713,6 +7763,7 @@ const AppState = (() => {
     heatNums: v => typeof v === 'boolean',
     gridStart: v => [5, 6, 7, 8, 9].includes(v),
     deepMin: v => [0, 30, 45, 60, 90].includes(v),
+    reflect: v => typeof v === 'boolean',
   };
   const RANGE_OK = {
     sr: ['3d', '7d', '2w', '1m', '3m', '6m', '1y', 'all'],
@@ -7759,6 +7810,7 @@ const AppState = (() => {
           +it.min > 0 &&
           (it.kind === 'test' ||
             it.kind === 'custom' ||
+            it.kind === 'reflect' ||
             (it.kind === 'topic' && Number.isInteger(it.i) && TOPICS[it.i]))
       )
       .map(it => {
@@ -7773,6 +7825,11 @@ const AppState = (() => {
           reason: typeof it.reason === 'string' ? it.reason.slice(0, 12) : 'custom',
         };
         if (it.kind === 'custom') o.label = String(it.label || '').slice(0, 60);
+        if (it.kind === 'reflect')
+          o.parts = (Array.isArray(it.parts) ? it.parts : [])
+            .filter(x => x && (x.i === -1 || (Number.isInteger(x.i) && TOPICS[x.i])) && Number.isFinite(+x.m))
+            .map(x => ({ i: x.i, m: Math.max(0, Math.round(+x.m)) }))
+            .slice(0, 8);
         if (it.custom) o.custom = true;
         if (it.check) o.check = true;
         return o;
@@ -9231,7 +9288,7 @@ const Schedule = (() => {
 
   function itemDone(it) {
     if (it.check) return true;
-    if (it.kind === 'custom') return false;
+    if (it.kind === 'custom' || it.kind === 'reflect') return false;
     if (it.kind === 'test') return (state.tests || []).some(x => x.date === it.date && x.score != null);
     return state.events.some(
       e => e.date === it.date && e.topic === it.i && (e.kind === 'study' || e.kind === 'review')
@@ -9294,8 +9351,9 @@ const Schedule = (() => {
     const rest = cands.filter(x => !pick.some(p => p.key === x.key) && x.kind === 'topic');
     rest.sort((a, b) => b.value / b.n - a.value / a.n);
     for (const r of rest) {
-      const fit = Math.floor((c + 1e-9) / r.per);
-      if (fit >= MIN_CHUNK_Q) {
+      const fit = Math.floor((c + 1e-9) / r.per),
+        least = Math.min(r.full || r.n, Math.max(MIN_CHUNK_Q, Math.ceil(10 / r.per)));
+      if (fit >= least) {
         const part = { ...r, n: Math.min(r.n, fit) };
         part.value = (r.value * part.n) / r.n;
         pick.push(part);
@@ -9314,52 +9372,129 @@ const Schedule = (() => {
     return (1 - c.p) * (c.diff || 1) + (c.reason === 'due' ? 0.3 : 0) + idle;
   };
 
-  /* fill one day's blocks; returns items with start times */
+  /* ---------- error review (reflection) ----------
+     Expected misses of a topic chunk = questions × (1 − p) × difficulty (a test counts 60 × (1 − p)).
+     Minutes = expected misses × your review minutes per wrong answer, rounded to 5, at least 10 and at most a quarter
+     of the block; none when fewer than 3 misses are expected (topics you mostly get right). */
+  const REFLECT_MIN = 10,
+    REFLECT_SHARE = 0.25,
+    REFLECT_FROM = 3,
+    LEFTOVER_TOPIC = 20,
+    MIN_ITEM = 10;
+  const missesOf = c => c.n * (1 - (c.p ?? 0.5)) * (c.kind === 'test' ? 1 : c.diff || 1);
+  function reflectFor(pick, cap) {
+    const st = settings(),
+      parts = pick.map(c => ({ i: c.kind === 'test' ? -1 : c.i, m: Math.round(missesOf(c)) })).filter(x => x.m > 0),
+      E = pick.reduce((a, c) => a + missesOf(c), 0);
+    if (!pref('reflect') || !st.reviewMin || E < REFLECT_FROM) return { min: 0, parts: [] };
+    const max = Math.max(REFLECT_MIN, Math.floor((cap * REFLECT_SHARE) / 5) * 5),
+      min = Math.max(REFLECT_MIN, Math.min(max, Math.round((E * st.reviewMin) / 5) * 5));
+    return { min, parts: parts.sort((a, b) => b.m - a.m) };
+  }
+  const usedBy = pick => pick.reduce((a, c) => a + Math.ceil(c.n * c.per), 0);
+  /* the smallest chunk worth placing: 10 minutes (or the whole topic when it is shorter), never under 5 questions */
+  const minN = c => (c.kind === 'test' ? c.n : Math.min(c.full, Math.max(MIN_CHUNK_Q, Math.ceil(MIN_ITEM / c.per))));
+
+  /* fill one day's blocks; returns items with start times.
+     Inside a block: topics (hardest first), then the error review. Topics are trimmed (easiest first) to make room for
+     the review in the same block; only when that is impossible (a practice test or a topic that cannot shrink fills
+     the block) does the review move to the start of the day's next block. */
   function packDay(date, ranges, energy) {
     const total = rangesTotal(ranges);
     if (!total) return [];
-    const boost = missedTopics(date),
-      P = buildPlan(date, { ...settings(), minutes: total * 4 }, energy || 'medium');
+    const st = settings(),
+      speed = { low: 1.15, medium: 1, high: 0.9 }[energy || 'medium'],
+      boost = missedTopics(date),
+      P = buildPlan(date, { ...st, minutes: total * 4 }, energy || 'medium');
+    /* the review of misses is its own item, so each question here counts only the time to answer it */
     let cands = P.items
       .filter(x => !x.done && x.n > 0 && (x.kind === 'test' || x.kind === 'topic'))
-      .map((x, k) => ({
-        key: x.kind + (x.i ?? 't') + '_' + k,
-        kind: x.kind,
-        i: x.i,
-        n: x.kind === 'test' ? TEST_Q : x.n,
-        per: x.per,
-        p: x.p,
-        diff: x.diff,
-        reason: x.reason,
-        date,
-        value:
-          (x.kind === 'test' ? TEST_Q * 1.5 : x.n * (1 - (x.pExam ?? x.p ?? 0.5))) *
-          (URGENCY[x.reason] || 1) *
-          (x.kind === 'topic' && boost.has(x.i) ? MISSED_BOOST : 1),
-      }))
+      .map((x, k) => {
+        const n = x.kind === 'test' ? TEST_Q : x.n,
+          review = (1 - (x.p ?? 0.5)) * st.reviewMin * (x.kind === 'test' ? 1 : x.diff || 1) * speed;
+        return {
+          key: x.kind + (x.i ?? 't') + '_' + k,
+          kind: x.kind,
+          i: x.i,
+          n,
+          full: x.kind === 'test' ? TEST_Q : TOPICS[x.i].q,
+          per: Math.max(0.2, x.per - review),
+          p: x.p,
+          diff: x.diff,
+          reason: x.reason,
+          date,
+          value:
+            (x.kind === 'test' ? TEST_Q * 1.5 : n * (1 - (x.pExam ?? x.p ?? 0.5))) *
+            (URGENCY[x.reason] || 1) *
+            (x.kind === 'topic' && boost.has(x.i) ? MISSED_BOOST : 1),
+        };
+      })
       .filter(c => c.per > 0);
     const out = [];
-    for (const [s, e] of ranges) {
-      if (!cands.length) break;
-      const cap = e - s;
-      let pick = knapsack(cands, cap);
+    let carry = null;
+    ranges.forEach(([s, e], bi) => {
+      const cap = e - s,
+        capT = cap - (carry ? carry.min : 0);
+      let t0 = s;
+      if (carry) {
+        out.push({
+          id: uid(),
+          date,
+          start: t0,
+          min: carry.min,
+          kind: 'reflect',
+          i: null,
+          n: 0,
+          reason: 'reflect',
+          parts: carry.parts,
+        });
+        t0 += carry.min;
+        carry = null;
+      }
+      if (!cands.length || capT < MIN_ITEM) return;
+      let pick = knapsack(cands, capT);
       /* deep work: few topic switches — at most one topic per ~45 min; the kept topics grow into the freed time */
       const deep = pref('deepMin'),
         maxTopics = deep ? Math.max(1, Math.round(cap / deep)) : Infinity;
       if (pick.length > maxTopics) {
         pick = pick.sort((a, b) => b.value - a.value).slice(0, maxTopics);
-        let left = cap - pick.reduce((a, c) => a + Math.ceil(c.n * c.per), 0);
+        let left = capT - usedBy(pick);
         pick.forEach(c => {
           if (c.kind !== 'topic') return;
-          const more = Math.min(TOPICS[c.i].q - c.n, Math.floor((left + 1e-9) / c.per));
+          const more = Math.min(c.full - c.n, Math.floor((left + 1e-9) / c.per));
           if (more > 0) {
             c.n += more;
             left -= Math.ceil(more * c.per);
           }
         });
       }
+      /* 20+ minutes still free (after the review) → one more topic instead of empty time */
+      const leftAfter = () => capT - usedBy(pick) - reflectFor(pick, cap).min;
+      if (leftAfter() >= LEFTOVER_TOPIC) {
+        const next = cands
+          .filter(x => x.kind === 'topic' && !pick.some(p => p.kind === x.kind && p.i === x.i))
+          .sort((a, b) => b.value / b.n - a.value / a.n)
+          .find(x => Math.floor(leftAfter() / x.per) >= minN(x));
+        if (next) {
+          const fit = Math.floor((leftAfter() - 5) / next.per),
+            n = Math.min(next.n, Math.max(minN(next), fit));
+          pick.push({ ...next, n, value: (next.value * n) / next.n });
+        }
+      }
+      /* room for the review in the same block: trim the easiest topics first, never under their smallest chunk */
       pick.sort((a, b) => hardness(b) - hardness(a));
-      let t0 = s;
+      let R = reflectFor(pick, cap);
+      for (let guard = 0; usedBy(pick) + R.min > capT && guard < 400; guard++) {
+        const c = pick
+          .slice()
+          .reverse()
+          .find(x => x.kind === 'topic' && x.n > minN(x));
+        if (!c) break;
+        c.n -= 1;
+        R = reflectFor(pick, cap);
+      }
+      const fits = usedBy(pick) + R.min <= capT,
+        hasNext = bi < ranges.length - 1;
       pick.forEach(c => {
         const min = Math.max(1, Math.round(c.n * c.per));
         out.push({
@@ -9376,7 +9511,37 @@ const Schedule = (() => {
         /* a topic is used once per day: drop the whole candidate even when only part of it was placed */
         cands = cands.filter(x => !(x.kind === c.kind && x.i === c.i));
       });
-    }
+      if (R.min) {
+        if (fits)
+          out.push({
+            id: uid(),
+            date,
+            start: t0,
+            min: R.min,
+            kind: 'reflect',
+            i: null,
+            n: 0,
+            reason: 'reflect',
+            parts: R.parts,
+          });
+        else if (hasNext) carry = R;
+        else {
+          const room = Math.floor((e - t0) / 5) * 5;
+          if (room >= REFLECT_MIN)
+            out.push({
+              id: uid(),
+              date,
+              start: t0,
+              min: room,
+              kind: 'reflect',
+              i: null,
+              n: 0,
+              reason: 'reflect',
+              parts: R.parts,
+            });
+        }
+      }
+    });
     return out;
   }
 
@@ -9394,6 +9559,7 @@ const Schedule = (() => {
           const items = d < todayISO() ? [] : packDay(d, blocks[d] || [], (energies || {})[d]);
           out[d] = items;
           items.forEach(it => {
+            if (it.kind === 'reflect') return;
             if (it.kind === 'test')
               state.tests.push({ id: 'sim' + it.id, date: d, q: TEST_Q, score: Math.round(blended(d).mu * 100) });
             else {
@@ -9486,6 +9652,15 @@ const Schedule = (() => {
       },
     ];
   }
+  /* what a plan item is called, and (error review) which topics' misses it covers */
+  function itemTitle(it) {
+    if (it.kind === 'test') return t('practiceTest');
+    if (it.kind === 'custom') return it.label || t('wzCustomDefault');
+    if (it.kind === 'reflect') return t('reflectName');
+    return TOPICS[it.i].name;
+  }
+  const reflectDetail = it =>
+    (it.parts || []).map(x => `${x.i === -1 ? t('practiceTest') : TOPICS[x.i].name} ${x.m}`).join(' · ');
   /* the manual done mark on a plan item (your own activities are only done this way) */
   function toggleCheck(id) {
     const p = (state.plans || []).find(x => (x.items || []).some(it => it.id === id));
@@ -9543,6 +9718,8 @@ const Schedule = (() => {
     toggleCheck,
     seedDemoPlan,
     testMinutes,
+    itemTitle,
+    reflectDetail,
   };
 })();
 const {
@@ -9568,6 +9745,8 @@ const {
   toggleCheck,
   seedDemoPlan,
   testMinutes,
+  itemTitle,
+  reflectDetail,
 } = Schedule;
 
 /* ===== module PlanView (js/views/plan.js) =====
@@ -9594,8 +9773,12 @@ const PlanView = (() => {
     };
   }
   const rowAttr = it =>
-    it.kind === 'test' ? 'data-pt="1"' : it.kind === 'custom' ? `data-cid="${esc(it.id)}"` : `data-q="${it.i}"`;
-  const rowName = it => (it.kind === 'custom' ? it.label || t('wzCustomDefault') : planRowName(it));
+    it.kind === 'test'
+      ? 'data-pt="1"'
+      : it.kind === 'custom' || it.kind === 'reflect'
+        ? `data-cid="${esc(it.id)}"`
+        : `data-q="${it.i}"`;
+  const rowName = it => (it.kind === 'topic' || it.kind === 'test' ? planRowName(it) : itemTitle(it));
   const checkBtn = it =>
     it.id
       ? `<button type="button" class="pck" data-chk="${esc(it.id)}" aria-label="${esc(t('itemCheck'))}">${it.done ? '✓' : ''}</button>`
@@ -9612,7 +9795,7 @@ const PlanView = (() => {
       ? P.items
           .map(
             it =>
-              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
+              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' || it.kind === 'reflect' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
           )
           .join('')
       : `<div class="muted">${esc(t(fromPlan ? 'planRestDay' : 'allClear'))}</div>`;
@@ -11857,12 +12040,9 @@ const PlanWeek = (() => {
   const longDay = d =>
     new Intl.DateTimeFormat(LOCALE[lang], { weekday: 'short', month: 'short', day: 'numeric' }).format(parse(d));
   const shortDate = d => new Intl.DateTimeFormat(LOCALE[lang], { month: 'short', day: 'numeric' }).format(parse(d));
-  const itemName = it =>
-    it.kind === 'test'
-      ? t('practiceTest')
-      : it.kind === 'custom'
-        ? it.label || t('wzCustomDefault')
-        : TOPICS[it.i].name;
+  const itemName = itemTitle;
+  /* own activities and error reviews are measured in minutes, topics and tests in questions */
+  const sizeOf = it => (it.kind === 'custom' || it.kind === 'reflect' ? fmtMin(it.min) : it.n + ' q');
   const at = (top, rows) => `top:calc(var(--rowh) * ${top});height:calc(var(--rowh) * ${rows})`;
   function planLabel(p) {
     const range = p.type === 'daily' ? longDay(p.start) : `${shortDate(p.start)} – ${shortDate(addDays(p.start, 6))}`;
@@ -11941,7 +12121,7 @@ const PlanWeek = (() => {
               const done = itemDone(it),
                 missed = !done && itemMissed(it),
                 rows = Math.max(1, it.min / SLOT);
-              inner += `<button type="button" class="wki r-${it.kind === 'test' ? 'test' : it.reason || 'custom'}${done ? ' done' : ''}${missed ? ' missed' : ''}${rows < 2 ? ' tiny' : ''}" style="${at(rowOf(it.start), rows)}" data-wi="${esc(it.id)}" title="${esc(`${clockOf(it.start)} · ${itemName(it)} · ${it.kind === 'custom' ? '' : it.n + ' q · '}${fmtMin(it.min)}`)}"><b>${done ? '✓ ' : missed ? '! ' : ''}${esc(itemName(it))}</b><span>${clockOf(it.start)} · ${it.kind === 'custom' ? fmtMin(it.min) : it.n + ' q'}</span></button>`;
+              inner += `<button type="button" class="wki r-${it.kind === 'test' ? 'test' : it.reason || 'custom'}${done ? ' done' : ''}${missed ? ' missed' : ''}${rows < 2 ? ' tiny' : ''}" style="${at(rowOf(it.start), rows)}" data-wi="${esc(it.id)}" title="${esc(`${clockOf(it.start)} · ${itemName(it)} · ${sizeOf(it)}${it.kind === 'reflect' ? ' · ' + reflectDetail(it) : ''}`)}"><b>${done ? '✓ ' : missed ? '! ' : ''}${esc(itemName(it))}</b><span>${clockOf(it.start)} · ${sizeOf(it)}</span></button>`;
             });
           if (d === today) {
             const now = new Date(),
@@ -12167,7 +12347,7 @@ const PlanWeek = (() => {
           .map(p => {
             const L = planLabel(p),
               topics = new Set((p.items || []).filter(it => it.kind === 'topic').map(it => it.i)).size;
-            return `<div class="pwrow${p.active ? ' on' : ''}" data-pid="${esc(p.id)}"><span class="pwtype ${p.type}">${esc(t(p.type === 'daily' ? 'pDaily' : 'pWeekly'))}</span><span class="pwname">${esc(L.name)}<small>${esc(L.range)} · ${fmtMin(planTotal(p))} · ${esc(tf('pwTopics', topics))}</small></span><span class="pwstat">${esc(t(p.active ? 'pwActive' : 'pwInactive'))}</span><span class="pwacts"><button type="button" data-act="view">${esc(t('pwView'))}</button><button type="button" data-act="edit">${esc(t('pwEdit'))}</button><button type="button" data-act="${p.active ? 'off' : 'on'}">${esc(t(p.active ? 'pwDeactivate' : 'pwActivate'))}</button>${p.type === 'weekly' ? `<button type="button" data-act="copy">${esc(t('pwCopy'))}</button>` : ''}<button type="button" class="danger" data-act="del" aria-label="${esc(t('del'))}">×</button></span></div>`;
+            return `<div class="pwrow${p.active ? ' on' : ''}" data-pid="${esc(p.id)}"><span class="pwtype ${p.type}">${esc(t(p.type === 'daily' ? 'pDaily' : 'pWeekly'))}</span><span class="pwname">${esc(L.name)}<small>${esc(L.range)} · ${fmtMin(planTotal(p))} · ${esc(tf('pwTopics', topics))}</small></span><span class="pwstat">${esc(t(p.active ? 'pwActive' : 'pwInactive'))}</span><span class="pwacts"><button type="button" data-act="view">${esc(t('pwView'))}</button><button type="button" data-act="edit">${esc(t('pwEdit'))}</button><button type="button" data-act="${p.active ? 'off' : 'on'}">${esc(t(p.active ? 'pwDeactivate' : 'pwActivate'))}</button>${p.type === 'weekly' ? `<button type="button" data-act="copy">${esc(t('pwCopy'))}</button>` : ''}<button type="button" class="danger" data-act="del" aria-label="${esc(t('del'))}"><span class="lglab">×</span><span class="smlab">${esc(t('del'))}</span></button></span></div>`;
           })
           .join('')
       : `<div class="pwempty">${esc(t('pwNoPlans'))}</div>`;
@@ -12207,7 +12387,7 @@ const PlanWeek = (() => {
     const it = weekData(Array.from({ length: 7 }, (_, k) => addDays(weekOf, k))).items.find(x => x.id === b.dataset.wi);
     if (!it) return;
     if (it.kind === 'test') openPt();
-    else if (it.kind === 'custom') toggleCheck(it.id);
+    else if (it.kind === 'custom' || it.kind === 'reflect') toggleCheck(it.id);
     else openModal(it.i, srModel(it.i).reps.length ? 'review' : 'study');
   };
   $('#pwNew').onclick = () => openWizard({ mode: 'new' });
@@ -12547,7 +12727,12 @@ const PlanWizard = (() => {
                 .map((it, k) => {
                   if (W.editItem === it.id) return editorHTML(`data-wid="${esc(it.id)}"`, it, 'ok', 'cancel');
                   const r = it.kind === 'test' ? 'test' : it.reason || 'custom';
-                  return `<div class="wzit r-${r}" data-wid="${esc(it.id)}"><span class="wzt">${clockOf(it.start)}</span><span class="wzn">${esc(itemName(it))}<small>${esc(t('rs_' + r))}${it.kind === 'custom' ? '' : ' · ' + esc(t('wzGoal'))}</small></span><span class="wzq">${it.kind === 'custom' ? '' : it.n + ' q · '}${fmtMin(it.min)}</span><span class="wzacts">${k ? `<button type="button" data-wact="up" aria-label="${esc(t('wzUp'))}">↑</button>` : ''}<button type="button" data-wact="edit" aria-label="${esc(t('pwEdit'))}">✎</button><button type="button" data-wact="del" aria-label="${esc(t('del'))}">×</button></span></div>`;
+                  const minutesOnly = it.kind === 'custom' || it.kind === 'reflect',
+                    sub =
+                      it.kind === 'reflect'
+                        ? `${t('rs_reflect')} · ${reflectDetail(it)}`
+                        : t('rs_' + r) + (it.kind === 'custom' ? '' : ' · ' + t('wzGoal'));
+                  return `<div class="wzit r-${r}" data-wid="${esc(it.id)}"><span class="wzt">${clockOf(it.start)}</span><span class="wzn">${esc(itemName(it))}<small>${esc(sub)}</small></span><span class="wzq">${minutesOnly ? '' : it.n + ' q · '}${fmtMin(it.min)}</span><span class="wzacts">${k ? `<button type="button" data-wact="up" aria-label="${esc(t('wzUp'))}">↑</button>` : ''}${it.kind === 'reflect' ? '' : `<button type="button" data-wact="edit" aria-label="${esc(t('pwEdit'))}">✎</button>`}<button type="button" data-wact="del" aria-label="${esc(t('del'))}">×</button></span></div>`;
                 })
                 .join('');
               const key = `${d}|${s}`;
@@ -13397,6 +13582,7 @@ const Settings = (() => {
           select('setDeep', [[0, t('setOff')], ...[30, 45, 60, 90].map(v => [v, tf('setDeepN', v)])], pref('deepMin')),
           'setDeepHint'
         ),
+        row('setReflect', toggle('setReflect', pref('reflect')), 'setReflectHint'),
       ]),
       section(
         'setChartsTitle',
@@ -13458,6 +13644,7 @@ const Settings = (() => {
     else if (id.startsWith('setRange_')) setRange(id.slice(9), v);
     else if (id === 'setCarousel') setPref('carousel', v);
     else if (id === 'setHeatNums') setPref('heatNums', v);
+    else if (id === 'setReflect') setPref('reflect', v);
     renderSettings();
   });
 
@@ -14645,13 +14832,50 @@ const SelfTest = (() => {
           used = day.reduce((a, it) => a + it.min, 0),
           seq = day.every((it, k) => !k || it.start >= day[k - 1].start + day[k - 1].min - 1e-9);
         ok('Plans', 'a 90-min block is filled without going over it', day.length && used <= 92, used);
+        const last = day[day.length - 1];
+        ok(
+          'Plans',
+          'the block ends with an error review sized 10 min … a quarter of the block',
+          last.kind === 'reflect' &&
+            last.min >= 10 &&
+            last.min <= 20 &&
+            last.start + last.min <= 1230 &&
+            last.parts.length,
+          JSON.stringify(last)
+        );
         ok(
           'Plans',
           'items run one after another inside the block',
           seq && day.every(it => it.start >= 1140 && it.start < 1230)
         );
-        ok('Plans', 'deep work: at most one topic per ~45 min (≤ 2 in 90 min)', day.length <= 2, day.length);
-        ok('Plans', 'a topic appears once per day', new Set(day.map(it => it.i)).size === day.length);
+        const topics = day.filter(it => it.kind === 'topic');
+        ok(
+          'Plans',
+          'deep work: one topic per ~45 min (2 in 90 min), one more only when 20+ min would stay empty',
+          topics.length <= 3,
+          topics.length
+        );
+        ok('Plans', 'a topic appears once per day', new Set(topics.map(it => it.i)).size === topics.length);
+        ok(
+          'Plans',
+          'no tiny items: every topic chunk is 10 min or more (or the whole small topic)',
+          topics.every(it => it.min >= 10 || it.n === TOPICS[it.i].q),
+          JSON.stringify(topics.map(x => [x.i, x.n, x.min]))
+        );
+        state.settings.reflect = false;
+        ok(
+          'Plans',
+          'error review off in Settings → no review item',
+          !packDay(T, [[1140, 1230]], 'medium').some(it => it.kind === 'reflect')
+        );
+        state.settings.reflect = true;
+        state.settings.reviewMin = 0;
+        ok(
+          'Plans',
+          'no review time per miss → no review item',
+          !packDay(T, [[1140, 1230]], 'medium').some(it => it.kind === 'reflect')
+        );
+        state.settings.reviewMin = 1.5;
         const two = packDay(
           T,
           [
@@ -14660,7 +14884,43 @@ const SelfTest = (() => {
           ],
           'medium'
         );
-        ok('Plans', 'two blocks on one day never repeat a topic', new Set(two.map(it => it.i)).size === two.length);
+        const twoT = two.filter(it => it.kind === 'topic');
+        ok('Plans', 'two blocks on one day never repeat a topic', new Set(twoT.map(it => it.i)).size === twoT.length);
+        ok(
+          'Plans',
+          'each block keeps its own error review at its end',
+          [1140, 1260].every(s0 => {
+            const b = two.filter(it => it.start >= s0 && it.start < s0 + 45);
+            return (
+              !b.length || b[b.length - 1].kind === 'reflect' || b.every(it => it.kind !== 'topic' || it.n * 0 === 0)
+            );
+          })
+        );
+        {
+          /* a practice test that fills its block exactly: its review moves to the start of the next block */
+          const keep = state.tests;
+          state.tests = [{ id: 'old', date: D(5), q: 60, score: 72 }];
+          state.settings.testEvery = 3;
+          const st = settings(),
+            ansTest = Math.ceil(TEST_Q * (60 / st.qph) * 1.1),
+            d2 = packDay(
+              T,
+              [
+                [600, 600 + ansTest],
+                [1140, 1230],
+              ],
+              'medium'
+            ),
+            first2 = d2.find(it => it.start >= 1140);
+          ok(
+            'Plans',
+            'when a practice test fills its block, its error review opens the next block',
+            d2[0].kind === 'test' && first2 && first2.kind === 'reflect' && first2.parts.some(x => x.i === -1),
+            JSON.stringify(d2.map(x => [x.kind, x.start, x.min]))
+          );
+          state.tests = keep;
+          state.settings.testEvery = 0;
+        }
         const wk = suggestDays([T, addDays(T, 1)], { [T]: [[1140, 1230]], [addDays(T, 1)]: [[1140, 1230]] }, {}),
           dueDay1 = wk[T].filter(it => it.reason === 'due').map(it => it.i);
         ok(

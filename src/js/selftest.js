@@ -1155,13 +1155,50 @@ const SelfTest = (() => {
           used = day.reduce((a, it) => a + it.min, 0),
           seq = day.every((it, k) => !k || it.start >= day[k - 1].start + day[k - 1].min - 1e-9);
         ok('Plans', 'a 90-min block is filled without going over it', day.length && used <= 92, used);
+        const last = day[day.length - 1];
+        ok(
+          'Plans',
+          'the block ends with an error review sized 10 min … a quarter of the block',
+          last.kind === 'reflect' &&
+            last.min >= 10 &&
+            last.min <= 20 &&
+            last.start + last.min <= 1230 &&
+            last.parts.length,
+          JSON.stringify(last)
+        );
         ok(
           'Plans',
           'items run one after another inside the block',
           seq && day.every(it => it.start >= 1140 && it.start < 1230)
         );
-        ok('Plans', 'deep work: at most one topic per ~45 min (≤ 2 in 90 min)', day.length <= 2, day.length);
-        ok('Plans', 'a topic appears once per day', new Set(day.map(it => it.i)).size === day.length);
+        const topics = day.filter(it => it.kind === 'topic');
+        ok(
+          'Plans',
+          'deep work: one topic per ~45 min (2 in 90 min), one more only when 20+ min would stay empty',
+          topics.length <= 3,
+          topics.length
+        );
+        ok('Plans', 'a topic appears once per day', new Set(topics.map(it => it.i)).size === topics.length);
+        ok(
+          'Plans',
+          'no tiny items: every topic chunk is 10 min or more (or the whole small topic)',
+          topics.every(it => it.min >= 10 || it.n === TOPICS[it.i].q),
+          JSON.stringify(topics.map(x => [x.i, x.n, x.min]))
+        );
+        state.settings.reflect = false;
+        ok(
+          'Plans',
+          'error review off in Settings → no review item',
+          !packDay(T, [[1140, 1230]], 'medium').some(it => it.kind === 'reflect')
+        );
+        state.settings.reflect = true;
+        state.settings.reviewMin = 0;
+        ok(
+          'Plans',
+          'no review time per miss → no review item',
+          !packDay(T, [[1140, 1230]], 'medium').some(it => it.kind === 'reflect')
+        );
+        state.settings.reviewMin = 1.5;
         const two = packDay(
           T,
           [
@@ -1170,7 +1207,43 @@ const SelfTest = (() => {
           ],
           'medium'
         );
-        ok('Plans', 'two blocks on one day never repeat a topic', new Set(two.map(it => it.i)).size === two.length);
+        const twoT = two.filter(it => it.kind === 'topic');
+        ok('Plans', 'two blocks on one day never repeat a topic', new Set(twoT.map(it => it.i)).size === twoT.length);
+        ok(
+          'Plans',
+          'each block keeps its own error review at its end',
+          [1140, 1260].every(s0 => {
+            const b = two.filter(it => it.start >= s0 && it.start < s0 + 45);
+            return (
+              !b.length || b[b.length - 1].kind === 'reflect' || b.every(it => it.kind !== 'topic' || it.n * 0 === 0)
+            );
+          })
+        );
+        {
+          /* a practice test that fills its block exactly: its review moves to the start of the next block */
+          const keep = state.tests;
+          state.tests = [{ id: 'old', date: D(5), q: 60, score: 72 }];
+          state.settings.testEvery = 3;
+          const st = settings(),
+            ansTest = Math.ceil(TEST_Q * (60 / st.qph) * 1.1),
+            d2 = packDay(
+              T,
+              [
+                [600, 600 + ansTest],
+                [1140, 1230],
+              ],
+              'medium'
+            ),
+            first2 = d2.find(it => it.start >= 1140);
+          ok(
+            'Plans',
+            'when a practice test fills its block, its error review opens the next block',
+            d2[0].kind === 'test' && first2 && first2.kind === 'reflect' && first2.parts.some(x => x.i === -1),
+            JSON.stringify(d2.map(x => [x.kind, x.start, x.min]))
+          );
+          state.tests = keep;
+          state.settings.testEvery = 0;
+        }
         const wk = suggestDays([T, addDays(T, 1)], { [T]: [[1140, 1230]], [addDays(T, 1)]: [[1140, 1230]] }, {}),
           dueDay1 = wk[T].filter(it => it.reason === 'due').map(it => it.i);
         ok(

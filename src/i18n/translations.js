@@ -1557,6 +1557,27 @@ const Translations = (() => {
   Object.assign(I18N.en, { kbSyncShort: 'Sync', pwNewShort: '+ New', pwEnergyShort: 'Energy' });
   Object.assign(I18N.pt, { kbSyncShort: 'Sincronizar', pwNewShort: '+ Novo', pwEnergyShort: 'Energia' });
   Object.assign(I18N.ja, { kbSyncShort: '同期', pwNewShort: '+ 新規', pwEnergyShort: 'エネルギー' });
+  Object.assign(I18N.en, {
+    reflectName: 'Error review',
+    rs_reflect: 'error review',
+    reason_reflect: 'Review the questions you missed in this block',
+    setReflect: 'Error review at the end of each block',
+    setReflectHint: 'Sized by the misses expected in the block (at least 10 min, at most a quarter of it)',
+  });
+  Object.assign(I18N.pt, {
+    reflectName: 'Revisão dos erros',
+    rs_reflect: 'revisão dos erros',
+    reason_reflect: 'Revise as questões que errou neste bloco',
+    setReflect: 'Revisão dos erros no fim de cada bloco',
+    setReflectHint: 'Proporcional aos erros esperados no bloco (mínimo 10 min, no máximo um quarto dele)',
+  });
+  Object.assign(I18N.ja, {
+    reflectName: '間違いの振り返り',
+    rs_reflect: '振り返り',
+    reason_reflect: 'このブロックで間違えた問題を見直す',
+    setReflect: '各ブロックの最後に間違いの振り返り',
+    setReflectHint: 'ブロックで予想される間違いに比例（最低10分、最大でブロックの4分の1）',
+  });
   return { I18N };
 })();
 const { I18N } = Translations;

@@ -14,12 +14,9 @@ const PlanWeek = (() => {
   const longDay = d =>
     new Intl.DateTimeFormat(LOCALE[lang], { weekday: 'short', month: 'short', day: 'numeric' }).format(parse(d));
   const shortDate = d => new Intl.DateTimeFormat(LOCALE[lang], { month: 'short', day: 'numeric' }).format(parse(d));
-  const itemName = it =>
-    it.kind === 'test'
-      ? t('practiceTest')
-      : it.kind === 'custom'
-        ? it.label || t('wzCustomDefault')
-        : TOPICS[it.i].name;
+  const itemName = itemTitle;
+  /* own activities and error reviews are measured in minutes, topics and tests in questions */
+  const sizeOf = it => (it.kind === 'custom' || it.kind === 'reflect' ? fmtMin(it.min) : it.n + ' q');
   const at = (top, rows) => `top:calc(var(--rowh) * ${top});height:calc(var(--rowh) * ${rows})`;
   function planLabel(p) {
     const range = p.type === 'daily' ? longDay(p.start) : `${shortDate(p.start)} – ${shortDate(addDays(p.start, 6))}`;
@@ -98,7 +95,7 @@ const PlanWeek = (() => {
               const done = itemDone(it),
                 missed = !done && itemMissed(it),
                 rows = Math.max(1, it.min / SLOT);
-              inner += `<button type="button" class="wki r-${it.kind === 'test' ? 'test' : it.reason || 'custom'}${done ? ' done' : ''}${missed ? ' missed' : ''}${rows < 2 ? ' tiny' : ''}" style="${at(rowOf(it.start), rows)}" data-wi="${esc(it.id)}" title="${esc(`${clockOf(it.start)} · ${itemName(it)} · ${it.kind === 'custom' ? '' : it.n + ' q · '}${fmtMin(it.min)}`)}"><b>${done ? '✓ ' : missed ? '! ' : ''}${esc(itemName(it))}</b><span>${clockOf(it.start)} · ${it.kind === 'custom' ? fmtMin(it.min) : it.n + ' q'}</span></button>`;
+              inner += `<button type="button" class="wki r-${it.kind === 'test' ? 'test' : it.reason || 'custom'}${done ? ' done' : ''}${missed ? ' missed' : ''}${rows < 2 ? ' tiny' : ''}" style="${at(rowOf(it.start), rows)}" data-wi="${esc(it.id)}" title="${esc(`${clockOf(it.start)} · ${itemName(it)} · ${sizeOf(it)}${it.kind === 'reflect' ? ' · ' + reflectDetail(it) : ''}`)}"><b>${done ? '✓ ' : missed ? '! ' : ''}${esc(itemName(it))}</b><span>${clockOf(it.start)} · ${sizeOf(it)}</span></button>`;
             });
           if (d === today) {
             const now = new Date(),
@@ -324,7 +321,7 @@ const PlanWeek = (() => {
           .map(p => {
             const L = planLabel(p),
               topics = new Set((p.items || []).filter(it => it.kind === 'topic').map(it => it.i)).size;
-            return `<div class="pwrow${p.active ? ' on' : ''}" data-pid="${esc(p.id)}"><span class="pwtype ${p.type}">${esc(t(p.type === 'daily' ? 'pDaily' : 'pWeekly'))}</span><span class="pwname">${esc(L.name)}<small>${esc(L.range)} · ${fmtMin(planTotal(p))} · ${esc(tf('pwTopics', topics))}</small></span><span class="pwstat">${esc(t(p.active ? 'pwActive' : 'pwInactive'))}</span><span class="pwacts"><button type="button" data-act="view">${esc(t('pwView'))}</button><button type="button" data-act="edit">${esc(t('pwEdit'))}</button><button type="button" data-act="${p.active ? 'off' : 'on'}">${esc(t(p.active ? 'pwDeactivate' : 'pwActivate'))}</button>${p.type === 'weekly' ? `<button type="button" data-act="copy">${esc(t('pwCopy'))}</button>` : ''}<button type="button" class="danger" data-act="del" aria-label="${esc(t('del'))}">×</button></span></div>`;
+            return `<div class="pwrow${p.active ? ' on' : ''}" data-pid="${esc(p.id)}"><span class="pwtype ${p.type}">${esc(t(p.type === 'daily' ? 'pDaily' : 'pWeekly'))}</span><span class="pwname">${esc(L.name)}<small>${esc(L.range)} · ${fmtMin(planTotal(p))} · ${esc(tf('pwTopics', topics))}</small></span><span class="pwstat">${esc(t(p.active ? 'pwActive' : 'pwInactive'))}</span><span class="pwacts"><button type="button" data-act="view">${esc(t('pwView'))}</button><button type="button" data-act="edit">${esc(t('pwEdit'))}</button><button type="button" data-act="${p.active ? 'off' : 'on'}">${esc(t(p.active ? 'pwDeactivate' : 'pwActivate'))}</button>${p.type === 'weekly' ? `<button type="button" data-act="copy">${esc(t('pwCopy'))}</button>` : ''}<button type="button" class="danger" data-act="del" aria-label="${esc(t('del'))}"><span class="lglab">×</span><span class="smlab">${esc(t('del'))}</span></button></span></div>`;
           })
           .join('')
       : `<div class="pwempty">${esc(t('pwNoPlans'))}</div>`;
@@ -364,7 +361,7 @@ const PlanWeek = (() => {
     const it = weekData(Array.from({ length: 7 }, (_, k) => addDays(weekOf, k))).items.find(x => x.id === b.dataset.wi);
     if (!it) return;
     if (it.kind === 'test') openPt();
-    else if (it.kind === 'custom') toggleCheck(it.id);
+    else if (it.kind === 'custom' || it.kind === 'reflect') toggleCheck(it.id);
     else openModal(it.i, srModel(it.i).reps.length ? 'review' : 'study');
   };
   $('#pwNew').onclick = () => openWizard({ mode: 'new' });

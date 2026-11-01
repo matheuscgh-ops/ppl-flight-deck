@@ -89,8 +89,8 @@ with sync_playwright() as p:
             ev("closeWizard()"); pg.wait_for_timeout(150)
             choose('#setGridStart', 6)
             choose('#setDeep', 90)
-            n90 = ev("packDay(todayISO(),[[1140,1230]],'medium').length")
-            check(f'{tag}: deep work 90 min → a 90-min block holds one topic', n90 == 1, n90)
+            n90 = ev("(()=>{const d=packDay(todayISO(),[[1140,1230]],'medium').filter(x=>x.kind==='topic');return {n:d.length,full:d.length<2||d[0].n===TOPICS[d[0].i].q}})()")
+            check(f'{tag}: deep work 90 min → one topic per 90-min block (a second only when the first is used up)', n90['n'] == 1 or (n90['n'] == 2 and n90['full']), n90)
             choose('#setDeep', 45)
 
             # ---------- charts, display ----------

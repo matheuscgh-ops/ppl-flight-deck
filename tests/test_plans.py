@@ -64,7 +64,10 @@ with sync_playwright() as p:
             items = ev("wizardState().items.map(it=>({s:it.start,m:it.min,i:it.i,k:it.kind,r:it.reason}))")
             used = sum(x['m'] for x in items)
             check(f'{tag}: step 3 suggests topics inside the block, one after another, without going over', items and items[0]['s'] == 1140 and used <= 122 and all(items[k]['s'] >= items[k - 1]['s'] + items[k - 1]['m'] - .01 for k in range(1, len(items))), items)
-            check(f'{tag}: deep work: at most one topic per ~45 min (≤ 3 in 2 h), each topic once', len(items) <= 3 and len({x['i'] for x in items}) == len(items), items)
+            tops = [x for x in items if x['k'] == 'topic']
+            check(f'{tag}: deep work: one topic per ~45 min (3 in 2 h, +1 only to avoid 20+ empty minutes), each topic once', len(tops) <= 4 and len({x['i'] for x in tops}) == len(tops), items)
+            check(f'{tag}: the block ends with the error review (hardest topics first, review last)', items[-1]['k'] == 'reflect' and 10 <= items[-1]['m'] <= 30, items[-1])
+            check(f'{tag}: the review row names the topics and their expected misses', 'Error review' in pg.inner_text('#wzBody') and ev("(()=>{const r=wizardState().items.find(x=>x.kind==='reflect');return r.parts.length>0&&r.parts.every(x=>x.m>0)})()"))
             check(f'{tag}: daily plan keeps the effort choice (Low / Medium / High)', ev("document.querySelectorAll('[data-wzen] [data-en]').length") == 3)
             # remove the last item and add your own activity in the free time
             pg.locator('[data-wact="del"]').last.click() if not touch else pg.locator('[data-wact="del"]').last.tap(); pg.wait_for_timeout(80)
@@ -163,7 +166,7 @@ with sync_playwright() as p:
             tap('#wzCopy'); pg.wait_for_timeout(80)
             check(f'{tag}: copy the day to the other 6 days', len(json.loads(ev("JSON.stringify(wizardState().blocks)"))) == 7)
             tap('#wzNext'); pg.wait_for_timeout(1200)
-            byday = ev("(()=>{const o={};wizardState().items.forEach(it=>{(o[it.date]=o[it.date]||[]).push(it.i)});return o})()")
+            byday = ev("(()=>{const o={};wizardState().items.filter(it=>it.kind==='topic').forEach(it=>{(o[it.date]=o[it.date]||[]).push(it.i)});return o})()")
             check(f'{tag}: every day of the week gets topics', len(byday) == 7, list(byday))
             check(f'{tag}: no topic twice on the same day', all(len(v) == len(set(v)) for v in byday.values()))
             check(f'{tag}: weekly plans can set energy per day', ev("document.querySelectorAll('[data-wzen]').length") == 7)
