@@ -1578,6 +1578,46 @@ const Translations = (() => {
     setReflect: '各ブロックの最後に間違いの振り返り',
     setReflectHint: 'ブロックで予想される間違いに比例（最低10分、最大でブロックの4分の1）',
   });
+  /* your own Kanban cards (tasks, not in the statistics) */
+  Object.assign(I18N.en, {
+    addCard: 'Add a card',
+    kbNewCard: 'New card',
+    close: 'Close',
+    addCardBtn: 'Add card',
+    cardHint: 'Enter a title (e.g. Review the theory)',
+    cardSave: 'Save',
+    cardDel: 'Delete',
+    ownTag: 'Task',
+    cardAdded: 'Card added',
+    cardDeleted: 'Card deleted',
+    cardEdited: 'Card renamed',
+  });
+  Object.assign(I18N.pt, {
+    addCard: 'Adicionar um card',
+    kbNewCard: 'Card novo',
+    close: 'Fechar',
+    addCardBtn: 'Adicionar card',
+    cardHint: 'Digite um título (ex.: Revisar a teoria)',
+    cardSave: 'Salvar',
+    cardDel: 'Apagar',
+    ownTag: 'Tarefa',
+    cardAdded: 'Card adicionado',
+    cardDeleted: 'Card apagado',
+    cardEdited: 'Card renomeado',
+  });
+  Object.assign(I18N.ja, {
+    addCard: 'カードを追加',
+    kbNewCard: '新しいカード',
+    close: '閉じる',
+    addCardBtn: 'カードを追加',
+    cardHint: 'タイトルを入力（例：理論の復習）',
+    cardSave: '保存',
+    cardDel: '削除',
+    ownTag: 'タスク',
+    cardAdded: 'カードを追加しました',
+    cardDeleted: 'カードを削除しました',
+    cardEdited: 'カード名を変更しました',
+  });
   /* Kanban: a card dropped in a new place inside its list */
   Object.assign(I18N.en, { reordered: 'Card moved' });
   Object.assign(I18N.pt, { reordered: 'Card movido' });

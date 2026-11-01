@@ -1422,3 +1422,7 @@ body.wzdragging * {
     align-items: center;
   }
 }
+.kbnew {
+  color: #b3a6f5;
+  font-weight: 800;
+}

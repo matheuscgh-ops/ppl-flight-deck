@@ -14,9 +14,10 @@ results = []
 def check(n, c, d=''): results.append((n, bool(c), str(d)[:240]))
 
 LANE = "(j=>[...document.querySelectorAll('.lane')[j].querySelectorAll('.task')].map(c=>+c.dataset.topic))"
+LANE2 = "(j=>[...document.querySelectorAll('.lane')[j].querySelectorAll('.task')].map(c=>c.dataset.card||+c.dataset.topic))"
 # drag with real pointer events: mouse moves at once, touch presses and holds first (the board's long-press)
 DRAG = """async ([from, toLane, beforeIdx, touch]) => {
-  const card = document.querySelector(`.task[data-topic="${from}"]`), lane = document.querySelectorAll('.lane')[toLane];
+  const card = document.querySelector(typeof from === 'string' ? `.task[data-card="${from}"]` : `.task[data-topic="${from}"]`), lane = document.querySelectorAll('.lane')[toLane];
   lane.scrollIntoView({block:'nearest', inline:'center'}); await new Promise(r=>setTimeout(r,250));
   const c = card.getBoundingClientRect(), P = (type, el, x, y) => el.dispatchEvent(new PointerEvent(type, {bubbles:true, cancelable:true, pointerId:3, pointerType: touch?'touch':'mouse', clientX:x, clientY:y, isPrimary:true, button:0}));
   let x = c.left + 10, y = c.top + 8;
@@ -74,6 +75,55 @@ with sync_playwright() as p:
             else: pg.click('.task[data-topic="5"] .tname')
             pg.wait_for_timeout(250)
             check(f'{tag}: a tap or click (no drag) still opens the card', pg.is_visible('#modalbg'))
+            pg.keyboard.press('Escape'); ev("typeof closeModal==='function'&&closeModal()"); pg.wait_for_timeout(150)
+            # ---------- your own cards (tasks): add, rename, drag, delete; never in the statistics ----------
+            stats0 = ev("JSON.stringify([counts(),TOTAL])")
+            ev("document.querySelectorAll('.lane')[4].scrollIntoView({block:'center',inline:'center'})"); pg.wait_for_timeout(250)
+            (pg.tap if touch else pg.click)('.lane[data-lane="4"] .addcard'); pg.wait_for_timeout(120)
+            check(f'{tag}: "+ Add a card" opens a title box at the end of the list', pg.is_visible('.composer .cardin') and ev("document.activeElement.classList.contains('cardin')"))
+            pg.keyboard.type('Review the theory'); pg.keyboard.press('Enter'); pg.wait_for_timeout(150)
+            check(f'{tag}: Enter adds the card to that list and keeps the box open for the next one', ev("state.cards.length===1&&state.cards[0].title==='Review the theory'&&state.cards[0].status==='To review'") and pg.is_visible('.composer .cardin'))
+            pg.keyboard.type('Simulator'); (pg.tap if touch else pg.click)('[data-cact="add"]'); pg.wait_for_timeout(150)
+            pg.keyboard.press('Escape'); pg.wait_for_timeout(120)
+            check(f'{tag}: "Add card" adds another; Esc closes the box', ev("state.cards.map(c=>c.title).join('|')") == 'Review the theory|Simulator' and not pg.is_visible('.composer'))
+            ids = ev("state.cards.map(c=>c.id)")
+            check(f'{tag}: your cards show in the list as tasks, after the topics', ev(LANE2 + "(4)")[-2:] == ids and pg.locator('.task.own .owntag').count() == 2)
+            check(f'{tag}: your cards are not in the statistics (progress and question bank unchanged)', ev("JSON.stringify([counts(),TOTAL])") == stats0)
+            ev(DRAG, [ids[0], 1, 1, touch])
+            check(f'{tag}: your card drags like any card and lands where dropped', ev(LANE2 + "(1)")[1:2] == [ids[0]] and ev("state.cards[0].status") == 'Doing', ev(LANE2 + "(1)"))
+            check(f'{tag}: moving your card is not a study event', ev("state.events.every(e=>Number.isInteger(e.topic))"))
+            ev(f"document.querySelector('.task[data-card=\"{ids[1]}\"]').scrollIntoView({{block:'center',inline:'center'}})"); pg.wait_for_timeout(250)
+            (pg.tap if touch else pg.click)(f'.task[data-card="{ids[1]}"] .tname'); pg.wait_for_timeout(150)
+            check(f'{tag}: a click on your card opens it to rename or delete', pg.is_visible('.own.editing .cardin') and pg.is_visible('[data-cact="del"]'))
+            pg.fill('.own.editing .cardin', 'Simulator: steep turns'); pg.keyboard.press('Enter'); pg.wait_for_timeout(150)
+            check(f'{tag}: rename saves with Enter', ev("state.cards[1].title") == 'Simulator: steep turns' and not pg.is_visible('.own.editing'))
+            (pg.tap if touch else pg.click)(f'.task[data-card="{ids[1]}"] .tname'); pg.wait_for_timeout(150)
+            (pg.tap if touch else pg.click)('[data-cact="del"]'); pg.wait_for_timeout(150)
+            check(f'{tag}: Delete removes your card (remembered as deleted for sync)', ev("state.cards.length") == 1 and ev(f"!!state.deleted['{ids[1]}']"))
+            ev("document.querySelector('#toast button').click()"); pg.wait_for_timeout(200)
+            check(f'{tag}: Undo brings it back', ev("state.cards.length") == 2)
+            pg.reload(); pg.wait_for_timeout(500); ev("window.pplTour&&pplTour.end()"); ev("goView('dash')"); pg.wait_for_timeout(150)
+            check(f'{tag}: your cards and their places are saved (reload)', ev("state.cards.length") == 2 and ev(LANE2 + "(1)")[1:2] == [ids[0]])
+            check(f'{tag}: sync unites cards made on two devices', ev("(()=>{const a=JSON.parse(JSON.stringify(state)),b=JSON.parse(JSON.stringify(state));b.cards=[...b.cards,{id:'kOther',title:'From the phone',status:'Todo'}];b.updatedAt=(a.updatedAt||0)+5;const m=mergeStates(a,b);return m.cards.length===3&&m.order.includes('kOther')})()"))
+            check(f'{tag}: a broken card list in a backup is cleaned, not fatal', ev("normalize({...JSON.parse(JSON.stringify(state)),cards:[{title:''},{title:'ok',status:'Nope'},null]}).cards.length") == 0)
+            # plan → Kanban: your own activities in today's plan become cards in Doing on Sync with Kanban (only that way)
+            ev("""(()=>{const T=todayISO();state.plans=[{id:'pK',type:'daily',name:'',start:T,active:true,blocks:{[T]:[[1140,1260]]},
+                 items:[{id:'a1',date:T,start:1140,min:30,kind:'custom',i:null,n:0,label:'Radio calls practice',reason:'custom'},
+                        {id:'a2',date:T,start:1170,min:20,kind:'custom',i:null,n:0,label:'review the theory',reason:'custom'}]}];save();render()})()""")
+            ev("(()=>{state.cards.forEach(c=>c.status='To review');save();render()})()")
+            ev("goView('plan')"); pg.wait_for_timeout(200)
+            check(f'{tag}: the plan editor does not offer Kanban cards (cards made on the Kanban stay off the plan)', ev("(openWizard({mode:'new',type:'daily',start:todayISO()}),!/Review the theory/.test(document.getElementById('wzBody').innerHTML))"))
+            ev("closeWizard()"); pg.wait_for_timeout(100)
+            (pg.tap if touch else pg.click)('#kbSync'); pg.wait_for_timeout(250)
+            txt = pg.inner_text('#kbList')
+            check(f'{tag}: Sync with Kanban lists the plan’s own activities: a new card, and your existing card moving to Doing', 'Radio calls practice' in txt and 'New card' in txt and 'Review the theory' in txt, txt)
+            (pg.tap if touch else pg.click)('#kbOk'); pg.wait_for_timeout(250)
+            check(f'{tag}: after OK the new card appears in Doing and the existing one moved there (no study events)', ev("state.cards.some(c=>c.title==='Radio calls practice'&&c.status==='Doing')&&state.cards.find(c=>c.id===%r).status==='Doing'&&state.cards.length===3" % ids[0]) and ev("state.events.every(e=>Number.isInteger(e.topic))"))
+            ev("goView('dash')"); pg.wait_for_timeout(150)
+            check(f'{tag}: the new card shows on the board', 'Radio calls practice' in pg.inner_text('.lane[data-lane="1"]'))
+            ev("goView('plan')"); pg.wait_for_timeout(100); (pg.tap if touch else pg.click)('#kbSync'); pg.wait_for_timeout(250)
+            check(f'{tag}: syncing again adds nothing twice', 'Radio calls practice' not in pg.inner_text('#kbList'))
+            ev("document.getElementById('kbCancel').click()"); pg.wait_for_timeout(100)
             check(f'{tag}: no script errors or browser pop-ups', not errs, errs)
             c.close()
     b.close()

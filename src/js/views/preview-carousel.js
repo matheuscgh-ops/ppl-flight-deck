@@ -168,7 +168,7 @@ const PreviewCarousel = (() => {
   window.addEventListener('resize', () => requestAnimationFrame(clipSugg));
   lanesEl.addEventListener('pointerover', e => {
     if (e.pointerType !== 'mouse' || drag) return;
-    const c = e.target.closest('.task');
+    const c = e.target.closest('.task[data-topic]');
     setPreview(c ? +c.dataset.topic : null);
   });
   lanesEl.addEventListener('pointerleave', () => setPreview(null));

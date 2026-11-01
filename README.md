@@ -37,6 +37,7 @@ The *How it is calculated* sections in the app list every formula.
 ## Features
 
 - **Kanban drag and drop like Trello:** the other cards slide aside and a card lands exactly where you drop it, in another list or a new place in the same one. The order is saved, goes into the backup and syncs; one Undo reverts a drop (mouse, or press and hold on touch).
+- **Your own cards:** "+ Add a card" at the end of a list adds a task of your own ("Review the theory", "Radio calls"). Click to rename or delete. They never count in the statistics. Your own activities in today's plan become cards in Doing on *Sync with Kanban*; cards made on the Kanban stay off the plan.
 - Calendar with study streak, activity per day and practice tests.
 - Charts with hover: a dashed crosshair to both axes, a dot on each line and the values. On practice tests the cursor snaps to each test. Tap and drag on phones.
 - Range selectors (3D → All) on every chart, with a separate one for all the small topic charts.

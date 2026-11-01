@@ -73,7 +73,7 @@ const GistSync = (() => {
             : 'error'
     );
   }
-  /* merge two copies: events, tests and plans are united by id (the newer copy wins for the same id, deleted ids stay deleted);
+  /* merge two copies: events, tests, plans and your own cards are united by id (the newer copy wins for the same id, deleted ids stay deleted);
    everything else (lists, scores, settings, exam date, plan of the day) comes from the newer copy */
   function mergeStates(a, b) {
     const [n, o] = a.updatedAt >= b.updatedAt ? [a, b] : [b, a],
@@ -91,6 +91,7 @@ const GistSync = (() => {
       events: un(n.events, o.events),
       tests: un(n.tests || [], o.tests || []),
       plans: un(n.plans || [], o.plans || []),
+      cards: un(n.cards || [], o.cards || []),
       deleted: del,
       updatedAt: Math.max(a.updatedAt, b.updatedAt),
     });

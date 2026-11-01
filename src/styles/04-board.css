@@ -182,3 +182,74 @@ body.dragging * {
   cursor: grabbing !important;
   user-select: none !important;
 }
+
+/* ===== your own cards and the "+ Add a card" composer (Trello style) ===== */
+.task.own .tmeta {
+  justify-content: flex-start;
+}
+.owntag {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #b3a6f5;
+  background: #2b2547;
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+.addcard {
+  flex: none;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  color: var(--ink2);
+  font-weight: 700;
+  padding: 7px 10px;
+  border-radius: 8px;
+}
+.addcard:hover {
+  background: #ffffff12;
+  color: var(--ink);
+  border: 0;
+}
+.composer,
+.task.own.editing {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: default;
+}
+.task.own.editing {
+  padding: 8px;
+}
+.cardin {
+  width: 100%;
+  box-sizing: border-box;
+  resize: none;
+  background: #22272b;
+  color: var(--ink);
+  border: 1px solid #579dff;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+.cardbtns {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cardbtns button {
+  padding: 6px 12px;
+}
+.cardbtns .cardx {
+  background: transparent;
+  border: 0;
+  font-size: 18px;
+  padding: 2px 8px;
+  color: var(--ink2);
+}

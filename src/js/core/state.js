@@ -1,5 +1,5 @@
 /* ===== module AppState (js/core/state.js) =====
-   public: normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs
+   public: normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs, normOrder
    shared state (getter/setter): embedded, state, loadedFromFile, lang, shown, sel, mKind, prevIds */
 const AppState = (() => {
   function normalize(o) {
@@ -64,14 +64,10 @@ const AppState = (() => {
             .map(x => ({ id: x.id || uid(), date: x.date, q: +x.q || 60, score: cl(x.score) }))
         : [],
       deadline: ok(o.deadline) ? o.deadline : '2026-11-30',
-      /* the order of the cards inside the Kanban lists (where you dropped them); a permutation of the topics */
-      order:
-        Array.isArray(o.order) &&
-        o.order.length === TOPICS.length &&
-        new Set(o.order).size === TOPICS.length &&
-        o.order.every(i => Number.isInteger(i) && TOPICS[i])
-          ? o.order.slice()
-          : TOPICS.map((_, i) => i),
+      /* your own cards on the Kanban (tasks such as "Review the theory"): a title and a list, no questions or score */
+      cards: normCards(o.cards),
+      /* the order of the cards inside the Kanban lists (where you dropped them): topic numbers and your cards' ids */
+      order: normOrder(o.order, normCards(o.cards)),
       lang: I18N[o.lang] ? o.lang : 'en',
       plan:
         o.plan && ok(o.plan.date)
@@ -246,8 +242,31 @@ const AppState = (() => {
     new Intl.NumberFormat(LOCALE[lang], { minimumFractionDigits: d, maximumFractionDigits: d }).format(n);
   /* remember which ids existed; any that disappear (delete, undo of an add, import) become tombstones */
   var prevIds = null;
+  function normCards(list) {
+    const seen = new Set();
+    return (Array.isArray(list) ? list : [])
+      .filter(c => c && typeof c.title === 'string' && c.title.trim() && STATUS.includes(c.status))
+      .map(c => ({ id: String(c.id || uid()).slice(0, 40), title: c.title.trim().slice(0, 80), status: c.status }))
+      .filter(c => !seen.has(c.id) && seen.add(c.id))
+      .slice(0, 200);
+  }
+  /* every topic and every card once, in your order; anything missing goes to the end */
+  function normOrder(order, cards) {
+    const keys = [...TOPICS.map((_, i) => i), ...cards.map(c => c.id)],
+      valid = new Set(keys),
+      out = [];
+    (Array.isArray(order) ? order : []).forEach(k => {
+      if (valid.has(k) && !out.includes(k)) out.push(k);
+    });
+    keys.forEach(k => {
+      if (!out.includes(k)) out.push(k);
+    });
+    return out;
+  }
   function trackDeletes() {
-    const now = new Set([...state.events, ...(state.tests || []), ...(state.plans || [])].map(x => x.id));
+    const now = new Set(
+      [...state.events, ...(state.tests || []), ...(state.plans || []), ...(state.cards || [])].map(x => x.id)
+    );
     state.deleted ??= {};
     if (prevIds)
       prevIds.forEach(id => {
@@ -343,6 +362,6 @@ const AppState = (() => {
       },
     ],
   });
-  return { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs };
+  return { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs, normOrder };
 })();
-const { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs } = AppState;
+const { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs, normOrder } = AppState;
