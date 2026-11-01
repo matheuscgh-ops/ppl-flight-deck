@@ -156,10 +156,11 @@
     <figure><img src="img/wiz-4.jpg" alt="Passo 4, revisão" loading="lazy"><figcaption>4 · Revisão</figcaption></figure>
   </div>
   <p><b>Como os tópicos são escolhidos.</b> Cada bloco é preenchido para proteger o máximo de questões no dia da prova, pelo tempo que cada questão leva (sua velocidade, a dificuldade do tópico e o tempo de revisar os erros). Dentro do bloco, o tópico mais difícil ou há mais tempo sem revisão vem primeiro. Para evitar trocas de assunto, um bloco tem no máximo um tópico a cada ~45 minutos (deep work, configurável). Num plano semanal, cada dia considera que os anteriores foram feitos: uma revisão de segunda não volta na terça.</p>
-  <p><b>Revisão dos erros.</b> Cada bloco termina com um item <span class="ui">Error review</span>, do tamanho dos erros esperados no bloco: questões × (1 − chance de acerto) × dificuldade × minutos por erro, arredondado para 5. Ele tem no mínimo 10 minutos e no máximo um quarto do bloco, e não aparece quando o bloco tem menos de 3 erros esperados (tópicos que você quase sempre acerta). O item mostra quantos erros se espera de cada tópico, por exemplo "Weather 8 · NAS 4". Para manter tudo no mesmo bloco, o app encurta primeiro o tópico mais fácil. A revisão só vai para o início do próximo bloco quando um simulado ou um tópico que não dá para encurtar ocupa o bloco inteiro. Se sobrarem 20 minutos ou mais, entra mais um tópico, e nenhum tópico fica com menos de 10 minutos.</p>
+  <p><b>Revisão dos erros.</b> Logo depois de cada tópico vem uma <span class="ui">Error review</span> dos erros daquele tópico, do jeito que o banco de questões mostra os erros de uma categoria assim que você termina. O tempo de revisão do bloco é do tamanho dos erros esperados nele: questões × (1 − chance de acerto) × dificuldade × minutos por erro, arredondado para 5, com no mínimo 10 minutos e no máximo um quarto do bloco, e nenhuma revisão quando o bloco tem menos de 3 erros esperados. Esse tempo é dividido entre os tópicos do bloco na proporção dos erros esperados de cada um, em passos de 5 minutos; um tópico cuja parte fica abaixo de 5 minutos não ganha revisão. Cada linha de revisão mostra os erros esperados do seu tópico, por exemplo "8 erros esperados". Para manter tudo no mesmo bloco, o app encurta primeiro o tópico mais fácil. Só quando um simulado ou um tópico que não dá para encurtar ocupa o bloco inteiro é que a revisão vai, como um item só, para o início do próximo bloco. Se sobrarem 20 minutos ou mais, entra mais um tópico, e nenhum tópico fica com menos de 10 minutos.</p>
   <p><b>Editar no passo 3:</b></p>
   <ul>
-    <li><kbd>✎</kbd> troca o tópico ou as questões; <kbd>×</kbd> remove; <kbd>↑</kbd> sobe na ordem. Os itens seguintes se reorganizam sozinhos.</li>
+    <li><b>Arraste um card</b> para mudá-lo de lugar: no computador, pegue em qualquer parte; no celular ou tablet, use a alça <kbd>⠿</kbd>. Os outros cards abrem um espaço onde ele vai cair, entre quaisquer dois cards do mesmo dia, e os horários se reorganizam quando você solta. Um tópico se move junto com a revisão dos erros dele.</li>
+    <li><b>Clique ou toque num card</b> para editar: mude as questões, escolha outra categoria ou o simulado, ou digite um nome seu (por exemplo "Teoria: frentes"). O <kbd>×</kbd> remove, e remover um tópico também remove a revisão dos erros dele.</li>
     <li><span class="ui">+ add</span> no tempo livre: adicione um tópico, o simulado, ou <span class="ui">Your own activity</span>, com nome e minutos, como "Simulador" ou "Revisar o material".</li>
     <li>A energia de cada dia (baixa, média, alta) refaz a sugestão daquele dia. <span class="ui">Suggest again</span> refaz tudo.</li>
   </ul>
@@ -313,7 +314,8 @@ passar / meta      beta-binomial em 60 questões: P(X ≥ 42) e P(X ≥ 51)
 ordem do plano     (1 − p no dia da prova) × urgência ÷ minutos por questão
 blocos             knapsack por bloco, mais difícil primeiro, 1 tópico a cada ~45 min
 revisão dos erros  erros esperados = Σ questões × (1 − p) × dificuldade
-                   minutos = erros × min por erro  (≥ 10, ≤ ¼ do bloco, só se ≥ 3 erros)</div>
+                   minutos do bloco = erros × min por erro  (≥ 10, ≤ ¼ do bloco, só se ≥ 3 erros)
+                   revisão de cada tópico = minutos do bloco × erros dele ÷ erros do bloco  (passos de 5 min)</div>
   <p>Na tendência dos simulados, a projeção desacelera depois do último simulado em vez de correr até 100%.</p>
 </section>
 <section class="chap" id="science">
@@ -350,7 +352,7 @@ S  estabilidade: quantos dias leva para R cair a 90%</div>
   <p>Cada tópico recebe uma prioridade: quantos pontos ele ainda pode te dar no dia da prova, quão urgente é a revisão dele e quanto tempo as questões dele levam.</p>
 <div class="formula">prioridade = (1 − p no dia da prova) × urgência ÷ minutos por questão</div>
   <p>Preencher um bloco é um <b>problema da mochila</b> (knapsack): escolher os tópicos cujo tempo total cabe no bloco e cujo valor total (questões protegidas) é o maior possível. O app resolve isso de forma exata para cada bloco e depois coloca o tópico mais difícil primeiro, quando a sua atenção está mais fresca.</p>
-  <p><b>Revisão dos erros.</b> Errar uma questão e depois estudar o porquê é uma das formas mais eficazes de aprender, principalmente quando o retorno vem logo depois do erro. Por isso cada bloco termina com uma revisão dos erros do tamanho dos erros esperados nele, dentro do mesmo bloco e não em outro dia.</p>
+  <p><b>Revisão dos erros.</b> Errar uma questão e depois estudar o porquê é uma das formas mais eficazes de aprender, principalmente quando o retorno vem logo depois do erro. Por isso cada tópico é seguido na hora por uma revisão dos próprios erros, proporcional aos erros esperados nele, dentro do mesmo bloco e não em outro dia.</p>
 
   <h3 id="sci-newport">Deep work e planejamento (Cal Newport)</h3>
   <p>O plano segue as ideias do livro <i>Deep Work</i>, de Cal Newport, e do método de planejamento por blocos de tempo dele:</p>

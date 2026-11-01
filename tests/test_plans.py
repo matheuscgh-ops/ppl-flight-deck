@@ -66,8 +66,24 @@ with sync_playwright() as p:
             check(f'{tag}: step 3 suggests topics inside the block, one after another, without going over', items and items[0]['s'] == 1140 and used <= 122 and all(items[k]['s'] >= items[k - 1]['s'] + items[k - 1]['m'] - .01 for k in range(1, len(items))), items)
             tops = [x for x in items if x['k'] == 'topic']
             check(f'{tag}: deep work: one topic per ~45 min (3 in 2 h, +1 only to avoid 20+ empty minutes), each topic once', len(tops) <= 4 and len({x['i'] for x in tops}) == len(tops), items)
-            check(f'{tag}: the block ends with the error review (hardest topics first, review last)', items[-1]['k'] == 'reflect' and 10 <= items[-1]['m'] <= 30, items[-1])
-            check(f'{tag}: the review row names the topics and their expected misses', 'Error review' in pg.inner_text('#wzBody') and ev("(()=>{const r=wizardState().items.find(x=>x.kind==='reflect');return r.parts.length>0&&r.parts.every(x=>x.m>0)})()"))
+            revs = [x for x in items if x['k'] == 'reflect']
+            check(f'{tag}: the error review is split after each topic (10 min … a quarter of the block in total)', revs and 10 <= sum(x['m'] for x in revs) <= 30 and ev("(()=>{const its=wizardState().items.slice().sort((a,b)=>a.start-b.start);return its.every((x,k)=>x.kind!=='reflect'||(k>0&&its[k-1].id===x.of&&x.parts.length===1))})()"), items)
+            check(f'{tag}: each review row sits under its topic and names its expected misses', 'Error review' in pg.inner_text('#wzBody') and ev("document.querySelectorAll('.wzg .wzit.child').length") == len(revs) and 'expected misses' in pg.inner_text('.wzit.child'))
+            check(f'{tag}: no ↑ arrows: topics are moved by dragging (grip on every topic)', ev("document.querySelectorAll('[data-wact=\"up\"]').length") == 0 and ev("[...document.querySelectorAll('.wzg')].every(g=>g.querySelector('.wzgrip'))"))
+            # drag the second topic (with its review) above the first
+            order0 = ev("[...document.querySelectorAll('.wzg')].map(g=>g.dataset.gid)")
+            if len(order0) >= 2:
+                if touch:
+                    ev("""(()=>{const g=document.querySelectorAll('.wzg')[1],h=g.querySelector('.wzgrip'),r=h.getBoundingClientRect(),t=document.querySelector('.wzg').getBoundingClientRect();
+                      const P=(type,el,x,y)=>el.dispatchEvent(new PointerEvent(type,{bubbles:true,cancelable:true,pointerId:7,pointerType:'touch',clientX:x,clientY:y,isPrimary:true}));
+                      P('pointerdown',h,r.left+3,r.top+3);P('pointermove',document,r.left+3,t.top+20);P('pointermove',document,r.left+3,t.top+4);P('pointerup',document,r.left+3,t.top+4)})()""")
+                else:
+                    g1 = pg.locator('.wzg').nth(1).locator('.wzn').first.bounding_box(); g0 = pg.locator('.wzg').nth(0).bounding_box()
+                    pg.mouse.move(g1['x'] + 20, g1['y'] + 6); pg.mouse.down(); pg.mouse.move(g1['x'] + 20, g0['y'] + 30, steps=5); pg.mouse.move(g1['x'] + 20, g0['y'] + 3, steps=5); pg.mouse.up()
+                pg.wait_for_timeout(150)
+                order1 = ev("[...document.querySelectorAll('.wzg')].map(g=>g.dataset.gid)")
+                check(f'{tag}: {"drag by the grip" if touch else "drag and drop"} moves a topic above another (its review goes with it, times laid out again)', order1[:2] == [order0[1], order0[0]] and ev("(()=>{const its=wizardState().items.slice().sort((a,b)=>a.start-b.start);return its[0].start===1140&&its.every((x,k)=>!k||x.start===its[k-1].start+its[k-1].min)&&its.every((x,k)=>x.kind!=='reflect'||its[k-1].id===x.of)})()"), [order0, order1])
+                check(f'{tag}: a drag does not open the editor', not pg.is_visible('.wzit.edit'))
             check(f'{tag}: daily plan keeps the effort choice (Low / Medium / High)', ev("document.querySelectorAll('[data-wzen] [data-en]').length") == 3)
             # remove the last item and add your own activity in the free time
             pg.locator('[data-wact="del"]').last.click() if not touch else pg.locator('[data-wact="del"]').last.tap(); pg.wait_for_timeout(80)
@@ -76,7 +92,8 @@ with sync_playwright() as p:
             tap('[data-wact="addok"]'); pg.wait_for_timeout(80)
             check(f'{tag}: you can add your own activity (name + minutes) in free time', ev("wizardState().items.some(it=>it.kind==='custom'&&it.label==='Simulator'&&it.min===15)"))
             # edit the first topic: change its questions
-            tap('[data-wact="edit"] >> nth=0'); pg.wait_for_timeout(80)
+            tap('.wzit.editable >> nth=0'); pg.wait_for_timeout(80)
+            check(f'{tag}: clicking a card opens its editor (category or your own name)', pg.is_visible('.wzit.edit [data-f="topic"]'))
             pg.fill('.wzit.edit [data-f="n"]', '5'); tap('[data-wact="ok"]'); pg.wait_for_timeout(80)
             check(f'{tag}: editing a topic changes its questions and minutes, later items move up', ev("(()=>{const its=wizardState().items.slice().sort((a,b)=>a.start-b.start);return its[0].n===5&&its.every((x,k)=>!k||x.start===its[k-1].start+its[k-1].min)})()"))
             tap('#wzNext'); pg.wait_for_timeout(300)

@@ -175,14 +175,37 @@ const Schedule = (() => {
       min = Math.max(REFLECT_MIN, Math.min(max, Math.round((E * st.reviewMin) / 5) * 5));
     return { min, parts: parts.sort((a, b) => b.m - a.m) };
   }
+  /* the block's review is split among its topics in proportion to their expected misses, in 5-minute steps
+     (largest remainder), so each topic is followed by the review of its own misses — the way the question bank
+     shows the misses of a category right after you finish it. A topic whose share is under 5 minutes gets none. */
+  function splitReflect(R, pick) {
+    const w = pick.map(c => missesOf(c)),
+      W = w.reduce((a, x) => a + x, 0),
+      units = Math.round(R.min / 5);
+    if (!R.min || !W) return pick.map(() => 0);
+    const raw = w.map(x => (x / W) * units),
+      got = raw.map(Math.floor);
+    let left = units - got.reduce((a, x) => a + x, 0);
+    raw
+      .map((x, k) => [x - got[k], k])
+      .sort((a, b) => b[0] - a[0])
+      .forEach(([, k]) => {
+        if (left > 0) {
+          got[k]++;
+          left--;
+        }
+      });
+    return got.map(u => u * 5);
+  }
   const usedBy = pick => pick.reduce((a, c) => a + Math.ceil(c.n * c.per), 0);
   /* the smallest chunk worth placing: 10 minutes (or the whole topic when it is shorter), never under 5 questions */
   const minN = c => (c.kind === 'test' ? c.n : Math.min(c.full, Math.max(MIN_CHUNK_Q, Math.ceil(MIN_ITEM / c.per))));
 
   /* fill one day's blocks; returns items with start times.
-     Inside a block: topics (hardest first), then the error review. Topics are trimmed (easiest first) to make room for
-     the review in the same block; only when that is impossible (a practice test or a topic that cannot shrink fills
-     the block) does the review move to the start of the day's next block. */
+     Inside a block: topics (hardest first), each followed by the review of its own misses (the block's review split
+     in proportion to each topic's expected misses). Topics are trimmed (easiest first) to make room for the reviews in
+     the same block; only when that is impossible (a practice test or a topic that cannot shrink fills the block) does
+     the whole review move to the start of the day's next block. */
   function packDay(date, ranges, energy) {
     const total = rangesTotal(ranges);
     if (!total) return [];
@@ -278,11 +301,13 @@ const Schedule = (() => {
         R = reflectFor(pick, cap);
       }
       const fits = usedBy(pick) + R.min <= capT,
-        hasNext = bi < ranges.length - 1;
-      pick.forEach(c => {
-        const min = Math.max(1, Math.round(c.n * c.per));
+        hasNext = bi < ranges.length - 1,
+        share = fits ? splitReflect(R, pick) : pick.map(() => 0);
+      pick.forEach((c, k) => {
+        const min = Math.max(1, Math.round(c.n * c.per)),
+          id = uid();
         out.push({
-          id: uid(),
+          id,
           date,
           start: t0,
           min,
@@ -292,23 +317,26 @@ const Schedule = (() => {
           reason: c.reason,
         });
         t0 += min;
-        /* a topic is used once per day: drop the whole candidate even when only part of it was placed */
-        cands = cands.filter(x => !(x.kind === c.kind && x.i === c.i));
-      });
-      if (R.min) {
-        if (fits)
+        if (share[k]) {
           out.push({
             id: uid(),
             date,
             start: t0,
-            min: R.min,
+            min: share[k],
             kind: 'reflect',
             i: null,
             n: 0,
             reason: 'reflect',
-            parts: R.parts,
+            of: id,
+            parts: [{ i: c.kind === 'test' ? -1 : c.i, m: Math.round(missesOf(c)) }],
           });
-        else if (hasNext) carry = R;
+          t0 += share[k];
+        }
+        /* a topic is used once per day: drop the whole candidate even when only part of it was placed */
+        cands = cands.filter(x => !(x.kind === c.kind && x.i === c.i));
+      });
+      if (R.min && !fits) {
+        if (hasNext) carry = R;
         else {
           const room = Math.floor((e - t0) / 5) * 5;
           if (room >= REFLECT_MIN)
@@ -443,8 +471,13 @@ const Schedule = (() => {
     if (it.kind === 'reflect') return t('reflectName');
     return TOPICS[it.i].name;
   }
-  const reflectDetail = it =>
-    (it.parts || []).map(x => `${x.i === -1 ? t('practiceTest') : TOPICS[x.i].name} ${x.m}`).join(' · ');
+  /* one topic: "Weather · 8 expected misses"; several (a review carried to the next block): "Weather 8 · NAS 4" */
+  const partName = x => (x.i === -1 ? t('practiceTest') : TOPICS[x.i].name);
+  const reflectDetail = it => {
+    const ps = it.parts || [];
+    if (ps.length === 1) return `${partName(ps[0])} · ${t('reflectMisses').replace('{n}', ps[0].m)}`;
+    return ps.map(x => `${partName(x)} ${x.m}`).join(' · ');
+  };
   /* the manual done mark on a plan item (your own activities are only done this way) */
   function toggleCheck(id) {
     const p = (state.plans || []).find(x => (x.items || []).some(it => it.id === id));

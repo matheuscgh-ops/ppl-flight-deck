@@ -171,6 +171,17 @@ const PlanWizard = (() => {
         t0 += it.min;
       });
   }
+  /* a topic and the error review of its misses move and go together; a review without its topic stands alone */
+  function groupsOf(list) {
+    const sorted = list.slice().sort((a, b) => a.start - b.start),
+      gs = [];
+    sorted.forEach(it => {
+      const owner = it.kind === 'reflect' && it.of && gs.find(g => g[0].id === it.of);
+      if (owner) owner.push(it);
+      else gs.push([it]);
+    });
+    return gs;
+  }
   function itemMinutes(kind, i, n, d) {
     return kind === 'test' ? testMinutes() : Math.max(1, Math.round(n * perQ(i, d, W.energy[d]).per));
   }
@@ -223,17 +234,23 @@ const PlanWizard = (() => {
               const its = dayItems.filter(it => it.start >= s && it.start < e).sort((a, b) => a.start - b.start),
                 used = its.reduce((a, it) => a + it.min, 0),
                 free = e - s - used;
-              const rows = its
-                .map((it, k) => {
-                  if (W.editItem === it.id) return editorHTML(`data-wid="${esc(it.id)}"`, it, 'ok', 'cancel');
-                  const r = it.kind === 'test' ? 'test' : it.reason || 'custom';
-                  const minutesOnly = it.kind === 'custom' || it.kind === 'reflect',
-                    sub =
-                      it.kind === 'reflect'
-                        ? `${t('rs_reflect')} · ${reflectDetail(it)}`
-                        : t('rs_' + r) + (it.kind === 'custom' ? '' : ' · ' + t('wzGoal'));
-                  return `<div class="wzit r-${r}" data-wid="${esc(it.id)}"><span class="wzt">${clockOf(it.start)}</span><span class="wzn">${esc(itemName(it))}<small>${esc(sub)}</small></span><span class="wzq">${minutesOnly ? '' : it.n + ' q · '}${fmtMin(it.min)}</span><span class="wzacts">${k ? `<button type="button" data-wact="up" aria-label="${esc(t('wzUp'))}">↑</button>` : ''}${it.kind === 'reflect' ? '' : `<button type="button" data-wact="edit" aria-label="${esc(t('pwEdit'))}">✎</button>`}<button type="button" data-wact="del" aria-label="${esc(t('del'))}">×</button></span></div>`;
-                })
+              const row = it => {
+                if (W.editItem === it.id) return editorHTML(`data-wid="${esc(it.id)}"`, it, 'ok', 'cancel');
+                const r = it.kind === 'test' ? 'test' : it.reason || 'custom';
+                /* the review of a topic's misses sits right under it, as part of that topic */
+                const child = it.kind === 'reflect' && it.of && its.some(x => x.id === it.of);
+                const minutesOnly = it.kind === 'custom' || it.kind === 'reflect',
+                  sub = child
+                    ? t('reflectMisses').replace('{n}', it.parts[0].m)
+                    : it.kind === 'reflect'
+                      ? reflectDetail(it)
+                      : t('rs_' + r) + (it.kind === 'custom' ? '' : ' · ' + t('wzGoal'));
+                /* drag the card (or its grip on touch screens) to move it; click or tap it to edit */
+                const editable = !past && it.kind !== 'reflect';
+                return `<div class="wzit r-${r}${child ? ' child' : ''}${editable ? ' editable' : ''}" data-wid="${esc(it.id)}"${editable ? ` role="button" tabindex="0" aria-label="${esc(t('pwEdit') + ': ' + itemName(it))}"` : ''}><span class="wzt">${child || past ? '' : `<span class="wzgrip" aria-hidden="true">⠿</span>`}${clockOf(it.start)}</span><span class="wzn">${esc(itemName(it))}<small>${esc(sub)}</small></span><span class="wzq">${minutesOnly ? '' : it.n + ' q · '}${fmtMin(it.min)}</span><span class="wzacts">${past ? '' : `<button type="button" data-wact="del" aria-label="${esc(t('del'))}">×</button>`}</span></div>`;
+              };
+              const rows = groupsOf(its)
+                .map(g => `<div class="wzg" data-gid="${esc(g[0].id)}">${g.map(row).join('')}</div>`)
                 .join('');
               const key = `${d}|${s}`;
               const add =
@@ -244,7 +261,7 @@ const PlanWizard = (() => {
                     : free < 0
                       ? `<div class="wzfree over"><span>${esc(t('wzOver').replace('{m}', fmtMin(-free)))}</span></div>`
                       : '';
-              return `<div class="wzblk"><div class="wzbh">${clockOf(s)}–${clockOf(e)} · ${fmtMin(e - s)}</div>${rows || `<div class="wzfree"><span>${esc(t('wzNothingFits'))}</span></div>`}${add}</div>`;
+              return `<div class="wzblk" data-d="${d}" data-s="${s}" data-e="${e}"><div class="wzbh">${clockOf(s)}–${clockOf(e)} · ${fmtMin(e - s)}</div>${rows || `<div class="wzfree"><span>${esc(t('wzNothingFits'))}</span></div>`}${add}</div>`;
             })
             .join('');
           return `<section class="wzday" data-d="${d}">${head}${blocks}</section>`;
@@ -418,6 +435,133 @@ const PlanWizard = (() => {
     renderWizard();
   }
 
+  /* ---------- drag and drop of topics (step 3) ----------
+     Mouse: drag a card anywhere. Touch: drag it by its grip (⠿), so the list still scrolls with the finger.
+     A topic moves with the review of its misses. While you drag, the cards open a gap where it will land (between two
+     cards, in any block of the same day); on release the blocks are laid out again from their start. */
+  let mv = null,
+    dragEndedAt = 0;
+  function dragStart(e, group) {
+    const r = group.getBoundingClientRect(),
+      ghost = group.cloneNode(true),
+      gap = document.createElement('div');
+    ghost.className = 'wzg wzghost';
+    Object.assign(ghost.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px' });
+    document.body.appendChild(ghost);
+    gap.className = 'wzgap';
+    gap.style.height = r.height + 'px';
+    group.after(gap);
+    group.hidden = true;
+    mv.on = true;
+    mv.ghost = ghost;
+    mv.gap = gap;
+    mv.dy = e.clientY - r.top;
+    document.body.classList.add('wzdragging');
+  }
+  function dragMove(e) {
+    const { group, gap, ghost } = mv;
+    ghost.style.top = e.clientY - mv.dy + 'px';
+    const day = group.closest('.wzday'),
+      y = e.clientY;
+    /* the block under the pointer (or the nearest one), then the first card whose middle is below the pointer */
+    const blks = [...day.querySelectorAll('.wzblk')];
+    let blk = blks.find(b => {
+      const r = b.getBoundingClientRect();
+      return y >= r.top && y <= r.bottom;
+    });
+    if (!blk)
+      blk = blks.reduce((best, b) => {
+        const r = b.getBoundingClientRect(),
+          d = Math.min(Math.abs(y - r.top), Math.abs(y - r.bottom));
+        return !best || d < best.d ? { b, d } : best;
+      }, null).b;
+    const cards = [...blk.querySelectorAll('.wzg')].filter(g => g !== group && !g.hidden),
+      before = cards.find(g => {
+        const r = g.getBoundingClientRect();
+        return y < r.top + r.height / 2;
+      });
+    if (before) {
+      if (gap.nextSibling !== before) before.before(gap);
+    } else {
+      const last = cards[cards.length - 1],
+        anchor = last || blk.querySelector('.wzbh');
+      if (anchor.nextSibling !== gap) anchor.after(gap);
+    }
+    /* scroll the wizard when the card reaches its top or bottom edge */
+    const body = $('#wzBody'),
+      br = body.getBoundingClientRect();
+    if (y < br.top + 40) body.scrollTop -= 12;
+    else if (y > br.bottom - 40) body.scrollTop += 12;
+  }
+  function dragEnd(commit) {
+    const { group, gap, ghost } = mv;
+    ghost.remove();
+    document.body.classList.remove('wzdragging');
+    if (commit) {
+      gap.replaceWith(group);
+      group.hidden = false;
+      /* read the new order from the page and lay every block of the day out again */
+      const day = group.closest('.wzday'),
+        d = day.dataset.d;
+      day.querySelectorAll('.wzblk').forEach(b => {
+        let t0 = +b.dataset.s;
+        b.querySelectorAll('.wzg').forEach(g => {
+          const first = W.items.find(x => x.id === g.dataset.gid),
+            members = first ? [first, ...W.items.filter(x => x.kind === 'reflect' && x.of === first.id)] : [];
+          members.forEach(x => {
+            x.date = d;
+            x.start = t0;
+            t0 += x.min;
+          });
+        });
+      });
+      dragEndedAt = Date.now();
+    } else {
+      gap.remove();
+      group.hidden = false;
+    }
+    mv = null;
+    renderWizard();
+  }
+  $('#wzBody').addEventListener('pointerdown', e => {
+    if (!W || W.step !== 3 || W.mode === 'view' || e.button > 0) return;
+    const grip = e.target.closest('.wzgrip'),
+      card = e.target.closest('.wzg');
+    if (!card || e.target.closest('button, input, select, .wzit.edit')) return;
+    if (e.pointerType !== 'mouse' && !grip) return;
+    if (!card.querySelector('.wzgrip')) return;
+    mv = { group: card, x: e.clientX, y: e.clientY, on: false, id: e.pointerId };
+    if (grip) {
+      e.preventDefault();
+      dragStart(e, card);
+    }
+  });
+  document.addEventListener('pointermove', e => {
+    if (!mv || e.pointerId !== mv.id) return;
+    if (!mv.on) {
+      if (Math.hypot(e.clientX - mv.x, e.clientY - mv.y) < 6) return;
+      dragStart(e, mv.group);
+    }
+    e.preventDefault();
+    dragMove(e);
+  });
+  document.addEventListener('pointerup', e => {
+    if (!mv || e.pointerId !== mv.id) return;
+    if (mv.on) dragEnd(true);
+    else mv = null;
+  });
+  document.addEventListener('pointercancel', () => {
+    if (mv && mv.on) dragEnd(false);
+    else mv = null;
+  });
+  $('#wzBody').addEventListener('keydown', e => {
+    const card = e.target.closest && e.target.closest('.wzit.editable');
+    if (!card || (e.key !== 'Enter' && e.key !== ' ')) return;
+    e.preventDefault();
+    W.editItem = card.dataset.wid;
+    renderWizard();
+  });
+
   /* ---------- clicks inside the wizard ---------- */
   $('#wzBody').addEventListener('click', e => {
     if (!W) return;
@@ -475,6 +619,14 @@ const PlanWizard = (() => {
       prepareTopics(false);
       return renderWizard();
     }
+    /* click or tap a card to edit it (topic, practice test or your own activity with its name) */
+    const card = tgt.closest('.wzit.editable');
+    if (card && !tgt.closest('[data-wact]')) {
+      if (Date.now() < dragEndedAt + 250) return;
+      W.editItem = card.dataset.wid;
+      W.addAt = null;
+      return renderWizard();
+    }
     const act = tgt.closest('[data-wact]');
     if (!act) return;
     const a = act.dataset.wact,
@@ -482,22 +634,23 @@ const PlanWizard = (() => {
       it = row && W.items.find(x => x.id === row.dataset.wid),
       blockOf = x => (W.blocks[x.date] || []).find(([s, e]) => x.start >= s && x.start < e);
     if (a === 'edit') W.editItem = it.id;
+    if (a === 'editrow') W.editItem = it.id;
     if (a === 'cancel') W.editItem = null;
     if (a === 'del') {
+      /* removing a topic also removes the review of its misses */
       const b = blockOf(it);
-      W.items = W.items.filter(x => x !== it);
+      W.items = W.items.filter(x => x !== it && !(x.kind === 'reflect' && x.of === it.id));
       if (b) repack(it.date, b[0], b[1]);
     }
     if (a === 'up') {
+      /* a topic moves up together with its review, above the previous topic and its review */
       const b = blockOf(it),
-        same = W.items
-          .filter(x => x.date === it.date && x.start >= b[0] && x.start < b[1])
-          .sort((p, q) => p.start - q.start),
-        k = same.indexOf(it);
+        gs = groupsOf(W.items.filter(x => x.date === it.date && x.start >= b[0] && x.start < b[1])),
+        k = gs.findIndex(g => g[0] === it);
       if (k > 0) {
-        [same[k - 1], same[k]] = [same[k], same[k - 1]];
+        [gs[k - 1], gs[k]] = [gs[k], gs[k - 1]];
         let t0 = b[0];
-        same.forEach(x => {
+        gs.flat().forEach(x => {
           x.start = t0;
           t0 += x.min;
         });
@@ -508,6 +661,8 @@ const PlanWizard = (() => {
       if (v.kind !== it.kind || v.i !== it.i) {
         it.reason = v.kind === 'test' ? 'test' : 'custom';
         it.custom = true;
+        /* another topic: the review of the old topic's misses no longer applies */
+        W.items = W.items.filter(x => !(x.kind === 'reflect' && x.of === it.id));
       }
       Object.assign(it, v, { reason: v.kind === 'custom' ? 'custom' : it.reason });
       if (it.label === undefined) delete it.label;
