@@ -350,3 +350,40 @@ body.dragging * {
     padding-left: 22px;
   }
 }
+/* the tick pops when it turns green; a checked card keeps a thin green edge so it reads at a glance on a phone */
+.tchk.on {
+  animation: tchkPop 0.28s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+@keyframes tchkPop {
+  0% {
+    transform: scale(0.5);
+  }
+  100% {
+    transform: none;
+  }
+}
+.task.checked {
+  box-shadow:
+    inset 3px 0 0 #4bce97,
+    0 1px 1px #0007;
+}
+@media (hover: none) {
+  /* a bigger finger target on touch screens */
+  .tchk {
+    width: 18px;
+    height: 18px;
+    top: 9px;
+    left: 9px;
+  }
+  .tchk::after {
+    inset: -11px;
+  }
+  .task .tname {
+    padding-left: 24px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tchk.on {
+    animation: none;
+  }
+}

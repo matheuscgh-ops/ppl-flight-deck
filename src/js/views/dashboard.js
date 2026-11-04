@@ -335,6 +335,8 @@ const Dashboard = (() => {
     if (tk) {
       e.stopPropagation();
       const k = tk.dataset.tchk;
+      /* a little haptic tap on phones when it turns green */
+      if (!tk.classList.contains('on')) navigator.vibrate?.(12);
       return toggleCardCheck(/^\d+$/.test(k) ? +k : k);
     }
     const b = e.target.closest('[data-cact]');
