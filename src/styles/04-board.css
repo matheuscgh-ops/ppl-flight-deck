@@ -100,8 +100,16 @@
   background: #2c333a;
   border-color: #4a535d;
 }
+/* the dragged card collapses (it stays in the page so a phone keeps sending the finger's events to it) */
 .task.dragging {
-  display: none;
+  visibility: hidden;
+  height: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  margin-top: -8px;
+  overflow: hidden;
+  pointer-events: none;
 }
 /* where the dragged card will land: a gap that moves between the cards */
 .task-gap {

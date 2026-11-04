@@ -542,6 +542,10 @@ const Dashboard = (() => {
     drag.gap = gap;
     drag.card.classList.add('dragging');
     document.body.classList.add('dragging');
+    /* keep receiving this finger's events even though the card is now collapsed under it (iOS) */
+    try {
+      lanesEl.setPointerCapture(drag.pid);
+    } catch (e) {}
     moveGhost(x, y);
   }
   function moveGhost(x, y) {
@@ -617,6 +621,17 @@ const Dashboard = (() => {
   }
   window.addEventListener('pointerup', e => endDrag(e, false));
   window.addEventListener('pointercancel', e => endDrag(e, true));
+  /* safety net for phones: if the browser drops the pointer events, the finger lifting still ends the drag (the card
+     lands where its gap is), and leaving the page puts it back — a card can never stay hidden */
+  window.addEventListener('touchend', () => {
+    if (drag && drag.active) setTimeout(() => drag && drag.active && endDrag(null, false), 60);
+  });
+  window.addEventListener('touchcancel', () => {
+    if (drag && drag.active) setTimeout(() => drag && drag.active && endDrag(null, true), 60);
+  });
+  const abandon = () => drag && drag.active && endDrag(null, true);
+  window.addEventListener('blur', abandon);
+  document.addEventListener('visibilitychange', () => document.hidden && abandon());
   lanesEl.addEventListener(
     'scroll',
     () => {

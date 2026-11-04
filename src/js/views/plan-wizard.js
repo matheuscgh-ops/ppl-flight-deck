@@ -453,7 +453,11 @@ const PlanWizard = (() => {
     gap.className = 'wzgap';
     gap.style.height = r.height + 'px';
     group.after(gap);
-    group.hidden = true;
+    /* the card collapses but stays in the page, so a phone keeps sending the finger's events (iOS) */
+    group.classList.add('wzlifted');
+    try {
+      $('#wzBody').setPointerCapture(e.pointerId);
+    } catch (err) {}
     mv.on = true;
     mv.ghost = ghost;
     mv.gap = gap;
@@ -479,7 +483,7 @@ const PlanWizard = (() => {
           d = Math.min(Math.abs(y - r.top), Math.abs(y - r.bottom));
         return !best || d < best.d ? { b, d } : best;
       }, null).b;
-    const cards = [...blk.querySelectorAll('.wzg')].filter(g => g !== group && !g.hidden),
+    const cards = [...blk.querySelectorAll('.wzg')].filter(g => g !== group),
       before = cards.find(g => {
         const r = g.getBoundingClientRect();
         return y < r.top + r.height / 2;
@@ -489,7 +493,7 @@ const PlanWizard = (() => {
       moving = before ? gap.nextSibling !== before : anchor.nextSibling !== gap;
     /* the cards of the day glide to open the gap where the dragged one will land */
     if (moving)
-      flip([...day.querySelectorAll('.wzg:not([hidden]), .wzfree, .wzbh')], () =>
+      flip([...day.querySelectorAll('.wzg:not(.wzlifted), .wzfree, .wzbh')], () =>
         before ? before.before(gap) : anchor.after(gap)
       );
     /* scroll the wizard when the card reaches its top or bottom edge */
@@ -504,7 +508,7 @@ const PlanWizard = (() => {
     document.body.classList.remove('wzdragging');
     if (commit) {
       gap.replaceWith(group);
-      group.hidden = false;
+      group.classList.remove('wzlifted');
       /* read the new order from the page and lay every block of the day out again */
       const day = group.closest('.wzday'),
         d = day.dataset.d;
@@ -523,7 +527,7 @@ const PlanWizard = (() => {
       dragEndedAt = Date.now();
     } else {
       gap.remove();
-      group.hidden = false;
+      group.classList.remove('wzlifted');
     }
     mv = null;
     renderWizard();
@@ -579,6 +583,11 @@ const PlanWizard = (() => {
     if (mv && mv.on) dragEnd(false);
     else mv = null;
   });
+  /* safety net for phones: a lifted finger always ends the drag, leaving the page puts the card back */
+  window.addEventListener('touchend', () => {
+    if (mv && mv.on) setTimeout(() => mv && mv.on && dragEnd(true), 60);
+  });
+  window.addEventListener('blur', () => mv && mv.on && dragEnd(false));
   $('#wzBody').addEventListener('keydown', e => {
     const card = e.target.closest && e.target.closest('.wzit.editable');
     if (!card || (e.key !== 'Enter' && e.key !== ' ')) return;

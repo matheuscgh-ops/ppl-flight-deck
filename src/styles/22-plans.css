@@ -1707,3 +1707,11 @@ svg.tick {
 .pck {
   position: relative;
 }
+/* the dragged card collapses while its ghost follows the finger */
+.wzg.wzlifted {
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+  margin: 0;
+  pointer-events: none;
+}

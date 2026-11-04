@@ -70,6 +70,20 @@ with sync_playwright() as p:
             pg.reload(); pg.wait_for_timeout(500); ev("window.pplTour&&pplTour.end()"); ev("goView('dash')"); pg.wait_for_timeout(150)
             check(f'{tag}: the order is saved (same after reload)', ev(LANE + "(1)") == want)
             check(f'{tag}: the order goes into the backup and survives a broken one', ev("normalize(JSON.parse(JSON.stringify(state))).order.join()") == ev("state.order.join()") and ev("normalize({...JSON.parse(JSON.stringify(state)),order:[1,1,2]}).order.length") == 26)
+            # phones: a card can never disappear. Press and hold, then lift without moving → the card is back where it was
+            if touch:
+                st = ev("""(async()=>{const c=document.querySelector('.task[data-topic="5"]');c.scrollIntoView({block:'center',inline:'center'});await new Promise(r=>setTimeout(r,250));
+                  const r=c.getBoundingClientRect(),P=(t,el,x,y)=>el.dispatchEvent(new PointerEvent(t,{bubbles:true,cancelable:true,pointerId:9,pointerType:'touch',clientX:x,clientY:y,isPrimary:true}));
+                  P('pointerdown',c,r.left+20,r.top+10);await new Promise(r=>setTimeout(r,350));const mid=!!document.querySelector('.ghost');
+                  P('pointerup',window,r.left+20,r.top+10);await new Promise(r=>setTimeout(r,250));
+                  return {mid,hidden:document.querySelectorAll('.task.dragging').length,gap:!!document.querySelector('.task-gap'),ghost:!!document.querySelector('.ghost'),vis:!!document.querySelector('.task[data-topic="5"]').offsetHeight,st:state.statuses[5]}})()""")
+                check(f'{tag}: press, hold and lift without moving: the card comes back, nothing left hidden', st['mid'] and st['hidden'] == 0 and not st['gap'] and not st['ghost'] and st['vis'], st)
+                # the browser drops the pointer events mid-drag (iOS): the lifted finger alone still ends it
+                st = ev("""(async()=>{const c=document.querySelector('.task[data-topic="5"]');const r=c.getBoundingClientRect(),P=(t,el,x,y)=>el.dispatchEvent(new PointerEvent(t,{bubbles:true,cancelable:true,pointerId:10,pointerType:'touch',clientX:x,clientY:y,isPrimary:true}));
+                  P('pointerdown',c,r.left+20,r.top+10);await new Promise(r=>setTimeout(r,350));P('pointermove',window,r.left+22,r.top+40);await new Promise(r=>setTimeout(r,60));
+                  window.dispatchEvent(new Event('touchend'));await new Promise(r=>setTimeout(r,250));
+                  return {hidden:document.querySelectorAll('.task.dragging').length,gap:!!document.querySelector('.task-gap'),ghost:!!document.querySelector('.ghost'),vis:!!document.querySelector('.task[data-topic="5"]').offsetHeight}})()""")
+                check(f'{tag}: if the browser loses the drag, lifting the finger still ends it (card visible, no gap, no ghost)', st['hidden'] == 0 and not st['gap'] and not st['ghost'] and st['vis'], st)
             # a tap still opens the card
             if touch: pg.tap('.task[data-topic="5"] .tname')
             else: pg.click('.task[data-topic="5"] .tname')
