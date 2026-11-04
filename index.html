@@ -5977,6 +5977,82 @@ body.wzdragging * {
   border-left: 3px solid currentColor;
 }
 
+/* ===== plan blocks: every check circle in one column, same size, centred on its line ===== */
+.wki.tiny {
+  padding: 0;
+}
+.wki .wkmain,
+.wki.tiny .wkmain,
+.wkrev {
+  padding-left: 8px;
+  padding-right: 30px;
+}
+.wkchk,
+.wkrev .wkchk,
+.wki.tiny .wkchk {
+  right: 8px;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+}
+/* a normal block: circle on the title line */
+.wki .wkmain > .wkchk {
+  top: 4px;
+  transform: none;
+}
+/* one-line blocks and review bands: circle centred vertically */
+.wki.tiny .wkmain > .wkchk,
+.wki.compact .wkmain > .wkchk,
+.wkrev .wkchk {
+  top: 50%;
+  transform: translateY(-50%);
+}
+/* compact: the topic's name and time on one line, so a short block never cuts the name */
+.wki.compact .wkmain {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.wki.compact .wkmain b {
+  min-width: 0;
+  flex: 0 1 auto;
+}
+.wki.compact .wkmain span {
+  flex: none;
+}
+.wkrev span {
+  margin-right: 0;
+}
+.wki:has(.wkchk) .wkmain,
+.wki .wkrev:has(.wkchk) {
+  padding-right: 32px;
+}
+.wkrev {
+  min-height: 20px;
+}
+/* narrow columns (a 7-day week on a tablet): time and size shorten with "…" instead of running under the circle */
+.wki .wkmain span,
+.wkrev span {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wki.compact .wkmain span,
+.wki.tiny .wkmain span {
+  flex: 0 1 auto;
+}
+.wkrev b {
+  flex: 0 1 auto;
+}
+.wkrev span {
+  flex: 0 1 auto;
+}
+
 /* ===== Settings (gear in the header) ===== */
 .gear {
   display: inline-grid;
@@ -14398,14 +14474,17 @@ const PlanWeek = (() => {
                 rows = Math.max(1, rowOf(it.start + total) - rowOf(it.start)),
                 tiny = rows < 2;
               lastBottom = top + rows;
+              /* the review band takes its share; when what is left for the topic is under ~2.5 rows, the topic is drawn
+                 on one line (name · time) so its name is never cut in half */
+              const share = rev ? Math.max(0.28, Math.min(0.5, rev.min / total)) : 0,
+                compact = !tiny && rows * (1 - share) < 2.5;
               const tip = `${clockOf(it.start)} · ${itemName(it)} · ${sizeOf(it)}${it.kind === 'reflect' ? ' · ' + reflectDetail(it) : ''}`;
               let band = '';
               if (rev) {
-                const rd = itemDone(rev),
-                  share = Math.max(0.28, Math.min(0.5, rev.min / total));
+                const rd = itemDone(rev);
                 band = `<div class="wkrev${rd ? ' done' : ''}" style="height:${(share * 100).toFixed(1)}%" data-wi="${esc(rev.id)}" title="${esc(`${clockOf(rev.start)} · ${itemName(rev)} · ${fmtMin(rev.min)} · ${reflectDetail(rev)}`)}">${chk(rev, rd)}<b>${esc(itemName(rev))}</b><span>${fmtMin(rev.min)}</span></div>`;
               }
-              inner += `<div role="button" tabindex="0" class="wki r-${it.kind === 'test' ? 'test' : it.reason || 'custom'}${done ? ' done' : ''}${missed ? ' missed' : ''}${tiny ? ' tiny' : ''}${rev ? ' hasrev' : ''}" style="${at(top, rows)}" data-wi="${esc(it.id)}" title="${esc(tip)}"><div class="wkmain">${chk(it, done)}<b>${missed ? '! ' : ''}${esc(itemName(it))}</b><span>${clockOf(it.start)} · ${sizeOf(it)}</span></div>${band}</div>`;
+              inner += `<div role="button" tabindex="0" class="wki r-${it.kind === 'test' ? 'test' : it.reason || 'custom'}${done ? ' done' : ''}${missed ? ' missed' : ''}${tiny ? ' tiny' : ''}${compact ? ' compact' : ''}${rev ? ' hasrev' : ''}" style="${at(top, rows)}" data-wi="${esc(it.id)}" title="${esc(tip)}"><div class="wkmain">${chk(it, done)}<b>${missed ? '! ' : ''}${esc(itemName(it))}</b><span>${clockOf(it.start)} · ${sizeOf(it)}</span></div>${band}</div>`;
             });
           if (d === today) {
             const now = new Date(),

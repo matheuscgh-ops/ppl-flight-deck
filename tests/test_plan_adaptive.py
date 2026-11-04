@@ -58,6 +58,9 @@ with sync_playwright() as p:
             n_chk = ev("document.querySelectorAll('#pwGrid .wkcol.today [data-wchk]').length")
             check(f'{tag}: today\'s blocks have check circles (blocks and their reviews)', n_chk >= 2, n_chk)
             check(f'{tag}: future days have no check circles', ev("[...document.querySelectorAll('#pwGrid .wkcol:not(.today):not(.past) [data-wchk]')].length") == 0)
+            al = ev("""[...document.querySelectorAll('#pwGrid .wkcol.today [data-wchk]')].filter(e=>e.offsetParent).map(e=>{const r=e.getBoundingClientRect(),p=(e.closest('.wkrev')||e.closest('.wki')).getBoundingClientRect(),
+                txt=[...e.parentElement.children].filter(x=>x!==e&&x.tagName!=='DIV'&&x.offsetWidth).map(x=>x.getBoundingClientRect().right);return [Math.round(r.right),Math.round(r.width),r.top>=p.top-0.5&&r.bottom<=p.bottom+0.5,!txt.length||Math.max(...txt)<=r.left-2]})""")
+            check(f'{tag}: check circles line up in one column, same size, inside their block, never touching the text', al and len({x[0] for x in al}) == 1 and len({x[1] for x in al}) == 1 and all(x[2] and x[3] for x in al), al)
             first = ev("[...document.querySelectorAll('#pwGrid .wkcol.today .wkmain [data-wchk]')].find(e=>e.offsetParent).dataset.wchk")
             ev(f"document.querySelector('#pwGrid [data-wchk=\"{first}\"]').scrollIntoView({{block:'center'}})"); pg.wait_for_timeout(100)
             tap(f'#pwGrid [data-wchk="{first}"]'); pg.wait_for_timeout(200)

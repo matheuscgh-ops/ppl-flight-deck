@@ -115,14 +115,17 @@ const PlanWeek = (() => {
                 rows = Math.max(1, rowOf(it.start + total) - rowOf(it.start)),
                 tiny = rows < 2;
               lastBottom = top + rows;
+              /* the review band takes its share; when what is left for the topic is under ~2.5 rows, the topic is drawn
+                 on one line (name · time) so its name is never cut in half */
+              const share = rev ? Math.max(0.28, Math.min(0.5, rev.min / total)) : 0,
+                compact = !tiny && rows * (1 - share) < 2.5;
               const tip = `${clockOf(it.start)} · ${itemName(it)} · ${sizeOf(it)}${it.kind === 'reflect' ? ' · ' + reflectDetail(it) : ''}`;
               let band = '';
               if (rev) {
-                const rd = itemDone(rev),
-                  share = Math.max(0.28, Math.min(0.5, rev.min / total));
+                const rd = itemDone(rev);
                 band = `<div class="wkrev${rd ? ' done' : ''}" style="height:${(share * 100).toFixed(1)}%" data-wi="${esc(rev.id)}" title="${esc(`${clockOf(rev.start)} · ${itemName(rev)} · ${fmtMin(rev.min)} · ${reflectDetail(rev)}`)}">${chk(rev, rd)}<b>${esc(itemName(rev))}</b><span>${fmtMin(rev.min)}</span></div>`;
               }
-              inner += `<div role="button" tabindex="0" class="wki r-${it.kind === 'test' ? 'test' : it.reason || 'custom'}${done ? ' done' : ''}${missed ? ' missed' : ''}${tiny ? ' tiny' : ''}${rev ? ' hasrev' : ''}" style="${at(top, rows)}" data-wi="${esc(it.id)}" title="${esc(tip)}"><div class="wkmain">${chk(it, done)}<b>${missed ? '! ' : ''}${esc(itemName(it))}</b><span>${clockOf(it.start)} · ${sizeOf(it)}</span></div>${band}</div>`;
+              inner += `<div role="button" tabindex="0" class="wki r-${it.kind === 'test' ? 'test' : it.reason || 'custom'}${done ? ' done' : ''}${missed ? ' missed' : ''}${tiny ? ' tiny' : ''}${compact ? ' compact' : ''}${rev ? ' hasrev' : ''}" style="${at(top, rows)}" data-wi="${esc(it.id)}" title="${esc(tip)}"><div class="wkmain">${chk(it, done)}<b>${missed ? '! ' : ''}${esc(itemName(it))}</b><span>${clockOf(it.start)} · ${sizeOf(it)}</span></div>${band}</div>`;
             });
           if (d === today) {
             const now = new Date(),

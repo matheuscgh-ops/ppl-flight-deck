@@ -1603,3 +1603,79 @@ body.wzdragging * {
 .pwlegend i.r-notes {
   border-left: 3px solid currentColor;
 }
+
+/* ===== plan blocks: every check circle in one column, same size, centred on its line ===== */
+.wki.tiny {
+  padding: 0;
+}
+.wki .wkmain,
+.wki.tiny .wkmain,
+.wkrev {
+  padding-left: 8px;
+  padding-right: 30px;
+}
+.wkchk,
+.wkrev .wkchk,
+.wki.tiny .wkchk {
+  right: 8px;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+}
+/* a normal block: circle on the title line */
+.wki .wkmain > .wkchk {
+  top: 4px;
+  transform: none;
+}
+/* one-line blocks and review bands: circle centred vertically */
+.wki.tiny .wkmain > .wkchk,
+.wki.compact .wkmain > .wkchk,
+.wkrev .wkchk {
+  top: 50%;
+  transform: translateY(-50%);
+}
+/* compact: the topic's name and time on one line, so a short block never cuts the name */
+.wki.compact .wkmain {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.wki.compact .wkmain b {
+  min-width: 0;
+  flex: 0 1 auto;
+}
+.wki.compact .wkmain span {
+  flex: none;
+}
+.wkrev span {
+  margin-right: 0;
+}
+.wki:has(.wkchk) .wkmain,
+.wki .wkrev:has(.wkchk) {
+  padding-right: 32px;
+}
+.wkrev {
+  min-height: 20px;
+}
+/* narrow columns (a 7-day week on a tablet): time and size shorten with "…" instead of running under the circle */
+.wki .wkmain span,
+.wkrev span {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wki.compact .wkmain span,
+.wki.tiny .wkmain span {
+  flex: 0 1 auto;
+}
+.wkrev b {
+  flex: 0 1 auto;
+}
+.wkrev span {
+  flex: 0 1 auto;
+}
