@@ -35,7 +35,7 @@ with sync_playwright() as p:
             ev = pg.evaluate
 
             # ---------- tabs ----------
-            check(f'{tag}: tab order Dashboard / Plan / Tests / Statistics', ev("[...document.querySelectorAll('.tabs button')].map(b=>b.dataset.view).join()") == 'dash,plan,tests,sr')
+            check(f'{tag}: tab order Dashboard / Plan / Errors / Tests / Statistics', ev("[...document.querySelectorAll('.tabs button')].map(b=>b.dataset.view).join()") == 'dash,plan,errors,tests,sr')
             check(f'{tag}: tab label "Practice tests" (same name everywhere)', pg.inner_text('.tabs button[data-view="tests"]') == 'Practice tests')
             check(f'{tag}: header tabs still fit the screen', ev('document.documentElement.scrollWidth') == W)
 

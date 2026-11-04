@@ -102,7 +102,7 @@ with sync_playwright() as p:
         check(f'{tag}: after it was seen, it does not open again by itself', not pg.is_visible('.tour-card'))
         tap('#setOpen'); pg.wait_for_timeout(200); tap('#tourBtn'); pg.wait_for_timeout(400)
         check(f'{tag}: the Tour button restarts it', pg.is_visible('.tour-card') and ev('pplTour.step()') == 0)
-        ev('pplTour.go(16)'); pg.wait_for_timeout(300)
+        ev('pplTour.go(pplTour.steps-1)'); pg.wait_for_timeout(300)
         tap('[data-tour="next"]'); pg.wait_for_timeout(300)
         check(f'{tag}: "Finish" on the last step closes it', not pg.is_visible('.tour-card'))
         tap('#setOpen'); pg.wait_for_timeout(200); tap('#tourBtn'); pg.wait_for_timeout(300); pg.keyboard.press('Escape'); pg.wait_for_timeout(250)

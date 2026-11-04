@@ -36,8 +36,9 @@ with sync_playwright() as p:
             ev("window.pplTour&&pplTour.end()"); ev(SETUP); pg.wait_for_timeout(150)
 
             # ---------- session sizes ----------
-            sizes = ev("state.plans[0].items.filter(x=>x.kind==='topic').map(x=>[x.i,x.n,TOPICS[x.i].q])")
-            check(f'{tag}: no chunk of a big topic is under 20 questions (and none over a 40-question session)', all(n >= min(q, 20) and n <= 40 for i, n, q in sizes), sizes)
+            sizes = ev("state.plans[0].items.filter(x=>x.kind==='topic').map(x=>[x.i,x.n,TOPICS[x.i].q,x.reason])")
+            # a review after a good score is a deliberate sample (10-19 questions); anything else is never cut under 20
+            check(f'{tag}: no chunk of a big topic is under 20 questions unless it is a review sample (and none over a 40-question session)', all((n >= min(q, 20) or (r == 'due' and n >= 10)) and n <= 40 for i, n, q, r in sizes), sizes)
             check(f'{tag}: a review after a good score is smaller than after a weak one', ev("reviewSize(13,{reps:[{p:90}],R:0.9})<reviewSize(13,{reps:[{p:62}],R:0.9})"))
 
             # ---------- Week view: blocks never overlap, titles stay on one line inside their block ----------
@@ -51,7 +52,7 @@ with sync_playwright() as p:
             titles = ev("""[...document.querySelectorAll('#pwGrid .wki .wkmain b, #pwGrid .wkrev b')].filter(b=>b.offsetParent).map(b=>{const r=b.getBoundingClientRect(),p=b.closest('.wki').getBoundingClientRect(),cs=getComputedStyle(b);
                 return cs.whiteSpace==='nowrap'&&r.height<=parseFloat(cs.lineHeight||14)*1.6+2&&r.top>=p.top-1&&r.bottom<=p.bottom+1})""")
             check(f'{tag}: every block title is one line, inside its block (no broken or overflowing names)', titles and all(titles), titles)
-            check(f'{tag}: a topic and its error review are one block (the review is its bottom band)', ev("document.querySelectorAll('#pwGrid .wki.hasrev .wkrev').length") >= 1 and ev("[...document.querySelectorAll('#pwGrid .wki')].every(e=>!e.className.includes('r-reflect')||!state.plans[0].items.find(x=>x.id===e.dataset.wi).of)"))
+            check(f'{tag}: a topic and its error review are one block (the review is its bottom band)', ev("(()=>{const ds=[...document.querySelectorAll('#pwGrid .wkcol')].map(c=>c.dataset.d),its=state.plans[0].items.filter(x=>ds.includes(x.date));return its.filter(x=>x.kind==='reflect'&&x.of&&its.some(o=>o.id===x.of)).length===document.querySelectorAll('#pwGrid .wki.hasrev .wkrev').length})()") and ev("[...document.querySelectorAll('#pwGrid .wki')].every(e=>!e.className.includes('r-reflect')||!state.plans[0].items.find(x=>x.id===e.dataset.wi).of)"))
 
             # ---------- check circles on today's blocks ----------
             n_chk = ev("document.querySelectorAll('#pwGrid .wkcol.today [data-wchk]').length")
