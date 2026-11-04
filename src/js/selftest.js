@@ -473,8 +473,22 @@ const SelfTest = (() => {
         const P = buildPlan(),
           it = P.items.find(x => x.i === 18),
           m = srModel(18, T, true),
-          exp = Math.min(158, Math.max(10, Math.min(40, Math.round(158 * (1 - m.R)))));
-        ok('Plan', 'review size = clamp(q × (1 − recall), 10, 40)', it.n === exp, `${it.n} vs ${exp}`);
+          last = m.reps[m.reps.length - 1].p,
+          base = last >= GOAL ? 15 : last >= 75 ? 20 : last >= 70 ? 25 : 40,
+          exp = Math.min(158, Math.max(10, Math.min(40, Math.round(base * (1 + Math.max(0, 1 - m.R))))));
+        ok(
+          'Plan',
+          'review size follows the last score (sample when good, full session when not) and what was forgotten',
+          it.n === exp,
+          `${it.n} vs ${exp}`
+        );
+        ok(
+          'Plan',
+          'a review is never more than one 40-question session, and smaller after a good score',
+          reviewSize(18, { reps: [{ p: 90 }], R: 0.9 }) < reviewSize(18, { reps: [{ p: 60 }], R: 0.9 }) &&
+            reviewSize(18, { reps: [{ p: 60 }], R: 0.2 }) === 40,
+          [reviewSize(18, { reps: [{ p: 90 }], R: 0.9 }), reviewSize(18, { reps: [{ p: 60 }], R: 0.9 })].join()
+        );
       }
       fixture([], { settings: { minutes: 180, qph: 40, tests: 2 } });
       {
@@ -1134,12 +1148,20 @@ const SelfTest = (() => {
             .join() === 'A,B',
           pick.map(x => x.key).join()
         );
-        const pick2 = knapsack([C('A', 10, 3, 10), C('B', 20, 2, 8)], 40);
+        const big = (key, n, per, value) => ({ ...C(key, n, per, value), full: 158 });
+        const pick2 = knapsack([C('A', 10, 3, 10), big('B', 40, 1, 8)], 60);
         ok(
           'Plans',
-          'time left after the knapsack gets part of the next topic (≥ 5 questions)',
-          pick2.some(x => x.key === 'A' && x.n === 10) && pick2.some(x => x.key === 'B' && x.n === 5),
+          'time left after the knapsack gets a real session of the next topic (≥ 20 questions)',
+          pick2.some(x => x.key === 'A' && x.n === 10) && pick2.some(x => x.key === 'B' && x.n === 30),
           JSON.stringify(pick2.map(x => [x.key, x.n]))
+        );
+        const pick3 = knapsack([C('A', 10, 3, 10), big('B', 40, 1, 8)], 40);
+        ok(
+          'Plans',
+          'a big topic is never cut into a chunk under 20 questions (Weather: no "12 q")',
+          !pick3.some(x => x.key === 'B'),
+          JSON.stringify(pick3.map(x => [x.key, x.n]))
         );
       }
       fixture(

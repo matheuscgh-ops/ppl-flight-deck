@@ -31,7 +31,7 @@
 const Schedule = (() => {
   const SLOT = 15,
     DAY_END = 24 * 60,
-    MIN_CHUNK_Q = 5,
+    MIN_CHUNK_Q = 20 /* the smallest session of a big topic (Weather 158 q is studied 40 at a time, never 12) */,
     MISSED_BOOST = 1.25,
     URGENCY = { due: 1.3, weak: 1.15, nodata: 1.1, new: 1, light: 0.8, test: 1.4, testDue: 1.4, custom: 1 };
 
@@ -73,6 +73,8 @@ const Schedule = (() => {
   function itemDone(it) {
     if (it.check) return true;
     if (it.kind === 'custom' || it.kind === 'reflect') return false;
+    /* a topic whose Kanban card you ticked "done today" on that day counts as done */
+    if (it.kind === 'topic' && (state.cardChecks || {})[it.i] === it.date) return true;
     if (it.kind === 'test') return (state.tests || []).some(x => x.date === it.date && x.score != null);
     return state.events.some(
       e => e.date === it.date && e.topic === it.i && (e.kind === 'study' || e.kind === 'review')
@@ -512,7 +514,63 @@ const Schedule = (() => {
 
   /* the plan grid starts at the hour chosen in Settings (default 6:00) */
   expose({ DAY_START: [() => pref('gridStart') * 60, () => {}] });
+  /* ---------- refresh: re-plan the days ahead with your latest results ----------
+     For every day from today on that an active plan drives: what is done, your own activities, items you edited by hand
+     and the error reviews that belong to them stay where they are; the rest of the time (from now on, for today) is
+     filled again from your current statistics — new scores change which topics come up, how many questions and when.
+     Past days and your time blocks never change. Returns the number of days refreshed. */
+  function rangesMinus(ranges, busy) {
+    let out = ranges.map(r => r.slice());
+    busy.forEach(([bs, be]) => {
+      out = out.flatMap(([s, e]) =>
+        be <= s || bs >= e ? [[s, e]] : [...(bs > s ? [[s, bs]] : []), ...(be < e ? [[be, e]] : [])]
+      );
+    });
+    return out.filter(([s, e]) => e - s >= 10);
+  }
+  function refreshPlans() {
+    const today = todayISO(),
+      now = new Date(),
+      nowMin = Math.ceil((now.getHours() * 60 + now.getMinutes()) / SLOT) * SLOT;
+    let days = 0;
+    plans()
+      .filter(p => p.active)
+      .forEach(p => {
+        const ds = Object.keys(p.blocks || {})
+          .filter(d => d >= today && rangesTotal(p.blocks[d]) && (activeFor(d) || {}).plan === p)
+          .sort();
+        if (!ds.length) return;
+        const keepIds = new Set(),
+          free = {};
+        ds.forEach(d => {
+          const its = (p.items || []).filter(it => it.date === d);
+          its.forEach(it => {
+            if (itemDone(it) || it.kind === 'custom' || it.custom) keepIds.add(it.id);
+          });
+          its.forEach(it => {
+            if (it.kind === 'reflect' && it.of && keepIds.has(it.of)) keepIds.add(it.id);
+          });
+          const busy = its.filter(it => keepIds.has(it.id)).map(it => [it.start, it.start + it.min]);
+          if (d === today) busy.push([0, nowMin]);
+          free[d] = rangesMinus(p.blocks[d], busy);
+        });
+        const fresh = suggestDays(ds, free, p.energy || {});
+        p.items = [
+          ...(p.items || []).filter(it => !ds.includes(it.date) || keepIds.has(it.id)),
+          ...ds.flatMap(d => fresh[d] || []),
+        ];
+        p.updated = Date.now();
+        days += ds.length;
+      });
+    return days;
+  }
+  const canRefresh = () =>
+    plans().some(p => p.active && Object.keys(p.blocks || {}).some(d => d >= todayISO() && rangesTotal(p.blocks[d])));
+
   return {
+    refreshPlans,
+    canRefresh,
+    rangesMinus,
     SLOT,
     DAY_END,
     mondayOf,
@@ -540,6 +598,9 @@ const Schedule = (() => {
   };
 })();
 const {
+  refreshPlans,
+  canRefresh,
+  rangesMinus,
   SLOT,
   DAY_END,
   mondayOf,

@@ -9878,7 +9878,7 @@ const ForecastView = (() => {
 const { fcCls, renderFcMini, renderForecast } = ForecastView;
 
 /* ===== module PlanModel (js/model/plan.js) =====
-   public: settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName
+   public: settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName, reviewSize
    shared state (getter/setter): energyMode */
 const PlanModel = (() => {
   /* ================= DAILY PLAN (mechanical, time-based) =================
@@ -9933,6 +9933,18 @@ const PlanModel = (() => {
     medium: { speed: 1, stretch: 1, test: true, order: 'standard' },
     high: { speed: 0.9, stretch: 1.1, test: true, order: 'hard' },
   };
+  /* how many questions a session takes, the way the question bank is used: a category is studied in sessions of up to
+     SESSION questions (Weather, 158 q, is 40 at a time). A review is sized by how well you know the topic: a sample when
+     your last score was good, a full session when it was not, a bit more the more you have forgotten since.
+       last score ≥ goal → 15 · ≥ 75% → 20 · ≥ 70% → 25 · below → 40   × (1 + forgotten share), between 10 and 40 */
+  const SESSION = 40;
+  function reviewSize(i, m) {
+    const q = TOPICS[i].q,
+      last = m.reps.length ? m.reps[m.reps.length - 1].p : 0 /* last session score, in % */,
+      base = last >= GOAL ? 15 : last >= 75 ? 20 : last >= 70 ? 25 : SESSION,
+      n = Math.round(base * (1 + Math.max(0, 1 - (m.R ?? 1))));
+    return Math.min(q, Math.max(10, Math.min(SESSION, n)));
+  }
   function buildPlan(asOf, over, mode) {
     asOf = asOf || todayISO();
     const st0 = over || settings(),
@@ -10008,9 +10020,8 @@ const PlanModel = (() => {
     }
     const ms = srAll(asOf, true);
     ms.filter(m => m.reps.length && m.over >= 0).forEach(m => {
-      const q = TOPICS[m.i].q;
       used.add(m.i);
-      add(topicItem(m.i, Math.min(q, Math.max(10, Math.min(40, Math.round(q * (1 - m.R))))), 'due'));
+      add(topicItem(m.i, reviewSize(m.i, m), 'due'));
     });
     ms.filter(m => !m.reps.length && !used.has(m.i)).forEach(m => {
       used.add(m.i);
@@ -10115,9 +10126,9 @@ const PlanModel = (() => {
       },
     ],
   });
-  return { settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName };
+  return { settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName, reviewSize };
 })();
-const { settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName } = PlanModel;
+const { settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName, reviewSize } = PlanModel;
 
 /* ===== module Schedule (js/model/schedule.js) =====
    live value (getter): DAY_START (first hour of the plan grid, from Settings)
@@ -10152,7 +10163,7 @@ const { settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, pl
 const Schedule = (() => {
   const SLOT = 15,
     DAY_END = 24 * 60,
-    MIN_CHUNK_Q = 5,
+    MIN_CHUNK_Q = 20 /* the smallest session of a big topic (Weather 158 q is studied 40 at a time, never 12) */,
     MISSED_BOOST = 1.25,
     URGENCY = { due: 1.3, weak: 1.15, nodata: 1.1, new: 1, light: 0.8, test: 1.4, testDue: 1.4, custom: 1 };
 
@@ -10194,6 +10205,8 @@ const Schedule = (() => {
   function itemDone(it) {
     if (it.check) return true;
     if (it.kind === 'custom' || it.kind === 'reflect') return false;
+    /* a topic whose Kanban card you ticked "done today" on that day counts as done */
+    if (it.kind === 'topic' && (state.cardChecks || {})[it.i] === it.date) return true;
     if (it.kind === 'test') return (state.tests || []).some(x => x.date === it.date && x.score != null);
     return state.events.some(
       e => e.date === it.date && e.topic === it.i && (e.kind === 'study' || e.kind === 'review')
@@ -10633,7 +10646,63 @@ const Schedule = (() => {
 
   /* the plan grid starts at the hour chosen in Settings (default 6:00) */
   expose({ DAY_START: [() => pref('gridStart') * 60, () => {}] });
+  /* ---------- refresh: re-plan the days ahead with your latest results ----------
+     For every day from today on that an active plan drives: what is done, your own activities, items you edited by hand
+     and the error reviews that belong to them stay where they are; the rest of the time (from now on, for today) is
+     filled again from your current statistics — new scores change which topics come up, how many questions and when.
+     Past days and your time blocks never change. Returns the number of days refreshed. */
+  function rangesMinus(ranges, busy) {
+    let out = ranges.map(r => r.slice());
+    busy.forEach(([bs, be]) => {
+      out = out.flatMap(([s, e]) =>
+        be <= s || bs >= e ? [[s, e]] : [...(bs > s ? [[s, bs]] : []), ...(be < e ? [[be, e]] : [])]
+      );
+    });
+    return out.filter(([s, e]) => e - s >= 10);
+  }
+  function refreshPlans() {
+    const today = todayISO(),
+      now = new Date(),
+      nowMin = Math.ceil((now.getHours() * 60 + now.getMinutes()) / SLOT) * SLOT;
+    let days = 0;
+    plans()
+      .filter(p => p.active)
+      .forEach(p => {
+        const ds = Object.keys(p.blocks || {})
+          .filter(d => d >= today && rangesTotal(p.blocks[d]) && (activeFor(d) || {}).plan === p)
+          .sort();
+        if (!ds.length) return;
+        const keepIds = new Set(),
+          free = {};
+        ds.forEach(d => {
+          const its = (p.items || []).filter(it => it.date === d);
+          its.forEach(it => {
+            if (itemDone(it) || it.kind === 'custom' || it.custom) keepIds.add(it.id);
+          });
+          its.forEach(it => {
+            if (it.kind === 'reflect' && it.of && keepIds.has(it.of)) keepIds.add(it.id);
+          });
+          const busy = its.filter(it => keepIds.has(it.id)).map(it => [it.start, it.start + it.min]);
+          if (d === today) busy.push([0, nowMin]);
+          free[d] = rangesMinus(p.blocks[d], busy);
+        });
+        const fresh = suggestDays(ds, free, p.energy || {});
+        p.items = [
+          ...(p.items || []).filter(it => !ds.includes(it.date) || keepIds.has(it.id)),
+          ...ds.flatMap(d => fresh[d] || []),
+        ];
+        p.updated = Date.now();
+        days += ds.length;
+      });
+    return days;
+  }
+  const canRefresh = () =>
+    plans().some(p => p.active && Object.keys(p.blocks || {}).some(d => d >= todayISO() && rangesTotal(p.blocks[d])));
+
   return {
+    refreshPlans,
+    canRefresh,
+    rangesMinus,
     SLOT,
     DAY_END,
     mondayOf,
@@ -10661,6 +10730,9 @@ const Schedule = (() => {
   };
 })();
 const {
+  refreshPlans,
+  canRefresh,
+  rangesMinus,
   SLOT,
   DAY_END,
   mondayOf,
@@ -15422,8 +15494,22 @@ const SelfTest = (() => {
         const P = buildPlan(),
           it = P.items.find(x => x.i === 18),
           m = srModel(18, T, true),
-          exp = Math.min(158, Math.max(10, Math.min(40, Math.round(158 * (1 - m.R)))));
-        ok('Plan', 'review size = clamp(q × (1 − recall), 10, 40)', it.n === exp, `${it.n} vs ${exp}`);
+          last = m.reps[m.reps.length - 1].p,
+          base = last >= GOAL ? 15 : last >= 75 ? 20 : last >= 70 ? 25 : 40,
+          exp = Math.min(158, Math.max(10, Math.min(40, Math.round(base * (1 + Math.max(0, 1 - m.R))))));
+        ok(
+          'Plan',
+          'review size follows the last score (sample when good, full session when not) and what was forgotten',
+          it.n === exp,
+          `${it.n} vs ${exp}`
+        );
+        ok(
+          'Plan',
+          'a review is never more than one 40-question session, and smaller after a good score',
+          reviewSize(18, { reps: [{ p: 90 }], R: 0.9 }) < reviewSize(18, { reps: [{ p: 60 }], R: 0.9 }) &&
+            reviewSize(18, { reps: [{ p: 60 }], R: 0.2 }) === 40,
+          [reviewSize(18, { reps: [{ p: 90 }], R: 0.9 }), reviewSize(18, { reps: [{ p: 60 }], R: 0.9 })].join()
+        );
       }
       fixture([], { settings: { minutes: 180, qph: 40, tests: 2 } });
       {
@@ -16083,12 +16169,20 @@ const SelfTest = (() => {
             .join() === 'A,B',
           pick.map(x => x.key).join()
         );
-        const pick2 = knapsack([C('A', 10, 3, 10), C('B', 20, 2, 8)], 40);
+        const big = (key, n, per, value) => ({ ...C(key, n, per, value), full: 158 });
+        const pick2 = knapsack([C('A', 10, 3, 10), big('B', 40, 1, 8)], 60);
         ok(
           'Plans',
-          'time left after the knapsack gets part of the next topic (≥ 5 questions)',
-          pick2.some(x => x.key === 'A' && x.n === 10) && pick2.some(x => x.key === 'B' && x.n === 5),
+          'time left after the knapsack gets a real session of the next topic (≥ 20 questions)',
+          pick2.some(x => x.key === 'A' && x.n === 10) && pick2.some(x => x.key === 'B' && x.n === 30),
           JSON.stringify(pick2.map(x => [x.key, x.n]))
+        );
+        const pick3 = knapsack([C('A', 10, 3, 10), big('B', 40, 1, 8)], 40);
+        ok(
+          'Plans',
+          'a big topic is never cut into a chunk under 20 questions (Weather: no "12 q")',
+          !pick3.some(x => x.key === 'B'),
+          JSON.stringify(pick3.map(x => [x.key, x.n]))
         );
       }
       fixture(
