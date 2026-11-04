@@ -16,6 +16,8 @@ const PlanWeek = (() => {
   const shortDate = d => new Intl.DateTimeFormat(LOCALE[lang], { month: 'short', day: 'numeric' }).format(parse(d));
   const itemName = itemTitle;
   /* own activities and error reviews are measured in minutes, topics and tests in questions */
+  /* a drawn tick, centred by geometry (a ✓ character sits off-centre in most fonts) */
+  const TICK = '<svg class="tick" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 8.4 6.8 11 12 5.4"/></svg>';
   const sizeOf = it =>
     it.kind === 'custom' || it.kind === 'reflect' || it.kind === 'notes' ? fmtMin(it.min) : it.n + ' q';
   const at = (top, rows) => `top:calc(var(--rowh) * ${top});height:calc(var(--rowh) * ${rows})`;
@@ -102,7 +104,7 @@ const PlanWeek = (() => {
           const checkable = opts.checks && d <= today;
           const chk = (it, done) =>
             checkable
-              ? `<span class="wkchk${done ? ' on' : ''}" role="checkbox" aria-checked="${done}" tabindex="0" data-wchk="${esc(it.id)}" aria-label="${esc(t('itemCheck'))}">${done ? '✓' : ''}</span>`
+              ? `<span class="wkchk${done ? ' on' : ''}" role="checkbox" aria-checked="${done}" tabindex="0" data-wchk="${esc(it.id)}" aria-label="${esc(t('itemCheck'))}">${done ? TICK : ''}</span>`
               : '';
           dayItems
             .filter(it => !owned.has(it.id))

@@ -151,20 +151,91 @@ const DemoData = (() => {
     const ex = new Date(base);
     ex.setDate(ex.getDate() + 31);
     /* a few example error notes (Errors tab and the 📝 buttons) */
-    const notes = [
-      [18, 6, 'METAR ceiling = lowest BKN or OVC layer (FEW and SCT do not count)'],
-      [18, 6, 'TAF: FM starts a new forecast group; BECMG is a gradual change'],
-      [18, 3, 'Radiation fog: ground cooling on clear calm nights; advection fog: moist air over a colder surface'],
-      [14, 4, 'Class C: two-way radio contact before entering; Class D: same, plus 3 SM / 500-1000-2000 clouds'],
-      [14, 4, 'Mode C veil: 30 NM around Class B primary airports'],
-      [13, 2, 'Hazardous attitudes: anti-authority, impulsivity, invulnerability, macho, resignation'],
-      [13, 2, 'Supplemental oxygen: required above 12,500 ft MSL after 30 minutes'],
-    ].map(([topic, n, text]) => ({ id: uid(), topic, date: D(n), text }));
-    return { v: 13, statuses, scores, events: ev, tests, notes, deadline: iso(ex), lang: 'en', updatedAt: 0 };
+    return {
+      v: 13,
+      statuses,
+      scores,
+      events: ev,
+      tests,
+      notes: demoNotes(),
+      deadline: iso(ex),
+      lang: 'en',
+      updatedAt: 0,
+    };
+  }
+  /* example error notes for the Errors tab and the 📝 buttons (fictional, written like real study notes) */
+  function demoNotes() {
+    const d0 = new Date(),
+      D = n => {
+        const d = new Date(d0);
+        d.setDate(d.getDate() - n);
+        return iso(d);
+      };
+    const T = name => TOPICS.findIndex(x => x.name === name);
+    return [
+      [
+        'Weather Information',
+        9,
+        'METAR ceiling = lowest BKN or OVC layer, or VV when the sky is obscured (FEW and SCT do not count)',
+      ],
+      [
+        'Weather Information',
+        9,
+        'TAF: FM starts a new forecast group; BECMG is a gradual change within the period given',
+      ],
+      [
+        'Weather Information',
+        6,
+        'Radiation fog: ground cooling on clear, calm nights. Advection fog: moist air moving over a colder surface',
+      ],
+      [
+        'Weather Information',
+        6,
+        'Thunderstorm stages: cumulus (updrafts), mature (rain reaches the ground), dissipating (downdrafts)',
+      ],
+      ['Weather Information', 2, 'PIREP: UA = routine, UUA = urgent'],
+      [
+        'National Airspace System',
+        8,
+        'Class C: two-way radio contact before entering. Class D: same, VFR 3 SM and 500 below / 1,000 above / 2,000 horizontal',
+      ],
+      [
+        'National Airspace System',
+        8,
+        'Mode C veil: 30 NM around the Class B primary airport, from the surface to 10,000 ft MSL',
+      ],
+      [
+        'National Airspace System',
+        3,
+        'Class B: clearance required ("cleared into the Class B"), not just radio contact',
+      ],
+      ['Human Factors', 5, 'Hazardous attitudes: anti-authority, impulsivity, invulnerability, macho, resignation'],
+      ['Human Factors', 5, 'Supplemental oxygen: crew above 12,500 ft MSL after 30 minutes; always above 14,000 ft'],
+      ['Human Factors', 1, 'Spatial disorientation: trust the instruments when flying into IMC'],
+      ['Taxiing', 7, 'Quartering tailwind: elevator down, aileron down on the side the wind comes from ("dive away")'],
+      ['Taxiing', 7, 'Jet blast and rotor wash are hazards on the ground, not only in the air'],
+      [
+        'Airworthiness Requirements',
+        4,
+        'AV1ATE: annual, VOR (IFR), 100-hour (hire), altimeter/static (IFR), transponder, ELT',
+      ],
+      [
+        'Performance and Limitations',
+        4,
+        'Density altitude goes up with temperature and humidity: longer takeoff roll, slower climb',
+      ],
+      [
+        'Performance and Limitations',
+        2,
+        'Forward CG: higher stall speed, more stable. Aft CG: less stable, harder stall recovery',
+      ],
+    ]
+      .map(([name, n, text]) => ({ id: uid(), topic: T(name), date: D(n), text }))
+      .filter(x => x.topic >= 0);
   }
   function defaultState() {
     return demoState();
   }
-  return { demoState, defaultState };
+  return { demoState, defaultState, demoNotes };
 })();
-const { demoState, defaultState } = DemoData;
+const { demoState, defaultState, demoNotes } = DemoData;

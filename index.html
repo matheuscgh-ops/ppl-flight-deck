@@ -6052,6 +6052,34 @@ body.wzdragging * {
 .wkrev span {
   flex: 0 1 auto;
 }
+/* the drawn tick inside every check circle (plan blocks, today's list, Kanban cards) */
+svg.tick {
+  display: block;
+  width: 72%;
+  height: 72%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.wkchk,
+.tchk,
+.pck {
+  line-height: 0;
+}
+.wkchk svg.tick,
+.tchk svg.tick,
+.pck svg.tick {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 11px;
+  height: 11px;
+}
+.pck {
+  position: relative;
+}
 
 /* ===== Settings (gear in the header) ===== */
 .gear {
@@ -9367,6 +9395,8 @@ const AppState = (() => {
     state = embedded;
     loadedFromFile = !!local;
   } else state = local || embedded || defaultState();
+  /* demo: a demo saved before the Errors tab existed gets the example error notes too */
+  if (BUILD.demo && typeof demoNotes === 'function' && !(state.notes || []).length) state.notes = demoNotes();
   try {
     const e = JSON.parse(localStorage.getItem(STORE + '-energy') || 'null'),
       pt = localStorage.getItem(STORE + '-ptday'),
@@ -9772,7 +9802,7 @@ const Dashboard = (() => {
      as done in today's plan) */
   const checkedToday = k => (state.cardChecks || {})[k] === todayISO();
   const checkHTML = k =>
-    `<button type="button" class="tchk${checkedToday(k) ? ' on' : ''}" data-tchk="${esc(String(k))}" aria-pressed="${checkedToday(k)}" aria-label="${esc(t('cardDoneToday'))}">${checkedToday(k) ? '✓' : ''}</button>`;
+    `<button type="button" class="tchk${checkedToday(k) ? ' on' : ''}" data-tchk="${esc(String(k))}" aria-pressed="${checkedToday(k)}" aria-label="${esc(t('cardDoneToday'))}">${checkedToday(k) ? '<svg class="tick" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 8.4 6.8 11 12 5.4"/></svg>' : ''}</button>`;
   function toggleCardCheck(k) {
     const on = !checkedToday(k);
     commit(
@@ -11659,8 +11689,8 @@ const PlanView = (() => {
   const rowName = it => (it.kind === 'topic' || it.kind === 'test' ? planRowName(it) : itemTitle(it));
   const checkBtn = it =>
     it.id
-      ? `<button type="button" class="pck" data-chk="${esc(it.id)}" aria-label="${esc(t('itemCheck'))}">${it.done ? '✓' : ''}</button>`
-      : `<span class="pck">${it.done ? '✓' : ''}</span>`;
+      ? `<button type="button" class="pck" data-chk="${esc(it.id)}" aria-label="${esc(t('itemCheck'))}">${it.done ? '<svg class="tick" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 8.4 6.8 11 12 5.4"/></svg>' : ''}</button>`
+      : `<span class="pck">${it.done ? '<svg class="tick" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 8.4 6.8 11 12 5.4"/></svg>' : ''}</span>`;
   /* error notebook: a 📝 button on error-review rows (write what you got wrong), and the count on a topic that has notes */
   function noteBtn(it) {
     if (it.kind === 'reflect') {
@@ -14375,6 +14405,8 @@ const PlanWeek = (() => {
   const shortDate = d => new Intl.DateTimeFormat(LOCALE[lang], { month: 'short', day: 'numeric' }).format(parse(d));
   const itemName = itemTitle;
   /* own activities and error reviews are measured in minutes, topics and tests in questions */
+  /* a drawn tick, centred by geometry (a ✓ character sits off-centre in most fonts) */
+  const TICK = '<svg class="tick" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 8.4 6.8 11 12 5.4"/></svg>';
   const sizeOf = it =>
     it.kind === 'custom' || it.kind === 'reflect' || it.kind === 'notes' ? fmtMin(it.min) : it.n + ' q';
   const at = (top, rows) => `top:calc(var(--rowh) * ${top});height:calc(var(--rowh) * ${rows})`;
@@ -14461,7 +14493,7 @@ const PlanWeek = (() => {
           const checkable = opts.checks && d <= today;
           const chk = (it, done) =>
             checkable
-              ? `<span class="wkchk${done ? ' on' : ''}" role="checkbox" aria-checked="${done}" tabindex="0" data-wchk="${esc(it.id)}" aria-label="${esc(t('itemCheck'))}">${done ? '✓' : ''}</span>`
+              ? `<span class="wkchk${done ? ' on' : ''}" role="checkbox" aria-checked="${done}" tabindex="0" data-wchk="${esc(it.id)}" aria-label="${esc(t('itemCheck'))}">${done ? TICK : ''}</span>`
               : '';
           dayItems
             .filter(it => !owned.has(it.id))
