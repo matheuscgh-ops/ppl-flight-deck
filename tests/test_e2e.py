@@ -375,7 +375,8 @@ def _(c):
 def _(c):
     check(c.pg.inner_text('#prevTitle') == 'All tracked topics · average', c.pg.inner_text('#prevTitle'))
     check(c.ev("document.querySelectorAll('#prevChart svg path.s-actual').length") == 1, 'avg curve')
-    check(c.ev("[...document.querySelectorAll('#sugg .qrow')].filter(r=>!r.hidden).length") >= 3, 'suggestions')
+    # whole sessions (a practice test due today can take most of the evening), so at least 2 rows
+    check(c.ev("[...document.querySelectorAll('#sugg .qrow')].filter(r=>!r.hidden).length") >= 2, 'suggestions')
 
 @T('SR panel', 'hovering a card shows its own curve; leaving returns to the average')
 def _(c):

@@ -37,7 +37,7 @@ with sync_playwright() as p:
             check(f'{tag}: plan preview on the dashboard with total questions', pg.is_visible('#sugg') and pg.inner_text('#planMiniTot').startswith('·'))
             if mode == 'desktop':
                 check(f'{tag}: dashboard still fits one screen', pg.evaluate('document.documentElement.scrollHeight') == 1190)
-                check(f'{tag}: at least 3 plan rows visible next to the chart', pg.evaluate("[...document.querySelectorAll('#sugg .qrow')].filter(r=>!r.hidden).length") >= 3)
+                check(f'{tag}: at least 2 plan rows visible next to the chart (whole sessions, not crumbs)', pg.evaluate("[...document.querySelectorAll('#sugg .qrow')].filter(r=>!r.hidden).length") >= 2)
                 check(f'{tag}: spaced-repetition preview chart still drawn', pg.evaluate("document.querySelectorAll('#prevChart svg').length") == 1)
             check(f'{tag}: page not wider than the screen', pg.evaluate('document.documentElement.scrollWidth') == W)
             pg.evaluate(SETUP); pg.wait_for_timeout(150)
