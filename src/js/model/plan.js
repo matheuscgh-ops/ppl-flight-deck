@@ -1,5 +1,5 @@
 /* ===== module PlanModel (js/model/plan.js) =====
-   public: settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName
+   public: settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName, reviewSize
    shared state (getter/setter): energyMode */
 const PlanModel = (() => {
   /* ================= DAILY PLAN (mechanical, time-based) =================
@@ -54,6 +54,18 @@ const PlanModel = (() => {
     medium: { speed: 1, stretch: 1, test: true, order: 'standard' },
     high: { speed: 0.9, stretch: 1.1, test: true, order: 'hard' },
   };
+  /* how many questions a session takes, the way the question bank is used: a category is studied in sessions of up to
+     SESSION questions (Weather, 158 q, is 40 at a time). A review is sized by how well you know the topic: a sample when
+     your last score was good, a full session when it was not, a bit more the more you have forgotten since.
+       last score ≥ goal → 15 · ≥ 75% → 20 · ≥ 70% → 25 · below → 40   × (1 + forgotten share), between 10 and 40 */
+  const SESSION = 40;
+  function reviewSize(i, m) {
+    const q = TOPICS[i].q,
+      last = m.reps.length ? m.reps[m.reps.length - 1].p : 0 /* last session score, in % */,
+      base = last >= GOAL ? 15 : last >= 75 ? 20 : last >= 70 ? 25 : SESSION,
+      n = Math.round(base * (1 + Math.max(0, 1 - (m.R ?? 1))));
+    return Math.min(q, Math.max(10, Math.min(SESSION, n)));
+  }
   function buildPlan(asOf, over, mode) {
     asOf = asOf || todayISO();
     const st0 = over || settings(),
@@ -129,9 +141,8 @@ const PlanModel = (() => {
     }
     const ms = srAll(asOf, true);
     ms.filter(m => m.reps.length && m.over >= 0).forEach(m => {
-      const q = TOPICS[m.i].q;
       used.add(m.i);
-      add(topicItem(m.i, Math.min(q, Math.max(10, Math.min(40, Math.round(q * (1 - m.R))))), 'due'));
+      add(topicItem(m.i, reviewSize(m.i, m), 'due'));
     });
     ms.filter(m => !m.reps.length && !used.has(m.i)).forEach(m => {
       used.add(m.i);
@@ -236,6 +247,6 @@ const PlanModel = (() => {
       },
     ],
   });
-  return { settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName };
+  return { settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName, reviewSize };
 })();
-const { settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName } = PlanModel;
+const { settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName, reviewSize } = PlanModel;

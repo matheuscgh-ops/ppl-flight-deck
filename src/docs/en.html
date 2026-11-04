@@ -89,6 +89,7 @@
   <p>One card per topic, in 5 lists: <span class="ui">To Do</span>, <span class="ui">Doing</span>, <span class="ui">Not Comfortable</span>, <span class="ui">Very Comfortable</span> and <span class="ui">To Review</span>. The number on each card is your last score on that topic.</p>
   <figure><img src="img/dash-board.jpg" alt="Kanban with the five lists" loading="lazy"></figure>
   <p><b>Move a card:</b> drag it with the mouse, or press and hold it on a touch screen. The other cards slide aside to open a gap, and the card lands exactly where you drop it: in another list or in a new place in the same list. The order is saved and syncs. Every change shows a notice with <span class="ui">Undo</span>.</p>
+  <p><b>Done today:</b> point at a card and a circle appears left of its name; tap it and it turns into a green check, like Trello. On a phone the circle is always there. The check clears itself the next day, and a topic checked today also counts as done in today's plan. It never changes your statistics.</p>
   <p><b>Log a session:</b></p>
   <ol class="steps">
     <li>Click the card's name (or select it and press <kbd>Enter</kbd>).</li>
@@ -134,9 +135,11 @@
   <h3 id="week">Week view</h3>
   <figure><img src="img/plan-week.jpg" alt="Week view in the Plan tab" loading="lazy"></figure>
   <ul>
-    <li><kbd>‹</kbd> <kbd>›</kbd> change the week and <span class="ui">Today</span> goes back to the current one.</li>
+    <li><kbd>‹</kbd> <kbd>›</kbd> change the week and <span class="ui">Today</span> goes back to the current one. <span class="ui">Week</span> | <span class="ui">Day</span> switches between the whole week and one wide day picked from the day strip (phones always show one day). Titles stay on one line, and blocks never overlap.</li>
     <li>On the right: the time planned, the time done and how many blocks were missed this week.</li>
     <li>Each block shows the time, the topic and the questions. The color tells the reason: review, weak topic, no data, new material, practice test, error review or your own activity. Clicking a block opens that topic's log.</li>
+    <li>Each block has a circle to mark it done by hand (today and earlier). A topic and the error review of its misses are one block: the review is the bottom band, with its own circle; click the band to open the topic's error notes.</li>
+    <li><span class="ui">↻ Refresh plan</span> plans the days ahead again with your latest results. What is done, your own activities, items you edited by hand and their reviews stay where they are; the rest of the time (from now on, for today) gets topics, sizes and order from your current statistics. Past days and your time blocks never change, your statistics are not touched, and one Undo reverts it.</li>
     <li>A day that comes from a daily plan gets a <span class="ui">D</span> mark.</li>
     <li>When today has no active plan, <span class="ui">Today's energy</span> appears: low, medium or high changes the size and order of today's suggestion.</li>
     <li>From Friday on, if next week has no plan, a notice suggests planning it.</li>
@@ -156,6 +159,7 @@
     <figure><img src="img/wiz-2.jpg" alt="Step 2, time blocks" loading="lazy"><figcaption>2 · Time blocks</figcaption></figure>
     <figure><img src="img/wiz-4.jpg" alt="Step 4, review" loading="lazy"><figcaption>4 · Review</figcaption></figure>
   </div>
+  <p><b>How many questions.</b> Like the question bank, a topic is studied in sessions of up to 40 questions (Weather, 158 questions, is 40 at a time), and a big topic is never cut into a chunk under 20. A review is sized by your last score: 15 questions after ≥ 85%, 20 after ≥ 75%, 25 after ≥ 70%, a full 40 below that, a little more the more you have forgotten since (between 10 and 40). When it is due again comes from spaced repetition, as before.</p>
   <p><b>How topics are chosen.</b> Each block is filled to protect as many questions as possible on exam day, given the time each question takes (your speed, the topic's difficulty and the time to review mistakes). Inside a block, the hardest topic, or the one longest without review, comes first. To avoid switching subjects, a block holds at most one topic per ~45 minutes (deep work, configurable). In a weekly plan, each day assumes the earlier days were done: a Monday review doesn't come back on Tuesday.</p>
   <p><b>Error review.</b> Right after each topic comes an <span class="ui">Error review</span> of that topic's mistakes, the way the question bank shows the misses of a category as soon as you finish it. The block's review time is sized to the mistakes expected in it: questions × (1 − chance of a right answer) × difficulty × minutes per mistake, rounded to 5, at least 10 minutes and at most a quarter of the block, and none when the block has fewer than 3 expected mistakes. That time is then split among the block's topics in proportion to each one's expected mistakes, in 5-minute steps; a topic whose share is under 5 minutes gets no review. Each review row shows its topic's expected mistakes, for example "8 expected misses". Tap 📝 on an error review (or click it in the week) to write what you got wrong in the topic's <b>error notes</b>; they come back with the topic in today's plan, in the plan wizard and in its log. To keep everything in the same block, the app shortens the easiest topic first. Only when a practice test or a topic that can't be shortened fills the whole block does the review move, as one item, to the start of the next block. If 20 minutes or more are left over, another topic is added, and no topic gets less than 10 minutes.</p>
   <p><b>Editing in step 3:</b></p>
@@ -314,6 +318,8 @@ bank model        μ = Σ (topic questions / 1,058) × p
 forecast          bank μ blended with the last 3 practice tests (10-day half-life)
 pass / goal       beta-binomial over 60 questions: P(X ≥ 42) and P(X ≥ 51)
 plan order        (1 − p on exam day) × urgency ÷ minutes per question
+session size      review: 15 / 20 / 25 / 40 by last score (≥ 85 / 75 / 70 / below) × (1 + forgotten share), 10 … 40
+                  new or weak topic: up to 40 · never a chunk under 20 for a big topic
 blocks            knapsack per block, hardest first, 1 topic per ~45 min
 error review      expected mistakes = Σ questions × (1 − p) × difficulty
                   block minutes = mistakes × min per mistake  (≥ 10, ≤ ¼ of the block, only if ≥ 3 mistakes)

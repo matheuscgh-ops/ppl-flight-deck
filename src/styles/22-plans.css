@@ -1459,3 +1459,135 @@ body.wzdragging * {
     min-height: 44px;
   }
 }
+
+/* ===== plan blocks: check circle, error-review band, titles on one line ===== */
+.wki {
+  padding: 0;
+}
+.wkmain {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+  flex: 1 1 auto;
+  padding: 2px 6px;
+  overflow: hidden;
+}
+.wki .wkmain b,
+.wkrev b {
+  display: block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wki:has(.wkchk) .wkmain {
+  padding-right: 24px;
+}
+.wkchk {
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  color: currentColor;
+  cursor: pointer;
+  z-index: 3;
+}
+.wkchk::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+.wkchk.on {
+  background: #4bce97;
+  border-color: #4bce97;
+  color: #0d0f12;
+}
+.wkrev {
+  position: relative;
+  flex: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 24px 0 6px;
+  background: #24303a;
+  color: #9fb8cc;
+  border-top: 1px solid #0d0f1255;
+  min-height: 14px;
+  overflow: hidden;
+}
+.wkrev b {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--ink);
+  min-width: 0;
+}
+.wkrev span {
+  font-size: 10px;
+  font-weight: 700;
+  color: #9fb8cc;
+  white-space: nowrap;
+  margin-left: auto;
+}
+.wkrev .wkchk {
+  top: 50%;
+  transform: translateY(-50%);
+  width: 13px;
+  height: 13px;
+}
+.wkrev.done b {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+/* one-line blocks: name · time on a single line, nothing else */
+.wki.tiny .wkmain {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.wki.tiny .wkmain span {
+  display: inline;
+  flex: none;
+}
+.wki.tiny .wkrev {
+  display: none;
+}
+.wki.tiny .wkchk {
+  top: 50%;
+  transform: translateY(-50%);
+}
+.pwview {
+  margin-left: 6px;
+}
+.pwview button {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+@media (max-width: 640px) {
+  .pwview {
+    display: none !important;
+  }
+}
+/* day view: one wide column, so names are shown in full */
+#pwGrid.oneday .wki .wkmain b {
+  font-size: 12.5px;
+}
+@media (min-width: 641px) {
+  .wkstrip button {
+    flex-direction: row;
+    gap: 5px;
+    justify-content: center;
+  }
+}

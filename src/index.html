@@ -110,9 +110,9 @@
   <div class="view" id="viewPlan" hidden>
     <section class="panel planweek" id="planWeek">
       <div class="pwhead"><div><h2 class="section" data-t="pwTitle"></h2><div class="muted" id="pwSource"></div></div>
-        <div class="pwbtns"><div class="seg pwtabs" id="pwTabs"><button type="button" data-pw="week" data-t="pwWeek"></button><button type="button" data-pw="plans" data-t="pwPlans"></button></div><button type="button" id="kbSync"><span class="lglab" data-t="kbSync"></span><span class="smlab" data-t="kbSyncShort"></span></button><button type="button" class="primary" id="pwNew"><span class="lglab" data-t="pwNew"></span><span class="smlab" data-t="pwNewShort"></span></button></div></div>
+        <div class="pwbtns"><div class="seg pwtabs" id="pwTabs"><button type="button" data-pw="week" data-t="pwWeek"></button><button type="button" data-pw="plans" data-t="pwPlans"></button></div><button type="button" id="pwRefresh" data-tt="pwRefreshTip"><span class="lglab" data-t="pwRefresh"></span><span class="smlab">↻</span></button><button type="button" id="kbSync"><span class="lglab" data-t="kbSync"></span><span class="smlab" data-t="kbSyncShort"></span></button><button type="button" class="primary" id="pwNew"><span class="lglab" data-t="pwNew"></span><span class="smlab" data-t="pwNewShort"></span></button></div></div>
       <div id="pwWeekBox">
-        <div class="pwnav"><button type="button" id="pwPrev" aria-label="Previous week">‹</button><b id="pwRange"></b><button type="button" id="pwNext" aria-label="Next week">›</button><button type="button" id="pwToday" data-t="today"></button><span class="pwstats" id="pwStats"></span></div>
+        <div class="pwnav"><button type="button" id="pwPrev" aria-label="Previous week">‹</button><b id="pwRange"></b><button type="button" id="pwNext" aria-label="Next week">›</button><button type="button" id="pwToday" data-t="today"></button><div class="seg pwview" id="pwView" role="group"><button type="button" data-v="week" data-t="pwWeekView"></button><button type="button" data-v="day" data-t="pwDayView"></button></div><span class="pwstats" id="pwStats"></span></div>
 
         <div class="pwmeta">
         <div class="pwprog" id="pwProg"><i><b id="pwProgBar"></b></i><span id="pwProgTxt"></span></div>

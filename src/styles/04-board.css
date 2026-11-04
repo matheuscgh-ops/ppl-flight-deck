@@ -281,3 +281,109 @@ body.dragging * {
 .lanehead .lcount {
   margin-left: auto;
 }
+/* "done today" tick, like Trello: a circle appears left of the name when you point at the card (the name slides
+   right to make room); once ticked it stays as a green check until the day ends */
+.task {
+  position: relative;
+}
+.tchk {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid #8f99a6;
+  background: transparent;
+  color: #0d0f12;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 0.14s,
+    transform 0.14s;
+  z-index: 2;
+}
+.tchk::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+.task .tname {
+  transition: padding-left 0.14s;
+}
+.task:hover .tchk,
+.task:focus-within .tchk,
+.task.checked .tchk {
+  opacity: 1;
+  transform: none;
+}
+.task:hover .tname,
+.task:focus-within .tname,
+.task.checked .tname {
+  padding-left: 22px;
+}
+.tchk:hover {
+  border-color: #4bce97;
+  background: transparent;
+}
+.tchk.on,
+.tchk.on:hover {
+  background: #4bce97;
+  border-color: #4bce97;
+}
+.task.checked .tname {
+  color: #b9c2cc;
+}
+/* touch screens have no hover: the circle is always there, faint */
+@media (hover: none) {
+  .tchk {
+    opacity: 0.55;
+    transform: none;
+  }
+  .task .tname {
+    padding-left: 22px;
+  }
+}
+/* the tick pops when it turns green; a checked card keeps a thin green edge so it reads at a glance on a phone */
+.tchk.on {
+  animation: tchkPop 0.28s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+@keyframes tchkPop {
+  0% {
+    transform: scale(0.5);
+  }
+  100% {
+    transform: none;
+  }
+}
+.task.checked {
+  box-shadow:
+    inset 3px 0 0 #4bce97,
+    0 1px 1px #0007;
+}
+@media (hover: none) {
+  /* a bigger finger target on touch screens */
+  .tchk {
+    width: 18px;
+    height: 18px;
+    top: 9px;
+    left: 9px;
+  }
+  .tchk::after {
+    inset: -11px;
+  }
+  .task .tname {
+    padding-left: 24px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tchk.on {
+    animation: none;
+  }
+}

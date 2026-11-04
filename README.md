@@ -38,6 +38,8 @@ The *How it is calculated* sections in the app list every formula.
 
 - **Kanban drag and drop like Trello:** the other cards slide aside and a card lands exactly where you drop it, in another list or a new place in the same one. The order is saved, goes into the backup and syncs; one Undo reverts a drop (mouse, or press and hold on touch).
 - **Error notebook:** 📝 on an error review opens the topic's notes; write what you got wrong and it comes back with the topic in today's plan, the plan wizard and its log. Saved, backed up and synced.
+- **Adaptive plan:** sessions are sized like the question bank (up to 40 questions; a big topic is never cut under 20), and a review by your last score (15 / 20 / 25 / 40 questions after ≥ 85 / 75 / 70 / below, a bit more the more you forgot). **↻ Refresh plan** re-plans the days ahead with your latest results, keeping what is done or yours (one Undo reverts it). Plan blocks have check circles, a topic and its error review are one block, and the Plan tab has **Week | Day** views with one-line titles that never overlap.
+- **Done today:** a Trello-style tick on every Kanban card (shown on hover, always on touch); it clears itself the next day.
 - **Your own cards:** "+ Add a card" at the end of a list adds a task of your own ("Review the theory", "Radio calls"). Click to rename or delete. They never count in the statistics. Your own activities in today's plan become cards in Doing on *Sync with Kanban*; cards made on the Kanban stay off the plan.
 - Calendar with study streak, activity per day and practice tests.
 - Charts with hover: a dashed crosshair to both axes, a dot on each line and the values. On practice tests the cursor snaps to each test. Tap and drag on phones.
