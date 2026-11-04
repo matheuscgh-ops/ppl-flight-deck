@@ -120,7 +120,7 @@ const Notes = (() => {
         i >= 0
           ? `${esc(label(state.statuses[i]))}${state.scores[i] != null ? ` · ${state.scores[i]}%` : ''}${m && m.next ? (m.next <= todayISO() ? ` · <span class="errdue">${esc(t('errDue'))}</span>` : ` · ${esc(t('errNext'))} ${esc(df.format(parse(m.next)))}`) : ''}`
           : '';
-    return `<article class="errcard" data-etopic="${i}"><header><b>${esc(topicName(i))}</b><span class="muted">${meta}</span><span class="errcount">${list.length}</span></header>${dates
+    return `<article class="errcard" data-etopic="${i}"><header><b>${esc(topicName(i))}</b><span class="errcount">${list.length}</span></header>${meta ? `<div class="errmeta">${meta}</div>` : ''}${dates
       .map(
         d =>
           `<div class="errday"><span class="errdate">${esc(df.format(parse(d)))}</span><ul>${byDate[d]

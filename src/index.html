@@ -129,8 +129,11 @@
   </div>
   <div class="view" id="viewErrors" hidden>
     <section class="panel errpage">
-      <div class="errhead"><div><h2 class="section" data-t="errTitle"></h2><div class="muted" data-t="errSub"></div></div>
-        <div class="errtools"><input type="search" id="errQ" autocomplete="off" data-ph="errSearch"><select id="errTopic"></select><button type="button" id="errImport" data-t="errImport"></button><button type="button" class="primary" id="errAdd" data-t="errAdd"></button></div></div>
+      <div class="errhead">
+        <div class="errtitle"><h2 class="section" data-t="errTitle"></h2><div class="muted errsub" data-t="errSub"></div></div>
+        <div class="erracts"><button type="button" class="quiet" id="errImport" data-tt="errImport"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 3a1 1 0 0 1 1 1v8.6l2.3-2.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4l2.3 2.3V4a1 1 0 0 1 1-1zM5 15a1 1 0 0 1 1 1v2h12v-2a1 1 0 1 1 2 0v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1z"/></svg><span class="lglab" data-t="errImport"></span></button><button type="button" class="primary" id="errAdd" data-tt="errAdd"><span class="lglab" data-t="errAdd"></span><span class="smlab">+</span></button></div>
+        <div class="errtools"><div class="errsearch"><input type="search" id="errQ" autocomplete="off"><select id="errTopic" aria-label="Topic"></select></div></div>
+      </div>
       <div id="errNew" hidden></div>
       <div id="errToday"></div>
       <div id="errList"></div>

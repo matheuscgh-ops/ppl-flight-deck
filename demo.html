@@ -6340,22 +6340,77 @@ body.wzdragging * {
 .errpage {
   padding: 18px 20px;
 }
+/* header: title + actions on one line, then one search field with the topic menu inside it */
 .errhead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'title acts'
+    'tools tools';
+  gap: 10px 14px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.errtitle {
+  grid-area: title;
+  min-width: 0;
+}
+.errsub {
+  font-size: 12.5px;
+}
+.erracts {
+  grid-area: acts;
   display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
+  gap: 6px;
+}
+.erracts button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+}
+.erracts .quiet {
+  background: transparent;
+  color: var(--ink2);
+}
+.erracts .quiet:hover {
+  color: var(--ink);
 }
 .errtools {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
+  grid-area: tools;
 }
-.errtools input {
-  width: 220px;
+.errsearch {
+  display: flex;
+  align-items: center;
+  max-width: 560px;
+  background: var(--panel2);
+  border: 1px solid var(--line2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.errsearch:focus-within {
+  border-color: #579dff;
+}
+.errsearch input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  padding: 8px 12px;
+}
+.errsearch input:focus-visible {
+  outline: none;
+}
+.errsearch select {
+  flex: none;
+  max-width: 46%;
+  border: 0;
+  border-left: 1px solid var(--line2);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink2);
+  font-weight: 700;
+  padding: 8px 10px;
 }
 .errnew {
   display: flex;
@@ -6509,17 +6564,17 @@ body.wzdragging * {
   .errpage {
     padding: 14px;
   }
-  .errtools {
-    width: 100%;
+  .errsub {
+    display: none;
   }
-  .errtools input,
-  .errtools select {
-    flex: 1 1 140px;
-    width: auto;
-    min-width: 0;
+  .erracts button {
+    width: 38px;
+    padding: 0;
+    justify-content: center;
+    font-size: 18px;
   }
-  .errtools button {
-    flex: 1 1 auto;
+  .errsearch {
+    max-width: none;
   }
   .errday {
     grid-template-columns: minmax(0, 1fr);
@@ -6532,6 +6587,21 @@ body.wzdragging * {
 .errdue {
   color: #ff9c95;
   font-weight: 800;
+}
+.errcard header {
+  flex-wrap: nowrap;
+  margin-bottom: 2px;
+}
+.errcard header b {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.errmeta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
 }
 .demotag{font-style:normal;font-size:.45em;vertical-align:middle;letter-spacing:.08em;color:#ffd08a;background:#3d2b14;border:1px solid #6b4a1c;border-radius:6px;padding:2px 7px;margin-left:6px}
 #syncChip{display:none!important}
@@ -6658,8 +6728,11 @@ body.wzdragging * {
   </div>
   <div class="view" id="viewErrors" hidden>
     <section class="panel errpage">
-      <div class="errhead"><div><h2 class="section" data-t="errTitle"></h2><div class="muted" data-t="errSub"></div></div>
-        <div class="errtools"><input type="search" id="errQ" autocomplete="off" data-ph="errSearch"><select id="errTopic"></select><button type="button" id="errImport" data-t="errImport"></button><button type="button" class="primary" id="errAdd" data-t="errAdd"></button></div></div>
+      <div class="errhead">
+        <div class="errtitle"><h2 class="section" data-t="errTitle"></h2><div class="muted errsub" data-t="errSub"></div></div>
+        <div class="erracts"><button type="button" class="quiet" id="errImport" data-tt="errImport"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 3a1 1 0 0 1 1 1v8.6l2.3-2.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4l2.3 2.3V4a1 1 0 0 1 1-1zM5 15a1 1 0 0 1 1 1v2h12v-2a1 1 0 1 1 2 0v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1z"/></svg><span class="lglab" data-t="errImport"></span></button><button type="button" class="primary" id="errAdd" data-tt="errAdd"><span class="lglab" data-t="errAdd"></span><span class="smlab">+</span></button></div>
+        <div class="errtools"><div class="errsearch"><input type="search" id="errQ" autocomplete="off"><select id="errTopic" aria-label="Topic"></select></div></div>
+      </div>
       <div id="errNew" hidden></div>
       <div id="errToday"></div>
       <div id="errList"></div>
@@ -12993,7 +13066,7 @@ const Notes = (() => {
         i >= 0
           ? `${esc(label(state.statuses[i]))}${state.scores[i] != null ? ` · ${state.scores[i]}%` : ''}${m && m.next ? (m.next <= todayISO() ? ` · <span class="errdue">${esc(t('errDue'))}</span>` : ` · ${esc(t('errNext'))} ${esc(df.format(parse(m.next)))}`) : ''}`
           : '';
-    return `<article class="errcard" data-etopic="${i}"><header><b>${esc(topicName(i))}</b><span class="muted">${meta}</span><span class="errcount">${list.length}</span></header>${dates
+    return `<article class="errcard" data-etopic="${i}"><header><b>${esc(topicName(i))}</b><span class="errcount">${list.length}</span></header>${meta ? `<div class="errmeta">${meta}</div>` : ''}${dates
       .map(
         d =>
           `<div class="errday"><span class="errdate">${esc(df.format(parse(d)))}</span><ul>${byDate[d]

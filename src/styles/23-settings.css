@@ -361,22 +361,77 @@
 .errpage {
   padding: 18px 20px;
 }
+/* header: title + actions on one line, then one search field with the topic menu inside it */
 .errhead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'title acts'
+    'tools tools';
+  gap: 10px 14px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.errtitle {
+  grid-area: title;
+  min-width: 0;
+}
+.errsub {
+  font-size: 12.5px;
+}
+.erracts {
+  grid-area: acts;
   display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
+  gap: 6px;
+}
+.erracts button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+}
+.erracts .quiet {
+  background: transparent;
+  color: var(--ink2);
+}
+.erracts .quiet:hover {
+  color: var(--ink);
 }
 .errtools {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
+  grid-area: tools;
 }
-.errtools input {
-  width: 220px;
+.errsearch {
+  display: flex;
+  align-items: center;
+  max-width: 560px;
+  background: var(--panel2);
+  border: 1px solid var(--line2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.errsearch:focus-within {
+  border-color: #579dff;
+}
+.errsearch input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  padding: 8px 12px;
+}
+.errsearch input:focus-visible {
+  outline: none;
+}
+.errsearch select {
+  flex: none;
+  max-width: 46%;
+  border: 0;
+  border-left: 1px solid var(--line2);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink2);
+  font-weight: 700;
+  padding: 8px 10px;
 }
 .errnew {
   display: flex;
@@ -530,17 +585,17 @@
   .errpage {
     padding: 14px;
   }
-  .errtools {
-    width: 100%;
+  .errsub {
+    display: none;
   }
-  .errtools input,
-  .errtools select {
-    flex: 1 1 140px;
-    width: auto;
-    min-width: 0;
+  .erracts button {
+    width: 38px;
+    padding: 0;
+    justify-content: center;
+    font-size: 18px;
   }
-  .errtools button {
-    flex: 1 1 auto;
+  .errsearch {
+    max-width: none;
   }
   .errday {
     grid-template-columns: minmax(0, 1fr);
@@ -553,4 +608,19 @@
 .errdue {
   color: #ff9c95;
   font-weight: 800;
+}
+.errcard header {
+  flex-wrap: nowrap;
+  margin-bottom: 2px;
+}
+.errcard header b {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.errmeta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
 }
