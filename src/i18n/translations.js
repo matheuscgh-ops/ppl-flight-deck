@@ -1578,6 +1578,47 @@ const Translations = (() => {
     setReflect: '各ブロックの最後に間違いの振り返り',
     setReflectHint: 'ブロックで予想される間違いに比例（最低10分、最大でブロックの4分の1）',
   });
+  /* Kanban: done today */
+  Object.assign(I18N.en, {
+    cardDoneToday: 'Done today',
+    cardChecked: 'Marked done today',
+    cardUnchecked: 'Not done today',
+  });
+  Object.assign(I18N.pt, {
+    cardDoneToday: 'Feito hoje',
+    cardChecked: 'Marcado como feito hoje',
+    cardUnchecked: 'Desmarcado',
+  });
+  Object.assign(I18N.ja, {
+    cardDoneToday: '今日完了',
+    cardChecked: '今日完了にしました',
+    cardUnchecked: '完了を外しました',
+  });
+  /* plan: refresh, week/day view, check circles */
+  Object.assign(I18N.en, {
+    pwRefresh: '↻ Refresh plan',
+    pwRefreshTip: 'Plan the days ahead again with your latest results (what is done or yours stays)',
+    pwRefreshed: 'Plan refreshed with your latest results',
+    pwRefreshNone: 'No days ahead to refresh',
+    pwWeekView: 'Week',
+    pwDayView: 'Day',
+  });
+  Object.assign(I18N.pt, {
+    pwRefresh: '↻ Atualizar plano',
+    pwRefreshTip: 'Planeja de novo os próximos dias com seus resultados mais recentes (o que foi feito ou é seu fica)',
+    pwRefreshed: 'Plano atualizado com seus resultados mais recentes',
+    pwRefreshNone: 'Não há dias à frente para atualizar',
+    pwWeekView: 'Semana',
+    pwDayView: 'Dia',
+  });
+  Object.assign(I18N.ja, {
+    pwRefresh: '↻ プランを更新',
+    pwRefreshTip: '最新の結果でこれからの日を計画し直します（完了したものと自分の項目はそのまま）',
+    pwRefreshed: '最新の結果でプランを更新しました',
+    pwRefreshNone: '更新する日がありません',
+    pwWeekView: '週',
+    pwDayView: '日',
+  });
   /* error notebook */
   Object.assign(I18N.en, {
     notesTitle: 'Error notes',

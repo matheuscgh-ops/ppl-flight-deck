@@ -963,6 +963,75 @@ body.dragging * {
 .lanehead .lcount {
   margin-left: auto;
 }
+/* "done today" tick, like Trello: a circle appears left of the name when you point at the card (the name slides
+   right to make room); once ticked it stays as a green check until the day ends */
+.task {
+  position: relative;
+}
+.tchk {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid #8f99a6;
+  background: transparent;
+  color: #0d0f12;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 0.14s,
+    transform 0.14s;
+  z-index: 2;
+}
+.tchk::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+.task .tname {
+  transition: padding-left 0.14s;
+}
+.task:hover .tchk,
+.task:focus-within .tchk,
+.task.checked .tchk {
+  opacity: 1;
+  transform: none;
+}
+.task:hover .tname,
+.task:focus-within .tname,
+.task.checked .tname {
+  padding-left: 22px;
+}
+.tchk:hover {
+  border-color: #4bce97;
+  background: transparent;
+}
+.tchk.on,
+.tchk.on:hover {
+  background: #4bce97;
+  border-color: #4bce97;
+}
+.task.checked .tname {
+  color: #b9c2cc;
+}
+/* touch screens have no hover: the circle is always there, faint */
+@media (hover: none) {
+  .tchk {
+    opacity: 0.55;
+    transform: none;
+  }
+  .task .tname {
+    padding-left: 22px;
+  }
+}
 
 /* modal */
 .modalbg {
@@ -5727,6 +5796,138 @@ body.wzdragging * {
   }
 }
 
+/* ===== plan blocks: check circle, error-review band, titles on one line ===== */
+.wki {
+  padding: 0;
+}
+.wkmain {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+  flex: 1 1 auto;
+  padding: 2px 6px;
+  overflow: hidden;
+}
+.wki .wkmain b,
+.wkrev b {
+  display: block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wki:has(.wkchk) .wkmain {
+  padding-right: 24px;
+}
+.wkchk {
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  color: currentColor;
+  cursor: pointer;
+  z-index: 3;
+}
+.wkchk::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+.wkchk.on {
+  background: #4bce97;
+  border-color: #4bce97;
+  color: #0d0f12;
+}
+.wkrev {
+  position: relative;
+  flex: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 24px 0 6px;
+  background: #24303a;
+  color: #9fb8cc;
+  border-top: 1px solid #0d0f1255;
+  min-height: 14px;
+  overflow: hidden;
+}
+.wkrev b {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--ink);
+  min-width: 0;
+}
+.wkrev span {
+  font-size: 10px;
+  font-weight: 700;
+  color: #9fb8cc;
+  white-space: nowrap;
+  margin-left: auto;
+}
+.wkrev .wkchk {
+  top: 50%;
+  transform: translateY(-50%);
+  width: 13px;
+  height: 13px;
+}
+.wkrev.done b {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+/* one-line blocks: name · time on a single line, nothing else */
+.wki.tiny .wkmain {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.wki.tiny .wkmain span {
+  display: inline;
+  flex: none;
+}
+.wki.tiny .wkrev {
+  display: none;
+}
+.wki.tiny .wkchk {
+  top: 50%;
+  transform: translateY(-50%);
+}
+.pwview {
+  margin-left: 6px;
+}
+.pwview button {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+@media (max-width: 640px) {
+  .pwview {
+    display: none !important;
+  }
+}
+/* day view: one wide column, so names are shown in full */
+#pwGrid.oneday .wki .wkmain b {
+  font-size: 12.5px;
+}
+@media (min-width: 641px) {
+  .wkstrip button {
+    flex-direction: row;
+    gap: 5px;
+    justify-content: center;
+  }
+}
+
 /* ===== Settings (gear in the header) ===== */
 .gear {
   display: inline-grid;
@@ -6189,9 +6390,9 @@ body.wzdragging * {
   <div class="view" id="viewPlan" hidden>
     <section class="panel planweek" id="planWeek">
       <div class="pwhead"><div><h2 class="section" data-t="pwTitle"></h2><div class="muted" id="pwSource"></div></div>
-        <div class="pwbtns"><div class="seg pwtabs" id="pwTabs"><button type="button" data-pw="week" data-t="pwWeek"></button><button type="button" data-pw="plans" data-t="pwPlans"></button></div><button type="button" id="kbSync"><span class="lglab" data-t="kbSync"></span><span class="smlab" data-t="kbSyncShort"></span></button><button type="button" class="primary" id="pwNew"><span class="lglab" data-t="pwNew"></span><span class="smlab" data-t="pwNewShort"></span></button></div></div>
+        <div class="pwbtns"><div class="seg pwtabs" id="pwTabs"><button type="button" data-pw="week" data-t="pwWeek"></button><button type="button" data-pw="plans" data-t="pwPlans"></button></div><button type="button" id="pwRefresh" data-tt="pwRefreshTip"><span class="lglab" data-t="pwRefresh"></span><span class="smlab">↻</span></button><button type="button" id="kbSync"><span class="lglab" data-t="kbSync"></span><span class="smlab" data-t="kbSyncShort"></span></button><button type="button" class="primary" id="pwNew"><span class="lglab" data-t="pwNew"></span><span class="smlab" data-t="pwNewShort"></span></button></div></div>
       <div id="pwWeekBox">
-        <div class="pwnav"><button type="button" id="pwPrev" aria-label="Previous week">‹</button><b id="pwRange"></b><button type="button" id="pwNext" aria-label="Next week">›</button><button type="button" id="pwToday" data-t="today"></button><span class="pwstats" id="pwStats"></span></div>
+        <div class="pwnav"><button type="button" id="pwPrev" aria-label="Previous week">‹</button><b id="pwRange"></b><button type="button" id="pwNext" aria-label="Next week">›</button><button type="button" id="pwToday" data-t="today"></button><div class="seg pwview" id="pwView" role="group"><button type="button" data-v="week" data-t="pwWeekView"></button><button type="button" data-v="day" data-t="pwDayView"></button></div><span class="pwstats" id="pwStats"></span></div>
 
         <div class="pwmeta">
         <div class="pwprog" id="pwProg"><i><b id="pwProgBar"></b></i><span id="pwProgTxt"></span></div>
@@ -8088,6 +8289,47 @@ const Translations = (() => {
     setReflect: '各ブロックの最後に間違いの振り返り',
     setReflectHint: 'ブロックで予想される間違いに比例（最低10分、最大でブロックの4分の1）',
   });
+  /* Kanban: done today */
+  Object.assign(I18N.en, {
+    cardDoneToday: 'Done today',
+    cardChecked: 'Marked done today',
+    cardUnchecked: 'Not done today',
+  });
+  Object.assign(I18N.pt, {
+    cardDoneToday: 'Feito hoje',
+    cardChecked: 'Marcado como feito hoje',
+    cardUnchecked: 'Desmarcado',
+  });
+  Object.assign(I18N.ja, {
+    cardDoneToday: '今日完了',
+    cardChecked: '今日完了にしました',
+    cardUnchecked: '完了を外しました',
+  });
+  /* plan: refresh, week/day view, check circles */
+  Object.assign(I18N.en, {
+    pwRefresh: '↻ Refresh plan',
+    pwRefreshTip: 'Plan the days ahead again with your latest results (what is done or yours stays)',
+    pwRefreshed: 'Plan refreshed with your latest results',
+    pwRefreshNone: 'No days ahead to refresh',
+    pwWeekView: 'Week',
+    pwDayView: 'Day',
+  });
+  Object.assign(I18N.pt, {
+    pwRefresh: '↻ Atualizar plano',
+    pwRefreshTip: 'Planeja de novo os próximos dias com seus resultados mais recentes (o que foi feito ou é seu fica)',
+    pwRefreshed: 'Plano atualizado com seus resultados mais recentes',
+    pwRefreshNone: 'Não há dias à frente para atualizar',
+    pwWeekView: 'Semana',
+    pwDayView: 'Dia',
+  });
+  Object.assign(I18N.ja, {
+    pwRefresh: '↻ プランを更新',
+    pwRefreshTip: '最新の結果でこれからの日を計画し直します（完了したものと自分の項目はそのまま）',
+    pwRefreshed: '最新の結果でプランを更新しました',
+    pwRefreshNone: '更新する日がありません',
+    pwWeekView: '週',
+    pwDayView: '日',
+  });
   /* error notebook */
   Object.assign(I18N.en, {
     notesTitle: 'Error notes',
@@ -8402,6 +8644,11 @@ const AppState = (() => {
           text: n.text.trim().slice(0, 500),
         }))
         .slice(-2000),
+      /* Kanban cards ticked "done today": card key (topic number or your card's id) → the date it was ticked */
+      cardChecks:
+        o.cardChecks && typeof o.cardChecks === 'object'
+          ? Object.fromEntries(Object.entries(o.cardChecks).filter(([k, d]) => ok(d) && k.length <= 40))
+          : {},
       /* your own cards on the Kanban (tasks such as "Review the theory"): a title and a list, no questions or score */
       cards: normCards(o.cards),
       /* the order of the cards inside the Kanban lists (where you dropped them): topic numbers and your cards' ids */
@@ -8929,7 +9176,7 @@ const Dashboard = (() => {
             sc = v == null ? 'none' : v >= GOAL ? 'good' : v >= 70 ? 'mid' : 'low';
           const ls = seen[i] ? diffDays(seen[i], today) : null;
           const last = ls == null ? '' : ls <= 0 ? t('todayShort') : tf('ago', ls);
-          return `<div class="task" tabindex="0" role="button" data-topic="${i}" aria-label="${esc(x.name)}" title="${esc(x.name)}"><div class="tname">${esc(x.name)}</div><div class="tmeta"><span>${tf('qn', x.q)}</span><span class="score sc-${sc}" title="${esc(t('editScore'))}">${v == null ? '—' : v + '%'}</span><span class="last">${esc(last)}</span></div></div>`;
+          return `<div class="task${checkedToday(i) ? ' checked' : ''}" tabindex="0" role="button" data-topic="${i}" aria-label="${esc(x.name)}" title="${esc(x.name)}">${checkHTML(i)}<div class="tname">${esc(x.name)}</div><div class="tmeta"><span>${tf('qn', x.q)}</span><span class="score sc-${sc}" title="${esc(t('editScore'))}">${v == null ? '—' : v + '%'}</span><span class="last">${esc(last)}</span></div></div>`;
         })
         .join('')}${composerHTML(j)}</div></div>`;
     }).join('');
@@ -8944,13 +9191,29 @@ const Dashboard = (() => {
   let addLane = null,
     editCard = null;
   const cardOf = id => (state.cards || []).find(c => c.id === id);
+  /* "done today": a green tick you set on any card; it clears itself the next day (a topic ticked today also counts
+     as done in today's plan) */
+  const checkedToday = k => (state.cardChecks || {})[k] === todayISO();
+  const checkHTML = k =>
+    `<button type="button" class="tchk${checkedToday(k) ? ' on' : ''}" data-tchk="${esc(String(k))}" aria-pressed="${checkedToday(k)}" aria-label="${esc(t('cardDoneToday'))}">${checkedToday(k) ? '✓' : ''}</button>`;
+  function toggleCardCheck(k) {
+    const on = !checkedToday(k);
+    commit(
+      () => {
+        state.cardChecks = { ...(state.cardChecks || {}) };
+        if (on) state.cardChecks[k] = todayISO();
+        else delete state.cardChecks[k];
+      },
+      t(on ? 'cardChecked' : 'cardUnchecked')
+    );
+  }
   /* the saved order of every card (topics and yours), completed if anything is missing */
   const orderOf = () => normOrder(state.order, state.cards || []);
   function ownCardHTML(c) {
     if (!c) return '';
     if (editCard === c.id)
       return `<div class="task own editing" data-card="${esc(c.id)}"><textarea class="cardin" maxlength="80" rows="2" enterkeyhint="done" aria-label="${esc(t('cardHint'))}">${esc(c.title)}</textarea><div class="cardbtns"><button type="button" class="primary" data-cact="save">${esc(t('cardSave'))}</button><button type="button" data-cact="del">${esc(t('cardDel'))}</button><button type="button" class="cardx" data-cact="cancel" aria-label="${esc(t('close'))}">×</button></div></div>`;
-    return `<div class="task own" tabindex="0" role="button" data-card="${esc(c.id)}" aria-label="${esc(c.title)}" title="${esc(c.title)}"><div class="tname">${esc(c.title)}</div><div class="tmeta"><span class="owntag">${esc(t('ownTag'))}</span></div></div>`;
+    return `<div class="task own${checkedToday(c.id) ? ' checked' : ''}" tabindex="0" role="button" data-card="${esc(c.id)}" aria-label="${esc(c.title)}" title="${esc(c.title)}">${checkHTML(c.id)}<div class="tname">${esc(c.title)}</div><div class="tmeta"><span class="owntag">${esc(t('ownTag'))}</span></div></div>`;
   }
   function composerHTML(j) {
     if (addLane === j)
@@ -9027,6 +9290,12 @@ const Dashboard = (() => {
     focusCardInput();
   }
   $('#lanes').addEventListener('click', e => {
+    const tk = e.target.closest('[data-tchk]');
+    if (tk) {
+      e.stopPropagation();
+      const k = tk.dataset.tchk;
+      return toggleCardCheck(/^\d+$/.test(k) ? +k : k);
+    }
     const b = e.target.closest('[data-cact]');
     if (b) cardAction(b.dataset.cact, b);
   });
@@ -9169,7 +9438,7 @@ const Dashboard = (() => {
   });
   lanesEl.addEventListener('pointerdown', e => {
     const card = e.target.closest('.task');
-    if (!card || e.button > 0 || e.target.closest('.score,.scorein,.editing,.cardin,[data-cact]')) return;
+    if (!card || e.button > 0 || e.target.closest('.score,.scorein,.editing,.cardin,[data-cact],[data-tchk]')) return;
     drag = {
       card,
       id: card.dataset.card ?? +card.dataset.topic,
@@ -13254,13 +13523,39 @@ const PlanWeek = (() => {
         } else {
           for (let r = 0; r < nRows; r += 4) inner += `<i class="wkline" style="top:calc(var(--rowh) * ${r})"></i>`;
           ranges.forEach(([s, e]) => (inner += `<i class="wkblk" style="${at(rowOf(s), rowOf(e) - rowOf(s))}"></i>`));
-          (data.items || [])
-            .filter(it => it.date === d)
+          /* a topic and the error review of its misses are drawn as one block (the review is its bottom band), and
+             blocks are laid out one under the other so a short item never covers the one before it */
+          const dayItems = (data.items || []).filter(it => it.date === d).sort((x, y) => x.start - y.start),
+            owned = new Set(
+              dayItems
+                .filter(it => it.kind === 'reflect' && it.of && dayItems.some(o => o.id === it.of))
+                .map(it => it.id)
+            );
+          let lastBottom = -1;
+          const checkable = opts.checks && d <= today;
+          const chk = (it, done) =>
+            checkable
+              ? `<span class="wkchk${done ? ' on' : ''}" role="checkbox" aria-checked="${done}" tabindex="0" data-wchk="${esc(it.id)}" aria-label="${esc(t('itemCheck'))}">${done ? '✓' : ''}</span>`
+              : '';
+          dayItems
+            .filter(it => !owned.has(it.id))
             .forEach(it => {
-              const done = itemDone(it),
+              const rev = dayItems.find(x => owned.has(x.id) && x.of === it.id),
+                done = itemDone(it),
                 missed = !done && itemMissed(it),
-                rows = Math.max(1, it.min / SLOT);
-              inner += `<button type="button" class="wki r-${it.kind === 'test' ? 'test' : it.reason || 'custom'}${done ? ' done' : ''}${missed ? ' missed' : ''}${rows < 2 ? ' tiny' : ''}" style="${at(rowOf(it.start), rows)}" data-wi="${esc(it.id)}" title="${esc(`${clockOf(it.start)} · ${itemName(it)} · ${sizeOf(it)}${it.kind === 'reflect' ? ' · ' + reflectDetail(it) : ''}`)}"><b>${done ? '✓ ' : missed ? '! ' : ''}${esc(itemName(it))}</b><span>${clockOf(it.start)} · ${sizeOf(it)}</span></button>`;
+                total = it.min + (rev ? rev.min : 0),
+                top = Math.max(rowOf(it.start), lastBottom),
+                rows = Math.max(1, rowOf(it.start + total) - rowOf(it.start)),
+                tiny = rows < 2;
+              lastBottom = top + rows;
+              const tip = `${clockOf(it.start)} · ${itemName(it)} · ${sizeOf(it)}${it.kind === 'reflect' ? ' · ' + reflectDetail(it) : ''}`;
+              let band = '';
+              if (rev) {
+                const rd = itemDone(rev),
+                  share = Math.max(0.28, Math.min(0.5, rev.min / total));
+                band = `<div class="wkrev${rd ? ' done' : ''}" style="height:${(share * 100).toFixed(1)}%" data-wi="${esc(rev.id)}" title="${esc(`${clockOf(rev.start)} · ${itemName(rev)} · ${fmtMin(rev.min)} · ${reflectDetail(rev)}`)}">${chk(rev, rd)}<b>${esc(itemName(rev))}</b><span>${fmtMin(rev.min)}</span></div>`;
+              }
+              inner += `<div role="button" tabindex="0" class="wki r-${it.kind === 'test' ? 'test' : it.reason || 'custom'}${done ? ' done' : ''}${missed ? ' missed' : ''}${tiny ? ' tiny' : ''}${rev ? ' hasrev' : ''}" style="${at(top, rows)}" data-wi="${esc(it.id)}" title="${esc(tip)}"><div class="wkmain">${chk(it, done)}<b>${missed ? '! ' : ''}${esc(itemName(it))}</b><span>${clockOf(it.start)} · ${sizeOf(it)}</span></div>${band}</div>`;
             });
           if (d === today) {
             const now = new Date(),
@@ -13444,9 +13739,14 @@ const PlanWeek = (() => {
         data = weekData(days);
       $('#pwRange').textContent = `${shortDate(days[0])} – ${shortDate(days[6])}`;
       if (dayIdx == null) dayIdx = Math.max(0, days.indexOf(todayISO()));
+      /* one day at a time on phones, and on larger screens when you pick "Day" */
       const phone = phoneMQ.matches,
-        shown = phone ? [days[dayIdx]] : days;
-      $('#pwStrip').innerHTML = phone ? stripHTML(days, dayIdx, 'data-pwd', data.blocks) : '';
+        oneDay = phone || viewMode() === 'day',
+        shown = oneDay ? [days[dayIdx]] : days;
+      document.querySelectorAll('#pwView button').forEach(b => b.classList.toggle('on', b.dataset.v === viewMode()));
+      $('#pwRefresh').hidden = !canRefresh();
+      $('#pwStrip').innerHTML = oneDay ? stripHTML(days, dayIdx, 'data-pwd', data.blocks) : '';
+      $('#pwGrid').classList.toggle('oneday', oneDay);
       const empty = !Object.values(data.blocks).some(r => r.length);
       /* weekly review (Cal Newport): planned vs done, so the next plan is based on what really happened */
       const planned = data.items.reduce((a, it) => a + it.min, 0),
@@ -13468,7 +13768,7 @@ const PlanWeek = (() => {
       $('#pwNudge').innerHTML =
         `<span>${esc(t('pwNudge'))}</span><button type="button" id="pwNudgeGo">${esc(t('pwNudgeBtn'))}</button>`;
       $('#pwGrid').innerHTML =
-        gridHTML(shown, data, 'view', { minSpan: 8 * 60 }) +
+        gridHTML(shown, data, 'view', { minSpan: 8 * 60, checks: true }) +
         (empty ? `<div class="pwempty">${esc(t('pwEmptyWeek'))}</div>` : '');
       fitGrid();
       scrollGrid($('#pwGrid'), data.blocks, shown);
@@ -13520,7 +13820,44 @@ const PlanWeek = (() => {
     dayIdx = +b.dataset.pwd;
     renderPlanWeek();
   };
+  /* Week | Day (remembered in this browser only) */
+  const viewMode = () => {
+    try {
+      return localStorage.getItem(STORE + '-planview') === 'day' ? 'day' : 'week';
+    } catch (e) {
+      return 'week';
+    }
+  };
+  $('#pwView').onclick = e => {
+    const b = e.target.closest('[data-v]');
+    if (!b) return;
+    try {
+      localStorage.setItem(STORE + '-planview', b.dataset.v);
+    } catch (err) {}
+    renderPlanWeek();
+  };
+  /* refresh: the days ahead are planned again with your latest results (what is done or yours stays) */
+  $('#pwRefresh').onclick = () => {
+    let n = 0;
+    commit(() => {
+      n = refreshPlans();
+    }, t('pwRefreshed'));
+    if (!n) toast(t('pwRefreshNone'));
+  };
+  $('#pwGrid').addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-wchk], .wki')) {
+      e.preventDefault();
+      e.target.click();
+    }
+  });
   $('#pwGrid').onclick = e => {
+    /* the circle marks the block done (or not done) by hand, for any kind of block */
+    const c = e.target.closest('[data-wchk]');
+    if (c) {
+      e.stopPropagation();
+      toggleCheck(c.dataset.wchk);
+      return;
+    }
     const b = e.target.closest('[data-wi]');
     if (!b) return;
     const it = weekData(Array.from({ length: 7 }, (_, k) => addDays(weekOf, k))).items.find(x => x.id === b.dataset.wi);

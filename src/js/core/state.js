@@ -81,6 +81,11 @@ const AppState = (() => {
           text: n.text.trim().slice(0, 500),
         }))
         .slice(-2000),
+      /* Kanban cards ticked "done today": card key (topic number or your card's id) → the date it was ticked */
+      cardChecks:
+        o.cardChecks && typeof o.cardChecks === 'object'
+          ? Object.fromEntries(Object.entries(o.cardChecks).filter(([k, d]) => ok(d) && k.length <= 40))
+          : {},
       /* your own cards on the Kanban (tasks such as "Review the theory"): a title and a list, no questions or score */
       cards: normCards(o.cards),
       /* the order of the cards inside the Kanban lists (where you dropped them): topic numbers and your cards' ids */

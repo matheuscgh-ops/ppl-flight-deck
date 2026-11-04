@@ -217,7 +217,7 @@ const Dashboard = (() => {
             sc = v == null ? 'none' : v >= GOAL ? 'good' : v >= 70 ? 'mid' : 'low';
           const ls = seen[i] ? diffDays(seen[i], today) : null;
           const last = ls == null ? '' : ls <= 0 ? t('todayShort') : tf('ago', ls);
-          return `<div class="task" tabindex="0" role="button" data-topic="${i}" aria-label="${esc(x.name)}" title="${esc(x.name)}"><div class="tname">${esc(x.name)}</div><div class="tmeta"><span>${tf('qn', x.q)}</span><span class="score sc-${sc}" title="${esc(t('editScore'))}">${v == null ? '—' : v + '%'}</span><span class="last">${esc(last)}</span></div></div>`;
+          return `<div class="task${checkedToday(i) ? ' checked' : ''}" tabindex="0" role="button" data-topic="${i}" aria-label="${esc(x.name)}" title="${esc(x.name)}">${checkHTML(i)}<div class="tname">${esc(x.name)}</div><div class="tmeta"><span>${tf('qn', x.q)}</span><span class="score sc-${sc}" title="${esc(t('editScore'))}">${v == null ? '—' : v + '%'}</span><span class="last">${esc(last)}</span></div></div>`;
         })
         .join('')}${composerHTML(j)}</div></div>`;
     }).join('');
@@ -232,13 +232,29 @@ const Dashboard = (() => {
   let addLane = null,
     editCard = null;
   const cardOf = id => (state.cards || []).find(c => c.id === id);
+  /* "done today": a green tick you set on any card; it clears itself the next day (a topic ticked today also counts
+     as done in today's plan) */
+  const checkedToday = k => (state.cardChecks || {})[k] === todayISO();
+  const checkHTML = k =>
+    `<button type="button" class="tchk${checkedToday(k) ? ' on' : ''}" data-tchk="${esc(String(k))}" aria-pressed="${checkedToday(k)}" aria-label="${esc(t('cardDoneToday'))}">${checkedToday(k) ? '✓' : ''}</button>`;
+  function toggleCardCheck(k) {
+    const on = !checkedToday(k);
+    commit(
+      () => {
+        state.cardChecks = { ...(state.cardChecks || {}) };
+        if (on) state.cardChecks[k] = todayISO();
+        else delete state.cardChecks[k];
+      },
+      t(on ? 'cardChecked' : 'cardUnchecked')
+    );
+  }
   /* the saved order of every card (topics and yours), completed if anything is missing */
   const orderOf = () => normOrder(state.order, state.cards || []);
   function ownCardHTML(c) {
     if (!c) return '';
     if (editCard === c.id)
       return `<div class="task own editing" data-card="${esc(c.id)}"><textarea class="cardin" maxlength="80" rows="2" enterkeyhint="done" aria-label="${esc(t('cardHint'))}">${esc(c.title)}</textarea><div class="cardbtns"><button type="button" class="primary" data-cact="save">${esc(t('cardSave'))}</button><button type="button" data-cact="del">${esc(t('cardDel'))}</button><button type="button" class="cardx" data-cact="cancel" aria-label="${esc(t('close'))}">×</button></div></div>`;
-    return `<div class="task own" tabindex="0" role="button" data-card="${esc(c.id)}" aria-label="${esc(c.title)}" title="${esc(c.title)}"><div class="tname">${esc(c.title)}</div><div class="tmeta"><span class="owntag">${esc(t('ownTag'))}</span></div></div>`;
+    return `<div class="task own${checkedToday(c.id) ? ' checked' : ''}" tabindex="0" role="button" data-card="${esc(c.id)}" aria-label="${esc(c.title)}" title="${esc(c.title)}">${checkHTML(c.id)}<div class="tname">${esc(c.title)}</div><div class="tmeta"><span class="owntag">${esc(t('ownTag'))}</span></div></div>`;
   }
   function composerHTML(j) {
     if (addLane === j)
@@ -315,6 +331,12 @@ const Dashboard = (() => {
     focusCardInput();
   }
   $('#lanes').addEventListener('click', e => {
+    const tk = e.target.closest('[data-tchk]');
+    if (tk) {
+      e.stopPropagation();
+      const k = tk.dataset.tchk;
+      return toggleCardCheck(/^\d+$/.test(k) ? +k : k);
+    }
     const b = e.target.closest('[data-cact]');
     if (b) cardAction(b.dataset.cact, b);
   });
@@ -457,7 +479,7 @@ const Dashboard = (() => {
   });
   lanesEl.addEventListener('pointerdown', e => {
     const card = e.target.closest('.task');
-    if (!card || e.button > 0 || e.target.closest('.score,.scorein,.editing,.cardin,[data-cact]')) return;
+    if (!card || e.button > 0 || e.target.closest('.score,.scorein,.editing,.cardin,[data-cact],[data-tchk]')) return;
     drag = {
       card,
       id: card.dataset.card ?? +card.dataset.topic,

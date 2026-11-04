@@ -89,13 +89,39 @@ const PlanWeek = (() => {
         } else {
           for (let r = 0; r < nRows; r += 4) inner += `<i class="wkline" style="top:calc(var(--rowh) * ${r})"></i>`;
           ranges.forEach(([s, e]) => (inner += `<i class="wkblk" style="${at(rowOf(s), rowOf(e) - rowOf(s))}"></i>`));
-          (data.items || [])
-            .filter(it => it.date === d)
+          /* a topic and the error review of its misses are drawn as one block (the review is its bottom band), and
+             blocks are laid out one under the other so a short item never covers the one before it */
+          const dayItems = (data.items || []).filter(it => it.date === d).sort((x, y) => x.start - y.start),
+            owned = new Set(
+              dayItems
+                .filter(it => it.kind === 'reflect' && it.of && dayItems.some(o => o.id === it.of))
+                .map(it => it.id)
+            );
+          let lastBottom = -1;
+          const checkable = opts.checks && d <= today;
+          const chk = (it, done) =>
+            checkable
+              ? `<span class="wkchk${done ? ' on' : ''}" role="checkbox" aria-checked="${done}" tabindex="0" data-wchk="${esc(it.id)}" aria-label="${esc(t('itemCheck'))}">${done ? '✓' : ''}</span>`
+              : '';
+          dayItems
+            .filter(it => !owned.has(it.id))
             .forEach(it => {
-              const done = itemDone(it),
+              const rev = dayItems.find(x => owned.has(x.id) && x.of === it.id),
+                done = itemDone(it),
                 missed = !done && itemMissed(it),
-                rows = Math.max(1, it.min / SLOT);
-              inner += `<button type="button" class="wki r-${it.kind === 'test' ? 'test' : it.reason || 'custom'}${done ? ' done' : ''}${missed ? ' missed' : ''}${rows < 2 ? ' tiny' : ''}" style="${at(rowOf(it.start), rows)}" data-wi="${esc(it.id)}" title="${esc(`${clockOf(it.start)} · ${itemName(it)} · ${sizeOf(it)}${it.kind === 'reflect' ? ' · ' + reflectDetail(it) : ''}`)}"><b>${done ? '✓ ' : missed ? '! ' : ''}${esc(itemName(it))}</b><span>${clockOf(it.start)} · ${sizeOf(it)}</span></button>`;
+                total = it.min + (rev ? rev.min : 0),
+                top = Math.max(rowOf(it.start), lastBottom),
+                rows = Math.max(1, rowOf(it.start + total) - rowOf(it.start)),
+                tiny = rows < 2;
+              lastBottom = top + rows;
+              const tip = `${clockOf(it.start)} · ${itemName(it)} · ${sizeOf(it)}${it.kind === 'reflect' ? ' · ' + reflectDetail(it) : ''}`;
+              let band = '';
+              if (rev) {
+                const rd = itemDone(rev),
+                  share = Math.max(0.28, Math.min(0.5, rev.min / total));
+                band = `<div class="wkrev${rd ? ' done' : ''}" style="height:${(share * 100).toFixed(1)}%" data-wi="${esc(rev.id)}" title="${esc(`${clockOf(rev.start)} · ${itemName(rev)} · ${fmtMin(rev.min)} · ${reflectDetail(rev)}`)}">${chk(rev, rd)}<b>${esc(itemName(rev))}</b><span>${fmtMin(rev.min)}</span></div>`;
+              }
+              inner += `<div role="button" tabindex="0" class="wki r-${it.kind === 'test' ? 'test' : it.reason || 'custom'}${done ? ' done' : ''}${missed ? ' missed' : ''}${tiny ? ' tiny' : ''}${rev ? ' hasrev' : ''}" style="${at(top, rows)}" data-wi="${esc(it.id)}" title="${esc(tip)}"><div class="wkmain">${chk(it, done)}<b>${missed ? '! ' : ''}${esc(itemName(it))}</b><span>${clockOf(it.start)} · ${sizeOf(it)}</span></div>${band}</div>`;
             });
           if (d === today) {
             const now = new Date(),
@@ -279,9 +305,14 @@ const PlanWeek = (() => {
         data = weekData(days);
       $('#pwRange').textContent = `${shortDate(days[0])} – ${shortDate(days[6])}`;
       if (dayIdx == null) dayIdx = Math.max(0, days.indexOf(todayISO()));
+      /* one day at a time on phones, and on larger screens when you pick "Day" */
       const phone = phoneMQ.matches,
-        shown = phone ? [days[dayIdx]] : days;
-      $('#pwStrip').innerHTML = phone ? stripHTML(days, dayIdx, 'data-pwd', data.blocks) : '';
+        oneDay = phone || viewMode() === 'day',
+        shown = oneDay ? [days[dayIdx]] : days;
+      document.querySelectorAll('#pwView button').forEach(b => b.classList.toggle('on', b.dataset.v === viewMode()));
+      $('#pwRefresh').hidden = !canRefresh();
+      $('#pwStrip').innerHTML = oneDay ? stripHTML(days, dayIdx, 'data-pwd', data.blocks) : '';
+      $('#pwGrid').classList.toggle('oneday', oneDay);
       const empty = !Object.values(data.blocks).some(r => r.length);
       /* weekly review (Cal Newport): planned vs done, so the next plan is based on what really happened */
       const planned = data.items.reduce((a, it) => a + it.min, 0),
@@ -303,7 +334,7 @@ const PlanWeek = (() => {
       $('#pwNudge').innerHTML =
         `<span>${esc(t('pwNudge'))}</span><button type="button" id="pwNudgeGo">${esc(t('pwNudgeBtn'))}</button>`;
       $('#pwGrid').innerHTML =
-        gridHTML(shown, data, 'view', { minSpan: 8 * 60 }) +
+        gridHTML(shown, data, 'view', { minSpan: 8 * 60, checks: true }) +
         (empty ? `<div class="pwempty">${esc(t('pwEmptyWeek'))}</div>` : '');
       fitGrid();
       scrollGrid($('#pwGrid'), data.blocks, shown);
@@ -355,7 +386,44 @@ const PlanWeek = (() => {
     dayIdx = +b.dataset.pwd;
     renderPlanWeek();
   };
+  /* Week | Day (remembered in this browser only) */
+  const viewMode = () => {
+    try {
+      return localStorage.getItem(STORE + '-planview') === 'day' ? 'day' : 'week';
+    } catch (e) {
+      return 'week';
+    }
+  };
+  $('#pwView').onclick = e => {
+    const b = e.target.closest('[data-v]');
+    if (!b) return;
+    try {
+      localStorage.setItem(STORE + '-planview', b.dataset.v);
+    } catch (err) {}
+    renderPlanWeek();
+  };
+  /* refresh: the days ahead are planned again with your latest results (what is done or yours stays) */
+  $('#pwRefresh').onclick = () => {
+    let n = 0;
+    commit(() => {
+      n = refreshPlans();
+    }, t('pwRefreshed'));
+    if (!n) toast(t('pwRefreshNone'));
+  };
+  $('#pwGrid').addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-wchk], .wki')) {
+      e.preventDefault();
+      e.target.click();
+    }
+  });
   $('#pwGrid').onclick = e => {
+    /* the circle marks the block done (or not done) by hand, for any kind of block */
+    const c = e.target.closest('[data-wchk]');
+    if (c) {
+      e.stopPropagation();
+      toggleCheck(c.dataset.wchk);
+      return;
+    }
     const b = e.target.closest('[data-wi]');
     if (!b) return;
     const it = weekData(Array.from({ length: 7 }, (_, k) => addDays(weekOf, k))).items.find(x => x.id === b.dataset.wi);
