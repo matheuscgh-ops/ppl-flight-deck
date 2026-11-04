@@ -5964,6 +5964,18 @@ body.wzdragging * {
     justify-content: center;
   }
 }
+/* error-notes review at the start of a session */
+.r-notes {
+  background: #2b2547;
+  color: #b3a6f5;
+}
+.rchip.notes {
+  background: #2b2547;
+  color: #b3a6f5;
+}
+.pwlegend i.r-notes {
+  border-left: 3px solid currentColor;
+}
 
 /* ===== Settings (gear in the header) ===== */
 .gear {
@@ -6527,7 +6539,7 @@ body.wzdragging * {
 <main class="app">
   <header class="top">
     <div>
-      <div class="brandrow"><div class="brand">PPL <span>/</span> PROGRESS</div><nav class="tabs" role="tablist"><button type="button" role="tab" data-view="dash" data-t="tabDash"></button><button type="button" role="tab" data-view="plan" data-t="tabPlan"></button><button type="button" role="tab" data-view="tests" data-t="tabTests"></button><button type="button" role="tab" data-view="sr" data-t="tabSR"></button><button type="button" role="tab" data-view="errors" data-t="tabErrors"></button></nav></div>
+      <div class="brandrow"><div class="brand">PPL <span>/</span> PROGRESS</div><nav class="tabs" role="tablist"><button type="button" role="tab" data-view="dash" data-t="tabDash"></button><button type="button" role="tab" data-view="plan" data-t="tabPlan"></button><button type="button" role="tab" data-view="errors" data-t="tabErrors"></button><button type="button" role="tab" data-view="tests" data-t="tabTests"></button><button type="button" role="tab" data-view="sr" data-t="tabSR"></button></nav></div>
       <div class="subtitle"><span data-t="sub"></span></div>
     </div>
     <div class="tools">
@@ -8582,6 +8594,22 @@ const Translations = (() => {
     pwWeekView: '週',
     pwDayView: '日',
   });
+  /* error-notes review at the start of a session */
+  Object.assign(I18N.en, {
+    notesReviewName: 'Error notes review',
+    rs_notes: 'notes',
+    reason_notes: 'Read your error notes from earlier sessions (Errors tab)',
+  });
+  Object.assign(I18N.pt, {
+    notesReviewName: 'Revisão das notas de erro',
+    rs_notes: 'notas',
+    reason_notes: 'Leia suas notas de erro das sessões anteriores (aba Erros)',
+  });
+  Object.assign(I18N.ja, {
+    notesReviewName: '間違いノートの見直し',
+    rs_notes: 'ノート',
+    reason_notes: '前回までの間違いノートを読む（間違いタブ）',
+  });
   /* Errors tab (error analysis) and spreadsheet import */
   Object.assign(I18N.en, {
     tabErrors: 'Errors',
@@ -9063,6 +9091,7 @@ const AppState = (() => {
           (it.kind === 'test' ||
             it.kind === 'custom' ||
             it.kind === 'reflect' ||
+            it.kind === 'notes' ||
             (it.kind === 'topic' && Number.isInteger(it.i) && TOPICS[it.i]))
       )
       .map(it => {
@@ -10805,7 +10834,7 @@ const Schedule = (() => {
 
   function itemDone(it) {
     if (it.check) return true;
-    if (it.kind === 'custom' || it.kind === 'reflect') return false;
+    if (it.kind === 'custom' || it.kind === 'reflect' || it.kind === 'notes') return false;
     /* a topic whose Kanban card you ticked "done today" on that day counts as done */
     if (it.kind === 'topic' && (state.cardChecks || {})[it.i] === it.date) return true;
     if (it.kind === 'test') return (state.tests || []).some(x => x.date === it.date && x.score != null);
@@ -10932,6 +10961,12 @@ const Schedule = (() => {
       });
     return got.map(u => u * 5);
   }
+  /* error-notes review at the start of a session: 10 min for a 1–2 h session, 15 min from 2 h, none under 1 h or when
+     there are no notes from earlier days (or the error review is off in Settings) */
+  function notesReviewFor(date, cap) {
+    if (!pref('reflect') || cap < 60 || !(state.notes || []).some(n => n.date < date)) return 0;
+    return cap >= 120 ? 15 : 10;
+  }
   const usedBy = pick => pick.reduce((a, c) => a + Math.ceil(c.n * c.per), 0);
   /* the smallest chunk worth placing: 10 minutes (or the whole topic when it is shorter), never under 5 questions */
   const minN = c => (c.kind === 'test' ? c.n : Math.min(c.full, Math.max(MIN_CHUNK_Q, Math.ceil(MIN_ITEM / c.per))));
@@ -10975,9 +11010,17 @@ const Schedule = (() => {
     const out = [];
     let carry = null;
     ranges.forEach(([s, e], bi) => {
-      const cap = e - s,
-        capT = cap - (carry ? carry.min : 0);
-      let t0 = s;
+      const cap = e - s;
+      let capT = cap - (carry ? carry.min : 0),
+        t0 = s;
+      /* a session of an hour or more opens with a read of your error notes from earlier days (the Errors tab shows
+         which); shorter sessions go straight to the topics */
+      const nr = notesReviewFor(date, cap);
+      if (nr) {
+        out.push({ id: uid(), date, start: t0, min: nr, kind: 'notes', i: null, n: 0, reason: 'notes' });
+        t0 += nr;
+        capT -= nr;
+      }
       if (carry) {
         out.push({
           id: uid(),
@@ -11106,7 +11149,7 @@ const Schedule = (() => {
           const items = d < todayISO() ? [] : packDay(d, blocks[d] || [], (energies || {})[d]);
           out[d] = items;
           items.forEach(it => {
-            if (it.kind === 'reflect') return;
+            if (it.kind === 'reflect' || it.kind === 'notes') return;
             if (it.kind === 'test')
               state.tests.push({ id: 'sim' + it.id, date: d, q: TEST_Q, score: Math.round(blended(d).mu * 100) });
             else {
@@ -11204,6 +11247,7 @@ const Schedule = (() => {
     if (it.kind === 'test') return t('practiceTest');
     if (it.kind === 'custom') return it.label || t('wzCustomDefault');
     if (it.kind === 'reflect') return t('reflectName');
+    if (it.kind === 'notes') return t('notesReviewName');
     return TOPICS[it.i].name;
   }
   /* one topic: "Weather · 8 expected misses"; several (a review carried to the next block): "Weather 8 · NAS 4" */
@@ -11301,6 +11345,7 @@ const Schedule = (() => {
     plans().some(p => p.active && Object.keys(p.blocks || {}).some(d => d >= todayISO() && rangesTotal(p.blocks[d])));
 
   return {
+    notesReviewFor,
     refreshPlans,
     canRefresh,
     rangesMinus,
@@ -11331,6 +11376,7 @@ const Schedule = (() => {
   };
 })();
 const {
+  notesReviewFor,
   refreshPlans,
   canRefresh,
   rangesMinus,
@@ -11386,9 +11432,11 @@ const PlanView = (() => {
   const rowAttr = it =>
     it.kind === 'test'
       ? 'data-pt="1"'
-      : it.kind === 'custom' || it.kind === 'reflect'
-        ? `data-cid="${esc(it.id)}"`
-        : `data-q="${it.i}"`;
+      : it.kind === 'notes'
+        ? `data-errs="1" data-cid="${esc(it.id)}"`
+        : it.kind === 'custom' || it.kind === 'reflect'
+          ? `data-cid="${esc(it.id)}"`
+          : `data-q="${it.i}"`;
   const rowName = it => (it.kind === 'topic' || it.kind === 'test' ? planRowName(it) : itemTitle(it));
   const checkBtn = it =>
     it.id
@@ -11418,7 +11466,7 @@ const PlanView = (() => {
       ? P.items
           .map(
             it =>
-              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}${noteBtn(it)}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' || it.kind === 'reflect' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
+              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}${noteBtn(it)}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' || it.kind === 'reflect' || it.kind === 'notes' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
           )
           .join('')
       : `<div class="muted">${esc(t(fromPlan ? 'planRestDay' : 'allClear'))}</div>`;
@@ -11994,6 +12042,11 @@ const PreviewCarousel = (() => {
     if (!r) return;
     if (r.dataset.pt) {
       openPt();
+      return;
+    }
+    if (r.dataset.errs) {
+      /* the error-notes review opens the Errors tab (the circle ticks it) */
+      goView('errors');
       return;
     }
     if (r.dataset.cid) {
@@ -14103,7 +14156,8 @@ const PlanWeek = (() => {
   const shortDate = d => new Intl.DateTimeFormat(LOCALE[lang], { month: 'short', day: 'numeric' }).format(parse(d));
   const itemName = itemTitle;
   /* own activities and error reviews are measured in minutes, topics and tests in questions */
-  const sizeOf = it => (it.kind === 'custom' || it.kind === 'reflect' ? fmtMin(it.min) : it.n + ' q');
+  const sizeOf = it =>
+    it.kind === 'custom' || it.kind === 'reflect' || it.kind === 'notes' ? fmtMin(it.min) : it.n + ' q';
   const at = (top, rows) => `top:calc(var(--rowh) * ${top});height:calc(var(--rowh) * ${rows})`;
   function planLabel(p) {
     const range = p.type === 'daily' ? longDay(p.start) : `${shortDate(p.start)} – ${shortDate(addDays(p.start, 6))}`;
@@ -14426,7 +14480,7 @@ const PlanWeek = (() => {
       fitGrid();
       scrollGrid($('#pwGrid'), data.blocks, shown);
       $('#pwLegend').innerHTML =
-        ['due', 'weak', 'nodata', 'new', 'test']
+        ['due', 'weak', 'nodata', 'new', 'test', 'notes']
           .map(r => `<span><i class="r-${r}"></i>${esc(t('rs_' + r))}</span>`)
           .join('') +
         `<span>✓ ${esc(t('planDone'))}</span><span>! ${esc(t('pwMissed'))}</span><span><b class="wkdaily">D</b> ${esc(t('pwDailyDay'))}</span>`;
@@ -14519,6 +14573,7 @@ const PlanWeek = (() => {
     else if (it.kind === 'reflect' && (it.parts || []).length)
       /* an error review opens the notebook of its topic(s); "Review done" is there */
       openNotes(it.parts[0].i, { topics: it.parts.map(x => x.i), itemId: it.id });
+    else if (it.kind === 'notes') goView('errors');
     else if (it.kind === 'custom' || it.kind === 'reflect') toggleCheck(it.id);
     else openModal(it.i, srModel(it.i).reps.length ? 'review' : 'study');
   };
@@ -14895,14 +14950,16 @@ const PlanWizard = (() => {
                 const r = it.kind === 'test' ? 'test' : it.reason || 'custom';
                 /* the review of a topic's misses sits right under it, as part of that topic */
                 const child = it.kind === 'reflect' && it.of && its.some(x => x.id === it.of);
-                const minutesOnly = it.kind === 'custom' || it.kind === 'reflect',
+                const minutesOnly = it.kind === 'custom' || it.kind === 'reflect' || it.kind === 'notes',
                   sub = child
                     ? t('reflectMisses').replace('{n}', it.parts[0].m)
                     : it.kind === 'reflect'
                       ? reflectDetail(it)
-                      : t('rs_' + r) + (it.kind === 'custom' ? '' : ' · ' + t('wzGoal'));
+                      : it.kind === 'notes'
+                        ? t('reason_notes')
+                        : t('rs_' + r) + (it.kind === 'custom' ? '' : ' · ' + t('wzGoal'));
                 /* drag the card (or its grip on touch screens) to move it; click or tap it to edit */
-                const editable = !past && it.kind !== 'reflect';
+                const editable = !past && it.kind !== 'reflect' && it.kind !== 'notes';
                 return `<div class="wzit r-${r}${child ? ' child' : ''}${editable ? ' editable' : ''}" data-wid="${esc(it.id)}"${editable ? ` role="button" tabindex="0" aria-label="${esc(t('pwEdit') + ': ' + itemName(it))}"` : ''}><span class="wzt">${child || past ? '' : `<span class="wzgrip" aria-hidden="true">⠿</span>`}${clockOf(it.start)}</span><span class="wzn">${esc(itemName(it))}${it.kind === 'topic' ? notesBadge(it.i) : ''}<small>${esc(sub)}</small></span><span class="wzq">${minutesOnly ? '' : it.n + ' q · '}${fmtMin(it.min)}</span><span class="wzacts">${past ? '' : `<button type="button" data-wact="del" aria-label="${esc(t('del'))}">×</button>`}</span></div>`;
               };
               const rows = groupsOf(its)
@@ -17242,6 +17299,37 @@ const SelfTest = (() => {
           topics.every(it => it.min >= 10 || it.n === TOPICS[it.i].q),
           JSON.stringify(topics.map(x => [x.i, x.n, x.min]))
         );
+        {
+          /* error-notes review: 10 min to open a 1–2 h session, 15 min from 2 h, none under 1 h or without notes */
+          const keepN = state.notes;
+          state.notes = [{ id: 'nx', topic: 18, date: D(1), text: 'x' }];
+          const one = packDay(T, [[1140, 1200]], 'medium'),
+            two = packDay(T, [[1140, 1260]], 'medium'),
+            half = packDay(T, [[1140, 1170]], 'medium');
+          ok(
+            'Plans',
+            'a 1 h session opens with a 10-min error-notes review, a 2 h one with 15 min',
+            one[0].kind === 'notes' &&
+              one[0].min === 10 &&
+              one[0].start === 1140 &&
+              two[0].kind === 'notes' &&
+              two[0].min === 15,
+            JSON.stringify([one[0], two[0]])
+          );
+          ok(
+            'Plans',
+            'a 30-min session has no error-notes review, just topics',
+            !half.some(it => it.kind === 'notes') && half.some(it => it.kind === 'topic'),
+            JSON.stringify(half.map(x => x.kind))
+          );
+          state.notes = [];
+          ok(
+            'Plans',
+            'no notes from earlier days → no error-notes review',
+            !packDay(T, [[1140, 1260]], 'medium').some(it => it.kind === 'notes')
+          );
+          state.notes = keepN;
+        }
         state.settings.reflect = false;
         ok(
           'Plans',

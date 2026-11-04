@@ -185,6 +185,11 @@ const PreviewCarousel = (() => {
       openPt();
       return;
     }
+    if (r.dataset.errs) {
+      /* the error-notes review opens the Errors tab (the circle ticks it) */
+      goView('errors');
+      return;
+    }
     if (r.dataset.cid) {
       toggleCheck(r.dataset.cid);
       return;

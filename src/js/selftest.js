@@ -1231,6 +1231,37 @@ const SelfTest = (() => {
           topics.every(it => it.min >= 10 || it.n === TOPICS[it.i].q),
           JSON.stringify(topics.map(x => [x.i, x.n, x.min]))
         );
+        {
+          /* error-notes review: 10 min to open a 1–2 h session, 15 min from 2 h, none under 1 h or without notes */
+          const keepN = state.notes;
+          state.notes = [{ id: 'nx', topic: 18, date: D(1), text: 'x' }];
+          const one = packDay(T, [[1140, 1200]], 'medium'),
+            two = packDay(T, [[1140, 1260]], 'medium'),
+            half = packDay(T, [[1140, 1170]], 'medium');
+          ok(
+            'Plans',
+            'a 1 h session opens with a 10-min error-notes review, a 2 h one with 15 min',
+            one[0].kind === 'notes' &&
+              one[0].min === 10 &&
+              one[0].start === 1140 &&
+              two[0].kind === 'notes' &&
+              two[0].min === 15,
+            JSON.stringify([one[0], two[0]])
+          );
+          ok(
+            'Plans',
+            'a 30-min session has no error-notes review, just topics',
+            !half.some(it => it.kind === 'notes') && half.some(it => it.kind === 'topic'),
+            JSON.stringify(half.map(x => x.kind))
+          );
+          state.notes = [];
+          ok(
+            'Plans',
+            'no notes from earlier days → no error-notes review',
+            !packDay(T, [[1140, 1260]], 'medium').some(it => it.kind === 'notes')
+          );
+          state.notes = keepN;
+        }
         state.settings.reflect = false;
         ok(
           'Plans',

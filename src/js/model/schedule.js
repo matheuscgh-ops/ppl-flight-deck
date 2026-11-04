@@ -72,7 +72,7 @@ const Schedule = (() => {
 
   function itemDone(it) {
     if (it.check) return true;
-    if (it.kind === 'custom' || it.kind === 'reflect') return false;
+    if (it.kind === 'custom' || it.kind === 'reflect' || it.kind === 'notes') return false;
     /* a topic whose Kanban card you ticked "done today" on that day counts as done */
     if (it.kind === 'topic' && (state.cardChecks || {})[it.i] === it.date) return true;
     if (it.kind === 'test') return (state.tests || []).some(x => x.date === it.date && x.score != null);
@@ -199,6 +199,12 @@ const Schedule = (() => {
       });
     return got.map(u => u * 5);
   }
+  /* error-notes review at the start of a session: 10 min for a 1–2 h session, 15 min from 2 h, none under 1 h or when
+     there are no notes from earlier days (or the error review is off in Settings) */
+  function notesReviewFor(date, cap) {
+    if (!pref('reflect') || cap < 60 || !(state.notes || []).some(n => n.date < date)) return 0;
+    return cap >= 120 ? 15 : 10;
+  }
   const usedBy = pick => pick.reduce((a, c) => a + Math.ceil(c.n * c.per), 0);
   /* the smallest chunk worth placing: 10 minutes (or the whole topic when it is shorter), never under 5 questions */
   const minN = c => (c.kind === 'test' ? c.n : Math.min(c.full, Math.max(MIN_CHUNK_Q, Math.ceil(MIN_ITEM / c.per))));
@@ -242,9 +248,17 @@ const Schedule = (() => {
     const out = [];
     let carry = null;
     ranges.forEach(([s, e], bi) => {
-      const cap = e - s,
-        capT = cap - (carry ? carry.min : 0);
-      let t0 = s;
+      const cap = e - s;
+      let capT = cap - (carry ? carry.min : 0),
+        t0 = s;
+      /* a session of an hour or more opens with a read of your error notes from earlier days (the Errors tab shows
+         which); shorter sessions go straight to the topics */
+      const nr = notesReviewFor(date, cap);
+      if (nr) {
+        out.push({ id: uid(), date, start: t0, min: nr, kind: 'notes', i: null, n: 0, reason: 'notes' });
+        t0 += nr;
+        capT -= nr;
+      }
       if (carry) {
         out.push({
           id: uid(),
@@ -373,7 +387,7 @@ const Schedule = (() => {
           const items = d < todayISO() ? [] : packDay(d, blocks[d] || [], (energies || {})[d]);
           out[d] = items;
           items.forEach(it => {
-            if (it.kind === 'reflect') return;
+            if (it.kind === 'reflect' || it.kind === 'notes') return;
             if (it.kind === 'test')
               state.tests.push({ id: 'sim' + it.id, date: d, q: TEST_Q, score: Math.round(blended(d).mu * 100) });
             else {
@@ -471,6 +485,7 @@ const Schedule = (() => {
     if (it.kind === 'test') return t('practiceTest');
     if (it.kind === 'custom') return it.label || t('wzCustomDefault');
     if (it.kind === 'reflect') return t('reflectName');
+    if (it.kind === 'notes') return t('notesReviewName');
     return TOPICS[it.i].name;
   }
   /* one topic: "Weather · 8 expected misses"; several (a review carried to the next block): "Weather 8 · NAS 4" */
@@ -568,6 +583,7 @@ const Schedule = (() => {
     plans().some(p => p.active && Object.keys(p.blocks || {}).some(d => d >= todayISO() && rangesTotal(p.blocks[d])));
 
   return {
+    notesReviewFor,
     refreshPlans,
     canRefresh,
     rangesMinus,
@@ -598,6 +614,7 @@ const Schedule = (() => {
   };
 })();
 const {
+  notesReviewFor,
   refreshPlans,
   canRefresh,
   rangesMinus,

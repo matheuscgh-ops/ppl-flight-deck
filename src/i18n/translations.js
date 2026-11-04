@@ -1619,6 +1619,22 @@ const Translations = (() => {
     pwWeekView: '週',
     pwDayView: '日',
   });
+  /* error-notes review at the start of a session */
+  Object.assign(I18N.en, {
+    notesReviewName: 'Error notes review',
+    rs_notes: 'notes',
+    reason_notes: 'Read your error notes from earlier sessions (Errors tab)',
+  });
+  Object.assign(I18N.pt, {
+    notesReviewName: 'Revisão das notas de erro',
+    rs_notes: 'notas',
+    reason_notes: 'Leia suas notas de erro das sessões anteriores (aba Erros)',
+  });
+  Object.assign(I18N.ja, {
+    notesReviewName: '間違いノートの見直し',
+    rs_notes: 'ノート',
+    reason_notes: '前回までの間違いノートを読む（間違いタブ）',
+  });
   /* Errors tab (error analysis) and spreadsheet import */
   Object.assign(I18N.en, {
     tabErrors: 'Errors',

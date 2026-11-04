@@ -1591,3 +1591,15 @@ body.wzdragging * {
     justify-content: center;
   }
 }
+/* error-notes review at the start of a session */
+.r-notes {
+  background: #2b2547;
+  color: #b3a6f5;
+}
+.rchip.notes {
+  background: #2b2547;
+  color: #b3a6f5;
+}
+.pwlegend i.r-notes {
+  border-left: 3px solid currentColor;
+}
