@@ -10,6 +10,7 @@ const Dashboard = (() => {
       el.title = t(el.dataset.tt);
       el.setAttribute('aria-label', t(el.dataset.tt));
     });
+    $('#langSel').value = lang;
     document.querySelectorAll('.flag').forEach(b => {
       const on = b.dataset.lang === lang;
       b.classList.toggle('on', on);

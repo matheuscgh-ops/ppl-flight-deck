@@ -37,7 +37,7 @@ with sync_playwright() as p:
             ev(f'pplTour.go({k})'); pg.wait_for_timeout(1500)
             r = ev("""(()=>{const h=document.querySelector('.tour-hole').getBoundingClientRect(),c=document.querySelector('.tour-card').getBoundingClientRect();
               return {h:[h.left,h.top,h.right,h.bottom],c:[c.left,c.top,c.right,c.bottom],center:document.querySelector('.tour-hole').classList.contains('center')}})()""")
-            sel = ev(f"(()=>{{const s=[null,'.board','.progress','#tsCard','#volCard','.cal','#fcMini','.nthen','.tabs button[data-view=\"plan\"]','#planWeek','#pwEnergy','#planPt','.tshero','#statSeg','#fcFull','.errhead','.flags',null][{k}];if(!s)return null;const e=document.querySelector(s).getBoundingClientRect();return [e.left,e.top,e.right,e.bottom]}})()")
+            sel = ev(f"(()=>{{const s=[null,'.board','.progress','#tsCard','#volCard','.cal','#fcMini','.nthen','.tabs button[data-view=\"plan\"]','#planWeek','#pwEnergy','#planPt','.tshero','#statSeg','#fcFull','.errhead','.flags, #langSel',null][{k}];if(!s)return null;const e=([...document.querySelectorAll(s)].find(x=>x.offsetParent!==null)||document.querySelector(s)).getBoundingClientRect();return [e.left,e.top,e.right,e.bottom]}})()")
             cx = r['c']
             if not (cx[0] >= -1 and cx[1] >= -1 and cx[2] <= W + 1 and cx[3] <= H + 1): bad.append((k, 'card off screen', cx))
             if sel is None and not r['center']: bad.append((k, 'should be centered'))

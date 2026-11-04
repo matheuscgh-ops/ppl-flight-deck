@@ -95,9 +95,9 @@ with sync_playwright() as p:
             pg.reload(); pg.wait_for_timeout(400); ev("goView('sr')"); pg.wait_for_timeout(300)
             check(f'{tag}: the interval choice is remembered', ev("document.querySelector('[data-heatr] button.on').dataset.hr") == '6m')
             ev("heatRange='3m';try{localStorage.setItem(STORE+'-heatr','3m')}catch(e){}")
-            pg.click('.flag[data-lang="pt"]'); pg.wait_for_timeout(150)
+            pg.evaluate("document.querySelector('.flag[data-lang=\"pt\"]').click()"); pg.wait_for_timeout(150)
             check(f'{tag}: Portuguese title', 'mapa de calor' in pg.inner_text('#heatPanel').lower())
-            pg.click('.flag[data-lang="en"]')
+            pg.evaluate("document.querySelector('.flag[data-lang=\"en\"]').click()")
             check(f'{tag}: no JavaScript errors', not errs, errs)
             c.close()
     # demo data covers every interval

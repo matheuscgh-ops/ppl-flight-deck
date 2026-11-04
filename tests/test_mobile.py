@@ -40,14 +40,15 @@ with sync_playwright() as p:
         c = b.new_context(**DEVICES['iPhone 17']); pg = c.new_page(); errs = []
         pg.on('pageerror', lambda e: errs.append(str(e)))
         pg.goto(url); pg.wait_for_timeout(450)
-        hb = pg.evaluate("(()=>{const b=document.querySelector('.brand').getBoundingClientRect(),f=document.querySelector('.flags').getBoundingClientRect();return {sameRow:Math.abs((f.top+f.bottom)/2-(b.top+b.bottom)/2)<12,right:Math.round(innerWidth-f.right)}})()")
-        check(f'{f} · phone: language flags sit top-right, on the title row', hb['sameRow'] and hb['right'] <= 14, hb)
+        hb = pg.evaluate("(()=>{const b=document.querySelector('.brand').getBoundingClientRect(),f=document.getElementById('langSel').getBoundingClientRect(),g=document.getElementById('setOpen').getBoundingClientRect(),d=document.getElementById('docsLink').getBoundingClientRect();return {sameRow:[f,g,d].every(x=>Math.abs((x.top+x.bottom)/2-(b.top+b.bottom)/2)<12),right:Math.round(innerWidth-f.right),even:Math.abs(f.height-g.height)<1&&Math.abs(g.height-d.height)<1&&Math.abs(f.width-g.width)<1,order:d.right<=g.left+1&&g.right<=f.left+1,flagsHidden:!document.querySelector('.flags').offsetWidth}})()")
+        check(f'{f} · phone: guide, Settings and language sit together top-right on the title row, same size', hb['sameRow'] and hb['right'] <= 14 and hb['even'] and hb['order'] and hb['flagsHidden'], hb)
         check(f'{f} · phone: slim header (under 130px tall)', pg.evaluate("document.querySelector('.top').getBoundingClientRect().height") < 130)
         for L in ['en', 'pt', 'ja']:
-            pg.click(f'.flag[data-lang="{L}"]'); pg.wait_for_timeout(80)
+            pg.select_option('#langSel', L); pg.wait_for_timeout(80)
+            check(f'{f} · phone ({L}): the language menu switches the app language', pg.evaluate('state.lang') == L)
             tr = pg.evaluate("[...document.querySelectorAll('.tools>button')].filter(b=>b.offsetWidth&&b.scrollWidth>b.clientWidth+1).map(b=>b.textContent)")
             check(f'{f} · phone ({L}): every header button label fits', not tr, tr)
-        pg.click('.flag[data-lang="en"]'); pg.wait_for_timeout(80)
+        pg.select_option('#langSel', 'en'); pg.wait_for_timeout(80)
         visible = pg.evaluate("[...document.querySelectorAll('.lane')].filter(l=>{const r=l.getBoundingClientRect();return r.left>=-1&&r.right<=innerWidth+1}).length")
         check(f'{f} · phone: Kanban shows one list per screen', visible == 1, visible)
         check(f'{f} · phone: 5 dots under the board', pg.evaluate("document.querySelectorAll('#laneDots button').length") == 5)
@@ -79,7 +80,7 @@ with sync_playwright() as p:
         pg.tap('#openSR'); pg.wait_for_timeout(300)
         check(f'{f} · phone: "Full analysis" opens every chart in the other tab',
               pg.is_visible('#viewSR') and pg.evaluate("document.querySelectorAll('.srcard').length") == pg.evaluate('srAll().length'))
-        pg.click('.tabs button[data-view="dash"]'); pg.click('.flag[data-lang="pt"]'); pg.wait_for_timeout(100)
+        pg.click('.tabs button[data-view="dash"]'); pg.evaluate("document.querySelector('.flag[data-lang=\"pt\"]').click()"); pg.wait_for_timeout(100)
         check(f'{f} · phone: picker translated (pt)',
               pg.evaluate("document.querySelector('.prevpick .flabel').textContent") == 'Mostrar curva de'
               and pg.evaluate("document.querySelector('#prevPick option').textContent").startswith('Todos'))

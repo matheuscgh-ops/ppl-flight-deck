@@ -87,7 +87,7 @@ with sync_playwright() as p:
             pg.keyboard.press('Escape'); pg.wait_for_timeout(100)
             check(f'{tag}: closes with Escape', not pg.is_visible('#volbg'))
             for L, word in [('pt', 'Esta semana'), ('ja', '今週')]:
-                pg.click(f'.flag[data-lang="{L}"]'); pg.wait_for_timeout(80)
+                pg.evaluate(f"document.querySelector('.flag[data-lang=\"{L}\"]').click()"); pg.wait_for_timeout(80)
                 check(f'{tag}: translated ({L})', pg.evaluate("document.querySelector('#volCard .label').textContent") == word)
             check(f'{tag}: no JavaScript errors', not errs, errs)
             c.close()

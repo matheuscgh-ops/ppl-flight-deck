@@ -241,11 +241,11 @@ with sync_playwright() as p:
             ev("state.plan=null;save();render()")
 
             # ---------- languages ----------
-            pg.click('.flag[data-lang="pt"]'); pg.wait_for_timeout(150)
+            pg.evaluate("document.querySelector('.flag[data-lang=\"pt\"]').click()"); pg.wait_for_timeout(150)
             check(f'{tag}: Portuguese tab "Simulados"', pg.inner_text('.tabs button[data-view="tests"]') == 'Simulados')
-            pg.click('.flag[data-lang="ja"]'); pg.wait_for_timeout(150)
+            pg.evaluate("document.querySelector('.flag[data-lang=\"ja\"]').click()"); pg.wait_for_timeout(150)
             check(f'{tag}: Japanese tab "模試"', pg.inner_text('.tabs button[data-view="tests"]') == '模試')
-            pg.click('.flag[data-lang="en"]')
+            pg.evaluate("document.querySelector('.flag[data-lang=\"en\"]').click()")
             check(f'{tag}: no JavaScript errors', not errs, errs)
             c.close()
 

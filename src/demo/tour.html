@@ -97,7 +97,7 @@ const STEPS=[
   en:['Error analysis','Everything you got wrong, by topic and date, with the topics of today’s session on top. Search, add notes, or import them from your spreadsheet.'],
   pt:['Análise de erros','Tudo o que você errou, por tópico e data, com os tópicos da sessão de hoje no topo. Busque, adicione notas ou importe da sua planilha.'],
   ja:['間違いの分析','間違えたことをトピックと日付ごとに。今日の学習のトピックが一番上。検索、メモの追加、スプレッドシートからの取り込み。']},
- {view:'dash',sel:'.flags',
+ {view:'dash',sel:'.flags, #langSel',
   en:['Your data, your language','English, Português or 日本語. Everything stays in your browser; Backup JSON and Save HTML keep a copy.'],
   pt:['Seus dados, seu idioma','English, Português ou 日本語. Tudo fica no seu navegador; Backup JSON e Save HTML guardam uma cópia.'],
   ja:['データも言語も自由に','English・Português・日本語。データはブラウザ内に保存。Backup JSONとSave HTMLでコピーを保存。']},
@@ -117,7 +117,7 @@ function build(){
   let st=null;window.addEventListener('scroll',()=>{els.hole.style.transition=els.card.style.transition='none';place();clearTimeout(st);st=setTimeout(()=>{els.hole.style.transition=els.card.style.transition=''},140)},{passive:true});
 }
 function key(e){if(k<0)return;if(e.key==='Escape'){e.preventDefault();e.stopPropagation();end()}else if(e.key==='ArrowRight'){e.preventDefault();go(k+1)}else if(e.key==='ArrowLeft'){e.preventDefault();go(k-1)}}
-function target(){const s=STEPS[k];return s.sel?document.querySelector(s.sel):null}
+function target(){const s=STEPS[k];if(!s.sel)return null;const all=[...document.querySelectorAll(s.sel)];return all.find(e=>e.offsetParent!==null)||all[0]||null}
 function place(){
   if(k<0)return;const s=STEPS[k],el=target(),W=innerWidth,H=innerHeight,pad=8;
   let r=el&&el.offsetParent!==null?el.getBoundingClientRect():null;
