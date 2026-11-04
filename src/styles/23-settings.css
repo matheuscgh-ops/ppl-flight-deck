@@ -356,3 +356,339 @@
   justify-content: space-between;
   gap: 8px;
 }
+
+/* ===== Errors tab: error analysis ===== */
+.errpage {
+  padding: 18px 20px;
+}
+/* header: title + actions on one line, then one search field with the topic menu inside it */
+.errhead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'title acts'
+    'tools tools';
+  gap: 10px 14px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.errtitle {
+  grid-area: title;
+  min-width: 0;
+}
+.errsub {
+  font-size: 12.5px;
+}
+.erracts {
+  grid-area: acts;
+  display: flex;
+  gap: 6px;
+}
+.erracts button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+}
+.erracts .quiet {
+  background: transparent;
+  color: var(--ink2);
+}
+.erracts .quiet:hover {
+  color: var(--ink);
+}
+.errtools {
+  grid-area: tools;
+}
+.errsearch {
+  display: flex;
+  align-items: center;
+  max-width: 560px;
+  background: var(--panel2);
+  border: 1px solid var(--line2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.errsearch:focus-within {
+  border-color: #579dff;
+}
+.errsearch input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  padding: 8px 12px;
+}
+.errsearch input:focus-visible {
+  outline: none;
+}
+.errsearch select {
+  flex: none;
+  max-width: 46%;
+  border: 0;
+  border-left: 1px solid var(--line2);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink2);
+  font-weight: 700;
+  padding: 8px 10px;
+}
+.errnew {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 640px;
+  margin: 0 0 14px;
+}
+.errnew textarea,
+#impIn {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  background: var(--panel2);
+  color: var(--ink);
+  border: 1px solid var(--line2);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+.errh {
+  margin: 14px 0 8px;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink2);
+}
+.errgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.errcard {
+  background: #1b1f24;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  min-width: 0;
+}
+.errcard header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.errcard header b {
+  font-size: 15px;
+}
+.errcard header .muted {
+  font-size: 12px;
+}
+.errcount {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 800;
+  color: #b3a6f5;
+  background: #2b2547;
+  border-radius: 10px;
+  padding: 1px 8px;
+}
+.errday {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 10px;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+.errdate {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--muted);
+  padding-top: 2px;
+}
+.errday ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.errday li {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+.errday li span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.errday li span::before {
+  content: '•';
+  color: var(--muted);
+  margin-right: 6px;
+}
+.errday li .x {
+  opacity: 0;
+  padding: 0 6px;
+  font-size: 12px;
+}
+.errday li:hover .x,
+.errday li:focus-within .x {
+  opacity: 1;
+}
+@media (hover: none) {
+  .errday li .x {
+    opacity: 0.6;
+  }
+}
+.errday mark {
+  background: #f5a52455;
+  color: var(--ink);
+  border-radius: 3px;
+}
+.erradd1 {
+  margin-top: 6px;
+}
+.modal.impmodal {
+  width: min(680px, 100%);
+}
+#impPrev {
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 30vh;
+  overflow: auto;
+}
+.improw {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 12px;
+  font-size: 13px;
+  background: #20252b;
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+.impbad {
+  font-size: 12.5px;
+  color: #ff9c95;
+}
+@media (max-width: 640px) {
+  .errpage {
+    padding: 14px;
+  }
+  .errsub {
+    display: none;
+  }
+  .erracts button {
+    width: 38px;
+    padding: 0;
+    justify-content: center;
+    font-size: 18px;
+  }
+  .errsearch {
+    max-width: none;
+  }
+  .errday {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+}
+.errday li span {
+  white-space: pre-line;
+}
+.errdue {
+  color: #ff9c95;
+  font-weight: 800;
+}
+.errcard header {
+  flex-wrap: nowrap;
+  margin-bottom: 2px;
+}
+.errcard header b {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.errmeta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+/* ===== phone header: the guide, Settings and the language as one even group in the title row ===== */
+#langSel {
+  display: none;
+}
+@media (max-width: 640px) {
+  .brand {
+    padding-right: 150px;
+  }
+  .tools .flags {
+    display: none !important;
+  }
+  #langSel,
+  .tools > .docsbtn,
+  .tools > button.gear {
+    position: absolute !important;
+    top: 0;
+    width: 40px !important;
+    height: 32px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    flex: none !important;
+    border-radius: 9px;
+    display: inline-grid;
+    place-items: center;
+  }
+  #langSel {
+    right: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    text-align: center;
+    text-align-last: center;
+    font-size: 18px !important;
+    line-height: 30px;
+    background: var(--panel2);
+    border: 1px solid var(--line2);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .tools > button.gear {
+    right: 46px;
+  }
+  .tools > .docsbtn {
+    right: 92px;
+  }
+  .tools > button.gear svg,
+  .docsbtn svg {
+    width: 17px;
+    height: 17px;
+  }
+}
+@media (max-width: 399px) {
+  .brand {
+    font-size: 17px !important;
+    padding-right: 140px;
+  }
+  #langSel,
+  .tools > .docsbtn,
+  .tools > button.gear {
+    width: 36px !important;
+  }
+  .tools > button.gear {
+    right: 41px;
+  }
+  .tools > .docsbtn {
+    right: 82px;
+  }
+}

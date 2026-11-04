@@ -30,14 +30,14 @@ with sync_playwright() as p:
         ev = pg.evaluate; tap = pg.tap if mode in ('phone', 'iPad mini') else pg.click
         check(f'{tag}: first visit opens the tour automatically', pg.is_visible('.tour-card') and ev('pplTour.step()') == 0)
         n = ev('pplTour.steps')
-        check(f'{tag}: 17 steps, "Step 1 of 17"', n == 17 and 'step 1 of 17' in pg.inner_text('.tour-card').lower())
+        check(f'{tag}: 18 steps, "Step 1 of 18"', n == 18 and 'step 1 of 18' in pg.inner_text('.tour-card').lower())
         # walk every step: highlight on the target, card inside the screen
         bad = []
         for k in range(n):
             ev(f'pplTour.go({k})'); pg.wait_for_timeout(1500)
             r = ev("""(()=>{const h=document.querySelector('.tour-hole').getBoundingClientRect(),c=document.querySelector('.tour-card').getBoundingClientRect();
               return {h:[h.left,h.top,h.right,h.bottom],c:[c.left,c.top,c.right,c.bottom],center:document.querySelector('.tour-hole').classList.contains('center')}})()""")
-            sel = ev(f"(()=>{{const s=[null,'.board','.progress','#tsCard','#volCard','.cal','#fcMini','.nthen','.tabs button[data-view=\"plan\"]','#planWeek','#pwEnergy','#planPt','.tshero','#statSeg','#fcFull','.flags',null][{k}];if(!s)return null;const e=document.querySelector(s).getBoundingClientRect();return [e.left,e.top,e.right,e.bottom]}})()")
+            sel = ev(f"(()=>{{const s=[null,'.board','.progress','#tsCard','#volCard','.cal','#fcMini','.nthen','.tabs button[data-view=\"plan\"]','#planWeek','#pwEnergy','#planPt','.tshero','#statSeg','#fcFull','.errhead','.flags, #langSel',null][{k}];if(!s)return null;const e=([...document.querySelectorAll(s)].find(x=>x.offsetParent!==null)||document.querySelector(s)).getBoundingClientRect();return [e.left,e.top,e.right,e.bottom]}})()")
             cx = r['c']
             if not (cx[0] >= -1 and cx[1] >= -1 and cx[2] <= W + 1 and cx[3] <= H + 1): bad.append((k, 'card off screen', cx))
             if sel is None and not r['center']: bad.append((k, 'should be centered'))
@@ -92,7 +92,7 @@ with sync_playwright() as p:
         check(f'{tag}: the chosen flag is marked', ev("document.querySelector('.tour-card [data-tlang=\"ja\"]').classList.contains('on')"))
         tap('.tour-card [data-tlang="en"]'); pg.wait_for_timeout(300)
         ev("document.querySelector('.flag[data-lang=\"pt\"]').click()"); pg.wait_for_timeout(300)
-        check(f'{tag}: tour follows the language (pt)', 'passo 3 de 17' in pg.inner_text('.tour-card').lower() and 'Próximo' in pg.inner_text('.tour-card'))
+        check(f'{tag}: tour follows the language (pt)', 'passo 3 de 18' in pg.inner_text('.tour-card').lower() and 'Próximo' in pg.inner_text('.tour-card'))
         ev("document.querySelector('.flag[data-lang=\"en\"]').click()"); pg.wait_for_timeout(200)
         # skip
         tap('[data-tour="skip"]'); pg.wait_for_timeout(300)
@@ -102,7 +102,7 @@ with sync_playwright() as p:
         check(f'{tag}: after it was seen, it does not open again by itself', not pg.is_visible('.tour-card'))
         tap('#setOpen'); pg.wait_for_timeout(200); tap('#tourBtn'); pg.wait_for_timeout(400)
         check(f'{tag}: the Tour button restarts it', pg.is_visible('.tour-card') and ev('pplTour.step()') == 0)
-        ev('pplTour.go(16)'); pg.wait_for_timeout(300)
+        ev('pplTour.go(pplTour.steps-1)'); pg.wait_for_timeout(300)
         tap('[data-tour="next"]'); pg.wait_for_timeout(300)
         check(f'{tag}: "Finish" on the last step closes it', not pg.is_visible('.tour-card'))
         tap('#setOpen'); pg.wait_for_timeout(200); tap('#tourBtn'); pg.wait_for_timeout(300); pg.keyboard.press('Escape'); pg.wait_for_timeout(250)

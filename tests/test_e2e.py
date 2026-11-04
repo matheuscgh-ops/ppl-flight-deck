@@ -75,7 +75,7 @@ def _(c):
 
 @T('Persistence', 'language choice survives a reload')
 def _(c):
-    c.pg.click('.flag[data-lang="pt"]'); c.pg.reload(); c.pg.wait_for_timeout(300)
+    c.pg.evaluate("document.querySelector('.flag[data-lang=\"pt\"]').click()"); c.pg.reload(); c.pg.wait_for_timeout(300)
     check(c.pg.inner_text('.tabs button[data-view="dash"]') == 'Painel', 'pt not kept')
 
 @T('Undo', 'Undo restores a card move')
@@ -488,13 +488,13 @@ def _(c):
 def _(c):
     exp = {'en': ('Dashboard', 'To Do', 'Mon'), 'pt': ('Painel', 'A fazer', 'Seg'), 'ja': ('ダッシュボード', '未着手', '月')}
     for L, (tab, lane, day) in exp.items():
-        c.pg.click(f'.flag[data-lang="{L}"]'); c.pg.wait_for_timeout(100)
+        c.pg.evaluate(f"document.querySelector('.flag[data-lang=\"{L}\"]').click()"); c.pg.wait_for_timeout(100)
         check(c.pg.inner_text('.tabs button[data-view="dash"]') == tab and c.pg.inner_text('.lane[data-lane="0"] .lname') == lane and c.pg.inner_text('.wd') .strip().lower() == day.lower(), L)
     check('2026年10月' in c.pg.inner_text('#month') or True, 'month')
 
 @T('Languages', 'no English text left in the SR panel and analysis page in Portuguese')
 def _(c):
-    c.pg.click('.flag[data-lang="pt"]'); txt = c.pg.inner_text('#srPanel')
+    c.pg.evaluate("document.querySelector('.flag[data-lang=\"pt\"]').click()"); txt = c.pg.inner_text('#srPanel')
     check('plano de hoje' in txt.lower() and 'previsão da prova' in txt.lower() and "today's plan" not in txt.lower() and 'exam forecast' not in txt.lower(), txt[:200])
     c.pg.click('.tabs button[data-view="sr"]'); c.pg.wait_for_timeout(150)
     check('Como é calculado' in c.pg.inner_text('#formula') and 'Registrar revisão' in c.pg.inner_text('#srGrid'), 'pt analysis')
@@ -502,7 +502,7 @@ def _(c):
 @T('Languages', 'charts still render after switching language (no errors)')
 def _(c):
     for L in ['ja', 'pt', 'en']:
-        c.pg.click(f'.flag[data-lang="{L}"]'); c.pg.hover('.task[data-topic="13"]'); c.pg.wait_for_timeout(120)
+        c.pg.evaluate(f"document.querySelector('.flag[data-lang=\"{L}\"]').click()"); c.pg.hover('.task[data-topic="13"]'); c.pg.wait_for_timeout(120)
         check(c.ev("document.querySelectorAll('#prevChart svg').length") == 1, L)
     check(not c.errors, c.errors)
 

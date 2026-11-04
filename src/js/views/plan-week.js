@@ -16,7 +16,8 @@ const PlanWeek = (() => {
   const shortDate = d => new Intl.DateTimeFormat(LOCALE[lang], { month: 'short', day: 'numeric' }).format(parse(d));
   const itemName = itemTitle;
   /* own activities and error reviews are measured in minutes, topics and tests in questions */
-  const sizeOf = it => (it.kind === 'custom' || it.kind === 'reflect' ? fmtMin(it.min) : it.n + ' q');
+  const sizeOf = it =>
+    it.kind === 'custom' || it.kind === 'reflect' || it.kind === 'notes' ? fmtMin(it.min) : it.n + ' q';
   const at = (top, rows) => `top:calc(var(--rowh) * ${top});height:calc(var(--rowh) * ${rows})`;
   function planLabel(p) {
     const range = p.type === 'daily' ? longDay(p.start) : `${shortDate(p.start)} – ${shortDate(addDays(p.start, 6))}`;
@@ -339,7 +340,7 @@ const PlanWeek = (() => {
       fitGrid();
       scrollGrid($('#pwGrid'), data.blocks, shown);
       $('#pwLegend').innerHTML =
-        ['due', 'weak', 'nodata', 'new', 'test']
+        ['due', 'weak', 'nodata', 'new', 'test', 'notes']
           .map(r => `<span><i class="r-${r}"></i>${esc(t('rs_' + r))}</span>`)
           .join('') +
         `<span>✓ ${esc(t('planDone'))}</span><span>! ${esc(t('pwMissed'))}</span><span><b class="wkdaily">D</b> ${esc(t('pwDailyDay'))}</span>`;
@@ -432,6 +433,7 @@ const PlanWeek = (() => {
     else if (it.kind === 'reflect' && (it.parts || []).length)
       /* an error review opens the notebook of its topic(s); "Review done" is there */
       openNotes(it.parts[0].i, { topics: it.parts.map(x => x.i), itemId: it.id });
+    else if (it.kind === 'notes') goView('errors');
     else if (it.kind === 'custom' || it.kind === 'reflect') toggleCheck(it.id);
     else openModal(it.i, srModel(it.i).reps.length ? 'review' : 'study');
   };

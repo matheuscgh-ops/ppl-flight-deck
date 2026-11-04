@@ -31,7 +31,7 @@ with sync_playwright() as p:
             W = opts['viewport']['width']
             # ---------- tabs ----------
             tabs = pg.evaluate("[...document.querySelectorAll('.tabs button')].map(b=>b.dataset.view).join()")
-            check(f'{tag}: four tabs Dashboard / Plan / Tests / Statistics', tabs == 'dash,plan,tests,sr' and pg.inner_text('.tabs button[data-view="sr"]') == 'Statistics', tabs)
+            check(f'{tag}: five tabs Dashboard / Plan / Errors / Tests / Statistics', tabs == 'dash,plan,errors,tests,sr' and pg.inner_text('.tabs button[data-view="sr"]') == 'Statistics', tabs)
             # ---------- dashboard previews ----------
             check(f'{tag}: forecast preview on the dashboard', pg.is_visible('#fcMini') and pg.inner_text('#fcMiniVal').endswith('%'))
             check(f'{tag}: plan preview on the dashboard with total questions', pg.is_visible('#sugg') and pg.inner_text('#planMiniTot').startswith('·'))
@@ -128,12 +128,12 @@ with sync_playwright() as p:
             check(f'{tag}: spaced-repetition section still below the forecast', pg.is_visible('#heatPanel') and pg.evaluate("document.querySelectorAll('.srcard').length") >= 1)
             check(f'{tag}: Statistics page not wider than the screen', pg.evaluate('document.documentElement.scrollWidth') == W)
             # ---------- languages ----------
-            pg.click('.flag[data-lang="pt"]'); pg.wait_for_timeout(120)
-            check(f'{tag}: Portuguese: tabs Painel / Plano / Simulados / Estatísticas', pg.evaluate("[...document.querySelectorAll('.tabs button')].map(b=>b.textContent).join('/')") == 'Painel/Plano/Simulados/Estatísticas')
+            pg.evaluate("document.querySelector('.flag[data-lang=\"pt\"]').click()"); pg.wait_for_timeout(120)
+            check(f'{tag}: Portuguese: tabs Painel / Plano / Erros / Simulados / Estatísticas', pg.evaluate("[...document.querySelectorAll('.tabs button')].map(b=>b.textContent).join('/')") == 'Painel/Plano/Erros/Simulados/Estatísticas')
             check(f'{tag}: Portuguese forecast labels', 'Chance de passar' in pg.inner_text('#fcKpis'))
-            pg.click('.flag[data-lang="ja"]'); pg.wait_for_timeout(120)
+            pg.evaluate("document.querySelector('.flag[data-lang=\"ja\"]').click()"); pg.wait_for_timeout(120)
             check(f'{tag}: Japanese tabs', pg.evaluate("document.querySelector('.tabs button[data-view=\"sr\"]').textContent") == '統計')
-            pg.click('.flag[data-lang="en"]')
+            pg.evaluate("document.querySelector('.flag[data-lang=\"en\"]').click()")
             check(f'{tag}: no JavaScript errors', not errs, errs)
             c.close()
     b.close()

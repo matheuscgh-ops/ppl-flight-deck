@@ -142,6 +142,7 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
       <ol>
         <li><a href="#bank">Question bank</a></li>
         <li><a href="#stats-tests">Practice tests</a></li>
+        <li><a href="#errors-tab">Error analysis</a></li>
       </ol>
     </li>
     <li><a href="#settings">Settings</a></li>
@@ -276,6 +277,7 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
   </div>
   <p><b>How many questions.</b> Like the question bank, a topic is studied in sessions of up to 40 questions (Weather, 158 questions, is 40 at a time), and a big topic is never cut into a chunk under 20. A review is sized by your last score: 15 questions after ≥ 85%, 20 after ≥ 75%, 25 after ≥ 70%, a full 40 below that, a little more the more you have forgotten since (between 10 and 40). When it is due again comes from spaced repetition, as before.</p>
   <p><b>How topics are chosen.</b> Each block is filled to protect as many questions as possible on exam day, given the time each question takes (your speed, the topic's difficulty and the time to review mistakes). Inside a block, the hardest topic, or the one longest without review, comes first. To avoid switching subjects, a block holds at most one topic per ~45 minutes (deep work, configurable). In a weekly plan, each day assumes the earlier days were done: a Monday review doesn't come back on Tuesday.</p>
+  <p><b>Error-notes review.</b> A session of an hour or more opens with 10 minutes (15 from two hours) to read your error notes from earlier days in the <span class="ui">Errors</span> tab, which puts the topics of today's session on top. A shorter session goes straight to the topics. The item opens the Errors tab; tick it when done.</p>
   <p><b>Error review.</b> Right after each topic comes an <span class="ui">Error review</span> of that topic's mistakes, the way the question bank shows the misses of a category as soon as you finish it. The block's review time is sized to the mistakes expected in it: questions × (1 − chance of a right answer) × difficulty × minutes per mistake, rounded to 5, at least 10 minutes and at most a quarter of the block, and none when the block has fewer than 3 expected mistakes. That time is then split among the block's topics in proportion to each one's expected mistakes, in 5-minute steps; a topic whose share is under 5 minutes gets no review. Each review row shows its topic's expected mistakes, for example "8 expected misses". Tap 📝 on an error review (or click it in the week) to write what you got wrong in the topic's <b>error notes</b>; they come back with the topic in today's plan, in the plan wizard and in its log. To keep everything in the same block, the app shortens the easiest topic first. Only when a practice test or a topic that can't be shortened fills the whole block does the review move, as one item, to the start of the next block. If 20 minutes or more are left over, another topic is added, and no topic gets less than 10 minutes.</p>
   <p><b>Editing in step 3:</b></p>
   <ul>
@@ -352,6 +354,15 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
   <h3 id="stats-tests">Practice tests</h3>
   <p>The forecast from practice tests (weighted average of the latest ones), the trend, the score histogram, the full forecast (chance to pass and to reach your goal, tests passed, consistency) and the model's accuracy compared with your real tests.</p>
   <figure><img src="img/en/stats-tests.jpg" alt="Practice test statistics" loading="lazy"></figure>
+  <h3 id="errors-tab">Error analysis (Errors tab)</h3>
+  <p>The <span class="ui">Errors</span> tab gathers every error note, by topic and date, like a spreadsheet you can search. On top, <span class="ui">Review before today's session</span> shows the notes of the topics in today's plan; below, the other topics, the ones due for review first, each with its notes grouped by date (newest first) and the topic's list, score and next review.</p>
+  <ul>
+    <li>Search the text, or pick one topic in the menu.</li>
+    <li><span class="ui">+ Add note</span>: choose a topic and type, one note per line. <kbd>×</kbd> deletes a note, with undo.</li>
+    <li><span class="ui">Import from spreadsheet</span>: in Google Sheets or Excel, select the rows (Topic · Date · Notes), copy and paste them. Each line of a cell becomes a note, "Weather" is recognized as Weather Information, dates can be 11/2/2026 or 2026-11-02, and a line you already have is not added twice. The preview shows what will be imported and what was not understood.</li>
+  </ul>
+  <figure><img src="img/en/errors.jpg" alt="The Errors tab with notes by topic and date" loading="lazy"></figure>
+  <p class="note">Error notes never change your statistics or the forecast.</p>
 </section>
 
 <section class="chap" id="settings">

@@ -174,7 +174,7 @@ with sync_playwright() as p:
     check('token is NOT in the synced Gist content', GOOD not in json.dumps(remote()))
 
     # ---- language ----
-    a.click('.flag[data-lang="pt"]'); a.wait_for_timeout(100)
+    a.evaluate("document.querySelector('.flag[data-lang=\"pt\"]').click()"); a.wait_for_timeout(100)
     check('chip and dialog translated (pt)', a.inner_text('#syncChip') in ('Sincronizado', 'Sincronizando…'), a.inner_text('#syncChip'))
     a.click('#syncChip'); check('dialog in Portuguese', 'Desconectar este aparelho' in a.inner_text('#syncbg'))
     a.click('#syncNow'); a.wait_for_timeout(400)

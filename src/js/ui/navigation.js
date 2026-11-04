@@ -7,9 +7,11 @@ const Navigation = (() => {
     curView = v;
     const sr = v === 'sr',
       pl = v === 'plan',
-      ts = v === 'tests';
-    document.body.classList.toggle('srview', sr || pl || ts);
-    $('#viewDash').hidden = sr || pl || ts;
+      ts = v === 'tests',
+      er = v === 'errors';
+    document.body.classList.toggle('srview', sr || pl || ts || er);
+    $('#viewDash').hidden = sr || pl || ts || er;
+    $('#viewErrors').hidden = !er;
     $('#viewSR').hidden = !sr;
     $('#viewPlan').hidden = !pl;
     $('#viewTests').hidden = !ts;
@@ -34,6 +36,9 @@ const Navigation = (() => {
     } else if (ts) {
       renderTestsPage();
       window.scrollTo(0, 0);
+    } else if (er) {
+      renderErrorsPage();
+      window.scrollTo(0, 0);
     } else {
       if (dashDirty) renderDash();
       else {
@@ -55,7 +60,9 @@ const Navigation = (() => {
           ? '#plan'
           : v === 'tests'
             ? '#tests'
-            : '#dashboard';
+            : v === 'errors'
+              ? '#errors'
+              : '#dashboard';
     try {
       if (location.hash !== h) history.pushState({ v, focus }, '', h);
     } catch (e) {}
@@ -70,6 +77,7 @@ const Navigation = (() => {
       showView('sr', f ? +f : null);
     } else if (h === '#plan') showView('plan');
     else if (h === '#tests') showView('tests');
+    else if (h === '#errors') showView('errors');
     else if (h === '#stats-tests') showView('sr', 'tests');
     else showView('dash');
   }

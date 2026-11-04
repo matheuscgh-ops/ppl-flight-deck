@@ -171,6 +171,7 @@ const AppState = (() => {
           (it.kind === 'test' ||
             it.kind === 'custom' ||
             it.kind === 'reflect' ||
+            it.kind === 'notes' ||
             (it.kind === 'topic' && Number.isInteger(it.i) && TOPICS[it.i]))
       )
       .map(it => {

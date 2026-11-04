@@ -11,6 +11,8 @@ const HeaderControls = (() => {
         render();
       })
   );
+  /* phones: one flag menu instead of three flags (it presses the same flag buttons, so everything follows) */
+  $('#langSel').onchange = e => document.querySelector(`.flag[data-lang="${e.target.value}"]`)?.click();
   $('#prev').onclick = () => {
     shown = new Date(shown.getFullYear(), shown.getMonth() - 1, 1);
     renderCalendar();

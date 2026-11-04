@@ -82,7 +82,7 @@ with sync_playwright() as p:
                 check(f'{tag}: suggestions still visible under the chart', pg.evaluate("[...document.querySelectorAll('#sugg .qrow')].filter(r=>!r.hidden).length") >= 2)
             else:
                 check(f'{tag}: page not wider than the phone', pg.evaluate('document.documentElement.scrollWidth') == 402)
-            pg.click('.flag[data-lang="pt"]'); pg.wait_for_timeout(80)
+            pg.evaluate("document.querySelector('.flag[data-lang=\"pt\"]').click()"); pg.wait_for_timeout(80)
             check(f'{tag}: "All" translated (pt: Tudo)', pg.evaluate("document.querySelector('#srPanel [data-sr=\"all\"]').textContent") == 'Tudo')
             check(f'{tag}: no JavaScript errors', not errs, errs)
             c.close()

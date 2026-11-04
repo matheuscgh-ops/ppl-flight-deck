@@ -150,7 +150,17 @@ const DemoData = (() => {
     ].map(([n, sc]) => ({ id: uid(), date: D(n), q: 60, score: sc }));
     const ex = new Date(base);
     ex.setDate(ex.getDate() + 31);
-    return { v: 13, statuses, scores, events: ev, tests, deadline: iso(ex), lang: 'en', updatedAt: 0 };
+    /* a few example error notes (Errors tab and the 📝 buttons) */
+    const notes = [
+      [18, 6, 'METAR ceiling = lowest BKN or OVC layer (FEW and SCT do not count)'],
+      [18, 6, 'TAF: FM starts a new forecast group; BECMG is a gradual change'],
+      [18, 3, 'Radiation fog: ground cooling on clear calm nights; advection fog: moist air over a colder surface'],
+      [14, 4, 'Class C: two-way radio contact before entering; Class D: same, plus 3 SM / 500-1000-2000 clouds'],
+      [14, 4, 'Mode C veil: 30 NM around Class B primary airports'],
+      [13, 2, 'Hazardous attitudes: anti-authority, impulsivity, invulnerability, macho, resignation'],
+      [13, 2, 'Supplemental oxygen: required above 12,500 ft MSL after 30 minutes'],
+    ].map(([topic, n, text]) => ({ id: uid(), topic, date: D(n), text }));
+    return { v: 13, statuses, scores, events: ev, tests, notes, deadline: iso(ex), lang: 'en', updatedAt: 0 };
   }
   function defaultState() {
     return demoState();

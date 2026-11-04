@@ -37,6 +37,8 @@ The *How it is calculated* sections in the app list every formula.
 ## Features
 
 - **Kanban drag and drop like Trello:** the other cards slide aside and a card lands exactly where you drop it, in another list or a new place in the same one. The order is saved, goes into the backup and syncs; one Undo reverts a drop (mouse, or press and hold on touch).
+- **Error-notes review:** a plan session of an hour or more opens with 10 minutes (15 from two hours) to read earlier error notes in the Errors tab; shorter sessions go straight to the topics.
+- **Errors tab (error analysis):** every error note by topic and date, the topics of today's session on top, search and topic filter, add (one note per line) and delete with undo, and **Import from spreadsheet** (paste Topic · Date · Notes rows from Google Sheets or Excel; one note per line, loose topic names, no duplicates).
 - **Error notebook:** 📝 on an error review opens the topic's notes; write what you got wrong and it comes back with the topic in today's plan, the plan wizard and its log. Saved, backed up and synced.
 - **Adaptive plan:** sessions are sized like the question bank (up to 40 questions; a big topic is never cut under 20), and a review by your last score (15 / 20 / 25 / 40 questions after ≥ 85 / 75 / 70 / below, a bit more the more you forgot). **↻ Refresh plan** re-plans the days ahead with your latest results, keeping what is done or yours (one Undo reverts it). Plan blocks have check circles, a topic and its error review are one block, and the Plan tab has **Week | Day** views with one-line titles that never overlap.
 - **Done today:** a Trello-style tick on every Kanban card (shown on hover, always on touch); it clears itself the next day.

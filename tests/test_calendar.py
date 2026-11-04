@@ -117,7 +117,7 @@ with sync_playwright() as p:
                 pg.click(f'.day[data-date="{d4}"]'); pg.wait_for_timeout(100)
                 check(f'{tag}: empty day says nothing was logged', 'Nothing logged' in pg.inner_text('#dayBody'))
                 pg.keyboard.press('Escape')
-            pg.click('.flag[data-lang="pt"]'); pg.wait_for_timeout(80)
+            pg.evaluate("document.querySelector('.flag[data-lang=\"pt\"]').click()"); pg.wait_for_timeout(80)
             if d1 in shown_month:
                 pg.click(f'.day[data-date="{d1}"]'); pg.wait_for_timeout(100)
                 check(f'{tag}: summary translated (pt)', 'Sessões de estudo' in pg.inner_text('#dayBody') and 'Estudou' in pg.inner_text('#dayBody'))

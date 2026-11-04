@@ -27,6 +27,7 @@
       <ol>
         <li><a href="#bank">Banco de questões</a></li>
         <li><a href="#stats-tests">Simulados</a></li>
+        <li><a href="#errors-tab">Análise de erros</a></li>
       </ol>
     </li>
     <li><a href="#settings">Ajustes</a></li>
@@ -161,6 +162,7 @@
   </div>
   <p><b>Quantas questões.</b> Como no banco de questões, um tópico é estudado em sessões de até 40 questões (Weather, 158 questões, é de 40 em 40), e um tópico grande nunca é cortado abaixo de 20. Uma revisão tem o tamanho da sua última nota: 15 questões depois de ≥ 85%, 20 depois de ≥ 75%, 25 depois de ≥ 70%, 40 abaixo disso, um pouco mais quanto mais você esqueceu desde então (entre 10 e 40). Quando ela volta continua vindo da repetição espaçada.</p>
   <p><b>Como os tópicos são escolhidos.</b> Cada bloco é preenchido para proteger o máximo de questões no dia da prova, pelo tempo que cada questão leva (sua velocidade, a dificuldade do tópico e o tempo de revisar os erros). Dentro do bloco, o tópico mais difícil ou há mais tempo sem revisão vem primeiro. Para evitar trocas de assunto, um bloco tem no máximo um tópico a cada ~45 minutos (deep work, configurável). Num plano semanal, cada dia considera que os anteriores foram feitos: uma revisão de segunda não volta na terça.</p>
+  <p><b>Revisão das notas de erro.</b> Uma sessão de uma hora ou mais começa com 10 minutos (15 a partir de duas horas) para ler suas notas de erro dos dias anteriores na aba <span class="ui">Erros</span>, que mostra os tópicos da sessão de hoje no topo. Uma sessão mais curta vai direto para os tópicos. O item abre a aba Erros; marque quando terminar.</p>
   <p><b>Revisão dos erros.</b> Logo depois de cada tópico vem uma <span class="ui">Error review</span> dos erros daquele tópico, do jeito que o banco de questões mostra os erros de uma categoria assim que você termina. O tempo de revisão do bloco é do tamanho dos erros esperados nele: questões × (1 − chance de acerto) × dificuldade × minutos por erro, arredondado para 5, com no mínimo 10 minutos e no máximo um quarto do bloco, e nenhuma revisão quando o bloco tem menos de 3 erros esperados. Esse tempo é dividido entre os tópicos do bloco na proporção dos erros esperados de cada um, em passos de 5 minutos; um tópico cuja parte fica abaixo de 5 minutos não ganha revisão. Cada linha de revisão mostra os erros esperados do seu tópico, por exemplo "8 erros esperados". Toque no 📝 de uma revisão dos erros (ou clique nela na semana) para anotar o que você errou no <b>caderno de erros</b> do tópico; as notas voltam com o tópico no plano de hoje, no passo a passo e no registro dele. Para manter tudo no mesmo bloco, o app encurta primeiro o tópico mais fácil. Só quando um simulado ou um tópico que não dá para encurtar ocupa o bloco inteiro é que a revisão vai, como um item só, para o início do próximo bloco. Se sobrarem 20 minutos ou mais, entra mais um tópico, e nenhum tópico fica com menos de 10 minutos.</p>
   <p><b>Editar no passo 3:</b></p>
   <ul>
@@ -237,6 +239,15 @@
   <h3 id="stats-tests">Simulados</h3>
   <p>A previsão pelos simulados (média ponderada dos últimos), a tendência, o histograma das notas, a previsão completa (chance de passar e de chegar na meta, simulados aprovados, consistência) e a precisão do modelo comparado com os simulados reais.</p>
   <figure><img src="img/stats-tests.jpg" alt="Estatísticas de simulados" loading="lazy"></figure>
+  <h3 id="errors-tab">Análise de erros (aba Erros)</h3>
+  <p>A aba <span class="ui">Erros</span> reúne todas as notas de erro, por tópico e data, como uma planilha que dá para buscar. No topo, <span class="ui">Revise antes da sessão de hoje</span> mostra as notas dos tópicos do plano de hoje; embaixo, os outros tópicos, os que vencem para revisão primeiro, cada um com as notas agrupadas por data (mais recentes primeiro) e a lista, a nota e a próxima revisão do tópico.</p>
+  <ul>
+    <li>Busque no texto ou escolha um tópico no menu.</li>
+    <li><span class="ui">+ Adicionar nota</span>: escolha o tópico e escreva, uma nota por linha. O <kbd>×</kbd> apaga uma nota, com desfazer.</li>
+    <li><span class="ui">Importar da planilha</span>: no Google Sheets ou Excel, selecione as linhas (Tópico · Data · Notas), copie e cole. Cada linha de uma célula vira uma nota, "Weather" é reconhecido como Weather Information, as datas podem ser 11/2/2026 ou 2026-11-02, e uma linha que você já tem não entra duas vezes. A prévia mostra o que será importado e o que não foi entendido.</li>
+  </ul>
+  <figure><img src="img/errors.jpg" alt="A aba Erros com as notas por tópico e data" loading="lazy"></figure>
+  <p class="note">As notas de erro nunca mudam suas estatísticas nem a previsão.</p>
 </section>
 
 <section class="chap" id="settings">

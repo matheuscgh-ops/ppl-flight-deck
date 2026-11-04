@@ -63,14 +63,14 @@ with sync_playwright() as p:
             ev("window.pplTour&&pplTour.end()"); pg.wait_for_timeout(100)
             check(f'{tag}: the app is called PPL / PROGRESS', 'PPL / PROGRESS' in pg.inner_text('.brand') and pg.title().startswith('PPL Progress'), pg.title())
             for l in ['en', 'pt', 'ja']:
-                pg.click(f'.flag[data-lang="{l}"]'); pg.wait_for_timeout(120)
+                pg.evaluate(f"document.querySelector('.flag[data-lang=\"{l}\"]').click()"); pg.wait_for_timeout(120)
                 href = pg.get_attribute('#docsLink', 'href')
                 check(f'{tag} [{l}]: the docs button opens the guide in the app language', href == URL[l], href)
             check(f'{tag}: the docs button opens in a new tab, safely', pg.get_attribute('#docsLink', 'target') == '_blank' and 'noopener' in pg.get_attribute('#docsLink', 'rel'))
             r = ev("(()=>{const e=document.getElementById('docsLink'),r=e.getBoundingClientRect();return {v:e.offsetParent!==null,l:r.left,r:r.right,t:r.top,b:r.bottom,w:r.width}})()")
             check(f'{tag}: the docs button is visible and inside the screen', r['v'] and r['l'] >= 0 and r['r'] <= W and r['w'] >= 30, r)
             # no overlap with the other header controls
-            boxes = ev("""[...document.querySelectorAll('#docsLink,#setOpen,.flags,.brand,#syncChip,#demoBadge,.tabs')].filter(e=>e.offsetParent!==null&&getComputedStyle(e).display!=='none').map(e=>{let r=e.getBoundingClientRect();if(e.classList.contains('brand')){const g=document.createRange();g.selectNodeContents(e);r=g.getBoundingClientRect()}return [e.id||e.className,r.left,r.top,r.right,r.bottom]})""")
+            boxes = ev("""[...document.querySelectorAll('#docsLink,#setOpen,.flags,#langSel,.brand,#syncChip,#demoBadge,.tabs')].filter(e=>e.offsetParent!==null&&getComputedStyle(e).display!=='none').map(e=>{let r=e.getBoundingClientRect();if(e.classList.contains('brand')){const g=document.createRange();g.selectNodeContents(e);r=g.getBoundingClientRect()}return [e.id||e.className,r.left,r.top,r.right,r.bottom]})""")
             d = [x for x in boxes if x[0] == 'docsLink'][0]
             over = [x[0] for x in boxes if x[0] != 'docsLink' and not (x[3] <= d[1] + 0.5 or x[1] >= d[3] - 0.5 or x[4] <= d[2] + 0.5 or x[2] >= d[4] - 0.5)]
             check(f'{tag}: the docs button overlaps nothing in the header', not over, over)
@@ -80,7 +80,7 @@ with sync_playwright() as p:
             check(f'{tag}: page fits the screen', ev('document.documentElement.scrollWidth') <= W)
             if f == 'demo':
                 for l in ['en', 'pt', 'ja']:
-                    pg.click(f'.flag[data-lang="{l}"]'); pg.wait_for_timeout(100)
+                    pg.evaluate(f"document.querySelector('.flag[data-lang=\"{l}\"]').click()"); pg.wait_for_timeout(100)
                     ev("pplTour.start()"); pg.wait_for_timeout(200); ev("pplTour.go(pplTour.steps-1)"); pg.wait_for_timeout(300)
                     a = pg.query_selector('.tour-card .tdocs')
                     check(f'{tag} [{l}]: the tour\'s last step links to the guide in the same language', a and a.get_attribute('href') == URL[l] and a.get_attribute('target') == '_blank' and pg.is_visible('.tour-card .tdocs'), a and a.get_attribute('href'))
