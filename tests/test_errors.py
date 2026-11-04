@@ -35,7 +35,9 @@ with sync_playwright() as p:
             ev = pg.evaluate; tap = pg.tap if touch else pg.click
             ev("window.pplTour&&pplTour.end()")
             if f == 'demo':
-                check(f'{tag}: the demo comes with example error notes', ev("state.notes.length") >= 5)
+                check(f'{tag}: the demo comes with example error notes on several topics', ev("state.notes.length") >= 12 and ev("new Set(state.notes.map(n=>n.topic)).size") >= 5)
+                ev("state.notes=[];save()"); pg.reload(); pg.wait_for_timeout(400); ev("window.pplTour&&pplTour.end()")
+                check(f'{tag}: a demo saved before the Errors tab gets the example notes too', ev("state.notes.length") >= 12)
             ev(SETUP); pg.wait_for_timeout(200)
             stats0 = ev(STATS)
             check(f'{tag}: the Errors tab opens the error analysis', pg.is_visible('#viewErrors') and pg.is_visible('.errhead') and ev("location.hash") == '#errors')

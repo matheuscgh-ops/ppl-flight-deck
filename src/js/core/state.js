@@ -229,6 +229,8 @@ const AppState = (() => {
     state = embedded;
     loadedFromFile = !!local;
   } else state = local || embedded || defaultState();
+  /* demo: a demo saved before the Errors tab existed gets the example error notes too */
+  if (BUILD.demo && typeof demoNotes === 'function' && !(state.notes || []).length) state.notes = demoNotes();
   try {
     const e = JSON.parse(localStorage.getItem(STORE + '-energy') || 'null'),
       pt = localStorage.getItem(STORE + '-ptday'),

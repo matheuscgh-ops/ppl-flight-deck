@@ -32,8 +32,8 @@ const PlanView = (() => {
   const rowName = it => (it.kind === 'topic' || it.kind === 'test' ? planRowName(it) : itemTitle(it));
   const checkBtn = it =>
     it.id
-      ? `<button type="button" class="pck" data-chk="${esc(it.id)}" aria-label="${esc(t('itemCheck'))}">${it.done ? '✓' : ''}</button>`
-      : `<span class="pck">${it.done ? '✓' : ''}</span>`;
+      ? `<button type="button" class="pck" data-chk="${esc(it.id)}" aria-label="${esc(t('itemCheck'))}">${it.done ? '<svg class="tick" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 8.4 6.8 11 12 5.4"/></svg>' : ''}</button>`
+      : `<span class="pck">${it.done ? '<svg class="tick" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 8.4 6.8 11 12 5.4"/></svg>' : ''}</span>`;
   /* error notebook: a 📝 button on error-review rows (write what you got wrong), and the count on a topic that has notes */
   function noteBtn(it) {
     if (it.kind === 'reflect') {

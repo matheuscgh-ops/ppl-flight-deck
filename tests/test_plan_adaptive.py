@@ -64,6 +64,8 @@ with sync_playwright() as p:
             first = ev("[...document.querySelectorAll('#pwGrid .wkcol.today .wkmain [data-wchk]')].find(e=>e.offsetParent).dataset.wchk")
             ev(f"document.querySelector('#pwGrid [data-wchk=\"{first}\"]').scrollIntoView({{block:'center'}})"); pg.wait_for_timeout(100)
             tap(f'#pwGrid [data-wchk="{first}"]'); pg.wait_for_timeout(200)
+            tk = ev("""(()=>{const e=document.querySelector('#pwGrid [data-wchk="'+%r+'"]');if(!e||!e.querySelector('svg'))return null;const c=e.getBoundingClientRect(),t=e.querySelector('svg').getBoundingClientRect();return [Math.abs(t.left+t.width/2-c.left-c.width/2),Math.abs(t.top+t.height/2-c.top-c.height/2)]})()""" % first)
+            check(f'{tag}: the tick is drawn exactly in the middle of its circle', tk and tk[0] < 0.6 and tk[1] < 0.6, tk)
             check(f'{tag}: the circle marks the block done (and does not open anything)', ev(f"state.plans[0].items.find(x=>x.id==='{first}').check===true") and not pg.is_visible('#modalbg') and not pg.is_visible('#notebg'))
             rid = ev("([...document.querySelectorAll('#pwGrid .wkcol.today .wkrev [data-wchk]')].find(e=>e.offsetParent)||{}).dataset?.wchk||null")
             if rid:

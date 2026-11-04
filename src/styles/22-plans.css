@@ -1679,3 +1679,31 @@ body.wzdragging * {
 .wkrev span {
   flex: 0 1 auto;
 }
+/* the drawn tick inside every check circle (plan blocks, today's list, Kanban cards) */
+svg.tick {
+  display: block;
+  width: 72%;
+  height: 72%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.wkchk,
+.tchk,
+.pck {
+  line-height: 0;
+}
+.wkchk svg.tick,
+.tchk svg.tick,
+.pck svg.tick {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 11px;
+  height: 11px;
+}
+.pck {
+  position: relative;
+}

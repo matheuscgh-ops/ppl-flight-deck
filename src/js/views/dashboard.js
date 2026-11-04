@@ -237,7 +237,7 @@ const Dashboard = (() => {
      as done in today's plan) */
   const checkedToday = k => (state.cardChecks || {})[k] === todayISO();
   const checkHTML = k =>
-    `<button type="button" class="tchk${checkedToday(k) ? ' on' : ''}" data-tchk="${esc(String(k))}" aria-pressed="${checkedToday(k)}" aria-label="${esc(t('cardDoneToday'))}">${checkedToday(k) ? '✓' : ''}</button>`;
+    `<button type="button" class="tchk${checkedToday(k) ? ' on' : ''}" data-tchk="${esc(String(k))}" aria-pressed="${checkedToday(k)}" aria-label="${esc(t('cardDoneToday'))}">${checkedToday(k) ? '<svg class="tick" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 8.4 6.8 11 12 5.4"/></svg>' : ''}</button>`;
   function toggleCardCheck(k) {
     const on = !checkedToday(k);
     commit(
