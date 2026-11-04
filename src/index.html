@@ -12,7 +12,7 @@
 <main class="app">
   <header class="top">
     <div>
-      <div class="brandrow"><div class="brand">PPL <span>/</span> PROGRESS</div><nav class="tabs" role="tablist"><button type="button" role="tab" data-view="dash" data-t="tabDash"></button><button type="button" role="tab" data-view="plan" data-t="tabPlan"></button><button type="button" role="tab" data-view="tests" data-t="tabTests"></button><button type="button" role="tab" data-view="sr" data-t="tabSR"></button></nav></div>
+      <div class="brandrow"><div class="brand">PPL <span>/</span> PROGRESS</div><nav class="tabs" role="tablist"><button type="button" role="tab" data-view="dash" data-t="tabDash"></button><button type="button" role="tab" data-view="plan" data-t="tabPlan"></button><button type="button" role="tab" data-view="tests" data-t="tabTests"></button><button type="button" role="tab" data-view="sr" data-t="tabSR"></button><button type="button" role="tab" data-view="errors" data-t="tabErrors"></button></nav></div>
       <div class="subtitle"><span data-t="sub"></span></div>
     </div>
     <div class="tools">
@@ -127,6 +127,15 @@
       <div id="pwPlansBox" hidden><div id="pwList"></div></div>
     </section>
   </div>
+  <div class="view" id="viewErrors" hidden>
+    <section class="panel errpage">
+      <div class="errhead"><div><h2 class="section" data-t="errTitle"></h2><div class="muted" data-t="errSub"></div></div>
+        <div class="errtools"><input type="search" id="errQ" autocomplete="off" data-ph="errSearch"><select id="errTopic"></select><button type="button" id="errImport" data-t="errImport"></button><button type="button" class="primary" id="errAdd" data-t="errAdd"></button></div></div>
+      <div id="errNew" hidden></div>
+      <div id="errToday"></div>
+      <div id="errList"></div>
+    </section>
+  </div>
   <div class="view" id="viewSR" hidden>
     <div class="seg statseg" id="statSeg"><button data-stat="bank" class="on" data-t="statBank"></button><button data-stat="tests" data-t="statTests"></button></div>
     <div id="statBank">
@@ -207,6 +216,14 @@
     </div>
     <div class="mbtns"><button class="primary" id="mSave" data-t="record"></button><button id="mCancel" data-t="cancel"></button></div>
     <div class="hist"><div class="histhead"><span class="flabel" data-t="history"></span><button type="button" class="linkbtn" id="mNotes"></button></div><div id="mHist"></div></div>
+  </div>
+</div>
+<div class="modalbg" id="impbg" hidden>
+  <div class="modal impmodal" role="dialog" aria-modal="true" aria-labelledby="impTitle">
+    <div class="mhead"><div><h3 id="impTitle" data-t="impTitle"></h3><div class="muted" data-t="impSub"></div></div><button class="x" id="impClose" aria-label="Close">×</button></div>
+    <textarea id="impIn" rows="8" spellcheck="false"></textarea>
+    <div id="impPrev"></div>
+    <div class="mbtns"><button type="button" class="primary" id="impOk" disabled></button><button type="button" id="impCancel" data-t="cancel"></button></div>
   </div>
 </div>
 <div class="modalbg" id="notebg" hidden>

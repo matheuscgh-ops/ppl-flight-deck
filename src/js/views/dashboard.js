@@ -414,6 +414,7 @@ const Dashboard = (() => {
     }
     if (!$('#viewPlan').hidden) renderPlanPage();
     if (!$('#viewTests').hidden) renderTestsPage();
+    if (!$('#viewErrors').hidden) renderErrorsPage();
     if (typeof renderSyncChip === 'function') renderSyncChip();
   }
 

@@ -57,7 +57,10 @@ def run(b, lang):
     pg.click('#heatOpen'); shot(pg, 'heat-history', '#heatbg .modal'); pg.keyboard.press('Escape')
     ev("document.getElementById('srGrid').scrollIntoView()"); shot(pg, 'stats-topics', '#srGrid .srcard >> nth=0')
     ev("setStat('tests')"); pg.wait_for_timeout(500); shot(pg, 'stats-tests', '#statTests')
+    # errors tab
+    ev("goView('errors')"); pg.wait_for_timeout(400); shot(pg, 'errors', '#viewErrors .errpage')
     # settings
+
     ev("goView('dash')"); pg.click('#setOpen'); pg.wait_for_timeout(300)
     save_el(pg, '#setbg .modal', 'settings')
     ev("document.querySelector('#setbg .modal').scrollTop=99999"); save_el(pg, '#setbg .modal', 'settings-2')

@@ -356,3 +356,201 @@
   justify-content: space-between;
   gap: 8px;
 }
+
+/* ===== Errors tab: error analysis ===== */
+.errpage {
+  padding: 18px 20px;
+}
+.errhead {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.errtools {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.errtools input {
+  width: 220px;
+}
+.errnew {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 640px;
+  margin: 0 0 14px;
+}
+.errnew textarea,
+#impIn {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  background: var(--panel2);
+  color: var(--ink);
+  border: 1px solid var(--line2);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+.errh {
+  margin: 14px 0 8px;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink2);
+}
+.errgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.errcard {
+  background: #1b1f24;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  min-width: 0;
+}
+.errcard header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.errcard header b {
+  font-size: 15px;
+}
+.errcard header .muted {
+  font-size: 12px;
+}
+.errcount {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 800;
+  color: #b3a6f5;
+  background: #2b2547;
+  border-radius: 10px;
+  padding: 1px 8px;
+}
+.errday {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 10px;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+.errdate {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--muted);
+  padding-top: 2px;
+}
+.errday ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.errday li {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+.errday li span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.errday li span::before {
+  content: '•';
+  color: var(--muted);
+  margin-right: 6px;
+}
+.errday li .x {
+  opacity: 0;
+  padding: 0 6px;
+  font-size: 12px;
+}
+.errday li:hover .x,
+.errday li:focus-within .x {
+  opacity: 1;
+}
+@media (hover: none) {
+  .errday li .x {
+    opacity: 0.6;
+  }
+}
+.errday mark {
+  background: #f5a52455;
+  color: var(--ink);
+  border-radius: 3px;
+}
+.erradd1 {
+  margin-top: 6px;
+}
+.modal.impmodal {
+  width: min(680px, 100%);
+}
+#impPrev {
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 30vh;
+  overflow: auto;
+}
+.improw {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 12px;
+  font-size: 13px;
+  background: #20252b;
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+.impbad {
+  font-size: 12.5px;
+  color: #ff9c95;
+}
+@media (max-width: 640px) {
+  .errpage {
+    padding: 14px;
+  }
+  .errtools {
+    width: 100%;
+  }
+  .errtools input,
+  .errtools select {
+    flex: 1 1 140px;
+    width: auto;
+    min-width: 0;
+  }
+  .errtools button {
+    flex: 1 1 auto;
+  }
+  .errday {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+}
+.errday li span {
+  white-space: pre-line;
+}
+.errdue {
+  color: #ff9c95;
+  font-weight: 800;
+}

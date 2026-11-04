@@ -27,6 +27,7 @@
       <ol>
         <li><a href="#bank">問題バンク</a></li>
         <li><a href="#stats-tests">模試</a></li>
+        <li><a href="#errors-tab">間違いの分析</a></li>
       </ol>
     </li>
     <li><a href="#settings">設定</a></li>
@@ -237,6 +238,15 @@
   <h3 id="stats-tests">模試</h3>
   <p>模試からの予測（最近の模試の加重平均）、傾向、スコアのヒストグラム、詳しい予測（合格と目標到達の確率、合格回数、安定度）、そして実際の模試と比べたモデルの精度。</p>
   <figure><img src="img/stats-tests.jpg" alt="模試の統計" loading="lazy"></figure>
+  <h3 id="errors-tab">間違いの分析（間違いタブ）</h3>
+  <p><span class="ui">間違い</span>タブには、すべての間違いメモがトピックと日付ごとに集まり、検索できる表のように見られます。一番上の<span class="ui">今日の学習の前に見直す</span>には今日の計画のトピックのメモ、その下に残りのトピック（復習の時期が近い順）があり、それぞれメモを日付ごと（新しい順）に、トピックのリスト・スコア・次の復習と一緒に表示します。</p>
+  <ul>
+    <li>テキストを検索するか、メニューでトピックを1つ選びます。</li>
+    <li><span class="ui">+ メモを追加</span>：トピックを選んで入力、1行に1つのメモ。<kbd>×</kbd>で削除（元に戻せます）。</li>
+    <li><span class="ui">スプレッドシートから取り込む</span>：Google スプレッドシートやExcelで行（トピック・日付・メモ）を選んでコピーし、貼り付けます。セルの各行が1つのメモになり、「Weather」はWeather Informationと認識され、日付は11/2/2026でも2026-11-02でもよく、すでにある行は二重に追加されません。プレビューで取り込む内容と読み取れなかった行を確認できます。</li>
+  </ul>
+  <figure><img src="img/errors.jpg" alt="トピックと日付ごとのメモがある間違いタブ" loading="lazy"></figure>
+  <p class="note">間違いメモが統計や予測を変えることはありません。</p>
 </section>
 
 <section class="chap" id="settings">
