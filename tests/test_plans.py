@@ -125,7 +125,7 @@ with sync_playwright() as p:
             # ---------- done marks ----------
             first = ev("todayPlan().items.find(x=>x.kind==='topic')")
             ev(f"commit(()=>state.events.push({{id:'done1',date:todayISO(),topic:{first['i']},kind:'review',score:88,from:null,to:null,partial:false,demo:false}}),'x')"); pg.wait_for_timeout(200)
-            check(f'{tag}: logging a session for a planned topic marks it done (✓)', ev(f"todayPlan().items.find(x=>x.id==='{first['id']}').done") and '✓' in pg.inner_text(f'#sugg [data-chk="{first["id"]}"]'))
+            check(f'{tag}: logging a session for a planned topic marks it done (✓)', ev(f"todayPlan().items.find(x=>x.id==='{first['id']}').done") and ev(f"!!document.querySelector('#sugg [data-chk=\"{first['id']}\"] svg.tick')"))
             cid = ev("todayPlan().items.find(x=>x.kind==='custom').id")
             ev(f"document.querySelector('#sugg [data-chk=\"{cid}\"]').click()"); pg.wait_for_timeout(200)
             check(f'{tag}: your own activity is marked done with its circle', ev(f"todayPlan().items.find(x=>x.id==='{cid}').done"))
