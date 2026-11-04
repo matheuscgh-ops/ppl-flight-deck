@@ -20,7 +20,7 @@ def shot(pg, name, sel=None, full=False):
 def save_el(pg, sel, name):
     pg.locator(sel).screenshot(path=os.path.join(OUT, name + '.jpg'), type='jpeg', quality=80)
 def setlang(pg, lang):
-    pg.click(f'.flag[data-lang="{lang}"]'); pg.wait_for_timeout(250)
+    pg.evaluate('L => document.querySelector(`.flag[data-lang="${L}"]`).click()', lang); pg.wait_for_timeout(250)
 def run(b, lang):
     c = b.new_context(viewport={'width': 1440, 'height': 900}, device_scale_factor=1); pg = c.new_page()
     pg.goto(DEMO); pg.wait_for_timeout(700); ev = pg.evaluate; ev("pplTour.end()"); pg.wait_for_timeout(300); setlang(pg, lang)
