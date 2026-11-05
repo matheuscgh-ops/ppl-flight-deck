@@ -56,9 +56,14 @@ with sync_playwright() as p:
 
             def preview(i):
                 """show topic i in the dashboard preview the way a person does: hover (mouse) or the picker (touch)"""
-                if touch: pg.select_option('#prevPick', str(i)); pg.wait_for_timeout(150)
+                if touch:
+                    # phones: the preview lives in the spaced-repetition card and opens maximized
+                    if mode == 'phone' and ev("document.getElementById('srMaxBg').hidden"): ev("goView('dash');openSrMax()"); pg.wait_for_timeout(200)
+                    pg.select_option('#prevPick', str(i)); pg.wait_for_timeout(150)
                 else: pg.hover(f'.task[data-topic="{i}"] .tname'); pg.wait_for_timeout(150)
-                return pg.inner_text('#prevStats')
+                out = pg.inner_text('#prevStats')
+                if mode == 'phone': ev("openSrMax.close()"); pg.wait_for_timeout(100)
+                return out
             def stats():
                 tap('.tabs button[data-view="sr"]'); pg.wait_for_timeout(300)
                 k = ev("[...document.querySelectorAll('#srKpis b')].map(b=>b.textContent)")

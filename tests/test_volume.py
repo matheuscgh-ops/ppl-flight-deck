@@ -55,7 +55,9 @@ with sync_playwright() as p:
             pg.evaluate("state.events.pop();save();render()")
             check(f'{tag}: deleting it goes back to 149', pg.inner_text('#volWeek') == '149')
             # active days moved next to the calendar
+            if pg.viewport_size['width'] <= 640: pg.evaluate("openCalMax()"); pg.wait_for_timeout(200)  # phones: calendar opens maximized
             check(f'{tag}: active days shown next to the calendar title', pg.is_visible('.calhead #activeDays') and pg.inner_text('#activeDays') == '3', pg.inner_text('#activeDays'))
+            if pg.viewport_size['width'] <= 640: pg.evaluate("openCalMax.close()"); pg.wait_for_timeout(150)
             # practice test shortcut still works and does NOT open the big chart
             (pg.tap if mode in ('phone', 'iPad mini') else pg.click)('#ptStat'); pg.wait_for_timeout(150)
             check(f'{tag}: practice-test shortcut opens the practice-test dialog (not the chart)', pg.is_visible('#ptbg') and not pg.is_visible('#volbg'))

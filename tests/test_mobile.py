@@ -31,7 +31,10 @@ with sync_playwright() as p:
             ed = pg.evaluate("(()=>{const i=document.getElementById('examDate').getBoundingClientRect(),c=document.querySelector('.countdown').getBoundingClientRect();return {inside:i.left>=c.left+4&&i.right<=c.right-4,gapL:Math.round(i.left-c.left),gapR:Math.round(c.right-i.right)}})()")
             check(f'{f} · {dev}: exam date field sits inside its card with even margins', ed['inside'] and abs(ed['gapL'] - ed['gapR']) <= 2, ed)
             check(f'{f} · {dev}: all 26 cards rendered', pg.evaluate("document.querySelectorAll('.task').length") == 26)
-            if w <= 1099:
+            if w <= 640:  # phones: the preview lives in the spaced-repetition card and opens maximized
+                pg.evaluate("openSrMax()"); pg.wait_for_timeout(150)
+                check(f'{f} · {dev}: spaced-repetition topic picker is shown (in the maximized card)', pg.is_visible('#prevPick'))
+            elif w <= 1099:
                 check(f'{f} · {dev}: spaced-repetition topic picker is shown', pg.is_visible('#prevPick'))
             check(f'{f} · {dev}: no JavaScript errors', not errs, errs)
             c.close()
@@ -59,6 +62,7 @@ with sync_playwright() as p:
         check(f'{f} · phone: card shows only name + score (no question count)', not pg.is_visible('.task .tmeta > span:first-child'))
         check(f'{f} · phone: calendar uses circles', pg.evaluate("getComputedStyle(document.querySelector('.day')).borderRadius") == '50%')
         # picker
+        pg.evaluate("openSrMax()"); pg.wait_for_timeout(200)
         check(f'{f} · phone: picker starts on the average curve (the carousel may already have moved on to a plan topic)', pg.evaluate("document.getElementById('prevPick').value") == '' and ('average' in pg.inner_text('#prevTitle') or pg.evaluate("carTopic!=null&&document.getElementById('prevTitle').textContent===TOPICS[carTopic].name")))
         opts = pg.evaluate("[...document.querySelectorAll('#prevPick option')].map(o=>o.textContent)")
         check(f'{f} · phone: picker = average + every tracked topic, most urgent first',
@@ -68,18 +72,20 @@ with sync_playwright() as p:
         check(f'{f} · phone: choosing a topic draws that topic\'s curve', pg.inner_text('#prevTitle') == name and pg.evaluate("document.querySelectorAll('#prevChart path.s-actual').length") == 1)
         pg.reload(); pg.wait_for_timeout(400)
         check(f'{f} · phone: chosen topic is remembered after reopening', pg.inner_text('#prevTitle') == name)
+        pg.evaluate("openSrMax()"); pg.wait_for_timeout(200)
         before = pg.inner_html('#prevChart')
         pg.evaluate(f"state.events.push({{id:uid(),date:todayISO(),topic:{pick},kind:'review',score:95,partial:false,demo:false}});save();render()"); pg.wait_for_timeout(150)
         check(f'{f} · phone: chosen curve updates live after a new session', pg.inner_html('#prevChart') != before)
+        pg.click('#srMaxClose'); pg.wait_for_timeout(150)
         row = pg.locator('#sugg .qrow[data-q]').first; s1 = int(row.get_attribute('data-q'))
-        row.tap(); pg.wait_for_timeout(200)
-        check(f'{f} · phone: tapping a plan item shows its curve in the panel and stays on the dashboard',
-              pg.inner_text('#prevTitle') == pg.evaluate(f'TOPICS[{s1}].name') and pg.is_visible('#viewDash'))
+        row.tap(); pg.wait_for_timeout(300)
+        check(f'{f} · phone: tapping a plan item opens its curve (maximized) and stays on the dashboard',
+              pg.inner_text('#prevTitle') == pg.evaluate(f'TOPICS[{s1}].name') and pg.is_visible('#viewDash') and pg.is_visible('#prevChart'))
         pg.select_option('#prevPick', ''); pg.wait_for_timeout(100)
         check(f'{f} · phone: back to the average', 'average' in pg.inner_text('#prevTitle'))
         pg.tap('#openSR'); pg.wait_for_timeout(300)
-        check(f'{f} · phone: "Full analysis" opens every chart in the other tab',
-              pg.is_visible('#viewSR') and pg.evaluate("document.querySelectorAll('.srcard').length") == pg.evaluate('srAll().length'))
+        check(f'{f} · phone: "Full analysis" opens every chart in the other tab (and closes the maximized card)',
+              pg.is_visible('#viewSR') and pg.evaluate("document.getElementById('srMaxBg').hidden") and pg.evaluate("document.querySelectorAll('.srcard').length") == pg.evaluate('srAll().length'))
         pg.click('.tabs button[data-view="dash"]'); pg.evaluate("document.querySelector('.flag[data-lang=\"pt\"]').click()"); pg.wait_for_timeout(100)
         check(f'{f} · phone: picker translated (pt)',
               pg.evaluate("document.querySelector('.prevpick .flabel').textContent") == 'Mostrar curva de'

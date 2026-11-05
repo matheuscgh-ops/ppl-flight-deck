@@ -29,7 +29,7 @@ STYLES = [
     '06-top-row-and-fit.css', '07-tabs-and-sr-panel.css', '08-statistics.css', '09-small-widgets.css',
     '10-responsive-mid.css', '11-streak.css', '12-phone.css', '13-tablet.css', '14-phone-header.css', '15-volume.css',
     '16-exam-date.css', '17-forecast.css', '18-plan.css', '19-heatmap-hover-carousel.css', '20-practice-tests.css',
-    '21-statistics-layout.css', '22-plans.css', '23-settings.css', '24-readiness.css', '25-focus.css',
+    '21-statistics-layout.css', '22-plans.css', '23-settings.css', '24-readiness.css', '25-focus.css', '26-phone-dash.css',
 ]
 
 # load order matters: config and helpers first, the boot sequence last
@@ -59,6 +59,7 @@ SCRIPTS = [
     'js/views/notes.js',   # error notebook (after the dialogs it opens from)
     'js/views/readiness.js',   # "Ready for the exam?" (meter in the countdown card and its dialog)
     'js/views/focus.js',   # next-up bar (phones) and focus mode
+    'js/views/phone-dash.js',   # phones: streak, training log and spaced-repetition cards (Strava style)
     'js/views/volume.js',
     'js/views/practice-tests.js',
     'js/views/heatmap.js',

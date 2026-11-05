@@ -43,6 +43,12 @@
         <button type="button" class="readybar" id="readyBar"><span class="rsegs" id="readySegs"></span><span class="rtxt" id="readyTxt"></span></button>
         <input type="date" id="examDate" aria-label="Exam date">
       </div>
+      <div class="panel streakcard" id="streakCard" role="button" tabindex="0">
+        <span class="label" data-t="streakTitle"></span>
+        <div class="flamebox"><svg class="flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.4 1.2c.7 3.3 4 5.3 5.9 8.6a8.1 8.1 0 1 1-14.4.9c.9-2 2.4-3.3 3.4-2.4.3 1.3.9 2.2 1.9 2.8-.5-3.6.5-7 3.2-9.9z"/></svg><b id="streakWeeks">0</b></div>
+        <div class="skw" id="streakWeeksLbl"></div>
+        <div class="skd" id="streakDays"></div>
+      </div>
       <div class="panel vol tscard" id="tsCard">
         <div class="volhead"><div><span class="label" data-t="tabTestsLong"></span><div class="volnum"><b id="tsLast">—</b> <span data-t="tsLastLbl"></span> <span class="tsbest" id="tsBestMini"></span></div></div><button type="button" class="volmore" id="tsExpand" aria-label="Open practice tests" data-tt="tabTestsLong">⤢</button></div>
         <div class="volchart tsspark" id="tsSpark"></div>
@@ -62,6 +68,10 @@
   </section>
 
   <section class="center">
+    <div class="minirow">
+      <div class="panel calmini" id="calMini" role="button" tabindex="0"><div class="minihead"><span class="label" data-t="trainLog"></span><span class="minigo">›</span></div><div id="calMiniBody"></div></div>
+      <div class="panel srmini" id="srMini" role="button" tabindex="0"><div class="minihead"><span class="label" data-t="srLabel"></span><span class="minigo">›</span></div><div id="srMiniBody"></div></div>
+    </div>
     <div class="panel cal">
       <div class="calhead">
         <h2 class="section" id="month"></h2>
@@ -74,6 +84,7 @@
     <div class="side">
       <div class="panel sr" id="srPanel">
         <button type="button" class="fcmini" id="fcMini"><span class="fclab" data-t="fcTitle"></span><b id="fcMiniVal">—</b><span class="fcbar"><i id="fcMiniBar"></i><em class="m70"></em><em class="m85"></em></span><span class="fcsub" id="fcMiniSub"></span></button>
+        <div class="srprev" id="srPrev">
         <div class="srtop"><span class="label" data-t="srLabel"></span><button class="linkbtn" id="openSR" data-t="openAnalysis"></button></div>
         <label class="prevpick"><span class="flabel" data-t="pickLabel"></span><select id="prevPick"></select></label>
         <div class="prevtitle" id="prevTitle"></div><div class="cardots" id="carDots" hidden></div>
@@ -81,6 +92,7 @@
         <div class="seg srrange" data-srr><button data-sr="3d">3D</button><button data-sr="7d">7D</button><button data-sr="2w">2W</button><button data-sr="1m">1M</button><button data-sr="3m">3M</button><button data-sr="6m">6M</button><button data-sr="1y">1Y</button><button data-sr="all" data-t="rAll"></button></div>
         <div class="chart" id="prevChart"></div>
         <div class="chartlegend small" id="srLegend2"></div>
+        </div>
         <div class="nthen"><div class="qh planhead"><span data-t="planToday"></span><span id="planMiniTot"></span><span class="enpill" id="planMiniMode"></span><button type="button" class="focusbtn" id="planFocus" data-tt="focusOpen" aria-label="Focus"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5v9l7-4.5z"/></svg></button><button type="button" class="linkbtn" id="openPlan" data-t="planOpen"></button></div><div id="sugg"></div></div>
       </div>
     </div>
@@ -319,6 +331,18 @@
       <button type="button" class="linkbtn" id="focusNotes" hidden></button>
       <div class="muted focusnext" id="focusNextUp"></div>
     </div>
+  </div>
+</div>
+<div class="modalbg maxbg" id="calMaxBg" hidden>
+  <div class="modal maxsheet" role="dialog" aria-modal="true" aria-label="Calendar">
+    <div class="mhead"><span></span><button class="x" id="calMaxClose" aria-label="Close">×</button></div>
+    <div id="calMaxBody"></div>
+  </div>
+</div>
+<div class="modalbg maxbg" id="srMaxBg" hidden>
+  <div class="modal maxsheet" role="dialog" aria-modal="true" aria-label="Spaced repetition">
+    <div class="mhead"><span></span><button class="x" id="srMaxClose" aria-label="Close">×</button></div>
+    <div id="srMaxBody"></div>
   </div>
 </div>
 <div class="modalbg" id="readybg" hidden>

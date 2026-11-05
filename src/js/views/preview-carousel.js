@@ -200,7 +200,9 @@ const PreviewCarousel = (() => {
         localStorage.setItem(STORE + '-pick', r.dataset.q);
       } catch (x) {}
       drawPreview();
-      $('#prevPick').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      /* phones: the preview is folded into its card, so it opens maximized */
+      if (phoneMQ.matches && typeof openSrMax === 'function') openSrMax();
+      else $('#prevPick').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     } else goView('sr', +r.dataset.q);
   };
   $('#openSR').onclick = () => goView('sr');

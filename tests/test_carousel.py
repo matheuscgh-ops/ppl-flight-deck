@@ -51,11 +51,13 @@ with sync_playwright() as p:
                 check(f'{tag}: … while on the card the carousel does not move', ev("carTopic") == cur and pg.inner_text('#prevTitle') == ev("TOPICS[18].name"))
                 pg.mouse.move(2, 2); pg.wait_for_timeout(300)
             else:
+                if mode == 'phone': ev("openSrMax()"); pg.wait_for_timeout(200)  # phones: the preview opens maximized
                 pg.select_option('#prevPick', str(L[2])); pg.wait_for_timeout(150)
                 ev("carTick()"); ev("carTick()")
                 check(f'{tag}: picking a topic stops the carousel on it', pg.inner_text('#prevTitle') == ev(f"TOPICS[{L[2]}].name") and ev("document.getElementById('carDots').hidden"))
                 pg.select_option('#prevPick', ''); pg.wait_for_timeout(150); ev("carTick()")
                 check(f'{tag}: back to "average" in the picker → the carousel runs again', ev("carTopic") is not None)
+                if mode == 'phone': pg.click('#srMaxClose'); pg.wait_for_timeout(150)
             # dynamic: the list follows today's plan
             plan_order = ev("(()=>{const s=new Set();return buildPlan(null,null,energyMode).items.filter(x=>x.kind==='topic'&&!x.done&&!s.has(x.i)&&s.add(x.i)&&srModel(x.i).reps.length).map(x=>x.i)})()")
             check(f'{tag}: carousel order = today\'s plan order', ev("carList()")[1:] == plan_order, (ev("carList()"), plan_order))

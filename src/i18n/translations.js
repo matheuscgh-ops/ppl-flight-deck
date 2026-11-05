@@ -1974,6 +1974,46 @@ const Translations = (() => {
     focusOver: '予定より {m} 超過',
     focusThen: '次：{x}',
   });
+  /* phones: streak, training log and spaced-repetition cards */
+  Object.assign(I18N.en, {
+    streakTitle: 'Streak',
+    streakWeek: 'week',
+    streakWeeks: 'weeks',
+    streakDaysLbl: '{n}-day streak',
+    trainLog: 'Training log',
+    thisWeekShort: 'This week',
+    lastWeekShort: 'Last week',
+    srRecallNow: 'recall now (average)',
+    srDue0: 'Nothing due',
+    srDue1: '1 review due',
+    srDueN: '{n} reviews due',
+  });
+  Object.assign(I18N.pt, {
+    streakTitle: 'Sequência',
+    streakWeek: 'semana',
+    streakWeeks: 'semanas',
+    streakDaysLbl: '{n} dias seguidos',
+    trainLog: 'Registro de estudo',
+    thisWeekShort: 'Esta semana',
+    lastWeekShort: 'Semana passada',
+    srRecallNow: 'retenção hoje (média)',
+    srDue0: 'Nada vencido',
+    srDue1: '1 revisão vencida',
+    srDueN: '{n} revisões vencidas',
+  });
+  Object.assign(I18N.ja, {
+    streakTitle: '連続記録',
+    streakWeek: '週',
+    streakWeeks: '週',
+    streakDaysLbl: '{n}日連続',
+    trainLog: '学習ログ',
+    thisWeekShort: '今週',
+    lastWeekShort: '先週',
+    srRecallNow: '現在の保持率（平均）',
+    srDue0: '期限の来た復習なし',
+    srDue1: '期限の来た復習 1件',
+    srDueN: '期限の来た復習 {n}件',
+  });
   return { I18N };
 })();
 const { I18N } = Translations;

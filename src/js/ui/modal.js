@@ -2,11 +2,24 @@
    public: modal, placeTip
    Shared pieces for every dialog and tooltip:
    modal(bg, { close, onClose })  wires a dialog backdrop the same way everywhere: the × button, a click on the
-                                  backdrop and Escape close it (Escape is left to the confirm box when it is open).
+                                  backdrop and Escape close it. Escape closes only the dialog on top (the one opened last, e.g. a
+                                  day opened from the maximized calendar), and is left to the confirm box when it is open.
                                   Returns { open(focusSel), close(), isOpen() }.
    placeTip(tip, e, opts)         puts a floating tooltip next to the pointer, inside the screen
                                   (above the finger on touch). */
 const Modal = (() => {
+  let seq = 0;
+  /* every dialog backdrop that is shown (by open() or by un-hiding it) gets a rank: the one shown last is on top */
+  new MutationObserver(ms =>
+    ms.forEach(m => {
+      if (m.target.classList.contains('modalbg') && !m.target.hidden) m.target._z = ++seq;
+    })
+  ).observe(document.documentElement, { subtree: true, attributes: true, attributeFilter: ['hidden'] });
+  const topOpen = () =>
+    [...document.querySelectorAll('.modalbg:not([hidden])')].reduce(
+      (top, el) => (!top || (el._z || 0) >= (top._z || 0) ? el : top),
+      null
+    );
   function modal(bgSel, { close: closeSel, onClose } = {}) {
     const bg = $(bgSel);
     const isOpen = () => !bg.hidden;
@@ -26,7 +39,10 @@ const Modal = (() => {
     });
     document.addEventListener('keydown', e => {
       const ask = document.getElementById('askbg');
-      if (e.key === 'Escape' && isOpen() && (!ask || ask.hidden || bg === ask)) close();
+      if (e.key !== 'Escape' || e._modalClosed || !isOpen()) return;
+      if (ask && !ask.hidden ? bg !== ask : topOpen() !== bg) return;
+      e._modalClosed = true;
+      close();
     });
     return { open, close, isOpen };
   }

@@ -190,6 +190,7 @@ const Dashboard = (() => {
           .replace('{n}', (state.tests || []).length)
       : t('practiceTests');
     if (typeof renderReady === 'function') renderReady();
+    if (typeof renderPhoneDash === 'function') renderPhoneDash();
   }
   function lastSeen() {
     const m = {};
