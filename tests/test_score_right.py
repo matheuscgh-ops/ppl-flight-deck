@@ -49,7 +49,11 @@ with sync_playwright() as p:
             # switch to typing the percentage
             show(18); tap('.task[data-topic="18"] .score'); pg.wait_for_timeout(150)
             tap('.task[data-topic="18"] .scoremode'); pg.wait_for_timeout(120)
-            check(f'{tag}: the "/30" button switches to typing the percentage, the editor stays open', ev("document.querySelector('.task[data-topic=\"18\"] .scoremode').textContent") == '%' and ev("document.activeElement.classList.contains('scorein')"))
+            o = ev("(()=>{const m=document.querySelector('.task[data-topic=\"18\"] .scoremode');return {mode:m&&m.textContent,active:document.activeElement&&document.activeElement.className}})()")
+            check(f'{tag}: the "/30" button switches to typing the percentage, the editor stays open', o['mode'] == '%' and o['active'] == 'scorein', o)
+            # a second press switches back, a third one again (one press = one switch, never two)
+            tap('.task[data-topic="18"] .scoremode'); pg.wait_for_timeout(800); tap('.task[data-topic="18"] .scoremode'); pg.wait_for_timeout(120)
+            check(f'{tag}: each press switches once (/30 → % → /30 → %)', ev("document.querySelector('.task[data-topic=\"18\"] .scoremode').textContent") == '%')
             pg.keyboard.type('85'); pg.keyboard.press('Enter'); pg.wait_for_timeout(250)
             check(f'{tag}: typed as a percentage, 85 saves 85%', ev("state.scores[18]") == 85)
             # more right answers than questions can't go over 100%

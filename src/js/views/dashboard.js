@@ -399,6 +399,8 @@ const Dashboard = (() => {
       left: l.offsetLeft - (lanesEl.clientWidth - l.offsetWidth) / 2,
       behavior: smooth ? 'smooth' : 'auto',
     });
+    /* light the dot now: Safari fires the scroll event late (or not at all for an instant jump) */
+    document.querySelectorAll('#laneDots button').forEach((b, j) => b.classList.toggle('on', j === k));
   }
   let dashDirty = false;
   function renderDash() {

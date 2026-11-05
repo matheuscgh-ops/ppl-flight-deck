@@ -247,6 +247,7 @@ const PreviewCarousel = (() => {
     const finish = ok => {
       if (done) return;
       done = true;
+      document.removeEventListener('pointerdown', outside, true);
       const v = inp.value.trim();
       const n = v === '' ? null : byCount ? pctOf(+v, N) : Math.max(0, Math.min(100, Math.round(+v)));
       if (!ok || n == null || n === state.scores[i]) {
@@ -274,27 +275,49 @@ const PreviewCarousel = (() => {
       if (ev.key === 'Enter') finish(true);
       else if (ev.key === 'Escape') finish(false);
     });
-    /* the mode button keeps the editor open: a tap on it blurs the input on iPhone/iPad (WebKit) before the click,
-       so the blur waits and is ignored while the button is being pressed */
-    let switching = false;
-    const hold = ev => {
-      ev.preventDefault();
-      switching = true;
-    };
-    mode.addEventListener('pointerdown', hold);
-    mode.addEventListener('mousedown', hold);
-    mode.addEventListener('touchstart', () => (switching = true), { passive: true });
-    mode.addEventListener('click', ev => {
-      ev.stopPropagation();
+    /* the editor closes (and saves) on Enter, Escape, Tab away, or a tap anywhere outside it. It does not close on
+       blur: on iPhone/iPad (WebKit) a tap on the /30 button blurs the input before its click, which used to close
+       the editor before it could switch. */
+    /* the switch happens on the press itself (touch or mouse): Safari may not send a click after a tap whose press
+       was cancelled (cancelling it keeps the keyboard open). A click with no press before it (keyboard) also works. */
+    let pressed = 0;
+    const flip = () => {
       byCount = !byCount;
       inp.value = '';
       paint();
       inp.focus();
-      switching = false;
+    };
+    const press = ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      /* touch sends touchstart and pointerdown for the same press: switch once */
+      if (Date.now() - pressed < 80) return;
+      pressed = Date.now();
+      flip();
+    };
+    mode.addEventListener('pointerdown', press);
+    mode.addEventListener('touchstart', press, { passive: false });
+    mode.addEventListener('mousedown', ev => ev.preventDefault());
+    mode.addEventListener('click', ev => {
+      ev.stopPropagation();
+      /* the click that follows a press was already handled by it */
+      const after = pressed && Date.now() - pressed < 1000;
+      pressed = 0;
+      if (!after) flip();
     });
-    inp.addEventListener('blur', () =>
-      setTimeout(() => !switching && document.activeElement !== inp && finish(true), 200)
-    );
+    const outside = ev => {
+      if (box.contains(ev.target)) return;
+      document.removeEventListener('pointerdown', outside, true);
+      finish(true);
+    };
+    document.addEventListener('pointerdown', outside, true);
+    inp.addEventListener('focusout', ev => {
+      /* keyboard: Tab to another control */
+      if (ev.relatedTarget && !box.contains(ev.relatedTarget)) {
+        document.removeEventListener('pointerdown', outside, true);
+        finish(true);
+      }
+    });
   });
 
   /* analysis tab */
