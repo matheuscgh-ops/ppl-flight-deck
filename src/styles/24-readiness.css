@@ -144,3 +144,11 @@
   text-transform: uppercase;
   color: var(--muted);
 }
+/* desktop "fit" layout: the top row keeps its height, so the bar is slimmer there (the whole bar still clicks) */
+@media (min-width: 1100px) and (min-height: 1050px) {
+  .toprow .readybar {
+    margin-top: 2px;
+    padding: 0;
+    min-height: 14px;
+  }
+}
