@@ -5,6 +5,8 @@
    in today's plan and in the plan wizard, and in the topic's log dialog. A practice test has its own notes (topic -1).
    Notes are saved, backed up and synced like sessions (united by id, deletions remembered). */
 const Notes = (() => {
+  /* longest note kept (characters); a note is never cut silently below this */
+  const NOTE_MAX = 2000;
   const notesOf = i => (state.notes || []).filter(n => n.topic === i).sort((a, b) => b.date.localeCompare(a.date) || 0);
   const topicName = i => (i === -1 ? t('practiceTest') : TOPICS[i].name);
   /* the small "📝 2" mark that tells you a topic has notes */
@@ -60,7 +62,7 @@ const Notes = (() => {
     return null;
   };
   function addNote() {
-    const text = $('#noteIn').value.trim().slice(0, 500);
+    const text = $('#noteIn').value.trim().slice(0, NOTE_MAX);
     if (!text || !cur) return;
     const topic = cur.i;
     commit(() => {
@@ -101,6 +103,12 @@ const Notes = (() => {
      topics in today's plan first, then the ones due for review soonest, then the most recently noted — each with its
      notes grouped by date (newest first). Search filters the text, the menu filters one topic. */
   let errNewOpen = false;
+  /* every topic in alphabetical order, then the practice test; `pick` is selected */
+  const topicOptions = pick =>
+    [...TOPICS.map((x, i) => ({ x, i }))]
+      .sort((a, b) => a.x.name.localeCompare(b.x.name))
+      .map(({ x, i }) => `<option value="${i}"${String(i) === String(pick) ? ' selected' : ''}>${esc(x.name)}</option>`)
+      .join('') + `<option value="-1"${String(pick) === '-1' ? ' selected' : ''}>${esc(t('practiceTest'))}</option>`;
   const dateFmt = () => new Intl.DateTimeFormat(LOCALE[lang], { weekday: 'short', month: 'short', day: 'numeric' });
   const hi = (text, q) => {
     const e = esc(text);
@@ -126,7 +134,7 @@ const Notes = (() => {
           `<div class="errday"><span class="errdate">${esc(df.format(parse(d)))}</span><ul>${byDate[d]
             .map(
               n =>
-                `<li data-nid="${esc(n.id)}"><span>${hi(n.text, q)}</span><button type="button" class="x" data-edel="${esc(n.id)}" aria-label="${esc(t('del'))}">×</button></li>`
+                `<li data-nid="${esc(n.id)}"><span>${hi(n.text, q)}</span><button type="button" class="x eed" data-eedit="${esc(n.id)}" aria-label="${esc(t('errEdit'))}" title="${esc(t('errEdit'))}">✎</button><button type="button" class="x" data-edel="${esc(n.id)}" aria-label="${esc(t('del'))}">×</button></li>`
             )
             .join('')}</ul></div>`
       )
@@ -154,12 +162,8 @@ const Notes = (() => {
     /* the form to add a note to any topic */
     $('#errNew').hidden = !errNewOpen;
     if (errNewOpen && !$('#errNew').innerHTML)
-      $('#errNew').innerHTML = `<div class="errnew"><select id="errNewTopic">${[...TOPICS.map((x, i) => ({ x, i }))]
-        .sort((a, b) => a.x.name.localeCompare(b.x.name))
-        .map(({ x, i }) => `<option value="${i}">${esc(x.name)}</option>`)
-        .join(
-          ''
-        )}<option value="-1">${esc(t('practiceTest'))}</option></select><textarea id="errNewText" rows="3" maxlength="2000" enterkeyhint="done" placeholder="${esc(t('errNewHint'))}"></textarea><div class="mbtns"><button type="button" class="primary" id="errNewSave">${esc(t('notesSave'))}</button><button type="button" id="errNewCancel">${esc(t('cancel'))}</button></div></div>`;
+      $('#errNew').innerHTML =
+        `<div class="errnew"><select id="errNewTopic" aria-label="${esc(t('errPickTopic'))}"><option value=""${sel === '' ? ' selected' : ''} disabled>${esc(t('errPickTopic'))}</option>${topicOptions(sel)}</select><textarea id="errNewText" rows="3" maxlength="2000" enterkeyhint="done" placeholder="${esc(t('errNewHint'))}"></textarea><div class="mbtns"><button type="button" class="primary" id="errNewSave">${esc(t('notesSave'))}</button><button type="button" id="errNewCancel">${esc(t('cancel'))}</button></div></div>`;
     if (!errNewOpen) $('#errNew').innerHTML = '';
     const match = n => (!q || n.text.toLowerCase().includes(q)) && (sel === '' || String(n.topic) === sel);
     const shown = all.filter(match);
@@ -223,10 +227,42 @@ const Notes = (() => {
     commit(() => {
       state.notes = [
         ...(state.notes || []),
-        ...lines.map(x => ({ id: uid(), topic, date: todayISO(), text: x.slice(0, 500) })),
+        ...lines.map(x => ({ id: uid(), topic, date: todayISO(), text: x.slice(0, NOTE_MAX) })),
       ];
     }, t('noteAdded'));
   }
+  function saveEdit(li, id) {
+    const n = (state.notes || []).find(x => x.id === id);
+    if (!n || !li) return renderErrorsPage();
+    const text = li.querySelector('[data-etext]').value.trim(),
+      to = +li.querySelector('[data-etopic]').value;
+    if (!text) return li.querySelector('[data-etext]').focus();
+    if (text === n.text && to === n.topic) return renderErrorsPage();
+    commit(
+      () => {
+        const x = state.notes.find(y => y.id === id);
+        x.text = text;
+        x.topic = to;
+      },
+      to !== n.topic ? t('errMoved').replace('{t}', topicName(to)) : t('errEdited')
+    );
+  }
+  $('#viewErrors').addEventListener('change', e => {
+    if (e.target.id === 'errNewTopic') e.target.classList.remove('need');
+  });
+  /* in the editor: Enter is a new line (notes often have several), Ctrl/⌘ + Enter saves, Escape cancels */
+  $('#viewErrors').addEventListener('keydown', e => {
+    if (!e.target.matches || !e.target.matches('[data-etext]')) return;
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !e.isComposing) {
+      e.preventDefault();
+      const li = e.target.closest('li');
+      saveEdit(li, li.querySelector('[data-esave]').dataset.esave);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      renderErrorsPage();
+    }
+  });
   $('#errQ').addEventListener('input', renderErrorsPage);
   $('#errTopic').addEventListener('change', renderErrorsPage);
   $('#errAdd').onclick = () => {
@@ -242,6 +278,22 @@ const Notes = (() => {
       }, t('noteDeleted'));
       return;
     }
+    /* edit a note: its text and its topic (a note filed under the wrong topic moves to the right one) */
+    const ed = e.target.closest('[data-eedit]');
+    if (ed) {
+      const n = (state.notes || []).find(x => x.id === ed.dataset.eedit),
+        li = ed.closest('li');
+      if (!n || !li) return;
+      li.classList.add('editing');
+      li.innerHTML = `<div class="eedit"><textarea data-etext rows="${Math.min(14, n.text.split('\n').length + 1)}" maxlength="${Math.max(NOTE_MAX, n.text.length)}" aria-label="${esc(t('errEdit'))}">${esc(n.text)}</textarea><select data-etopic aria-label="${esc(t('errMove'))}">${topicOptions(n.topic)}</select><div class="mbtns"><button type="button" class="primary" data-esave="${esc(n.id)}">${esc(t('cardSave'))}</button><button type="button" data-ecancel>${esc(t('cancel'))}</button></div></div>`;
+      const ta = li.querySelector('textarea');
+      ta.focus();
+      ta.setSelectionRange(ta.value.length, ta.value.length);
+      return;
+    }
+    if (e.target.closest('[data-ecancel]')) return renderErrorsPage();
+    const sv = e.target.closest('[data-esave]');
+    if (sv) return saveEdit(sv.closest('li'), sv.dataset.esave);
     const add1 = e.target.closest('[data-eadd]');
     if (add1) return openNotes(+add1.dataset.eadd);
     if (e.target.closest('#errNewCancel')) {
@@ -249,8 +301,16 @@ const Notes = (() => {
       return renderErrorsPage();
     }
     if (e.target.closest('#errNewSave')) {
-      const topic = +$('#errNewTopic').value,
+      const ts = $('#errNewTopic'),
         text = $('#errNewText').value;
+      /* the topic has to be chosen: a note filed under the wrong topic would not come back with the right one */
+      if (ts.value === '') {
+        ts.classList.add('need');
+        ts.focus();
+        toast(t('errPickTopicFirst'));
+        return;
+      }
+      const topic = +ts.value;
       errNewOpen = false;
       $('#errNew').innerHTML = '';
       addFromPage(topic, text);
@@ -362,11 +422,11 @@ const Notes = (() => {
         .filter(Boolean);
       let n = 0;
       lines.forEach(x => {
-        const key = `${topic}|${d}|${x.slice(0, 500)}`;
+        const key = `${topic}|${d}|${x.slice(0, NOTE_MAX)}`;
         const f = flat(x);
         if (have.has(key) || (f && (known[topic] || []).some(k => k.includes(f)))) return;
         have.add(key);
-        notes.push({ id: uid(), topic, date: d, text: x.slice(0, 500) });
+        notes.push({ id: uid(), topic, date: d, text: x.slice(0, NOTE_MAX) });
         n++;
       });
       rows.push({ topic, name: topicName(topic), date: d, n });

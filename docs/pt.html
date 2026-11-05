@@ -388,7 +388,8 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
   <p>A aba <span class="ui">Erros</span> reúne todas as notas de erro, por tópico e data, como uma planilha que dá para buscar. No topo, <span class="ui">Revise antes da sessão de hoje</span> mostra as notas dos tópicos do plano de hoje; embaixo, os outros tópicos, os que vencem para revisão primeiro, cada um com as notas agrupadas por data (mais recentes primeiro) e a lista, a nota e a próxima revisão do tópico.</p>
   <ul>
     <li>Busque no texto ou escolha um tópico no menu.</li>
-    <li><span class="ui">+ Adicionar nota</span>: escolha o tópico e escreva, uma nota por linha. O <kbd>×</kbd> apaga uma nota, com desfazer.</li>
+    <li><span class="ui">+ Adicionar nota</span>: escolha o tópico (ele começa no tópico do menu, ou em nenhum, para a nota nunca cair no tópico errado sem querer) e escreva, uma nota por linha.</li>
+    <li>O <kbd>✎</kbd> edita uma nota: o texto (até 2.000 caracteres, pode ter várias linhas) e o tópico, para mover uma nota que ficou no tópico errado. <kbd>Ctrl</kbd>/<kbd>⌘</kbd> <kbd>Enter</kbd> salva, <kbd>Esc</kbd> cancela. O <kbd>×</kbd> apaga uma nota. Os dois têm desfazer.</li>
     <li><span class="ui">Importar da planilha</span>: no Google Sheets ou Excel, selecione as linhas (Tópico · Data · Notas), copie e cole. Cada linha de uma célula vira uma nota, "Weather" é reconhecido como Weather Information, as datas podem ser 11/2/2026 ou 2026-11-02, e uma linha que você já tem não entra duas vezes. A prévia mostra o que será importado e o que não foi entendido.</li>
   </ul>
   <figure><img src="img/pt/errors.jpg" alt="A aba Erros com as notas por tópico e data" loading="lazy"></figure>
