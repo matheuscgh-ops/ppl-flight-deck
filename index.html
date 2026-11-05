@@ -3345,6 +3345,10 @@ html {
   background: #3d2b14;
   color: #ffd08a;
 }
+.rchip.carried {
+  background: #43301a;
+  color: #ffbe7a;
+}
 .rchip.nodata {
   background: #2f2a45;
   color: #c3b6ff;
@@ -10062,6 +10066,40 @@ const Translations = (() => {
     scoreModePct: 'パーセントで入力',
     scoreModeCount: '正解数で入力',
   });
+  /* your pace (learned from ticks and focus mode) and topics moved forward by Refresh plan */
+  Object.assign(I18N.en, {
+    rs_carried: 'moved',
+    reason_carried: 'Left undone on an earlier day, moved here by Refresh plan',
+    setPace: 'Your pace',
+    setPaceHint: 'Learned from your ticks on topic blocks and from focus mode; plan times follow it',
+    paceNone: 'Still learning: tick topic blocks when you finish them',
+    paceAll: '{f}× the estimate · {n} sessions',
+    paceReset: 'Reset',
+    paceResetDone: 'Pace reset to the estimate',
+    paceNoted: 'Time noted for your pace',
+  });
+  Object.assign(I18N.pt, {
+    rs_carried: 'movido',
+    reason_carried: 'Ficou sem fazer num dia anterior, trazido para cá pelo Atualizar plano',
+    setPace: 'Seu ritmo',
+    setPaceHint: 'Aprendido com seus checks nos blocos de tópico e com o modo foco; os tempos do plano seguem ele',
+    paceNone: 'Ainda aprendendo: dê check nos blocos de tópico quando terminar',
+    paceAll: '{f}× a estimativa · {n} sessões',
+    paceReset: 'Zerar',
+    paceResetDone: 'Ritmo voltou à estimativa',
+    paceNoted: 'Tempo anotado para o seu ritmo',
+  });
+  Object.assign(I18N.ja, {
+    rs_carried: '移動',
+    reason_carried: '前の日に終わらず、プラン更新でここへ移動',
+    setPace: 'あなたのペース',
+    setPaceHint: 'トピックのブロックのチェックとフォーカスモードから学習し、プランの時間に反映します',
+    paceNone: '学習中：トピックのブロックが終わったらチェックしてください',
+    paceAll: '見積もりの{f}倍 · {n}セッション',
+    paceReset: 'リセット',
+    paceResetDone: 'ペースを見積もりに戻しました',
+    paceNoted: 'ペース用に時間を記録しました',
+  });
   return { I18N };
 })();
 const { I18N } = Translations;
@@ -10303,6 +10341,21 @@ const AppState = (() => {
           text: n.text.trim().slice(0, 2000),
         }))
         .slice(-2000),
+      /* your pace: how long topic blocks took against the estimate (see paceFactor), the last 400 */
+      paces: (Array.isArray(o.paces) ? o.paces : [])
+        .filter(
+          x => x && ok(x.date) && Number.isInteger(x.topic) && TOPICS[x.topic] && +x.min > 0 && +x.est > 0 && +x.n > 0
+        )
+        .map(x => ({
+          id: String(x.id || uid()).slice(0, 40),
+          topic: x.topic,
+          date: x.date,
+          n: Math.round(+x.n),
+          min: +x.min,
+          est: +x.est,
+          src: x.src === 'focus' ? 'focus' : 'tick',
+        }))
+        .slice(-400),
       /* Kanban cards ticked "done today": card key (topic number or your card's id) → the date it was ticked */
       cardChecks:
         o.cardChecks && typeof o.cardChecks === 'object'
@@ -10416,6 +10469,7 @@ const AppState = (() => {
         if (it.kind === 'reflect' && typeof it.of === 'string') o.of = it.of.slice(0, 40);
         if (it.custom) o.custom = true;
         if (it.check) o.check = true;
+        if (it.check && Number.isFinite(+it.checkedAt) && +it.checkedAt > 0) o.checkedAt = +it.checkedAt;
         return o;
       });
     const extra = p.demo ? { demo: true } : {};
@@ -11935,6 +11989,17 @@ const PlanModel = (() => {
     delete r.tests;
     return r;
   };
+  /* how long a question of the topic takes, from what the FAA questions ask:
+       2.0  calculations with charts and the E6B: Pilotage and Dead Reckoning, Cross-Country Flight Planning,
+            Performance and Limitations (weight and balance, density altitude, takeoff and landing charts)
+       1.6  decoding and instruments: Navigation Systems (VOR, GPS), Weather Information (METAR, TAF, charts)
+       1.3  reading a chart or a diagram: National Airspace System (sectional), Communications, Lights and Runways
+            (signs, markings, light gun), Night Preparation (lighting, vision)
+       0.8  plain recall, quick multiple choice: Human Factors, Pilot Qualifications, Airworthiness Requirements,
+            the emergency topics (approach and landing, descent, equipment), Before Takeoff Check, Flight Deck
+            Management, Slow Flight, Power-Off Stalls, Spin Awareness
+       1.0  everything else
+     Your own pace (paceFactor) then corrects these numbers topic by topic as you study. */
   const DIFF = {
     7: 2,
     12: 2,
@@ -11944,11 +12009,88 @@ const PlanModel = (() => {
     14: 1.3,
     0: 1.3,
     8: 1.3,
-  }; /* Pilotage, Cross-Country, Performance · Navigation, Weather · Airspace, Comms/Lights, Night */
+    2: 0.8,
+    3: 0.8,
+    4: 0.8,
+    11: 0.8,
+    13: 0.8,
+    17: 0.8,
+    19: 0.8,
+    20: 0.8,
+    23: 0.8,
+    24: 0.8,
+    25: 0.8,
+  };
   const diffOf = i => DIFF[i] || 1;
   const easeOf = m => (!m || !m.reps.length ? 1.15 : Math.max(0.75, Math.min(1.15, 1.15 - 0.12 * Math.log2(1 + m.S))));
-  function minutesPerQ(i, st, m, p) {
+  /* the estimate before your own pace is applied (what a pace observation is compared with) */
+  function baseMinutesPerQ(i, st, m, p) {
     return (60 / st.qph) * diffOf(i) * easeOf(m) + (1 - p) * st.reviewMin * diffOf(i);
+  }
+  function minutesPerQ(i, st, m, p) {
+    return baseMinutesPerQ(i, st, m, p) * paceFactor(i);
+  }
+
+  /* ================= YOUR PACE (learned from your check marks and focus mode) =================
+     Every time a topic block of today's plan is ticked (or finished in focus mode) the time it took is compared with
+     the estimate: r = minutes it took ÷ minutes estimated. The time is the focus-mode stopwatch when there is one;
+     otherwise from your previous tick today (or the block's planned start for the first one) to this tick. A ratio
+     outside 0.25–4 is ignored (a forgotten tick, a break).
+       weight of an observation  w = 0.5^(age in days / 30)
+       all topics   g = exp( Σ w·ln r / (Σ w + 2) )                 (pulled toward 1 until there are a few)
+       one topic    f = exp( (Σ w·ln r + 1.5·ln g) / (Σ w + 1.5) )   (pulled toward your overall pace)
+     Minutes per question = estimate × f (between 0.35× and 2.5×). It only changes how much fits in your time, never
+     a score, the forecast or a statistic.                                                                    */
+  const PACE_HALF = 30,
+    PACE_K_ALL = 2,
+    PACE_K_TOPIC = 1.5;
+  let _pace = null;
+  function paceTable() {
+    const obs = state.paces || [],
+      key = obs.length + '|' + (obs.at(-1) || {}).id + '|' + todayISO();
+    if (_pace && _pace.k === key) return _pace.v;
+    const today = todayISO(),
+      w = o => Math.pow(0.5, Math.max(0, diffDays(o.date, today)) / PACE_HALF),
+      lr = o => Math.log(Math.max(0.25, Math.min(4, o.min / o.est)));
+    let W = 0,
+      S = 0;
+    const per = {};
+    obs.forEach(o => {
+      if (!(o.est > 0 && o.min > 0)) return;
+      const ww = w(o),
+        l = lr(o);
+      W += ww;
+      S += ww * l;
+      const x = (per[o.topic] ??= { W: 0, S: 0, n: 0 });
+      x.W += ww;
+      x.S += ww * l;
+      x.n++;
+    });
+    const lg = S / (W + PACE_K_ALL),
+      v = { all: Math.exp(lg), n: obs.length, topic: {} };
+    Object.entries(per).forEach(([i, x]) => {
+      v.topic[i] = { f: Math.exp((x.S + PACE_K_TOPIC * lg) / (x.W + PACE_K_TOPIC)), n: x.n };
+    });
+    _pace = { k: key, v };
+    return v;
+  }
+  function paceFactor(i) {
+    const P = paceTable(),
+      f = P.topic[i] ? P.topic[i].f : P.all;
+    return Math.max(0.35, Math.min(2.5, f));
+  }
+  /* record how long n questions of topic i took (minutes); est = the estimate without your pace */
+  function notePace(i, n, min, src) {
+    if (!(n > 0) || !(min > 0) || !TOPICS[i]) return false;
+    const m = srModel(i, todayISO(), true),
+      est = n * baseMinutesPerQ(i, settings(), m, topicPNow(i, m));
+    const r = min / est;
+    if (r < 0.25 || r > 4) return false;
+    state.paces = [
+      ...(state.paces || []),
+      { id: uid(), topic: i, date: todayISO(), n, min: Math.round(min * 10) / 10, est: Math.round(est * 10) / 10, src },
+    ].slice(-400);
+    return true;
   }
   function topicPNow(i, m) {
     const sc = m && m.reps.length ? m.reps[m.reps.length - 1].p : state.scores[i];
@@ -11978,7 +12120,7 @@ const PlanModel = (() => {
       n = Math.round(base * (1 + Math.max(0, 1 - (m.R ?? 1))));
     return Math.min(q, Math.max(10, Math.min(SESSION, n)));
   }
-  function buildPlan(asOf, over, mode) {
+  function buildPlan(asOf, over, mode, carry) {
     asOf = asOf || todayISO();
     const st0 = over || settings(),
       E = ENERGY[mode || 'medium'],
@@ -11992,6 +12134,12 @@ const PlanModel = (() => {
     const cap = Math.max(10, Math.round((st.minutes * st.qph) / 60)); /* questions/night with no review (reference) */
     const doneT = new Set(
       state.events.filter(e => e.date === asOf && (e.kind === 'study' || e.kind === 'review')).map(e => e.topic)
+    );
+    /* a topic block of a saved plan ticked that day counts as done too (no need to log the session first) */
+    (state.plans || []).forEach(p =>
+      (p.items || []).forEach(it => {
+        if (it.date === asOf && it.kind === 'topic' && it.check) doneT.add(it.i);
+      })
     );
     const testsToday = (state.tests || []).filter(x => x.date === asOf).length,
       items = [],
@@ -12055,8 +12203,15 @@ const PlanModel = (() => {
           p: mu,
         });
     }
+    /* topics left undone on earlier days and moved here by "Refresh plan" (before reviews due: they were due already) */
+    (carry ? [...carry] : [])
+      .filter(i => TOPICS[i] && !used.has(i))
+      .forEach(i => {
+        used.add(i);
+        add(topicItem(i, Math.min(TOPICS[i].q, 40), 'carried'));
+      });
     const ms = srAll(asOf, true);
-    ms.filter(m => m.reps.length && m.over >= 0).forEach(m => {
+    ms.filter(m => m.reps.length && m.over >= 0 && !used.has(m.i)).forEach(m => {
       used.add(m.i);
       add(topicItem(m.i, lastDay ? Math.min(20, reviewSize(m.i, m)) : reviewSize(m.i, m), 'due'));
     });
@@ -12186,6 +12341,10 @@ const PlanModel = (() => {
     examPhase,
     STRETCH_DAYS,
     LASTDAY_MAX,
+    paceFactor,
+    paceTable,
+    notePace,
+    baseMinutesPerQ,
   };
 })();
 const {
@@ -12201,6 +12360,10 @@ const {
   examPhase,
   STRETCH_DAYS,
   LASTDAY_MAX,
+  paceFactor,
+  paceTable,
+  notePace,
+  baseMinutesPerQ,
 } = PlanModel;
 
 /* ===== module Schedule (js/model/schedule.js) =====
@@ -12238,7 +12401,7 @@ const Schedule = (() => {
     DAY_END = 24 * 60,
     MIN_CHUNK_Q = 20 /* the smallest session of a big topic (Weather 158 q is studied 40 at a time, never 12) */,
     MISSED_BOOST = 1.25,
-    URGENCY = { due: 1.3, weak: 1.15, nodata: 1.1, new: 1, light: 0.8, test: 1.4, testDue: 1.4, custom: 1 };
+    URGENCY = { due: 1.3, carried: 2, weak: 1.15, nodata: 1.1, new: 1, light: 0.8, test: 1.4, testDue: 1.4, custom: 1 };
 
   const plans = () => state.plans || (state.plans = []);
   function mondayOf(date) {
@@ -12447,7 +12610,8 @@ const Schedule = (() => {
     const st = settings(),
       speed = { low: 1.15, medium: 1, high: 0.9 }[energy || 'medium'],
       boost = missedTopics(date),
-      P = buildPlan(date, { ...st, minutes: total * 4 }, energy || 'medium');
+      /* candidates from a generous budget, so a long practice test never crowds out the topics that fit a short block */
+      P = buildPlan(date, { ...st, minutes: Math.max(total * 4, 480) }, energy || 'medium', carryNow);
     /* the review of misses is its own item, so each question here counts only the time to answer it */
     let cands = P.items
       .filter(x => !x.done && x.n > 0 && (x.kind === 'test' || x.kind === 'topic'))
@@ -12603,17 +12767,20 @@ const Schedule = (() => {
 
   /* fill several days in order, simulating the earlier days as done; returns { date: items } */
   function suggestDays(days, blocks, energies) {
-    const saved = { events: state.events, tests: state.tests },
+    const saved = { events: state.events, tests: state.tests, statuses: state.statuses },
       out = {};
     try {
       state.events = state.events.slice();
       state.tests = (state.tests || []).slice();
+      state.statuses = state.statuses.slice();
       days
         .slice()
         .sort()
         .forEach(d => {
           const items = d < todayISO() ? [] : packDay(d, blocks[d] || [], (energies || {})[d]);
           out[d] = items;
+          /* a topic moved forward is placed once, on the first day it fits */
+          if (carryNow) items.forEach(it => it.kind === 'topic' && carryNow.delete(it.i));
           items.forEach(it => {
             if (it.kind === 'reflect' || it.kind === 'notes') return;
             if (it.kind === 'test')
@@ -12630,12 +12797,16 @@ const Schedule = (() => {
                 partial: false,
                 demo: false,
               });
+              /* a new topic studied whole is not new any more on the next days (it comes back as a review) */
+              if (it.n >= TOPICS[it.i].q && ['Todo', 'Doing'].includes(state.statuses[it.i]))
+                state.statuses[it.i] = 'Very Comfortable';
             }
           });
         });
     } finally {
       state.events = saved.events;
       state.tests = saved.tests;
+      state.statuses = saved.statuses;
     }
     return out;
   }
@@ -12732,8 +12903,14 @@ const Schedule = (() => {
     commit(
       () => {
         const q = state.plans.find(x => x.id === p.id).items.find(x => x.id === id);
-        if (on) q.check = true;
-        else delete q.check;
+        if (on) {
+          paceFromTick(p, q);
+          q.check = true;
+          q.checkedAt = Date.now();
+        } else {
+          delete q.check;
+          delete q.checkedAt;
+        }
         state.plans.find(x => x.id === p.id).updated = Date.now();
       },
       t(on ? 'itemChecked' : 'itemUnchecked')
@@ -12771,14 +12948,75 @@ const Schedule = (() => {
     });
     return out.filter(([s, e]) => e - s >= 10);
   }
+  /* topics moved forward by "Refresh plan" from earlier days, while it re-plans (see refreshPlans) */
+  let carryNow = null;
+  /* minutes from midnight → today's timestamp, and back */
+  const clockMs = (date, min) => {
+    const d = parse(date);
+    d.setHours(0, min, 0, 0);
+    return d.getTime();
+  };
+  /* a tick on a topic block also tells how long it took (your pace): from your previous tick today, or from the
+     block's planned start for the first one, to now */
+  function paceFromTick(p, it) {
+    if (it.kind !== 'topic' || it.date !== todayISO() || !it.n) return;
+    const now = Date.now(),
+      prev = (state.plans || [])
+        .flatMap(q => q.items || [])
+        .filter(x => x.date === it.date && x.checkedAt && x.checkedAt < now && x.id !== it.id)
+        .reduce((a, x) => Math.max(a, x.checkedAt), 0),
+      start = prev && now - prev < 4 * 3600e3 ? prev : clockMs(it.date, it.start);
+    const min = (now - start) / 60000;
+    if (min >= 2) notePace(it.i, it.n, min, 'tick');
+  }
   function refreshPlans() {
     const today = todayISO(),
       now = new Date(),
       nowMin = Math.ceil((now.getHours() * 60 + now.getMinutes()) / SLOT) * SLOT;
     let days = 0;
+    /* 1) topic blocks left undone in the last 7 days move forward: they leave their old day (with their error
+          reviews) and the re-plan below puts them first */
+    const carry = new Set(),
+      from = addDays(today, -7);
     plans()
       .filter(p => p.active)
       .forEach(p => {
+        const gone = new Set();
+        (p.items || []).forEach(it => {
+          if (it.kind === 'topic' && it.date < today && it.date >= from && !itemDone(it)) {
+            carry.add(it.i);
+            gone.add(it.id);
+          }
+        });
+        if (!gone.size) return;
+        p.items = p.items.filter(
+          it =>
+            !gone.has(it.id) &&
+            !(
+              it.kind === 'reflect' &&
+              it.date < today &&
+              !it.check &&
+              (gone.has(it.of) || (!it.of && (it.parts || []).every(x => carry.has(x.i))))
+            )
+        );
+      });
+    plans()
+      .filter(p => p.active)
+      .forEach(p => {
+        /* 2) blocks of today already done but planned for later move before now (the ones before them slide earlier
+              so nothing overlaps): the rest of today's time is free for the re-plan */
+        let end = nowMin;
+        (p.items || [])
+          .filter(it => it.date === today && itemDone(it) && it.kind !== 'notes')
+          .sort((a, b) => b.start - a.start)
+          .forEach(it => {
+            if (it.start + it.min <= end) {
+              end = Math.min(end, it.start);
+              return;
+            }
+            it.start = Math.max(0, end - it.min);
+            end = it.start;
+          });
         const ds = Object.keys(p.blocks || {})
           .filter(d => d >= today && rangesTotal(p.blocks[d]) && (activeFor(d) || {}).plan === p)
           .sort();
@@ -12790,14 +13028,26 @@ const Schedule = (() => {
           its.forEach(it => {
             if (itemDone(it) || it.kind === 'custom' || it.custom) keepIds.add(it.id);
           });
+          /* the error review of a topic you did stays (you still have to read your misses) */
           its.forEach(it => {
-            if (it.kind === 'reflect' && it.of && keepIds.has(it.of)) keepIds.add(it.id);
+            if (
+              it.kind === 'reflect' &&
+              ((it.of && keepIds.has(it.of)) ||
+                (!it.of && (it.parts || []).some(x => its.some(y => y.kind === 'topic' && y.i === x.i && itemDone(y)))))
+            )
+              keepIds.add(it.id);
           });
           const busy = its.filter(it => keepIds.has(it.id)).map(it => [it.start, it.start + it.min]);
           if (d === today) busy.push([0, nowMin]);
           free[d] = rangesMinus(p.blocks[d], busy);
         });
-        const fresh = suggestDays(ds, free, p.energy || {});
+        carryNow = carry.size ? carry : null;
+        let fresh;
+        try {
+          fresh = suggestDays(ds, free, p.energy || {});
+        } finally {
+          carryNow = null;
+        }
         p.items = [
           ...(p.items || []).filter(it => !ds.includes(it.date) || keepIds.has(it.id)),
           ...ds.flatMap(d => fresh[d] || []),
@@ -15011,6 +15261,9 @@ const Focus = (() => {
   function finish() {
     const it = cur;
     if (!it) return;
+    /* the stopwatch is the most exact measure of your pace */
+    const min = elapsed() / 60000;
+    if (it.kind === 'topic' && it.n && min >= 2) commit(() => notePace(it.i, it.n, min, 'focus'), t('paceNoted'));
     closeFocus(false);
     if (it.kind === 'topic') {
       const m = srModel(it.i);
@@ -17998,6 +18251,7 @@ const Settings = (() => {
           ),
           'setEnergyHint'
         ),
+        row('setPace', paceHTML(), 'setPaceHint'),
         `<p class="setnote">${esc(t('setPlanNote'))} ${esc(t('planWeights'))}</p>`,
       ]),
       section('setPlansTitle', [
@@ -18087,6 +18341,22 @@ const Settings = (() => {
     setDialog.open('#setClose');
     renderSettings();
   }
+  /* your learned pace: the overall factor, the topics measured most, and a reset */
+  function paceHTML() {
+    const P = paceTable();
+    if (!P.n) return `<span class="setval muted" id="setPaceVal">${esc(t('paceNone'))}</span>`;
+    const top = Object.entries(P.topic)
+      .sort((a, b) => b[1].n - a[1].n)
+      .slice(0, 3)
+      .map(([i]) => `${TOPICS[i].name} ${paceFactor(+i).toFixed(2)}×`)
+      .join(' · ');
+    return `<span class="setval" id="setPaceVal" title="${esc(top)}">${esc(t('paceAll').replace('{f}', P.all.toFixed(2)).replace('{n}', P.n))}</span><button type="button" id="setPaceReset">${esc(t('paceReset'))}</button>`;
+  }
+  $('#setBody').addEventListener('click', e => {
+    if (e.target.id !== 'setPaceReset') return;
+    commit(() => (state.paces = []), t('paceResetDone'));
+    renderSettings();
+  });
   $('#setOpen').onclick = openSettings;
   $('#setSyncOpen').onclick = () => {
     closeSettings();
@@ -19673,6 +19943,7 @@ const GistSync = (() => {
       plans: un(n.plans || [], o.plans || []),
       cards: un(n.cards || [], o.cards || []),
       notes: un(n.notes || [], o.notes || []),
+      paces: un(n.paces || [], o.paces || []),
       deleted: del,
       updatedAt: Math.max(a.updatedAt, b.updatedAt),
     });

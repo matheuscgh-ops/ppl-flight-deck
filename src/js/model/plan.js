@@ -38,6 +38,17 @@ const PlanModel = (() => {
     delete r.tests;
     return r;
   };
+  /* how long a question of the topic takes, from what the FAA questions ask:
+       2.0  calculations with charts and the E6B: Pilotage and Dead Reckoning, Cross-Country Flight Planning,
+            Performance and Limitations (weight and balance, density altitude, takeoff and landing charts)
+       1.6  decoding and instruments: Navigation Systems (VOR, GPS), Weather Information (METAR, TAF, charts)
+       1.3  reading a chart or a diagram: National Airspace System (sectional), Communications, Lights and Runways
+            (signs, markings, light gun), Night Preparation (lighting, vision)
+       0.8  plain recall, quick multiple choice: Human Factors, Pilot Qualifications, Airworthiness Requirements,
+            the emergency topics (approach and landing, descent, equipment), Before Takeoff Check, Flight Deck
+            Management, Slow Flight, Power-Off Stalls, Spin Awareness
+       1.0  everything else
+     Your own pace (paceFactor) then corrects these numbers topic by topic as you study. */
   const DIFF = {
     7: 2,
     12: 2,
@@ -47,11 +58,88 @@ const PlanModel = (() => {
     14: 1.3,
     0: 1.3,
     8: 1.3,
-  }; /* Pilotage, Cross-Country, Performance · Navigation, Weather · Airspace, Comms/Lights, Night */
+    2: 0.8,
+    3: 0.8,
+    4: 0.8,
+    11: 0.8,
+    13: 0.8,
+    17: 0.8,
+    19: 0.8,
+    20: 0.8,
+    23: 0.8,
+    24: 0.8,
+    25: 0.8,
+  };
   const diffOf = i => DIFF[i] || 1;
   const easeOf = m => (!m || !m.reps.length ? 1.15 : Math.max(0.75, Math.min(1.15, 1.15 - 0.12 * Math.log2(1 + m.S))));
-  function minutesPerQ(i, st, m, p) {
+  /* the estimate before your own pace is applied (what a pace observation is compared with) */
+  function baseMinutesPerQ(i, st, m, p) {
     return (60 / st.qph) * diffOf(i) * easeOf(m) + (1 - p) * st.reviewMin * diffOf(i);
+  }
+  function minutesPerQ(i, st, m, p) {
+    return baseMinutesPerQ(i, st, m, p) * paceFactor(i);
+  }
+
+  /* ================= YOUR PACE (learned from your check marks and focus mode) =================
+     Every time a topic block of today's plan is ticked (or finished in focus mode) the time it took is compared with
+     the estimate: r = minutes it took ÷ minutes estimated. The time is the focus-mode stopwatch when there is one;
+     otherwise from your previous tick today (or the block's planned start for the first one) to this tick. A ratio
+     outside 0.25–4 is ignored (a forgotten tick, a break).
+       weight of an observation  w = 0.5^(age in days / 30)
+       all topics   g = exp( Σ w·ln r / (Σ w + 2) )                 (pulled toward 1 until there are a few)
+       one topic    f = exp( (Σ w·ln r + 1.5·ln g) / (Σ w + 1.5) )   (pulled toward your overall pace)
+     Minutes per question = estimate × f (between 0.35× and 2.5×). It only changes how much fits in your time, never
+     a score, the forecast or a statistic.                                                                    */
+  const PACE_HALF = 30,
+    PACE_K_ALL = 2,
+    PACE_K_TOPIC = 1.5;
+  let _pace = null;
+  function paceTable() {
+    const obs = state.paces || [],
+      key = obs.length + '|' + (obs.at(-1) || {}).id + '|' + todayISO();
+    if (_pace && _pace.k === key) return _pace.v;
+    const today = todayISO(),
+      w = o => Math.pow(0.5, Math.max(0, diffDays(o.date, today)) / PACE_HALF),
+      lr = o => Math.log(Math.max(0.25, Math.min(4, o.min / o.est)));
+    let W = 0,
+      S = 0;
+    const per = {};
+    obs.forEach(o => {
+      if (!(o.est > 0 && o.min > 0)) return;
+      const ww = w(o),
+        l = lr(o);
+      W += ww;
+      S += ww * l;
+      const x = (per[o.topic] ??= { W: 0, S: 0, n: 0 });
+      x.W += ww;
+      x.S += ww * l;
+      x.n++;
+    });
+    const lg = S / (W + PACE_K_ALL),
+      v = { all: Math.exp(lg), n: obs.length, topic: {} };
+    Object.entries(per).forEach(([i, x]) => {
+      v.topic[i] = { f: Math.exp((x.S + PACE_K_TOPIC * lg) / (x.W + PACE_K_TOPIC)), n: x.n };
+    });
+    _pace = { k: key, v };
+    return v;
+  }
+  function paceFactor(i) {
+    const P = paceTable(),
+      f = P.topic[i] ? P.topic[i].f : P.all;
+    return Math.max(0.35, Math.min(2.5, f));
+  }
+  /* record how long n questions of topic i took (minutes); est = the estimate without your pace */
+  function notePace(i, n, min, src) {
+    if (!(n > 0) || !(min > 0) || !TOPICS[i]) return false;
+    const m = srModel(i, todayISO(), true),
+      est = n * baseMinutesPerQ(i, settings(), m, topicPNow(i, m));
+    const r = min / est;
+    if (r < 0.25 || r > 4) return false;
+    state.paces = [
+      ...(state.paces || []),
+      { id: uid(), topic: i, date: todayISO(), n, min: Math.round(min * 10) / 10, est: Math.round(est * 10) / 10, src },
+    ].slice(-400);
+    return true;
   }
   function topicPNow(i, m) {
     const sc = m && m.reps.length ? m.reps[m.reps.length - 1].p : state.scores[i];
@@ -81,7 +169,7 @@ const PlanModel = (() => {
       n = Math.round(base * (1 + Math.max(0, 1 - (m.R ?? 1))));
     return Math.min(q, Math.max(10, Math.min(SESSION, n)));
   }
-  function buildPlan(asOf, over, mode) {
+  function buildPlan(asOf, over, mode, carry) {
     asOf = asOf || todayISO();
     const st0 = over || settings(),
       E = ENERGY[mode || 'medium'],
@@ -95,6 +183,12 @@ const PlanModel = (() => {
     const cap = Math.max(10, Math.round((st.minutes * st.qph) / 60)); /* questions/night with no review (reference) */
     const doneT = new Set(
       state.events.filter(e => e.date === asOf && (e.kind === 'study' || e.kind === 'review')).map(e => e.topic)
+    );
+    /* a topic block of a saved plan ticked that day counts as done too (no need to log the session first) */
+    (state.plans || []).forEach(p =>
+      (p.items || []).forEach(it => {
+        if (it.date === asOf && it.kind === 'topic' && it.check) doneT.add(it.i);
+      })
     );
     const testsToday = (state.tests || []).filter(x => x.date === asOf).length,
       items = [],
@@ -158,8 +252,15 @@ const PlanModel = (() => {
           p: mu,
         });
     }
+    /* topics left undone on earlier days and moved here by "Refresh plan" (before reviews due: they were due already) */
+    (carry ? [...carry] : [])
+      .filter(i => TOPICS[i] && !used.has(i))
+      .forEach(i => {
+        used.add(i);
+        add(topicItem(i, Math.min(TOPICS[i].q, 40), 'carried'));
+      });
     const ms = srAll(asOf, true);
-    ms.filter(m => m.reps.length && m.over >= 0).forEach(m => {
+    ms.filter(m => m.reps.length && m.over >= 0 && !used.has(m.i)).forEach(m => {
       used.add(m.i);
       add(topicItem(m.i, lastDay ? Math.min(20, reviewSize(m.i, m)) : reviewSize(m.i, m), 'due'));
     });
@@ -289,6 +390,10 @@ const PlanModel = (() => {
     examPhase,
     STRETCH_DAYS,
     LASTDAY_MAX,
+    paceFactor,
+    paceTable,
+    notePace,
+    baseMinutesPerQ,
   };
 })();
 const {
@@ -304,4 +409,8 @@ const {
   examPhase,
   STRETCH_DAYS,
   LASTDAY_MAX,
+  paceFactor,
+  paceTable,
+  notePace,
+  baseMinutesPerQ,
 } = PlanModel;

@@ -2061,6 +2061,40 @@ const Translations = (() => {
     scoreModePct: 'パーセントで入力',
     scoreModeCount: '正解数で入力',
   });
+  /* your pace (learned from ticks and focus mode) and topics moved forward by Refresh plan */
+  Object.assign(I18N.en, {
+    rs_carried: 'moved',
+    reason_carried: 'Left undone on an earlier day, moved here by Refresh plan',
+    setPace: 'Your pace',
+    setPaceHint: 'Learned from your ticks on topic blocks and from focus mode; plan times follow it',
+    paceNone: 'Still learning: tick topic blocks when you finish them',
+    paceAll: '{f}× the estimate · {n} sessions',
+    paceReset: 'Reset',
+    paceResetDone: 'Pace reset to the estimate',
+    paceNoted: 'Time noted for your pace',
+  });
+  Object.assign(I18N.pt, {
+    rs_carried: 'movido',
+    reason_carried: 'Ficou sem fazer num dia anterior, trazido para cá pelo Atualizar plano',
+    setPace: 'Seu ritmo',
+    setPaceHint: 'Aprendido com seus checks nos blocos de tópico e com o modo foco; os tempos do plano seguem ele',
+    paceNone: 'Ainda aprendendo: dê check nos blocos de tópico quando terminar',
+    paceAll: '{f}× a estimativa · {n} sessões',
+    paceReset: 'Zerar',
+    paceResetDone: 'Ritmo voltou à estimativa',
+    paceNoted: 'Tempo anotado para o seu ritmo',
+  });
+  Object.assign(I18N.ja, {
+    rs_carried: '移動',
+    reason_carried: '前の日に終わらず、プラン更新でここへ移動',
+    setPace: 'あなたのペース',
+    setPaceHint: 'トピックのブロックのチェックとフォーカスモードから学習し、プランの時間に反映します',
+    paceNone: '学習中：トピックのブロックが終わったらチェックしてください',
+    paceAll: '見積もりの{f}倍 · {n}セッション',
+    paceReset: 'リセット',
+    paceResetDone: 'ペースを見積もりに戻しました',
+    paceNoted: 'ペース用に時間を記録しました',
+  });
   return { I18N };
 })();
 const { I18N } = Translations;

@@ -178,6 +178,7 @@ const Settings = (() => {
           ),
           'setEnergyHint'
         ),
+        row('setPace', paceHTML(), 'setPaceHint'),
         `<p class="setnote">${esc(t('setPlanNote'))} ${esc(t('planWeights'))}</p>`,
       ]),
       section('setPlansTitle', [
@@ -267,6 +268,22 @@ const Settings = (() => {
     setDialog.open('#setClose');
     renderSettings();
   }
+  /* your learned pace: the overall factor, the topics measured most, and a reset */
+  function paceHTML() {
+    const P = paceTable();
+    if (!P.n) return `<span class="setval muted" id="setPaceVal">${esc(t('paceNone'))}</span>`;
+    const top = Object.entries(P.topic)
+      .sort((a, b) => b[1].n - a[1].n)
+      .slice(0, 3)
+      .map(([i]) => `${TOPICS[i].name} ${paceFactor(+i).toFixed(2)}×`)
+      .join(' · ');
+    return `<span class="setval" id="setPaceVal" title="${esc(top)}">${esc(t('paceAll').replace('{f}', P.all.toFixed(2)).replace('{n}', P.n))}</span><button type="button" id="setPaceReset">${esc(t('paceReset'))}</button>`;
+  }
+  $('#setBody').addEventListener('click', e => {
+    if (e.target.id !== 'setPaceReset') return;
+    commit(() => (state.paces = []), t('paceResetDone'));
+    renderSettings();
+  });
   $('#setOpen').onclick = openSettings;
   $('#setSyncOpen').onclick = () => {
     closeSettings();

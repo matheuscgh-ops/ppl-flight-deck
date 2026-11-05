@@ -81,6 +81,21 @@ const AppState = (() => {
           text: n.text.trim().slice(0, 2000),
         }))
         .slice(-2000),
+      /* your pace: how long topic blocks took against the estimate (see paceFactor), the last 400 */
+      paces: (Array.isArray(o.paces) ? o.paces : [])
+        .filter(
+          x => x && ok(x.date) && Number.isInteger(x.topic) && TOPICS[x.topic] && +x.min > 0 && +x.est > 0 && +x.n > 0
+        )
+        .map(x => ({
+          id: String(x.id || uid()).slice(0, 40),
+          topic: x.topic,
+          date: x.date,
+          n: Math.round(+x.n),
+          min: +x.min,
+          est: +x.est,
+          src: x.src === 'focus' ? 'focus' : 'tick',
+        }))
+        .slice(-400),
       /* Kanban cards ticked "done today": card key (topic number or your card's id) → the date it was ticked */
       cardChecks:
         o.cardChecks && typeof o.cardChecks === 'object'
@@ -194,6 +209,7 @@ const AppState = (() => {
         if (it.kind === 'reflect' && typeof it.of === 'string') o.of = it.of.slice(0, 40);
         if (it.custom) o.custom = true;
         if (it.check) o.check = true;
+        if (it.check && Number.isFinite(+it.checkedAt) && +it.checkedAt > 0) o.checkedAt = +it.checkedAt;
         return o;
       });
     const extra = p.demo ? { demo: true } : {};
