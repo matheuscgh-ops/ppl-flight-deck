@@ -2095,6 +2095,10 @@ const Translations = (() => {
     paceResetDone: 'ペースを見積もりに戻しました',
     paceNoted: 'ペース用に時間を記録しました',
   });
+  /* dashboard volume card: the last 7 days, day by day */
+  Object.assign(I18N.en, { last7: 'Last 7 days', dayByDay: 'Day by day' });
+  Object.assign(I18N.pt, { last7: 'Últimos 7 dias', dayByDay: 'Dia a dia' });
+  Object.assign(I18N.ja, { last7: '過去7日間', dayByDay: '日ごと' });
   return { I18N };
 })();
 const { I18N } = Translations;
