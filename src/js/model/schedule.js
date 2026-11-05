@@ -308,7 +308,8 @@ const Schedule = (() => {
         let left = capT - usedBy(pick);
         pick.forEach(c => {
           if (c.kind !== 'topic') return;
-          const more = Math.min(c.full - c.n, Math.floor((left + 1e-9) / c.per));
+          /* never past one session of the question bank (40 questions) */
+          const more = Math.min(Math.min(c.full, 40) - c.n, Math.floor((left + 1e-9) / c.per));
           if (more > 0) {
             c.n += more;
             left -= Math.ceil(more * c.per);
@@ -324,8 +325,21 @@ const Schedule = (() => {
           .find(x => Math.floor(leftAfter() / x.per) >= minN(x));
         if (next) {
           const fit = Math.floor((leftAfter() - 5) / next.per),
-            n = Math.min(next.n, Math.max(minN(next), fit));
-          pick.push({ ...next, n, value: (next.value * n) / next.n });
+            n = Math.min(next.n, Math.max(minN(next), fit)),
+            add = { ...next, n, value: (next.value * n) / next.n };
+          /* only when every topic can still be followed by its own review in this block (trimmed as below) */
+          const trial = [...pick, add].map(x => ({ ...x }));
+          let RT = reflectFor(trial, cap);
+          for (let guard = 0; usedBy(trial) + RT.min > capT && guard < 400; guard++) {
+            const c = trial
+              .slice()
+              .sort((a, b) => hardness(a) - hardness(b))
+              .find(x => x.kind === 'topic' && x.n > minN(x));
+            if (!c) break;
+            c.n -= 1;
+            RT = reflectFor(trial, cap);
+          }
+          if (usedBy(trial) + RT.min <= capT) pick.push(add);
         }
       }
       /* room for the review in the same block: trim the easiest topics first, never under their smallest chunk */
@@ -338,6 +352,15 @@ const Schedule = (() => {
           .find(x => x.kind === 'topic' && x.n > minN(x));
         if (!c) break;
         c.n -= 1;
+        R = reflectFor(pick, cap);
+      }
+      /* still no room: drop the easiest topic (it comes back on another day) rather than lose the reviews */
+      while (usedBy(pick) + R.min > capT && pick.filter(x => x.kind === 'topic').length > 1) {
+        const c = pick
+          .slice()
+          .reverse()
+          .find(x => x.kind === 'topic');
+        pick = pick.filter(x => x !== c);
         R = reflectFor(pick, cap);
       }
       const fits = usedBy(pick) + R.min <= capT,
