@@ -13892,16 +13892,27 @@ const PreviewCarousel = (() => {
       if (ev.key === 'Enter') finish(true);
       else if (ev.key === 'Escape') finish(false);
     });
-    /* the mode button keeps the editor open (its pointerdown would otherwise blur the input) */
-    mode.addEventListener('pointerdown', ev => ev.preventDefault());
+    /* the mode button keeps the editor open: a tap on it blurs the input on iPhone/iPad (WebKit) before the click,
+       so the blur waits and is ignored while the button is being pressed */
+    let switching = false;
+    const hold = ev => {
+      ev.preventDefault();
+      switching = true;
+    };
+    mode.addEventListener('pointerdown', hold);
+    mode.addEventListener('mousedown', hold);
+    mode.addEventListener('touchstart', () => (switching = true), { passive: true });
     mode.addEventListener('click', ev => {
       ev.stopPropagation();
       byCount = !byCount;
       inp.value = '';
       paint();
       inp.focus();
+      switching = false;
     });
-    inp.addEventListener('blur', () => setTimeout(() => document.activeElement !== inp && finish(true), 0));
+    inp.addEventListener('blur', () =>
+      setTimeout(() => !switching && document.activeElement !== inp && finish(true), 200)
+    );
   });
 
   /* analysis tab */

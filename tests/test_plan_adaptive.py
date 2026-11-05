@@ -100,8 +100,8 @@ with sync_playwright() as p:
             check(f'{tag}: refresh keeps your own activities in place', ev("state.plans[0].items.some(x=>x.id==='mine'&&x.start===1290)"))
             check(f'{tag}: refresh never touches past days, and blocks stay the same', ev("JSON.stringify(state.plans[0].items.filter(x=>x.date<todayISO()))") == past and ev("Object.values(state.plans[0].blocks).every(r=>JSON.stringify(r)==='[[1140,1260],[1290,1350]]')"))
             lay2 = ev("""(()=>{const its=state.plans[0].items;return Object.entries(state.plans[0].blocks).every(([d,rs])=>{const x=its.filter(i=>i.date===d).sort((a,b)=>a.start-b.start);
-                return x.every((i,k)=>(!k||i.start>=x[k-1].start+x[k-1].min-0.01)&&rs.some(([s,e])=>i.start>=s&&i.start+i.min<=e+0.01))})})()""")
-            check(f'{tag}: after refresh every item still fits its block, one after another', lay2)
+                return x.every((i,k)=>(!k||i.start>=x[k-1].start+x[k-1].min-0.01)&&(itemDone(i)||rs.some(([s,e])=>i.start>=s&&i.start+i.min<=e+0.01)))})})()""")
+            check(f'{tag}: after refresh every item still fits its block, one after another (a block already done may move before now, whatever the time of day)', lay2)
             ev("document.querySelector('#toast button').click()"); pg.wait_for_timeout(200)
             check(f'{tag}: one Undo restores the plan as it was', ev("state.plans[0].items.filter(x=>x.date===addDays(todayISO(),1)&&x.i===window.__t&&x.kind==='topic').reduce((a,x)=>a+x.n,0)") == tomorrow0)
             check(f'{tag}: refresh and undo never change your statistics', ev(STATS) == before_stats)
