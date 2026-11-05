@@ -7186,6 +7186,230 @@ svg.tick {
   font-weight: 650;
   min-height: 1em;
 }
+
+/* ===== phones: a cleaner dashboard (Strava style) — streak, training log and spaced-repetition cards =====
+   Larger screens are unchanged: the new cards are hidden and the preview wrapper does not affect layout. */
+.streakcard,
+.minirow {
+  display: none;
+}
+.srprev {
+  display: contents;
+}
+.maxsheet {
+  width: min(760px, 100%);
+}
+.maxsheet .mhead {
+  margin-bottom: 4px;
+}
+.cal.inmax,
+.srprev.inmax {
+  display: block;
+  border: 0;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+.srprev.inmax {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  /* top row: countdown | streak, then practice tests and the volume chart across the whole width */
+  .toprow .streakcard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 12px;
+    cursor: pointer;
+    text-align: center;
+  }
+  .streakcard .label {
+    align-self: flex-start;
+  }
+  .flamebox {
+    position: relative;
+    width: 74px;
+    height: 74px;
+    display: grid;
+    place-items: center;
+    margin-top: 2px;
+  }
+  .flame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    fill: #fc5200;
+  }
+  .streakcard.cold .flame {
+    fill: #3a414a;
+  }
+  .flamebox b {
+    position: relative;
+    margin-top: 26px;
+    font-size: 23px;
+    font-weight: 900;
+    color: #3a1500;
+    font-variant-numeric: tabular-nums;
+  }
+  .streakcard.cold .flamebox b {
+    color: var(--ink);
+  }
+  .skw {
+    font-size: 18px;
+    font-weight: 850;
+    color: #fc5200;
+    line-height: 1.1;
+  }
+  .streakcard.cold .skw {
+    color: var(--muted);
+  }
+  .skd {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .toprow .tscard {
+    order: 5;
+  }
+  .toprow #volCard {
+    grid-column: 1/-1;
+    order: 6;
+  }
+  .toprow #volCard .volchart {
+    height: 150px;
+    min-height: 150px;
+  }
+
+  /* the calendar and the spaced-repetition preview live in their cards; they open maximized */
+  .center > .cal,
+  #srPanel > .srprev {
+    display: none;
+  }
+  .minirow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+  }
+  .calmini,
+  .srmini {
+    padding: 12px;
+    cursor: pointer;
+    min-width: 0;
+  }
+  .minihead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .minigo {
+    font-size: 20px;
+    line-height: 1;
+    color: var(--muted);
+  }
+  .tlrow + .tlrow {
+    margin-top: 8px;
+  }
+  .tlhead {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--ink2);
+  }
+  .tlhead b {
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .tldots,
+  .tldays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    align-items: center;
+    justify-items: center;
+  }
+  .tldots {
+    height: 26px;
+  }
+  .tl i {
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #59626e;
+  }
+  .tl.later i {
+    background: #343b44;
+  }
+  .tl i.on {
+    width: var(--s);
+    height: var(--s);
+    background: var(--s3);
+  }
+  .tl.now i:not(.on) {
+    width: 9px;
+    height: 9px;
+    background: none;
+    box-shadow: inset 0 0 0 1.5px var(--ink2);
+  }
+  .tl.now i.on {
+    box-shadow:
+      0 0 0 2px #0d0f12,
+      0 0 0 3.5px var(--ink2);
+  }
+  .tldays {
+    margin-top: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .srbig {
+    font-size: 30px;
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+  }
+  .srsub {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .srbar {
+    height: 6px;
+    border-radius: 3px;
+    background: #343b44;
+    margin: 10px 0 8px;
+    overflow: hidden;
+  }
+  .srbar i {
+    display: block;
+    height: 100%;
+    background: var(--s1);
+    border-radius: 3px;
+  }
+  .srdue {
+    font-size: 12px;
+    font-weight: 750;
+    color: var(--ink2);
+  }
+  .srdue.on {
+    color: var(--exam);
+  }
+  /* the maximized card fills the phone screen */
+  .maxbg .maxsheet {
+    width: 100%;
+    max-height: calc(100dvh - 16px);
+  }
+}
 </style>
 </head>
 <body>
@@ -7223,6 +7447,12 @@ svg.tick {
         <button type="button" class="readybar" id="readyBar"><span class="rsegs" id="readySegs"></span><span class="rtxt" id="readyTxt"></span></button>
         <input type="date" id="examDate" aria-label="Exam date">
       </div>
+      <div class="panel streakcard" id="streakCard" role="button" tabindex="0">
+        <span class="label" data-t="streakTitle"></span>
+        <div class="flamebox"><svg class="flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.4 1.2c.7 3.3 4 5.3 5.9 8.6a8.1 8.1 0 1 1-14.4.9c.9-2 2.4-3.3 3.4-2.4.3 1.3.9 2.2 1.9 2.8-.5-3.6.5-7 3.2-9.9z"/></svg><b id="streakWeeks">0</b></div>
+        <div class="skw" id="streakWeeksLbl"></div>
+        <div class="skd" id="streakDays"></div>
+      </div>
       <div class="panel vol tscard" id="tsCard">
         <div class="volhead"><div><span class="label" data-t="tabTestsLong"></span><div class="volnum"><b id="tsLast">—</b> <span data-t="tsLastLbl"></span> <span class="tsbest" id="tsBestMini"></span></div></div><button type="button" class="volmore" id="tsExpand" aria-label="Open practice tests" data-tt="tabTestsLong">⤢</button></div>
         <div class="volchart tsspark" id="tsSpark"></div>
@@ -7242,6 +7472,10 @@ svg.tick {
   </section>
 
   <section class="center">
+    <div class="minirow">
+      <div class="panel calmini" id="calMini" role="button" tabindex="0"><div class="minihead"><span class="label" data-t="trainLog"></span><span class="minigo">›</span></div><div id="calMiniBody"></div></div>
+      <div class="panel srmini" id="srMini" role="button" tabindex="0"><div class="minihead"><span class="label" data-t="srLabel"></span><span class="minigo">›</span></div><div id="srMiniBody"></div></div>
+    </div>
     <div class="panel cal">
       <div class="calhead">
         <h2 class="section" id="month"></h2>
@@ -7254,6 +7488,7 @@ svg.tick {
     <div class="side">
       <div class="panel sr" id="srPanel">
         <button type="button" class="fcmini" id="fcMini"><span class="fclab" data-t="fcTitle"></span><b id="fcMiniVal">—</b><span class="fcbar"><i id="fcMiniBar"></i><em class="m70"></em><em class="m85"></em></span><span class="fcsub" id="fcMiniSub"></span></button>
+        <div class="srprev" id="srPrev">
         <div class="srtop"><span class="label" data-t="srLabel"></span><button class="linkbtn" id="openSR" data-t="openAnalysis"></button></div>
         <label class="prevpick"><span class="flabel" data-t="pickLabel"></span><select id="prevPick"></select></label>
         <div class="prevtitle" id="prevTitle"></div><div class="cardots" id="carDots" hidden></div>
@@ -7261,6 +7496,7 @@ svg.tick {
         <div class="seg srrange" data-srr><button data-sr="3d">3D</button><button data-sr="7d">7D</button><button data-sr="2w">2W</button><button data-sr="1m">1M</button><button data-sr="3m">3M</button><button data-sr="6m">6M</button><button data-sr="1y">1Y</button><button data-sr="all" data-t="rAll"></button></div>
         <div class="chart" id="prevChart"></div>
         <div class="chartlegend small" id="srLegend2"></div>
+        </div>
         <div class="nthen"><div class="qh planhead"><span data-t="planToday"></span><span id="planMiniTot"></span><span class="enpill" id="planMiniMode"></span><button type="button" class="focusbtn" id="planFocus" data-tt="focusOpen" aria-label="Focus"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5v9l7-4.5z"/></svg></button><button type="button" class="linkbtn" id="openPlan" data-t="planOpen"></button></div><div id="sugg"></div></div>
       </div>
     </div>
@@ -7499,6 +7735,18 @@ svg.tick {
       <button type="button" class="linkbtn" id="focusNotes" hidden></button>
       <div class="muted focusnext" id="focusNextUp"></div>
     </div>
+  </div>
+</div>
+<div class="modalbg maxbg" id="calMaxBg" hidden>
+  <div class="modal maxsheet" role="dialog" aria-modal="true" aria-label="Calendar">
+    <div class="mhead"><span></span><button class="x" id="calMaxClose" aria-label="Close">×</button></div>
+    <div id="calMaxBody"></div>
+  </div>
+</div>
+<div class="modalbg maxbg" id="srMaxBg" hidden>
+  <div class="modal maxsheet" role="dialog" aria-modal="true" aria-label="Spaced repetition">
+    <div class="mhead"><span></span><button class="x" id="srMaxClose" aria-label="Close">×</button></div>
+    <div id="srMaxBody"></div>
   </div>
 </div>
 <div class="modalbg" id="readybg" hidden>
@@ -9634,6 +9882,46 @@ const Translations = (() => {
     focusOver: '予定より {m} 超過',
     focusThen: '次：{x}',
   });
+  /* phones: streak, training log and spaced-repetition cards */
+  Object.assign(I18N.en, {
+    streakTitle: 'Streak',
+    streakWeek: 'week',
+    streakWeeks: 'weeks',
+    streakDaysLbl: '{n}-day streak',
+    trainLog: 'Training log',
+    thisWeekShort: 'This week',
+    lastWeekShort: 'Last week',
+    srRecallNow: 'recall now (average)',
+    srDue0: 'Nothing due',
+    srDue1: '1 review due',
+    srDueN: '{n} reviews due',
+  });
+  Object.assign(I18N.pt, {
+    streakTitle: 'Sequência',
+    streakWeek: 'semana',
+    streakWeeks: 'semanas',
+    streakDaysLbl: '{n} dias seguidos',
+    trainLog: 'Registro de estudo',
+    thisWeekShort: 'Esta semana',
+    lastWeekShort: 'Semana passada',
+    srRecallNow: 'retenção hoje (média)',
+    srDue0: 'Nada vencido',
+    srDue1: '1 revisão vencida',
+    srDueN: '{n} revisões vencidas',
+  });
+  Object.assign(I18N.ja, {
+    streakTitle: '連続記録',
+    streakWeek: '週',
+    streakWeeks: '週',
+    streakDaysLbl: '{n}日連続',
+    trainLog: '学習ログ',
+    thisWeekShort: '今週',
+    lastWeekShort: '先週',
+    srRecallNow: '現在の保持率（平均）',
+    srDue0: '期限の来た復習なし',
+    srDue1: '期限の来た復習 1件',
+    srDueN: '期限の来た復習 {n}件',
+  });
   return { I18N };
 })();
 const { I18N } = Translations;
@@ -9685,11 +9973,24 @@ const { $, pad, iso, parse, todayISO, diffDays, esc, uid, TOTAL, flip } = Util;
    public: modal, placeTip
    Shared pieces for every dialog and tooltip:
    modal(bg, { close, onClose })  wires a dialog backdrop the same way everywhere: the × button, a click on the
-                                  backdrop and Escape close it (Escape is left to the confirm box when it is open).
+                                  backdrop and Escape close it. Escape closes only the dialog on top (the one opened last, e.g. a
+                                  day opened from the maximized calendar), and is left to the confirm box when it is open.
                                   Returns { open(focusSel), close(), isOpen() }.
    placeTip(tip, e, opts)         puts a floating tooltip next to the pointer, inside the screen
                                   (above the finger on touch). */
 const Modal = (() => {
+  let seq = 0;
+  /* every dialog backdrop that is shown (by open() or by un-hiding it) gets a rank: the one shown last is on top */
+  new MutationObserver(ms =>
+    ms.forEach(m => {
+      if (m.target.classList.contains('modalbg') && !m.target.hidden) m.target._z = ++seq;
+    })
+  ).observe(document.documentElement, { subtree: true, attributes: true, attributeFilter: ['hidden'] });
+  const topOpen = () =>
+    [...document.querySelectorAll('.modalbg:not([hidden])')].reduce(
+      (top, el) => (!top || (el._z || 0) >= (top._z || 0) ? el : top),
+      null
+    );
   function modal(bgSel, { close: closeSel, onClose } = {}) {
     const bg = $(bgSel);
     const isOpen = () => !bg.hidden;
@@ -9709,7 +10010,10 @@ const Modal = (() => {
     });
     document.addEventListener('keydown', e => {
       const ask = document.getElementById('askbg');
-      if (e.key === 'Escape' && isOpen() && (!ask || ask.hidden || bg === ask)) close();
+      if (e.key !== 'Escape' || e._modalClosed || !isOpen()) return;
+      if (ask && !ask.hidden ? bg !== ask : topOpen() !== bg) return;
+      e._modalClosed = true;
+      close();
     });
     return { open, close, isOpen };
   }
@@ -10367,6 +10671,7 @@ const Dashboard = (() => {
           .replace('{n}', (state.tests || []).length)
       : t('practiceTests');
     if (typeof renderReady === 'function') renderReady();
+    if (typeof renderPhoneDash === 'function') renderPhoneDash();
   }
   function lastSeen() {
     const m = {};
@@ -13069,7 +13374,9 @@ const PreviewCarousel = (() => {
         localStorage.setItem(STORE + '-pick', r.dataset.q);
       } catch (x) {}
       drawPreview();
-      $('#prevPick').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      /* phones: the preview is folded into its card, so it opens maximized */
+      if (phoneMQ.matches && typeof openSrMax === 'function') openSrMax();
+      else $('#prevPick').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     } else goView('sr', +r.dataset.q);
   };
   $('#openSR').onclick = () => goView('sr');
@@ -14489,6 +14796,131 @@ const Focus = (() => {
 })();
 const { nextItem, renderNowBar, openFocus, closeFocus } = Focus;
 
+/* ===== module PhoneDash (js/views/phone-dash.js) =====
+   public: renderPhoneDash, weekStreak, openCalMax, openSrMax
+   A cleaner dashboard on phones (Strava style). Nothing is removed — the big pieces become small cards that open the
+   real thing:
+     · Streak card: weeks in a row with at least one active day (the current week counts once it is active), and the
+       day streak under it. Tapping it opens the calendar.
+     · Training log: this week and last week as dots (bigger dot = more questions that day). Tapping it opens the
+       full calendar in a maximized card.
+     · Spaced repetition: average recall now and reviews due. Tapping it opens the spaced-repetition preview (picker,
+       curve, intervals) in a maximized card.
+   The real calendar and preview are moved into the maximized card and back, so they keep every feature. Larger
+   screens are unchanged (these cards are hidden there).                                                        */
+const PhoneDash = (() => {
+  /* weeks (Monday to Sunday) in a row with activity; this week counts once it has an active day */
+  function weekStreak() {
+    const set = new Set(state.events.map(e => e.date).concat((state.tests || []).map(x => x.date)));
+    const active = w => Array.from({ length: 7 }, (_, k) => addDays(w, k)).some(d => set.has(d));
+    let w = mondayOf(todayISO());
+    if (!active(w)) w = addDays(w, -7);
+    let n = 0;
+    while (active(w) && n < 520) {
+      n++;
+      w = addDays(w, -7);
+    }
+    return n;
+  }
+  /* questions done per day (study, review and practice tests), like the volume chart */
+  function qByDay() {
+    const by = {};
+    state.events.forEach(e => {
+      if ((e.kind === 'study' || e.kind === 'review') && !e.partial) by[e.date] = (by[e.date] || 0) + TOPICS[e.topic].q;
+    });
+    (state.tests || []).forEach(x => (by[x.date] = (by[x.date] || 0) + (x.q || 60)));
+    state.events.forEach(e => {
+      if (!(e.date in by)) by[e.date] = 0;
+    });
+    return by;
+  }
+  function renderPhoneDash() {
+    if (!$('#streakCard')) return;
+    const wk = weekStreak(),
+      s = streakInfo();
+    $('#streakWeeks').textContent = wk;
+    $('#streakWeeksLbl').textContent = t(wk === 1 ? 'streakWeek' : 'streakWeeks');
+    $('#streakDays').textContent = t('streakDaysLbl').replace('{n}', s.n);
+    $('#streakCard').classList.toggle('cold', !wk);
+    /* training log: two rows of 7 dots */
+    const by = qByDay(),
+      today = todayISO(),
+      mon = mondayOf(today),
+      max = Math.max(1, ...Object.values(by)),
+      wf = new Intl.DateTimeFormat(LOCALE[lang], { weekday: 'narrow' });
+    const row = (w, lbl) => {
+      let q = 0;
+      const dots = Array.from({ length: 7 }, (_, k) => {
+        const d = addDays(w, k),
+          v = by[d];
+        if (v) q += v;
+        const size = v == null ? 0 : 8 + Math.round(14 * Math.sqrt(v / max));
+        return `<span class="tl${d === today ? ' now' : ''}${d > today ? ' later' : ''}" title="${esc(d)}${v != null ? ' · ' + v + ' q' : ''}"><i${v != null ? ` class="on" style="--s:${size}px"` : ''}></i></span>`;
+      }).join('');
+      return `<div class="tlrow"><div class="tlhead"><span>${esc(t(lbl))}</span><b>${fmt(q)} q</b></div><div class="tldots">${dots}</div></div>`;
+    };
+    const days = Array.from({ length: 7 }, (_, k) => `<span>${esc(wf.format(parse(addDays(mon, k))))}</span>`).join('');
+    $('#calMiniBody').innerHTML =
+      `${row(mon, 'thisWeekShort')}${row(addDays(mon, -7), 'lastWeekShort')}<div class="tldays">${days}</div>`;
+    /* spaced repetition: average recall now, reviews due */
+    const ms = srAll(today, true),
+      avgR = wavg(ms),
+      due = ms.filter(m => m.reps.length && m.over >= 0).length;
+    $('#srMiniBody').innerHTML =
+      `<div class="srbig">${avgR == null ? '—' : Math.round(avgR * 100) + '%'}</div><div class="srsub">${esc(t('srRecallNow'))}</div><div class="srbar"><i style="width:${avgR == null ? 0 : Math.round(avgR * 100)}%"></i></div><div class="srdue${due ? ' on' : ''}">${esc(due ? t(due === 1 ? 'srDue1' : 'srDueN').replace('{n}', due) : t('srDue0'))}</div>`;
+  }
+  /* the maximized cards: the real element moves in, and back where it was on close */
+  function maxCard(bgSel, bodySel, closeSel, elSel, after) {
+    let home = null,
+      next = null;
+    const d = modal(bgSel, {
+      close: closeSel,
+      onClose: () => {
+        const el = $(elSel);
+        el.classList.remove('inmax');
+        if (home) home.insertBefore(el, next);
+        after && after();
+      },
+    });
+    const open = () => {
+      const el = $(elSel);
+      home = el.parentNode;
+      next = el.nextSibling;
+      el.classList.add('inmax');
+      $(bodySel).appendChild(el);
+      d.open(closeSel);
+      after && after();
+    };
+    open.close = d.close;
+    return open;
+  }
+  const openCalMax = maxCard('#calMaxBg', '#calMaxBody', '#calMaxClose', '.cal', () => {
+    renderCalendar();
+    requestAnimationFrame(fitTags);
+  });
+  const openSrMax = maxCard('#srMaxBg', '#srMaxBody', '#srMaxClose', '#srPrev', () =>
+    requestAnimationFrame(() => renderSRPanel())
+  );
+  const onKey = f => e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      f();
+    }
+  };
+  /* "Statistics →" inside the maximized preview goes to the other tab: the card closes first */
+  $('#openSR').addEventListener('click', () => openSrMax.close(), true);
+  [
+    ['#calMini', openCalMax],
+    ['#streakCard', openCalMax],
+    ['#srMini', openSrMax],
+  ].forEach(([s, f]) => {
+    $(s).addEventListener('click', f);
+    $(s).addEventListener('keydown', onKey(f));
+  });
+  return { renderPhoneDash, weekStreak, openCalMax, openSrMax };
+})();
+const { renderPhoneDash, weekStreak, openCalMax, openSrMax } = PhoneDash;
+
 /* ===== module VolumeView (js/views/volume.js) =====
    public: weekStart, weeklyVolume, rangeSeries, renderVolume, renderVolPanel
    shared state (getter/setter): volRange */
@@ -14526,7 +14958,7 @@ const VolumeView = (() => {
     for (let w = first; w <= cur; w = addDays(w, 7)) out.push({ w, q: by[w] || 0 });
     return out;
   }
-  function volSVG(data, W, H, big) {
+  function volSVG(data, W, H, big, vals = true) {
     const L = big ? 8 : 4,
       Rp = big ? 46 : 4,
       T = big ? 16 : 6,
@@ -14555,7 +14987,7 @@ const VolumeView = (() => {
       const cur = k === pts.length - 1;
       if (cur) g += `<circle class="vhalo" cx="${f(p[0])}" cy="${f(p[1])}" r="${r * 2.6}"/>`;
       g += `<circle class="vdot${cur ? ' cur' : ''}" cx="${f(p[0])}" cy="${f(p[1])}" r="${r}"><title>${esc(data[k].day ? new Intl.DateTimeFormat(LOCALE[lang], { weekday: 'short', month: 'short', day: 'numeric' }).format(parse(data[k].w)) : t('weekOf').replace('{d}', new Intl.DateTimeFormat(LOCALE[lang], { month: 'short', day: 'numeric' }).format(parse(data[k].w))))}: ${data[k].q} ${esc(t('questionsUnit'))}</title></circle>`;
-      if (big && data.length <= 14 && data[k].q)
+      if (big && vals && data.length <= 14 && data[k].q)
         g += `<text class="vval" x="${f(p[0])}" y="${f(p[1] - 9)}" text-anchor="middle">${data[k].q}</text>`;
     });
     if (big && data[0].day) {
@@ -14639,7 +15071,8 @@ const VolumeView = (() => {
     $('#volWeek').textContent = fmt(d.at(-1).q);
     const w = Math.max(120, Math.round(box.clientWidth || 240)),
       h = Math.max(30, Math.round(box.clientHeight || 46));
-    box.innerHTML = volSVG(d, w, h, false);
+    /* phones: the dashboard card is a full-width chart with axes (Strava style), without the value labels */
+    box.innerHTML = volSVG(d, w, h, phoneMQ.matches, false);
     if (!$('#volbg').hidden) renderVolBig();
     renderVolPanel();
   }

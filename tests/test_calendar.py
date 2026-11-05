@@ -56,6 +56,8 @@ with sync_playwright() as p:
             check(f'{tag}: removing yesterday breaks it → 1', bubble(pg) == '1', bubble(pg))
             pg.evaluate(SETUP); pg.wait_for_timeout(100)
 
+            # phones: the calendar lives in the Training log card and opens maximized
+            if mode == 'phone': pg.evaluate("openCalMax()"); pg.wait_for_timeout(200)
             # -------- week checks & bubble placement --------
             rows = pg.evaluate("""(()=>{const out=[];document.querySelectorAll('#calgrid .wcheck').forEach(w=>{const r=+w.style.gridRow;const days=[...document.querySelectorAll('#calgrid .day')].filter(d=>+d.style.gridRow===r);out.push({on:w.classList.contains('on'),active:days.some(d=>d.classList.contains('active'))})});return out})()""")
             check(f'{tag}: every week check matches whether that week had activity', all(r['on'] == r['active'] for r in rows), rows)

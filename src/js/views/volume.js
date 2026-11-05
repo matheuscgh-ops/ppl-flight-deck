@@ -35,7 +35,7 @@ const VolumeView = (() => {
     for (let w = first; w <= cur; w = addDays(w, 7)) out.push({ w, q: by[w] || 0 });
     return out;
   }
-  function volSVG(data, W, H, big) {
+  function volSVG(data, W, H, big, vals = true) {
     const L = big ? 8 : 4,
       Rp = big ? 46 : 4,
       T = big ? 16 : 6,
@@ -64,7 +64,7 @@ const VolumeView = (() => {
       const cur = k === pts.length - 1;
       if (cur) g += `<circle class="vhalo" cx="${f(p[0])}" cy="${f(p[1])}" r="${r * 2.6}"/>`;
       g += `<circle class="vdot${cur ? ' cur' : ''}" cx="${f(p[0])}" cy="${f(p[1])}" r="${r}"><title>${esc(data[k].day ? new Intl.DateTimeFormat(LOCALE[lang], { weekday: 'short', month: 'short', day: 'numeric' }).format(parse(data[k].w)) : t('weekOf').replace('{d}', new Intl.DateTimeFormat(LOCALE[lang], { month: 'short', day: 'numeric' }).format(parse(data[k].w))))}: ${data[k].q} ${esc(t('questionsUnit'))}</title></circle>`;
-      if (big && data.length <= 14 && data[k].q)
+      if (big && vals && data.length <= 14 && data[k].q)
         g += `<text class="vval" x="${f(p[0])}" y="${f(p[1] - 9)}" text-anchor="middle">${data[k].q}</text>`;
     });
     if (big && data[0].day) {
@@ -148,7 +148,8 @@ const VolumeView = (() => {
     $('#volWeek').textContent = fmt(d.at(-1).q);
     const w = Math.max(120, Math.round(box.clientWidth || 240)),
       h = Math.max(30, Math.round(box.clientHeight || 46));
-    box.innerHTML = volSVG(d, w, h, false);
+    /* phones: the dashboard card is a full-width chart with axes (Strava style), without the value labels */
+    box.innerHTML = volSVG(d, w, h, phoneMQ.matches, false);
     if (!$('#volbg').hidden) renderVolBig();
     renderVolPanel();
   }

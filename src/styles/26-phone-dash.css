@@ -1,0 +1,223 @@
+/* ===== phones: a cleaner dashboard (Strava style) — streak, training log and spaced-repetition cards =====
+   Larger screens are unchanged: the new cards are hidden and the preview wrapper does not affect layout. */
+.streakcard,
+.minirow {
+  display: none;
+}
+.srprev {
+  display: contents;
+}
+.maxsheet {
+  width: min(760px, 100%);
+}
+.maxsheet .mhead {
+  margin-bottom: 4px;
+}
+.cal.inmax,
+.srprev.inmax {
+  display: block;
+  border: 0;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+.srprev.inmax {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  /* top row: countdown | streak, then practice tests and the volume chart across the whole width */
+  .toprow .streakcard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 12px;
+    cursor: pointer;
+    text-align: center;
+  }
+  .streakcard .label {
+    align-self: flex-start;
+  }
+  .flamebox {
+    position: relative;
+    width: 74px;
+    height: 74px;
+    display: grid;
+    place-items: center;
+    margin-top: 2px;
+  }
+  .flame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    fill: #fc5200;
+  }
+  .streakcard.cold .flame {
+    fill: #3a414a;
+  }
+  .flamebox b {
+    position: relative;
+    margin-top: 26px;
+    font-size: 23px;
+    font-weight: 900;
+    color: #3a1500;
+    font-variant-numeric: tabular-nums;
+  }
+  .streakcard.cold .flamebox b {
+    color: var(--ink);
+  }
+  .skw {
+    font-size: 18px;
+    font-weight: 850;
+    color: #fc5200;
+    line-height: 1.1;
+  }
+  .streakcard.cold .skw {
+    color: var(--muted);
+  }
+  .skd {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .toprow .tscard {
+    order: 5;
+  }
+  .toprow #volCard {
+    grid-column: 1/-1;
+    order: 6;
+  }
+  .toprow #volCard .volchart {
+    height: 150px;
+    min-height: 150px;
+  }
+
+  /* the calendar and the spaced-repetition preview live in their cards; they open maximized */
+  .center > .cal,
+  #srPanel > .srprev {
+    display: none;
+  }
+  .minirow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+  }
+  .calmini,
+  .srmini {
+    padding: 12px;
+    cursor: pointer;
+    min-width: 0;
+  }
+  .minihead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .minigo {
+    font-size: 20px;
+    line-height: 1;
+    color: var(--muted);
+  }
+  .tlrow + .tlrow {
+    margin-top: 8px;
+  }
+  .tlhead {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--ink2);
+  }
+  .tlhead b {
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .tldots,
+  .tldays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    align-items: center;
+    justify-items: center;
+  }
+  .tldots {
+    height: 26px;
+  }
+  .tl i {
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #59626e;
+  }
+  .tl.later i {
+    background: #343b44;
+  }
+  .tl i.on {
+    width: var(--s);
+    height: var(--s);
+    background: var(--s3);
+  }
+  .tl.now i:not(.on) {
+    width: 9px;
+    height: 9px;
+    background: none;
+    box-shadow: inset 0 0 0 1.5px var(--ink2);
+  }
+  .tl.now i.on {
+    box-shadow:
+      0 0 0 2px #0d0f12,
+      0 0 0 3.5px var(--ink2);
+  }
+  .tldays {
+    margin-top: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .srbig {
+    font-size: 30px;
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+  }
+  .srsub {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .srbar {
+    height: 6px;
+    border-radius: 3px;
+    background: #343b44;
+    margin: 10px 0 8px;
+    overflow: hidden;
+  }
+  .srbar i {
+    display: block;
+    height: 100%;
+    background: var(--s1);
+    border-radius: 3px;
+  }
+  .srdue {
+    font-size: 12px;
+    font-weight: 750;
+    color: var(--ink2);
+  }
+  .srdue.on {
+    color: var(--exam);
+  }
+  /* the maximized card fills the phone screen */
+  .maxbg .maxsheet {
+    width: 100%;
+    max-height: calc(100dvh - 16px);
+  }
+}

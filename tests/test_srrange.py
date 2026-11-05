@@ -28,25 +28,26 @@ with sync_playwright() as p:
             pg.goto(url); pg.wait_for_timeout(400); pg.evaluate(SETUP); pg.wait_for_timeout(150)
             tag = f'{f} · {mode}'
             tap = pg.tap if mode == 'phone' else pg.click
+            if mode == 'phone': pg.evaluate("openSrMax()"); pg.wait_for_timeout(200)  # phones: the preview opens maximized
             check(f'{tag}: preview has the interval selector, 1M selected by default',
-                  pg.is_visible('#srPanel [data-srr]') and pg.evaluate("document.querySelector('#srPanel [data-srr] button.on').dataset.sr") == '1m')
+                  pg.is_visible('#srPrev [data-srr]') and pg.evaluate("document.querySelector('#srPrev [data-srr] button.on').dataset.sr") == '1m')
             # average chart: earliest date shown depends on the interval
             def first_day():
                 return pg.evaluate("(()=>{const svg=document.querySelector('#prevChart svg');const t=[...svg.querySelectorAll('text.cx')].map(x=>x.textContent);return t[0]})()")
             spans = {}
             for r in ['3d', '7d', '2w', '1m', '3m', '6m', '1y', 'all']:
-                tap(f'#srPanel [data-sr="{r}"]'); pg.wait_for_timeout(120)
+                tap(f'#srPrev [data-sr="{r}"]'); pg.wait_for_timeout(120)
                 spans[r] = pg.evaluate("(()=>{const p=document.querySelector('#prevChart path.s-actual');return p?p.getAttribute('d').split(/[ML]/).filter(Boolean).length:0})()")
                 check(f'{tag}: average chart redraws for {r.upper()}', pg.evaluate("document.querySelectorAll('#prevChart svg').length") == 1 and spans[r] > 0, spans[r])
             check(f'{tag}: longer intervals cover more history (3D < 7D < 2W < 1M < 3M ≤ 6M ≤ 1Y ≤ All)', spans['3d'] < spans['7d'] < spans['2w'] < spans['1m'] < spans['3m'] <= spans['6m'] <= spans['1y'] <= spans['all'], spans)
-            check(f'{tag}: same 8 intervals as the volume chart', pg.evaluate("[...document.querySelectorAll('#srPanel [data-srr] button')].map(b=>b.dataset.sr).join()") == pg.evaluate("[...document.querySelectorAll('#volRange button')].map(b=>b.dataset.r).join()") == '3d,7d,2w,1m,3m,6m,1y,all')
+            check(f'{tag}: same 8 intervals as the volume chart', pg.evaluate("[...document.querySelectorAll('#srPrev [data-srr] button')].map(b=>b.dataset.sr).join()") == pg.evaluate("[...document.querySelectorAll('#volRange button')].map(b=>b.dataset.r).join()") == '3d,7d,2w,1m,3m,6m,1y,all')
             check(f'{tag}: "All" starts at the very first session (80 days ago)', spans['all'] >= 80 * 4, spans['all'])
             # topic chart in preview obeys the interval
             if mode == 'desktop':
                 pg.hover('.task[data-topic="12"]'); pg.wait_for_timeout(150)
             else:
                 pg.select_option('#prevPick', '12'); pg.wait_for_timeout(150)
-            tap(f'#srPanel [data-sr="7d"]') if mode == 'phone' else None
+            tap(f'#srPrev [data-sr="7d"]') if mode == 'phone' else None
             if mode == 'desktop':
                 pg.evaluate("setSrRange('7d')"); pg.hover('.task[data-topic="12"]'); pg.wait_for_timeout(150)
             n7 = pg.evaluate("document.querySelectorAll('#prevChart line.crep').length")
@@ -60,7 +61,8 @@ with sync_playwright() as p:
             minx = pg.evaluate("(()=>{const xs=[...document.querySelectorAll('#prevChart path')].flatMap(p=>[...p.getAttribute('d').matchAll(/[ML](-?[\\d.]+) /g)].map(m=>+m[1]));return Math.min(...xs)})()")
             check(f'{tag}: clipped curve never draws outside the chart (left edge ≥ axis)', minx >= 35, minx)
             pg.reload(); pg.wait_for_timeout(400)
-            check(f'{tag}: chosen interval is remembered after reopening', pg.evaluate("document.querySelector('#srPanel [data-srr] button.on').dataset.sr") == '7d')
+            if mode == 'phone': pg.evaluate("openSrMax()"); pg.wait_for_timeout(200)
+            check(f'{tag}: chosen interval is remembered after reopening', pg.evaluate("document.querySelector('#srPrev [data-srr] button.on').dataset.sr") == '7d')
             # Full analysis
             tap('#openSR'); pg.wait_for_timeout(300)
             check(f'{tag}: Full analysis has the interval selector too (same choice)', pg.is_visible('#viewSR [data-srr]') and pg.evaluate("document.querySelector('#viewSR [data-srr] button.on').dataset.sr") == '7d')
@@ -76,14 +78,14 @@ with sync_playwright() as p:
             check(f'{tag}: the question-bank chart follows the interval', pg.evaluate("document.querySelectorAll('#fcChart svg').length") == 1)
             check(f'{tag}: KPIs (recall, due) do not change with the interval', True)
             pg.click('.tabs button[data-view="dash"]'); pg.wait_for_timeout(150)
-            check(f'{tag}: back on the dashboard the preview shows the same interval', pg.evaluate("document.querySelector('#srPanel [data-srr] button.on').dataset.sr") == '7d')
+            check(f'{tag}: back on the dashboard the preview shows the same interval', pg.evaluate("document.querySelector('#srPrev [data-srr] button.on').dataset.sr") == '7d')
             if mode == 'desktop':
                 check(f'{tag}: dashboard still fits one screen with the selector', pg.evaluate('document.documentElement.scrollHeight') == 1190)
                 check(f'{tag}: suggestions still visible under the chart', pg.evaluate("[...document.querySelectorAll('#sugg .qrow')].filter(r=>!r.hidden).length") >= 2)
             else:
                 check(f'{tag}: page not wider than the phone', pg.evaluate('document.documentElement.scrollWidth') == 402)
             pg.evaluate("document.querySelector('.flag[data-lang=\"pt\"]').click()"); pg.wait_for_timeout(80)
-            check(f'{tag}: "All" translated (pt: Tudo)', pg.evaluate("document.querySelector('#srPanel [data-sr=\"all\"]').textContent") == 'Tudo')
+            check(f'{tag}: "All" translated (pt: Tudo)', pg.evaluate("document.querySelector('#srPrev [data-sr=\"all\"]').textContent") == 'Tudo')
             check(f'{tag}: no JavaScript errors', not errs, errs)
             c.close()
     b.close()

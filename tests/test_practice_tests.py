@@ -41,8 +41,9 @@ with sync_playwright() as p:
 
             # ---------- dashboard card (top row, between exam countdown and "This week") ----------
             pg.evaluate(SETUP); pg.wait_for_timeout(200)
-            order = ev("[...document.querySelector('.toprow').children].map(x=>x.id||x.className.split(' ')[1])")
-            check(f'{tag}: top row order: progress, countdown, practice tests, this week', order == ['progress', 'countdown', 'tsCard', 'volCard'], order)
+            order = ev("[...document.querySelector('.toprow').children].filter(x=>getComputedStyle(x).display!=='none').map(x=>x.id||x.className.split(' ')[1])")
+            want = ['progress', 'countdown', 'streakCard', 'tsCard', 'volCard'] if mode == 'phone' else ['progress', 'countdown', 'tsCard', 'volCard']
+            check(f'{tag}: top row order: progress, countdown{" (+ streak on phones)" if mode == "phone" else ""}, practice tests, this week', order == want, order)
             check(f'{tag}: no practice-test footer under the calendar', ev("document.getElementById('tsStrip')") is None and ev("document.querySelector('#viewDash > :last-child').className") == 'center')
             check(f'{tag}: card shows last score 78% and best 78%', pg.inner_text('#tsLast') == '78%' and '78%' in pg.inner_text('#tsBestMini'), (pg.inner_text('#tsLast'), pg.inner_text('#tsBestMini')))
             check(f'{tag}: card shows average of last 3 = 74% (visible)', pg.is_visible('#tsStripKpis') and '74%' in pg.inner_text('#tsStripKpis'), pg.inner_text('#tsStripKpis'))
@@ -51,7 +52,9 @@ with sync_playwright() as p:
             boxes = ev("['tsCard','volCard'].map(id=>{const b=document.getElementById(id).getBoundingClientRect();return [b.left,b.right,b.top,b.bottom]})")
             check(f'{tag}: practice-test card and "This week" do not overlap and fit the screen', all(b[1] <= W for b in boxes) and (boxes[0][1] <= boxes[1][0] or boxes[0][2] >= boxes[1][3] or boxes[1][2] >= boxes[0][3]), boxes)
             check(f'{tag}: progress legend names are not cut off', not ev("[...document.querySelectorAll('.progress .lg strong')].some(e=>e.scrollWidth>e.clientWidth+1)"))
-            if mode in ('phone', 'iPad mini'):
+            if mode == 'phone':
+                check(f'{tag}: phone: countdown and streak side by side, then practice tests, then "This week" across the width', ev("document.getElementById('volCard').getBoundingClientRect().top>=document.getElementById('tsCard').getBoundingClientRect().bottom-1") and abs(ev("document.querySelector('.countdown').getBoundingClientRect().top-document.getElementById('streakCard').getBoundingClientRect().top")) < 1)
+            if mode == 'iPad mini':
                 check(f'{tag}: countdown and "This week" stay side by side, practice tests below', ev("document.getElementById('tsCard').getBoundingClientRect().top>=document.getElementById('volCard').getBoundingClientRect().bottom-1") and abs(ev("document.querySelector('.countdown').getBoundingClientRect().top-document.getElementById('volCard').getBoundingClientRect().top")) < 1)
             if mode == 'desktop':
                 check(f'{tag}: dashboard still fits one screen', ev('document.documentElement.scrollHeight') == H, ev('document.documentElement.scrollHeight'))

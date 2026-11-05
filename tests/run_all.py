@@ -43,6 +43,7 @@ suites = [('End-to-end (index.html)', ['test_e2e.py', os.path.join(ROOT, 'index.
           ('Errors tab and spreadsheet import', ['test_errors.py']),
           ('Exam phases, readiness checklist & forecast track record', ['test_exam_ready.py']),
           ('Next-up bar & focus mode', ['test_focus.py']),
+          ('Phone dashboard: streak, training log, spaced-repetition cards', ['test_phone_dash.py']),
           ('Settings', ['test_settings.py']),
           ('Demo guided tour', ['test_tour.py']),
           ('User guide, docs button & tour link', ['test_docs.py']),
