@@ -42,7 +42,7 @@ def card(pg, i):
     return pg.evaluate(f"[...document.querySelectorAll('#sr-{i} .kpirow b')].map(b=>b.textContent)")
 
 with sync_playwright() as p:
-    b = p.chromium.launch()
+    b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
     for f in ['index', 'demo']:
         for mode, opts in DEV:
             tag = f'{f} · {mode}'; touch = mode in ('phone', 'iPad mini'); tap = pg_tap = None

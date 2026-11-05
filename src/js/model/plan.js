@@ -1,5 +1,6 @@
 /* ===== module PlanModel (js/model/plan.js) =====
-   public: settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName, reviewSize
+   public: settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName, reviewSize, examPhase,
+           STRETCH_DAYS, LASTDAY_MAX
    shared state (getter/setter): energyMode */
 const PlanModel = (() => {
   /* ================= DAILY PLAN (mechanical, time-based) =================
@@ -15,6 +16,20 @@ const PlanModel = (() => {
    Order: 1) practice test when due  2) reviews due today  3) topics never scored, weak topics (< 70%)
           4) new material (skipped in the last 7 days). Each item is cut to what still fits in the remaining minutes.
    Topics left undone in a saved plan during the last 7 days get a 25% priority boost (see Schedule). */
+  /* ================= EXAM PHASES (days left until the exam date) =================
+   normal   > 21 days   the standard plan
+   stretch  8–21 days   final stretch: "weak" means below your goal (not below 70%), new material counts 20% less,
+                        a practice test at least every 3 days (every 2 in the last 10), error-notes review +5 min
+   week     2–7 days    as the stretch, and no new material at all
+   lastday  0–1 day     the day before and the exam day: no practice test, no topic never studied, reviews of at most
+                        20 questions, at most 90 minutes in all — rest beats cramming
+   after    the exam date has passed: the standard plan */
+  const STRETCH_DAYS = 21,
+    LASTDAY_MAX = 90;
+  function examPhase(date) {
+    const d = diffDays(date || todayISO(), state.deadline);
+    return d < 0 ? 'after' : d <= 1 ? 'lastday' : d <= 7 ? 'week' : d <= STRETCH_DAYS ? 'stretch' : 'normal';
+  }
   const DEF_SET = { minutes: 180, qph: 40, testEvery: 3, reviewMin: 1.5 };
   const settings = () => {
     const o = state.settings || {},
@@ -72,7 +87,11 @@ const PlanModel = (() => {
       E = ENERGY[mode || 'medium'],
       st = { ...st0, minutes: st0.minutes * E.stretch },
       daysLeft = Math.max(1, diffDays(asOf, state.deadline)),
-      final = daysLeft <= 7;
+      phase = examPhase(asOf),
+      final = daysLeft <= 7,
+      lastDay = phase === 'lastday',
+      weakBelow = phase === 'normal' || phase === 'after' ? 70 : GOAL;
+    if (lastDay) st.minutes = Math.min(st.minutes, LASTDAY_MAX);
     const cap = Math.max(10, Math.round((st.minutes * st.qph) / 60)); /* questions/night with no review (reference) */
     const doneT = new Set(
       state.events.filter(e => e.date === asOf && (e.kind === 'study' || e.kind === 'review')).map(e => e.topic)
@@ -125,7 +144,7 @@ const PlanModel = (() => {
     const add = it => cands.push(it);
     const tw = testWhy(asOf, st0),
       man = asOf === todayISO() && manualTest(asOf);
-    if (testsToday || tw.due || man) {
+    if (testsToday || (tw.due && !lastDay) || man) {
       const mu = blended(asOf).mu;
       if (E.test || testsToday || tw.overdue >= 2 || man)
         add({
@@ -142,20 +161,23 @@ const PlanModel = (() => {
     const ms = srAll(asOf, true);
     ms.filter(m => m.reps.length && m.over >= 0).forEach(m => {
       used.add(m.i);
-      add(topicItem(m.i, reviewSize(m.i, m), 'due'));
+      add(topicItem(m.i, lastDay ? Math.min(20, reviewSize(m.i, m)) : reviewSize(m.i, m), 'due'));
     });
-    ms.filter(m => !m.reps.length && !used.has(m.i)).forEach(m => {
+    ms.filter(m => !lastDay && !m.reps.length && !used.has(m.i)).forEach(m => {
       used.add(m.i);
       add(topicItem(m.i, Math.min(TOPICS[m.i].q, 40), 'nodata'));
     });
     TOPICS.map((x, i) => i)
       .filter(
-        i => !used.has(i) && ['Not Comfortable', 'To review'].includes(state.statuses[i]) && (state.scores[i] ?? 0) < 70
+        i =>
+          !used.has(i) &&
+          ['Not Comfortable', 'To review'].includes(state.statuses[i]) &&
+          (state.scores[i] ?? 0) < weakBelow
       )
       .sort((a, b) => TOPICS[b].q - TOPICS[a].q)
       .forEach(i => {
         used.add(i);
-        add(topicItem(i, Math.min(TOPICS[i].q, 40), 'weak'));
+        add(topicItem(i, Math.min(TOPICS[i].q, lastDay ? 20 : 40), 'weak'));
       });
     const newOnes = [];
     if (!final)
@@ -183,7 +205,13 @@ const PlanModel = (() => {
     /* standard: practice test first, then the most exam questions at stake per minute of study:
      (1 − pExam) × urgency ÷ minutes per question — every bank question is equally likely on the exam, so this is the
      expected exam-day questions protected per minute (urgency: overdue review 1.3, weak 1.15, no data 1.1, new 1.0) */
-    const URG = { due: 1.3, weak: 1.15, nodata: 1.1, new: 1, light: 0.8 },
+    const URG = {
+        due: 1.3,
+        weak: 1.15,
+        nodata: 1.1,
+        new: phase === 'normal' || phase === 'after' ? 1 : 0.8,
+        light: 0.8,
+      },
       missed = typeof missedTopics === 'function' ? missedTopics(asOf) : new Set(),
       val = x => ((1 - x.pExam) * (URG[x.reason] || 1) * (missed.has(x.i) ? 1.25 : 1)) / x.per;
     if (E.order === 'standard') todo.sort((a, b) => (b.kind === 'test') - (a.kind === 'test') || val(b) - val(a));
@@ -217,6 +245,7 @@ const PlanModel = (() => {
       ),
       daysLeft,
       final,
+      phase,
       pace: Math.ceil(remaining / daysLeft),
     };
   }
@@ -247,6 +276,32 @@ const PlanModel = (() => {
       },
     ],
   });
-  return { settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName, reviewSize };
+  return {
+    settings,
+    easeOf,
+    minutesPerQ,
+    buildPlan,
+    planDay,
+    setEnergy,
+    fmtMin,
+    planRowName,
+    reviewSize,
+    examPhase,
+    STRETCH_DAYS,
+    LASTDAY_MAX,
+  };
 })();
-const { settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName, reviewSize } = PlanModel;
+const {
+  settings,
+  easeOf,
+  minutesPerQ,
+  buildPlan,
+  planDay,
+  setEnergy,
+  fmtMin,
+  planRowName,
+  reviewSize,
+  examPhase,
+  STRETCH_DAYS,
+  LASTDAY_MAX,
+} = PlanModel;

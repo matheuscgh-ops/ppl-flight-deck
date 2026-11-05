@@ -32,6 +32,10 @@ def run(b, lang):
     pg.click('#volOpen'); shot(pg, 'volume', '#volbg .modal'); pg.keyboard.press('Escape')
     pg.click('#fcMini'); shot(pg, 'fctop', '#fcTopBg .modal'); pg.keyboard.press('Escape')
     pg.keyboard.press('Control+k'); pg.keyboard.type('wea'); shot(pg, 'palette', '#palbg .pal'); pg.keyboard.press('Escape')
+    # "Ready for the exam?" — shown in the final stretch (15 days before the exam), then the date is put back
+    ev("window._dl=state.deadline;state.deadline=addDays(todayISO(),15);render()"); pg.wait_for_timeout(200)
+    shot(pg, 'ready-meter', '.countdown'); ev("openReady()"); pg.wait_for_timeout(200); shot(pg, 'ready', '#readybg .modal')
+    pg.keyboard.press('Escape'); ev("state.deadline=window._dl;render()"); pg.wait_for_timeout(200)
     # plan
     ev("goView('plan')"); pg.wait_for_timeout(300); pg.click('#pwNext'); shot(pg, 'plan-week', '#planWeek')
     pg.click('#pwTabs [data-pw="plans"]'); shot(pg, 'plan-myplans', '#planWeek'); pg.click('#pwTabs [data-pw="week"]'); pg.click('#pwToday')

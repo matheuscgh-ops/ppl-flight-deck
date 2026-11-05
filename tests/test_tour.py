@@ -16,7 +16,7 @@ DEMO = 'file://' + os.path.join(ROOT, 'demo.html'); INDEX = 'file://' + os.path.
 REAL_USER = "Object.defineProperty(navigator,'webdriver',{get:()=>false})"   # behave like a person's browser
 
 with sync_playwright() as p:
-    b = p.chromium.launch()
+    b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
     # ---- personal app: no tour ----
     pg = b.new_page(); pg.add_init_script(REAL_USER); pg.goto(INDEX); pg.wait_for_timeout(1200)
     check('personal app: no tour button, no tour script, nothing opens', pg.evaluate("!document.getElementById('tourBtn')&&!window.pplTour&&!document.querySelector('.tour-card')"))
@@ -30,7 +30,7 @@ with sync_playwright() as p:
         ev = pg.evaluate; tap = pg.tap if mode in ('phone', 'iPad mini') else pg.click
         check(f'{tag}: first visit opens the tour automatically', pg.is_visible('.tour-card') and ev('pplTour.step()') == 0)
         n = ev('pplTour.steps')
-        check(f'{tag}: 18 steps, "Step 1 of 18"', n == 18 and 'step 1 of 18' in pg.inner_text('.tour-card').lower())
+        check(f'{tag}: 19 steps, "Step 1 of 19"', n == 19 and 'step 1 of 19' in pg.inner_text('.tour-card').lower())
         # walk every step: highlight on the target, card inside the screen
         bad = []
         for k in range(n):
@@ -92,7 +92,7 @@ with sync_playwright() as p:
         check(f'{tag}: the chosen flag is marked', ev("document.querySelector('.tour-card [data-tlang=\"ja\"]').classList.contains('on')"))
         tap('.tour-card [data-tlang="en"]'); pg.wait_for_timeout(300)
         ev("document.querySelector('.flag[data-lang=\"pt\"]').click()"); pg.wait_for_timeout(300)
-        check(f'{tag}: tour follows the language (pt)', 'passo 3 de 18' in pg.inner_text('.tour-card').lower() and 'Próximo' in pg.inner_text('.tour-card'))
+        check(f'{tag}: tour follows the language (pt)', 'passo 3 de 19' in pg.inner_text('.tour-card').lower() and 'Próximo' in pg.inner_text('.tour-card'))
         ev("document.querySelector('.flag[data-lang=\"en\"]').click()"); pg.wait_for_timeout(200)
         # skip
         tap('[data-tour="skip"]'); pg.wait_for_timeout(300)

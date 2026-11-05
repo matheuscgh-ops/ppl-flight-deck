@@ -20,7 +20,7 @@ SETUP = """(()=>{const T=todayISO(),D=n=>addDays(T,-n),ev=(n,topic,sc)=>({id:'p'
   state.settings={minutes:180,qph:40,testEvery:0,reviewMin:1.5};save();render();})()"""
 
 with sync_playwright() as p:
-    b = p.chromium.launch()
+    b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
     for f in ['index', 'demo']:
         for mode, opts in DEV:
             tag = f'{f} · {mode}'; touch = mode in ('phone', 'iPad mini'); phone = mode == 'phone'; W = opts['viewport']['width']

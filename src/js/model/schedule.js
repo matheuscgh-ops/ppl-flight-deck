@@ -202,8 +202,11 @@ const Schedule = (() => {
   /* error-notes review at the start of a session: 10 min for a 1–2 h session, 15 min from 2 h, none under 1 h or when
      there are no notes from earlier days (or the error review is off in Settings) */
   function notesReviewFor(date, cap) {
-    if (!pref('reflect') || cap < 60 || !(state.notes || []).some(n => n.date < date)) return 0;
-    return cap >= 120 ? 15 : 10;
+    const ph = examPhase(date),
+      stretch = ph === 'stretch' || ph === 'week' || ph === 'lastday';
+    /* final stretch: from 45 min, and 5 min longer (your own mistakes are the best review before the exam) */
+    if (!pref('reflect') || cap < (stretch ? 45 : 60) || !(state.notes || []).some(n => n.date < date)) return 0;
+    return (cap >= 120 ? 15 : 10) + (stretch ? 5 : 0);
   }
   const usedBy = pick => pick.reduce((a, c) => a + Math.ceil(c.n * c.per), 0);
   /* the smallest chunk worth placing: 10 minutes (or the whole topic when it is shorter), never under 5 questions */
@@ -215,6 +218,17 @@ const Schedule = (() => {
      the same block; only when that is impossible (a practice test or a topic that cannot shrink fills the block) does
      the whole review move to the start of the day's next block. */
   function packDay(date, ranges, energy) {
+    /* the day before the exam and the exam day: at most 90 minutes, the first ones you blocked */
+    if (examPhase(date) === 'lastday') {
+      let room = LASTDAY_MAX;
+      ranges = (ranges || [])
+        .map(([s, e]) => {
+          const len = Math.max(0, Math.min(e - s, room));
+          room -= len;
+          return [s, s + len];
+        })
+        .filter(([s, e]) => e > s);
+    }
     const total = rangesTotal(ranges);
     if (!total) return [];
     const st = settings(),
@@ -241,6 +255,7 @@ const Schedule = (() => {
           value:
             (x.kind === 'test' ? TEST_Q * 1.5 : n * (1 - (x.pExam ?? x.p ?? 0.5))) *
             (URGENCY[x.reason] || 1) *
+            (x.reason === 'new' && !['normal', 'after'].includes(examPhase(date)) ? 0.8 : 1) *
             (x.kind === 'topic' && boost.has(x.i) ? MISSED_BOOST : 1),
         };
       })

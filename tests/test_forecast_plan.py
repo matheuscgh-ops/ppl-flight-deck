@@ -20,7 +20,7 @@ DEV = [('desktop', dict(viewport={'width': 2000, 'height': 1190})),
        ('phone', dict(viewport={'width': 402, 'height': 874}, is_mobile=True, has_touch=True, user_agent=UA))]
 
 with sync_playwright() as p:
-    b = p.chromium.launch()
+    b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
     for f in ['index', 'demo']:
         url = 'file://' + os.path.join(ROOT, f + '.html')
         for mode, opts in DEV:

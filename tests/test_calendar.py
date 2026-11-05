@@ -24,7 +24,7 @@ def streak(pg): return pg.evaluate('streakInfo().n')
 def bubble(pg): return pg.inner_text('.bubble')
 
 with sync_playwright() as p:
-    b = p.chromium.launch()
+    b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
     for f in ['index', 'demo']:
         url = 'file://' + os.path.join(ROOT, f + '.html')
         for mode, opts in [('desktop', dict(viewport={'width': 2000, 'height': 1190})),

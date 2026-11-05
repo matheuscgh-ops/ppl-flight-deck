@@ -18,7 +18,7 @@ def check(name, cond, detail=''):
     results.append((name, bool(cond), str(detail)[:200]))
 
 with sync_playwright() as p:
-    b = p.chromium.launch()
+    b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
     for f in ['index', 'demo']:
         url = 'file://' + os.path.join(ROOT, f + '.html')
         for dev, opts in DEVICES.items():

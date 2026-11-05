@@ -23,7 +23,7 @@ SETUP = """(()=>{state.events=[];state.settings={minutes:180,qph:40,testEvery:3,
 EMPTY = "(()=>{state.tests=[];save();render();})()"
 
 with sync_playwright() as p:
-    b = p.chromium.launch()
+    b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
     for f in ['index', 'demo']:
         url = 'file://' + os.path.join(ROOT, f + '.html')
         for mode, opts in DEV:

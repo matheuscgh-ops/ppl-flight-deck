@@ -100,9 +100,11 @@ const PlanView = (() => {
     const parts = [
       !w.every
         ? t('tsOff')
-        : w.due
-          ? t('tsNextToday') + ' · ' + t('reason_' + w.reason)
-          : t('tsNextIn').replace('{n}', diffDays(todayISO(), w.next)),
+        : w.rest
+          ? t('tsRest')
+          : w.due
+            ? t('tsNextToday') + ' · ' + t('reason_' + w.reason)
+            : t('tsNextIn').replace('{n}', diffDays(todayISO(), w.next)),
     ];
     if (last)
       parts.push(

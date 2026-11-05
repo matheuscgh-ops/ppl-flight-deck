@@ -43,7 +43,7 @@ DIALOGS = [('settings', "document.getElementById('setOpen').click()", '#setbg'),
 CLOSE = "document.querySelectorAll('.modalbg').forEach(m=>m.hidden=true);window.closeWizard&&wizardState()&&closeWizard();document.getElementById('askbg').hidden=true"
 
 with sync_playwright() as p:
-    b = p.chromium.launch()
+    b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
     for f in ['index', 'demo']:
         for mode, opts in DEV:
             c = b.new_context(**opts); pg = c.new_page(); errs = []; pops = []
