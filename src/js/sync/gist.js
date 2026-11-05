@@ -93,6 +93,7 @@ const GistSync = (() => {
       plans: un(n.plans || [], o.plans || []),
       cards: un(n.cards || [], o.cards || []),
       notes: un(n.notes || [], o.notes || []),
+      paces: un(n.paces || [], o.paces || []),
       deleted: del,
       updatedAt: Math.max(a.updatedAt, b.updatedAt),
     });

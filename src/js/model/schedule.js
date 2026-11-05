@@ -33,7 +33,7 @@ const Schedule = (() => {
     DAY_END = 24 * 60,
     MIN_CHUNK_Q = 20 /* the smallest session of a big topic (Weather 158 q is studied 40 at a time, never 12) */,
     MISSED_BOOST = 1.25,
-    URGENCY = { due: 1.3, weak: 1.15, nodata: 1.1, new: 1, light: 0.8, test: 1.4, testDue: 1.4, custom: 1 };
+    URGENCY = { due: 1.3, carried: 2, weak: 1.15, nodata: 1.1, new: 1, light: 0.8, test: 1.4, testDue: 1.4, custom: 1 };
 
   const plans = () => state.plans || (state.plans = []);
   function mondayOf(date) {
@@ -242,7 +242,8 @@ const Schedule = (() => {
     const st = settings(),
       speed = { low: 1.15, medium: 1, high: 0.9 }[energy || 'medium'],
       boost = missedTopics(date),
-      P = buildPlan(date, { ...st, minutes: total * 4 }, energy || 'medium');
+      /* candidates from a generous budget, so a long practice test never crowds out the topics that fit a short block */
+      P = buildPlan(date, { ...st, minutes: Math.max(total * 4, 480) }, energy || 'medium', carryNow);
     /* the review of misses is its own item, so each question here counts only the time to answer it */
     let cands = P.items
       .filter(x => !x.done && x.n > 0 && (x.kind === 'test' || x.kind === 'topic'))
@@ -398,17 +399,20 @@ const Schedule = (() => {
 
   /* fill several days in order, simulating the earlier days as done; returns { date: items } */
   function suggestDays(days, blocks, energies) {
-    const saved = { events: state.events, tests: state.tests },
+    const saved = { events: state.events, tests: state.tests, statuses: state.statuses },
       out = {};
     try {
       state.events = state.events.slice();
       state.tests = (state.tests || []).slice();
+      state.statuses = state.statuses.slice();
       days
         .slice()
         .sort()
         .forEach(d => {
           const items = d < todayISO() ? [] : packDay(d, blocks[d] || [], (energies || {})[d]);
           out[d] = items;
+          /* a topic moved forward is placed once, on the first day it fits */
+          if (carryNow) items.forEach(it => it.kind === 'topic' && carryNow.delete(it.i));
           items.forEach(it => {
             if (it.kind === 'reflect' || it.kind === 'notes') return;
             if (it.kind === 'test')
@@ -425,12 +429,16 @@ const Schedule = (() => {
                 partial: false,
                 demo: false,
               });
+              /* a new topic studied whole is not new any more on the next days (it comes back as a review) */
+              if (it.n >= TOPICS[it.i].q && ['Todo', 'Doing'].includes(state.statuses[it.i]))
+                state.statuses[it.i] = 'Very Comfortable';
             }
           });
         });
     } finally {
       state.events = saved.events;
       state.tests = saved.tests;
+      state.statuses = saved.statuses;
     }
     return out;
   }
@@ -527,8 +535,14 @@ const Schedule = (() => {
     commit(
       () => {
         const q = state.plans.find(x => x.id === p.id).items.find(x => x.id === id);
-        if (on) q.check = true;
-        else delete q.check;
+        if (on) {
+          paceFromTick(p, q);
+          q.check = true;
+          q.checkedAt = Date.now();
+        } else {
+          delete q.check;
+          delete q.checkedAt;
+        }
         state.plans.find(x => x.id === p.id).updated = Date.now();
       },
       t(on ? 'itemChecked' : 'itemUnchecked')
@@ -566,14 +580,75 @@ const Schedule = (() => {
     });
     return out.filter(([s, e]) => e - s >= 10);
   }
+  /* topics moved forward by "Refresh plan" from earlier days, while it re-plans (see refreshPlans) */
+  let carryNow = null;
+  /* minutes from midnight → today's timestamp, and back */
+  const clockMs = (date, min) => {
+    const d = parse(date);
+    d.setHours(0, min, 0, 0);
+    return d.getTime();
+  };
+  /* a tick on a topic block also tells how long it took (your pace): from your previous tick today, or from the
+     block's planned start for the first one, to now */
+  function paceFromTick(p, it) {
+    if (it.kind !== 'topic' || it.date !== todayISO() || !it.n) return;
+    const now = Date.now(),
+      prev = (state.plans || [])
+        .flatMap(q => q.items || [])
+        .filter(x => x.date === it.date && x.checkedAt && x.checkedAt < now && x.id !== it.id)
+        .reduce((a, x) => Math.max(a, x.checkedAt), 0),
+      start = prev && now - prev < 4 * 3600e3 ? prev : clockMs(it.date, it.start);
+    const min = (now - start) / 60000;
+    if (min >= 2) notePace(it.i, it.n, min, 'tick');
+  }
   function refreshPlans() {
     const today = todayISO(),
       now = new Date(),
       nowMin = Math.ceil((now.getHours() * 60 + now.getMinutes()) / SLOT) * SLOT;
     let days = 0;
+    /* 1) topic blocks left undone in the last 7 days move forward: they leave their old day (with their error
+          reviews) and the re-plan below puts them first */
+    const carry = new Set(),
+      from = addDays(today, -7);
     plans()
       .filter(p => p.active)
       .forEach(p => {
+        const gone = new Set();
+        (p.items || []).forEach(it => {
+          if (it.kind === 'topic' && it.date < today && it.date >= from && !itemDone(it)) {
+            carry.add(it.i);
+            gone.add(it.id);
+          }
+        });
+        if (!gone.size) return;
+        p.items = p.items.filter(
+          it =>
+            !gone.has(it.id) &&
+            !(
+              it.kind === 'reflect' &&
+              it.date < today &&
+              !it.check &&
+              (gone.has(it.of) || (!it.of && (it.parts || []).every(x => carry.has(x.i))))
+            )
+        );
+      });
+    plans()
+      .filter(p => p.active)
+      .forEach(p => {
+        /* 2) blocks of today already done but planned for later move before now (the ones before them slide earlier
+              so nothing overlaps): the rest of today's time is free for the re-plan */
+        let end = nowMin;
+        (p.items || [])
+          .filter(it => it.date === today && itemDone(it) && it.kind !== 'notes')
+          .sort((a, b) => b.start - a.start)
+          .forEach(it => {
+            if (it.start + it.min <= end) {
+              end = Math.min(end, it.start);
+              return;
+            }
+            it.start = Math.max(0, end - it.min);
+            end = it.start;
+          });
         const ds = Object.keys(p.blocks || {})
           .filter(d => d >= today && rangesTotal(p.blocks[d]) && (activeFor(d) || {}).plan === p)
           .sort();
@@ -585,14 +660,26 @@ const Schedule = (() => {
           its.forEach(it => {
             if (itemDone(it) || it.kind === 'custom' || it.custom) keepIds.add(it.id);
           });
+          /* the error review of a topic you did stays (you still have to read your misses) */
           its.forEach(it => {
-            if (it.kind === 'reflect' && it.of && keepIds.has(it.of)) keepIds.add(it.id);
+            if (
+              it.kind === 'reflect' &&
+              ((it.of && keepIds.has(it.of)) ||
+                (!it.of && (it.parts || []).some(x => its.some(y => y.kind === 'topic' && y.i === x.i && itemDone(y)))))
+            )
+              keepIds.add(it.id);
           });
           const busy = its.filter(it => keepIds.has(it.id)).map(it => [it.start, it.start + it.min]);
           if (d === today) busy.push([0, nowMin]);
           free[d] = rangesMinus(p.blocks[d], busy);
         });
-        const fresh = suggestDays(ds, free, p.energy || {});
+        carryNow = carry.size ? carry : null;
+        let fresh;
+        try {
+          fresh = suggestDays(ds, free, p.energy || {});
+        } finally {
+          carryNow = null;
+        }
         p.items = [
           ...(p.items || []).filter(it => !ds.includes(it.date) || keepIds.has(it.id)),
           ...ds.flatMap(d => fresh[d] || []),

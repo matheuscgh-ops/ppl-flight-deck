@@ -70,6 +70,10 @@
   background: #3d2b14;
   color: #ffd08a;
 }
+.rchip.carried {
+  background: #43301a;
+  color: #ffbe7a;
+}
 .rchip.nodata {
   background: #2f2a45;
   color: #c3b6ff;

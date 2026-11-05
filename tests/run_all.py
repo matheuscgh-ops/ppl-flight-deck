@@ -45,6 +45,7 @@ suites = [('End-to-end (index.html)', ['test_e2e.py', os.path.join(ROOT, 'index.
           ('Next-up bar & focus mode', ['test_focus.py']),
           ('Phone dashboard: streak, training log, spaced-repetition cards', ['test_phone_dash.py']),
           ('Score from right answers of the planned questions', ['test_score_right.py']),
+          ('Your pace and the dynamic Refresh plan', ['test_plan_pace.py']),
           ('Settings', ['test_settings.py']),
           ('Demo guided tour', ['test_tour.py']),
           ('User guide, docs button & tour link', ['test_docs.py']),

@@ -150,6 +150,9 @@ const Focus = (() => {
   function finish() {
     const it = cur;
     if (!it) return;
+    /* the stopwatch is the most exact measure of your pace */
+    const min = elapsed() / 60000;
+    if (it.kind === 'topic' && it.n && min >= 2) commit(() => notePace(it.i, it.n, min, 'focus'), t('paceNoted'));
     closeFocus(false);
     if (it.kind === 'topic') {
       const m = srModel(it.i);
