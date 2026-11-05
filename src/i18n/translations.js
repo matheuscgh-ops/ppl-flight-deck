@@ -1937,6 +1937,43 @@ const Translations = (() => {
     tsRest: '今は模試なし：試験前は休みましょう',
     tsRestShort: '休息',
   });
+  /* next-up bar (phones) and focus mode */
+  Object.assign(I18N.en, {
+    focusOpen: 'Focus mode: the next item of today',
+    focusTitle: 'Focus',
+    focusStart: 'Start',
+    focusPause: 'Pause',
+    focusResume: 'Resume',
+    focusDone: 'Finished → log score',
+    focusDoneTask: 'Done',
+    focusPlanned: 'of {m} planned',
+    focusOver: '{m} over the plan',
+    focusThen: 'Then: {x}',
+  });
+  Object.assign(I18N.pt, {
+    focusOpen: 'Modo foco: o próximo item de hoje',
+    focusTitle: 'Foco',
+    focusStart: 'Começar',
+    focusPause: 'Pausar',
+    focusResume: 'Continuar',
+    focusDone: 'Terminei → nota',
+    focusDoneTask: 'Feito',
+    focusPlanned: 'de {m} planejados',
+    focusOver: '{m} além do plano',
+    focusThen: 'Depois: {x}',
+  });
+  Object.assign(I18N.ja, {
+    focusOpen: 'フォーカスモード：今日の次の項目',
+    focusTitle: 'フォーカス',
+    focusStart: '開始',
+    focusPause: '一時停止',
+    focusResume: '再開',
+    focusDone: '終了 → スコアを記録',
+    focusDoneTask: '完了',
+    focusPlanned: '予定 {m} のうち',
+    focusOver: '予定より {m} 超過',
+    focusThen: '次：{x}',
+  });
   return { I18N };
 })();
 const { I18N } = Translations;

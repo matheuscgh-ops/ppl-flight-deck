@@ -36,6 +36,9 @@ def run(b, lang):
     ev("window._dl=state.deadline;state.deadline=addDays(todayISO(),15);render()"); pg.wait_for_timeout(200)
     shot(pg, 'ready-meter', '.countdown'); ev("openReady()"); pg.wait_for_timeout(200); shot(pg, 'ready', '#readybg .modal')
     pg.keyboard.press('Escape'); ev("state.deadline=window._dl;render()"); pg.wait_for_timeout(200)
+    # focus mode on the next item of today's plan (stopwatch shown at 12:34)
+    ev("openFocus();(()=>{const k=STORE+'-focus',w=JSON.parse(localStorage.getItem(k));w.acc=754000;w.run=0;localStorage.setItem(k,JSON.stringify(w))})();closeFocus(true);openFocus()"); pg.wait_for_timeout(300)
+    shot(pg, 'focus', '.focus'); ev("closeFocus(false)"); pg.wait_for_timeout(100)
     # plan
     ev("goView('plan')"); pg.wait_for_timeout(300); pg.click('#pwNext'); shot(pg, 'plan-week', '#planWeek')
     pg.click('#pwTabs [data-pw="plans"]'); shot(pg, 'plan-myplans', '#planWeek'); pg.click('#pwTabs [data-pw="week"]'); pg.click('#pwToday')

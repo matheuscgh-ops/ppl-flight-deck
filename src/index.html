@@ -81,7 +81,7 @@
         <div class="seg srrange" data-srr><button data-sr="3d">3D</button><button data-sr="7d">7D</button><button data-sr="2w">2W</button><button data-sr="1m">1M</button><button data-sr="3m">3M</button><button data-sr="6m">6M</button><button data-sr="1y">1Y</button><button data-sr="all" data-t="rAll"></button></div>
         <div class="chart" id="prevChart"></div>
         <div class="chartlegend small" id="srLegend2"></div>
-        <div class="nthen"><div class="qh planhead"><span data-t="planToday"></span><span id="planMiniTot"></span><span class="enpill" id="planMiniMode"></span><button type="button" class="linkbtn" id="openPlan" data-t="planOpen"></button></div><div id="sugg"></div></div>
+        <div class="nthen"><div class="qh planhead"><span data-t="planToday"></span><span id="planMiniTot"></span><span class="enpill" id="planMiniMode"></span><button type="button" class="focusbtn" id="planFocus" data-tt="focusOpen" aria-label="Focus"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5v9l7-4.5z"/></svg></button><button type="button" class="linkbtn" id="openPlan" data-t="planOpen"></button></div><div id="sugg"></div></div>
       </div>
     </div>
   </section>
@@ -301,6 +301,23 @@
       <div class="muted" id="syncLast"></div>
       <div class="mbtns"><button class="primary" id="syncNow" data-t="syncNow"></button><button id="syncOff" data-t="syncDisconnect"></button></div>
       <p class="syncnote" data-t="syncHow"></p>
+    </div>
+  </div>
+</div>
+<div class="nowbar" id="nowBar" hidden>
+  <button type="button" class="pck nowchk" id="nowChk" data-tt="itemCheck" aria-label="Done"></button>
+  <button type="button" class="nowmain" id="nowOpen" data-tt="focusOpen" aria-label="Focus"><span class="nowtxt"><b id="nowName"></b><small id="nowMeta"></small></span><span class="nowleft" id="nowLeft"></span><span class="nowgo"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5v9l7-4.5z"/></svg></span></button>
+</div>
+<div class="focusbg" id="focusbg" hidden>
+  <div class="focus" role="dialog" aria-modal="true" aria-labelledby="focusName">
+    <div class="focushead"><span class="label" data-t="focusTitle"></span><button class="x" id="focusClose" aria-label="Close">×</button></div>
+    <div class="focusbody">
+      <h2 id="focusName"></h2>
+      <div class="muted focusmeta" id="focusMeta"></div>
+      <div class="focusring" id="focusRing"><div><b id="focusClock">0:00</b><small id="focusPlanned"></small></div></div>
+      <div class="focusbtns"><button type="button" id="focusPause"></button><button type="button" class="primary" id="focusDone"></button></div>
+      <button type="button" class="linkbtn" id="focusNotes" hidden></button>
+      <div class="muted focusnext" id="focusNextUp"></div>
     </div>
   </div>
 </div>

@@ -37,6 +37,7 @@ The *How it is calculated* sections in the app list every formula.
 ## Features
 
 - **Ready for the exam?:** a bar under the countdown (one segment per check) opens a checklist: practice tests at your goal, chance to pass ≥ 90%, every topic studied, none below 70%, reviews up to date. It also shows the exam phase and **how right the forecast has been** (the forecast the day before each practice test vs. your score: average miss and Brier score). It only reads your data.
+- **Next-up bar and focus mode:** on phones a bar at the bottom of the Dashboard and Plan tabs shows the next item of today's plan (its circle ticks it). Tapping it, or ▶ next to *Today's plan* on a computer, opens **focus mode**: one item, a stopwatch against the planned minutes (pause/resume, kept across a reload or a locked phone, screen kept awake), and *Finished → log score* through the usual dialog.
 - **Final stretch:** in the last 21 days the plan changes on its own: weak = below your goal, new material gets less room, a practice test at least every 3 days (every 2 in the last 10), 5 more minutes of error notes from 45-minute sessions; no new material in the last 7 days; the day before and the exam day are light (no test, short reviews, 90 minutes at most).
 - **Kanban drag and drop like Trello:** the other cards slide aside and a card lands exactly where you drop it, in another list or a new place in the same one. The order is saved, goes into the backup and syncs; one Undo reverts a drop (mouse, or press and hold on touch).
 - **Error-notes review:** a plan session of an hour or more opens with 10 minutes (15 from two hours) to read earlier error notes in the Errors tab; shorter sessions go straight to the topics.
@@ -111,7 +112,7 @@ To run a suite in WebKit (the engine of Safari on iPhone) instead of Chromium: `
 
 **Continuous integration:** `.github/workflows/tests.yml` runs every suite in Chromium on each pull request and push to `main` (one job per suite, in parallel), and the touch and layout suites in WebKit. The WebKit jobs are report-only for now: they show their result on the pull request without blocking the merge.
 
-The suites cover the built-in unit tests (formulas checked against independent calculations and scipy), end to end, sync with a mocked GitHub API, demo/personal isolation, layouts, calendar, volume, spaced repetition everywhere, forecast and plan, practice tests, chart hover, the Statistics layout and heat map, the carousels, saved plans and the Kanban sync, exam phases and the readiness checklist, Settings, the guided tour, the user guide and its links, and the build itself.
+The suites cover the built-in unit tests (formulas checked against independent calculations and scipy), end to end, sync with a mocked GitHub API, demo/personal isolation, layouts, calendar, volume, spaced repetition everywhere, forecast and plan, practice tests, chart hover, the Statistics layout and heat map, the carousels, saved plans and the Kanban sync, exam phases and the readiness checklist, the next-up bar and focus mode, Settings, the guided tour, the user guide and its links, and the build itself.
 
 ## Publishing on GitHub Pages
 

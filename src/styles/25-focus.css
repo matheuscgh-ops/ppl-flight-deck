@@ -1,0 +1,236 @@
+/* ===== next-up bar (phones) and focus mode ===== */
+.planhead .focusbtn {
+  margin-left: auto;
+}
+.planhead .focusbtn + .linkbtn {
+  margin-left: 0;
+}
+.focusbtn {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--line2);
+  background: #20252b;
+  color: var(--ink2);
+  cursor: pointer;
+}
+.focusbtn:hover {
+  color: var(--ink);
+  border-color: #59626e;
+}
+.focusbtn svg,
+.nowgo svg {
+  width: 11px;
+  height: 11px;
+  fill: currentColor;
+}
+
+/* the bar: phones only, fixed at the bottom of the Dashboard and Plan tabs */
+.nowbar {
+  display: none;
+}
+@media (max-width: 640px) {
+  .nowbar:not([hidden]) {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 8px 8px 12px;
+    border-radius: 16px;
+    background: #1f252ce6;
+    border: 1px solid #3d4651;
+    box-shadow: 0 10px 30px #000b;
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+  body.hasnow .app {
+    padding-bottom: 92px;
+  }
+  /* out of the way while the tour, a dialog or focus mode is open */
+  body.focusing .nowbar,
+  body:has(.modalbg:not([hidden])) .nowbar,
+  body:has(.tour-card:not([hidden])) .nowbar {
+    display: none !important;
+  }
+}
+.nowchk {
+  flex: none;
+  position: relative;
+  width: 22px;
+  height: 22px;
+}
+.nowchk::before {
+  content: '';
+  position: absolute;
+  inset: -11px;
+}
+.nowmain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  min-height: 40px;
+}
+.nowtxt {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.nowtxt b {
+  font-size: 14px;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nowtxt small {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nowleft {
+  flex: none;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--muted);
+}
+.nowgo {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--s3);
+  color: #0d0f12;
+}
+.nowgo svg {
+  width: 14px;
+  height: 14px;
+  margin-left: 2px;
+}
+
+/* focus mode: the whole screen, one item */
+.focusbg {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.focusbg[hidden] {
+  display: none;
+}
+.focus {
+  width: min(520px, 100%);
+  max-height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+.focushead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.focusbody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 16px 0 8px;
+}
+.focusbody h2 {
+  margin: 0;
+  font-size: clamp(22px, 6vw, 30px);
+  line-height: 1.2;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.focusmeta {
+  font-size: 13.5px;
+  font-weight: 700;
+}
+.focusring {
+  --f: 0;
+  position: relative;
+  width: min(240px, 62vw);
+  aspect-ratio: 1;
+  margin: 14px 0 8px;
+  border-radius: 50%;
+  background: conic-gradient(var(--s3) calc(var(--f) * 360deg), #262c33 0);
+  display: grid;
+  place-items: center;
+}
+.focusring.over {
+  background: conic-gradient(var(--exam) 360deg, #262c33 0);
+}
+.focusring > div {
+  width: 86%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #0d0f12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.focusring b {
+  font-size: clamp(38px, 12vw, 54px);
+  font-weight: 850;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.focusring small {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 0 12px;
+}
+.focusring.over small {
+  color: var(--exam);
+}
+.focusbtns {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: 360px;
+}
+.focusbtns button {
+  flex: 1;
+  min-height: 48px;
+  font-size: 15px;
+  font-weight: 800;
+}
+.focusnext {
+  font-size: 12.5px;
+  font-weight: 650;
+  min-height: 1em;
+}
