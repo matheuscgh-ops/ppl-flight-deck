@@ -225,7 +225,7 @@ const Dashboard = (() => {
             sc = v == null ? 'none' : v >= GOAL ? 'good' : v >= 70 ? 'mid' : 'low';
           const ls = seen[i] ? diffDays(seen[i], today) : null;
           const last = ls == null ? '' : ls <= 0 ? t('todayShort') : tf('ago', ls);
-          return `<div class="task${checkedToday(i) ? ' checked' : ''}" tabindex="0" role="button" data-topic="${i}" aria-label="${esc(x.name)}" title="${esc(x.name)}">${checkHTML(i)}<div class="tname">${esc(x.name)}</div><div class="tmeta"><span>${tf('qn', x.q)}</span><span class="score sc-${sc}" title="${esc(t('editScore'))}">${v == null ? '—' : v + '%'}</span><span class="last">${esc(last)}</span></div></div>`;
+          return `<div class="task${checkedToday(i) ? ' checked' : ''}" tabindex="0" role="button" data-topic="${i}" aria-label="${esc(x.name)}" title="${esc(x.name)}">${checkHTML(i)}<div class="tname">${esc(x.name)}</div><div class="tmeta">${plannedToday(i) ? `<span class="hasplan" title="${esc(t('qPlannedTip'))}"><b class="qplan">${plannedToday(i)}</b><i class="qtot">/${esc(tf('qn', x.q))}</i><i class="qshort">${lang === 'ja' ? '' : ' '}${esc(tf('qn', '').trim())}</i></span>` : `<span>${tf('qn', x.q)}</span>`}<span class="score sc-${sc}" title="${esc(t('editScore'))}">${v == null ? '—' : v + '%'}</span><span class="last">${esc(last)}</span></div></div>`;
         })
         .join('')}${composerHTML(j)}</div></div>`;
     }).join('');
@@ -495,7 +495,12 @@ const Dashboard = (() => {
   });
   lanesEl.addEventListener('pointerdown', e => {
     const card = e.target.closest('.task');
-    if (!card || e.button > 0 || e.target.closest('.score,.scorein,.editing,.cardin,[data-cact],[data-tchk]')) return;
+    if (
+      !card ||
+      e.button > 0 ||
+      e.target.closest('.score,.scorein,.scoreedit,.editing,.cardin,[data-cact],[data-tchk]')
+    )
+      return;
     /* a new touch while an older drag never got its "finger up": land the older one first */
     if (drag && drag.active) endDrag(null, false);
     else if (drag) clearTimeout(drag.timer);

@@ -2039,6 +2039,28 @@ const Translations = (() => {
     errEdit: 'このノートを編集',
     errEdited: 'ノートを更新しました',
   });
+  /* score from right answers of the questions planned today */
+  Object.assign(I18N.en, {
+    rightField: 'Right answers',
+    ofWord: 'of',
+    qPlannedTip: "Questions planned for today (of the topic's total)",
+    scoreModePct: 'Type the percentage instead',
+    scoreModeCount: 'Type right answers instead',
+  });
+  Object.assign(I18N.pt, {
+    rightField: 'Acertos',
+    ofWord: 'de',
+    qPlannedTip: 'Questões planejadas para hoje (do total do tópico)',
+    scoreModePct: 'Digitar a porcentagem',
+    scoreModeCount: 'Digitar os acertos',
+  });
+  Object.assign(I18N.ja, {
+    rightField: '正解数',
+    ofWord: '/',
+    qPlannedTip: '今日予定の問題数（トピック全体のうち）',
+    scoreModePct: 'パーセントで入力',
+    scoreModeCount: '正解数で入力',
+  });
   return { I18N };
 })();
 const { I18N } = Translations;
