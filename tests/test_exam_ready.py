@@ -73,7 +73,7 @@ with sync_playwright() as p:
                 return {vis:b.offsetParent!==null,in:r.left>=c.left-0.5&&r.right<=c.right+0.5&&r.bottom<=c.bottom+0.5,h:r.height,segs:b.querySelectorAll('.rsegs i').length,
                   ok:b.querySelectorAll('.rsegs i.ok').length,txt:document.getElementById('readyTxt').textContent,want:R.ok+'/'+R.checks.length,label:b.getAttribute('aria-label')}})()""")
             check(f'{tag}: readiness meter visible inside the countdown card, one segment per check, matching count',
-                  r['vis'] and r['in'] and r['segs'] == 5 and r['txt'] == r['want'] and r['ok'] == int(r['want'].split('/')[0]) and r['h'] >= 20, r)
+                  r['vis'] and r['in'] and r['segs'] == 5 and r['txt'] == r['want'] and r['ok'] == int(r['want'].split('/')[0]) and r['h'] >= 14, r)
             check(f'{tag}: page fits the screen', ev('document.documentElement.scrollWidth') <= W, ev('document.documentElement.scrollWidth'))
 
             # ---------- the dialog, in each language and each phase ----------

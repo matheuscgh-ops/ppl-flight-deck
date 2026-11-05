@@ -34,7 +34,10 @@ jobs:
       - run: pip install playwright
       - run: python -m playwright install --with-deps chromium
       - name: Same fonts as the dev machine (Inter, Noto CJK, emoji), so text widths match
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq fonts-inter fonts-noto-cjk fonts-noto-color-emoji
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq fonts-inter fonts-noto-cjk fonts-noto-color-emoji
+          sudo cp .github/fonts/56-prefer-inter.conf /etc/fonts/conf.d/ && fc-cache -f >/dev/null
+          fc-match system-ui
       - name: Built files are up to date
         if: matrix.suite == 'unit'
         run: python build.py && git diff --exit-code -- index.html demo.html docs
@@ -63,6 +66,9 @@ jobs:
       - run: pip install playwright
       - run: python -m playwright install --with-deps webkit
       - name: Same fonts as the dev machine (Inter, Noto CJK, emoji), so text widths match
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq fonts-inter fonts-noto-cjk fonts-noto-color-emoji
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq fonts-inter fonts-noto-cjk fonts-noto-color-emoji
+          sudo cp .github/fonts/56-prefer-inter.conf /etc/fonts/conf.d/ && fc-cache -f >/dev/null
+          fc-match system-ui
       - name: ${{ matrix.suite }} in WebKit (Safari engine)
         run: python tests/${{ matrix.suite }}
