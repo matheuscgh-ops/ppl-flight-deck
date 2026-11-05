@@ -541,13 +541,46 @@
   font-size: 12px;
 }
 .errday li:hover .x,
-.errday li:focus-within .x {
+.errday li:focus-within .x,
+.errday li .x.eed:focus-visible {
   opacity: 1;
 }
 @media (hover: none) {
   .errday li .x {
     opacity: 0.6;
   }
+}
+.errday li.editing::before,
+.errday li.editing > span::before {
+  content: none;
+}
+.eedit {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.eedit textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  background: var(--panel2);
+  color: var(--ink);
+  border: 1px solid var(--line2);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+.eedit .mbtns {
+  margin: 0;
+  justify-content: flex-start;
+}
+#errNewTopic.need {
+  outline: 2px solid var(--exam);
+  outline-offset: 1px;
 }
 .errday mark {
   background: #f5a52455;

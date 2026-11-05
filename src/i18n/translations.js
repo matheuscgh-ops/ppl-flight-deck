@@ -2014,6 +2014,31 @@ const Translations = (() => {
     srDue1: '期限の来た復習 1件',
     srDueN: '期限の来た復習 {n}件',
   });
+  /* Errors tab: choosing the topic of a new note, moving a note to another topic */
+  Object.assign(I18N.en, {
+    errPickTopic: 'Choose the topic…',
+    errPickTopicFirst: 'Choose the topic first',
+    errMove: 'Move to another topic',
+    errMoved: 'Note moved to {t}',
+    errEdit: 'Edit this note',
+    errEdited: 'Note updated',
+  });
+  Object.assign(I18N.pt, {
+    errPickTopic: 'Escolha o tópico…',
+    errPickTopicFirst: 'Escolha o tópico primeiro',
+    errMove: 'Mover para outro tópico',
+    errMoved: 'Nota movida para {t}',
+    errEdit: 'Editar esta nota',
+    errEdited: 'Nota atualizada',
+  });
+  Object.assign(I18N.ja, {
+    errPickTopic: 'トピックを選択…',
+    errPickTopicFirst: '先にトピックを選んでください',
+    errMove: '別のトピックへ移動',
+    errMoved: 'ノートを{t}へ移動しました',
+    errEdit: 'このノートを編集',
+    errEdited: 'ノートを更新しました',
+  });
   return { I18N };
 })();
 const { I18N } = Translations;

@@ -64,9 +64,38 @@ with sync_playwright() as p:
             pg.select_option('#errTopic', ''); pg.wait_for_timeout(100)
             # add from the page: one note per line
             tap('#errAdd'); pg.wait_for_timeout(120)
+            # no topic is chosen for you: Save without one keeps the text and asks for the topic
+            check(f'{tag}: "+ Add note" starts with no topic chosen', ev("document.getElementById('errNewTopic').value") == '')
+            n0 = ev("state.notes.length"); pg.fill('#errNewText', 'Fog: radiation fog forms on clear calm nights')
+            tap('#errNewSave'); pg.wait_for_timeout(200)
+            check(f'{tag}: Save without a topic saves nothing, keeps the text and marks the topic menu', ev("state.notes.length") == n0 and ev("document.getElementById('errNewText').value").startswith('Fog') and ev("document.getElementById('errNewTopic').classList.contains('need')"))
             pg.select_option('#errNewTopic', '13'); pg.fill('#errNewText', 'Hypoxia: oxygen above 12,500 ft\nSpatial disorientation in IMC')
             tap('#errNewSave'); pg.wait_for_timeout(200)
             check(f'{tag}: "+ Add note" adds one note per line to the chosen topic', ev("state.notes.filter(n=>n.topic===13).length") == 2 and 'Human Factors' in pg.inner_text('#errList'))
+            # with the topic menu on a topic, the form starts on that topic
+            pg.select_option('#errTopic', '18'); pg.wait_for_timeout(100); tap('#errAdd'); pg.wait_for_timeout(120)
+            check(f'{tag}: with a topic filtered, "+ Add note" starts on that topic', ev("document.getElementById('errNewTopic').value") == '18')
+            tap('#errNewCancel'); pg.wait_for_timeout(100); pg.select_option('#errTopic', ''); pg.wait_for_timeout(100)
+            # edit a note: its text (several lines, longer than 500 characters) and its topic
+            eid = ev("state.notes.find(n=>n.topic===13).id")
+            ev(f"document.querySelector('[data-eedit=\"{eid}\"]').scrollIntoView({{block:'center'}})"); pg.wait_for_timeout(100)
+            tap(f'[data-eedit="{eid}"]'); pg.wait_for_timeout(150)
+            check(f'{tag}: ✎ opens the note in an editor with its text and topic', ev("!!document.querySelector('#viewErrors li.editing textarea')") and ev("document.querySelector('#viewErrors li.editing select').value") == '13')
+            long = 'Line one about hypoxia' + '\n' + 'x' * 700
+            pg.fill('#viewErrors li.editing textarea', long); pg.select_option('#viewErrors li.editing select', '18')
+            tap('#viewErrors li.editing [data-esave]'); pg.wait_for_timeout(200)
+            nn = ev(f"state.notes.find(n=>n.id==='{eid}')")
+            check(f'{tag}: Save keeps the whole text (several lines, over 500 characters) and moves it to the new topic', nn['topic'] == 18 and len(nn['text']) == len(long) and '\n' in nn['text'], (nn['topic'], len(nn['text'])))
+            check(f'{tag}: the edited note shows under its new topic', 'Line one about hypoxia' in ev("document.querySelector('[data-etopic=\"18\"]').innerText"))
+            ev("document.querySelector('#toast button').click()"); pg.wait_for_timeout(200)
+            check(f'{tag}: Undo puts the note back as it was', ev(f"state.notes.find(n=>n.id==='{eid}').topic") == 13 and 'x' * 50 not in ev(f"state.notes.find(n=>n.id==='{eid}').text"))
+            tap(f'[data-eedit="{eid}"]'); pg.wait_for_timeout(150)
+            pg.fill('#viewErrors li.editing textarea', 'changed?'); pg.keyboard.press('Escape'); pg.wait_for_timeout(150)
+            check(f'{tag}: Escape cancels the edit', ev(f"state.notes.find(n=>n.id==='{eid}').text") != 'changed?' and not ev("document.querySelector('#viewErrors li.editing')"))
+            tap(f'[data-eedit="{eid}"]'); pg.wait_for_timeout(150)
+            pg.fill('#viewErrors li.editing textarea', 'Hypoxia: oxygen above 12,500 ft (edited)'); pg.keyboard.press('Control+Enter'); pg.wait_for_timeout(200)
+            check(f'{tag}: Ctrl/⌘ + Enter saves the edit', ev(f"state.notes.find(n=>n.id==='{eid}').text") == 'Hypoxia: oxygen above 12,500 ft (edited)')
+            pg.fill('#viewErrors li.editing textarea', '') if ev("!!document.querySelector('#viewErrors li.editing')") else None
             # delete with undo
             nid = ev("state.notes.find(n=>n.topic===13).id")
             ev(f"document.querySelector('[data-edel=\"{nid}\"]').scrollIntoView({{block:'center'}})"); pg.wait_for_timeout(100)
