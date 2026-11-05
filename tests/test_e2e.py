@@ -219,10 +219,14 @@ def _(c):
 def _(c):
     c.pg.focus('.task[data-topic="2"]'); c.pg.keyboard.press('Shift+ArrowRight'); check(status(c, 2) == 'Doing', status(c, 2))
 
+def pct_mode(c):
+    """a card in today's plan asks for right answers first; switch its editor to the percentage"""
+    if c.pg.locator('.scoreedit .scoremode').count(): c.pg.click('.scoreedit .scoremode')
+
 @T('Kanban', 'inline score edit: Enter saves, Escape cancels, values clamped 0–100')
 def _(c):
     def edit(v, key='Enter'):
-        c.pg.click('.task[data-topic="5"] .score'); c.pg.keyboard.press('Control+a'); c.pg.keyboard.type(v); c.pg.keyboard.press(key); c.pg.wait_for_timeout(100)
+        c.pg.click('.task[data-topic="5"] .score'); pct_mode(c); c.pg.keyboard.press('Control+a'); c.pg.keyboard.type(v); c.pg.keyboard.press(key); c.pg.wait_for_timeout(100)
     edit('55'); check(c.ev('state.scores[5]') == 55, 'enter')
     edit('12', 'Escape'); check(c.ev('state.scores[5]') == 55, 'escape')
     edit('150'); check(c.ev('state.scores[5]') == 100, 'clamp high')
@@ -230,7 +234,7 @@ def _(c):
 
 @T('Kanban', 'inline score edit updates the latest session (for the curves)')
 def _(c):
-    c.pg.click('.task[data-topic="22"] .score'); c.pg.keyboard.press('Control+a'); c.pg.keyboard.type('95'); c.pg.keyboard.press('Enter'); c.pg.wait_for_timeout(100)
+    c.pg.click('.task[data-topic="22"] .score'); pct_mode(c); c.pg.keyboard.press('Control+a'); c.pg.keyboard.type('95'); c.pg.keyboard.press('Enter'); c.pg.wait_for_timeout(100)
     check(c.ev("state.events.filter(e=>e.topic===22).at(-1).score") == 95 and abs(c.ev('srModel(22).S') - 2) < 1e-9, 'session not updated')
 
 # ---------------------------------------------------------------- card dialog
@@ -427,7 +431,7 @@ def _(c):
     get = lambda: (c.pg.hover('.task[data-topic="22"]'), c.pg.wait_for_timeout(120), c.pg.inner_html('#prevChart'))[2]
     a = get(); c.pg.click('.task[data-topic="22"] .tname'); c.pg.click('#seg button[data-kind="review"]'); c.pg.fill('#mScore', '90'); c.pg.click('#mSave'); c.pg.wait_for_timeout(100)
     b = get(); check(a != b, 'log')
-    c.pg.click('.task[data-topic="22"] .score'); c.pg.keyboard.press('Control+a'); c.pg.keyboard.type('60'); c.pg.keyboard.press('Enter'); c.pg.wait_for_timeout(100)
+    c.pg.click('.task[data-topic="22"] .score'); pct_mode(c); c.pg.keyboard.press('Control+a'); c.pg.keyboard.type('60'); c.pg.keyboard.press('Enter'); c.pg.wait_for_timeout(100)
     d = get(); check(d != b, 'edit')
     c.pg.click('.task[data-topic="22"] .tname'); c.pg.fill('#mScore', ''); c.pg.click('#mSave'); c.pg.wait_for_timeout(100)
     e = get(); check(e == d, 'in-progress changed the chart')

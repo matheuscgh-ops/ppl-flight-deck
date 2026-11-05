@@ -2,7 +2,7 @@
    live value (getter): DAY_START (first hour of the plan grid, from Settings)
    public: SLOT, DAY_END, mondayOf, planDays, planTotal, rangesTotal, normRanges, activeFor, todayPlan,
            itemDone, itemMissed, missedTopics, suggestDays, packDay, perQ, conflictsFor, weeklyUnder, clockOf,
-           knapsack, toggleCheck, seedDemoPlan, testMinutes
+           knapsack, toggleCheck, seedDemoPlan, testMinutes, plannedToday
    Saved study plans (state.plans) and the scheduler that fills selected time blocks with topics.
 
    A plan: { id, type: 'daily' | 'weekly', name, start (the date, or the Monday of the week), active,
@@ -108,6 +108,14 @@ const Schedule = (() => {
     return { source: src.kind, plan: src.plan, items };
   }
 
+  /* questions of topic i planned for today (today's plan, saved or suggested); null when it is not in the plan.
+     The Kanban card and the score fields use it so you can type how many you got right instead of a percentage. */
+  function plannedToday(i) {
+    const n = todayPlan()
+      .items.filter(it => it.kind === 'topic' && it.i === i && it.reason !== 'extra')
+      .reduce((a, it) => a + (it.n || 0), 0);
+    return n > 0 ? Math.min(n, TOPICS[i].q) : null;
+  }
   /* minutes for one question of topic i on a date (same formula as the daily plan) */
   function perQ(i, date, energy) {
     const m = srModel(i, date, true),
@@ -626,6 +634,7 @@ const Schedule = (() => {
     testMinutes,
     itemTitle,
     reflectDetail,
+    plannedToday,
   };
 })();
 const {
@@ -657,4 +666,5 @@ const {
   testMinutes,
   itemTitle,
   reflectDetail,
+  plannedToday,
 } = Schedule;

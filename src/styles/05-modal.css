@@ -126,3 +126,19 @@
   padding: 1px 8px;
   font-size: 12px;
 }
+/* score from right answers: "27 of 30" next to the score (%) */
+.rightof {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rightof input {
+  flex: 1;
+  min-width: 0;
+}
+.rightof span {
+  flex: none;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 13px;
+}

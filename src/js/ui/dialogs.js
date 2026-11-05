@@ -30,6 +30,9 @@ const Dialogs = (() => {
     $('#mDesc').textContent =
       tf('qn', x.q) + (state.scores[i] == null ? '' : ` · ${state.scores[i]}%`) + ` · ${label(state.statuses[i])}`;
     $('#mScore').value = state.scores[i] ?? '';
+    /* right answers of the questions planned today (editable); typing them fills the score */
+    $('#mRight').value = '';
+    $('#mOf').value = plannedToday(i) ?? '';
     $('#mScore').placeholder = t('blankInProgress');
     $('#mStatus').innerHTML = STATUS.map(s => `<option value="${esc(s)}">${esc(label(s))}</option>`).join('');
     $('#mStatus').value = state.statuses[i];
@@ -52,6 +55,16 @@ const Dialogs = (() => {
     closeModal();
     openNotes(i);
   };
+  /* right answers ÷ questions → score (%); typing the score yourself clears the right answers */
+  const fillFromRight = () => {
+    const r = $('#mRight').value.trim(),
+      n = +$('#mOf').value;
+    if (r === '' || !(n > 0)) return;
+    $('#mScore').value = Math.max(0, Math.min(100, Math.round((Math.min(+r, n) / n) * 100)));
+  };
+  $('#mRight').addEventListener('input', fillFromRight);
+  $('#mOf').addEventListener('input', fillFromRight);
+  $('#mScore').addEventListener('input', () => ($('#mRight').value = ''));
   $('#seg').onclick = e => {
     const b = e.target.closest('button');
     if (b) {

@@ -207,19 +207,40 @@ const PreviewCarousel = (() => {
   };
   $('#openSR').onclick = () => goView('sr');
 
-  /* inline score edit on the card: updates the latest study/review session */
+  /* inline score edit on the card: updates the latest study/review session.
+     When the topic is in today's plan you type how many you got right of the planned questions ("27" of 30 → 90%);
+     the "/30" button switches to typing the percentage instead. */
   lanesEl.addEventListener('click', e => {
     const pill = e.target.closest('.task .score');
     if (!pill) return;
     e.stopPropagation();
     const i = +pill.closest('.task').dataset.topic,
-      inp = document.createElement('input');
+      N = plannedToday(i),
+      box = document.createElement('span'),
+      inp = document.createElement('input'),
+      mode = document.createElement('button');
+    let byCount = !!N;
+    box.className = 'scoreedit';
     inp.type = 'number';
+    inp.inputMode = 'numeric';
     inp.min = 0;
-    inp.max = 100;
     inp.className = 'scorein';
-    inp.value = state.scores[i] ?? '';
-    pill.replaceWith(inp);
+    mode.type = 'button';
+    mode.className = 'scoremode';
+    const paint = () => {
+      inp.max = byCount ? N : 100;
+      inp.placeholder = byCount ? '✓' : '%';
+      const v = inp.value.trim();
+      mode.textContent = byCount ? `/${N}${v !== '' ? ' = ' + pctOf(+v, N) + '%' : ''}` : '%';
+      mode.title = t(byCount ? 'scoreModePct' : 'scoreModeCount');
+      mode.setAttribute('aria-label', mode.title);
+    };
+    const pctOf = (c, n) => Math.max(0, Math.min(100, Math.round((Math.min(c, n) / n) * 100)));
+    inp.value = byCount ? '' : (state.scores[i] ?? '');
+    box.append(inp);
+    if (N) box.append(mode);
+    paint();
+    pill.replaceWith(box);
     inp.focus();
     inp.select();
     let done = false;
@@ -227,11 +248,11 @@ const PreviewCarousel = (() => {
       if (done) return;
       done = true;
       const v = inp.value.trim();
-      if (!ok || v === '' || Math.round(+v) === state.scores[i]) {
+      const n = v === '' ? null : byCount ? pctOf(+v, N) : Math.max(0, Math.min(100, Math.round(+v)));
+      if (!ok || n == null || n === state.scores[i]) {
         renderBoard();
         return;
       }
-      const n = Math.max(0, Math.min(100, Math.round(+v)));
       commit(
         () => {
           state.scores[i] = n;
@@ -247,12 +268,22 @@ const PreviewCarousel = (() => {
         tf('scoreSaved', n).replace('{t}', TOPICS[i].name)
       );
     };
+    inp.addEventListener('input', paint);
     inp.addEventListener('keydown', ev => {
       ev.stopPropagation();
       if (ev.key === 'Enter') finish(true);
       else if (ev.key === 'Escape') finish(false);
     });
-    inp.addEventListener('blur', () => finish(true));
+    /* the mode button keeps the editor open (its pointerdown would otherwise blur the input) */
+    mode.addEventListener('pointerdown', ev => ev.preventDefault());
+    mode.addEventListener('click', ev => {
+      ev.stopPropagation();
+      byCount = !byCount;
+      inp.value = '';
+      paint();
+      inp.focus();
+    });
+    inp.addEventListener('blur', () => setTimeout(() => document.activeElement !== inp && finish(true), 0));
   });
 
   /* analysis tab */

@@ -1080,6 +1080,47 @@ body.dragging * {
     animation: none;
   }
 }
+/* questions planned today on a card ("30/158 q") and the inline score editor with right answers */
+.qplan {
+  color: var(--ink);
+  font-weight: 850;
+}
+.scoreedit {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.scoremode {
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--line2);
+  background: #2c3138;
+  color: var(--ink2);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.hasplan i {
+  font-style: normal;
+}
+.hasplan .qshort {
+  display: none;
+}
+/* phones show only the planned questions ("20 q") next to the score */
+@media (max-width: 640px) {
+  .task .tmeta > span.hasplan {
+    display: inline;
+    font-size: 11px;
+  }
+  .hasplan .qtot {
+    display: none;
+  }
+  .hasplan .qshort {
+    display: inline;
+  }
+}
 
 /* modal */
 .modalbg {
@@ -1208,6 +1249,22 @@ body.dragging * {
   margin-left: auto;
   padding: 1px 8px;
   font-size: 12px;
+}
+/* score from right answers: "27 of 30" next to the score (%) */
+.rightof {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rightof input {
+  flex: 1;
+  min-width: 0;
+}
+.rightof span {
+  flex: none;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 13px;
 }
 
 /* top row: progress + countdown + stats */
@@ -7663,7 +7720,10 @@ svg.tick {
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
     <div class="mhead"><div><h3 id="mTitle"></h3><div class="muted" id="mDesc"></div></div><button class="x" id="mClose" aria-label="Close">×</button></div>
     <div class="field"><span class="flabel" data-t="activity"></span><div class="seg" id="seg"><button data-kind="study"></button><button data-kind="review"></button><button data-kind="none"></button></div></div>
-    <label class="field"><span class="flabel" data-t="scoreField"></span><input type="number" id="mScore" min="0" max="100" step="1" inputmode="numeric" data-ph="blankInProgress"></label>
+    <div class="row2 scorerow">
+      <div class="field"><span class="flabel" data-t="rightField"></span><div class="rightof"><input type="number" id="mRight" min="0" step="1" inputmode="numeric" aria-label="Right answers"><span data-t="ofWord"></span><input type="number" id="mOf" min="1" step="1" inputmode="numeric" aria-label="Questions"></div></div>
+      <label class="field"><span class="flabel" data-t="scoreField"></span><input type="number" id="mScore" min="0" max="100" step="1" inputmode="numeric" data-ph="blankInProgress"></label>
+    </div>
     <div class="row2">
       <label class="field"><span class="flabel" data-t="status"></span><select id="mStatus"></select></label>
       <label class="field"><span class="flabel" data-t="date"></span><input type="date" id="mDate"></label>
@@ -9980,6 +10040,28 @@ const Translations = (() => {
     errEdit: 'このノートを編集',
     errEdited: 'ノートを更新しました',
   });
+  /* score from right answers of the questions planned today */
+  Object.assign(I18N.en, {
+    rightField: 'Right answers',
+    ofWord: 'of',
+    qPlannedTip: "Questions planned for today (of the topic's total)",
+    scoreModePct: 'Type the percentage instead',
+    scoreModeCount: 'Type right answers instead',
+  });
+  Object.assign(I18N.pt, {
+    rightField: 'Acertos',
+    ofWord: 'de',
+    qPlannedTip: 'Questões planejadas para hoje (do total do tópico)',
+    scoreModePct: 'Digitar a porcentagem',
+    scoreModeCount: 'Digitar os acertos',
+  });
+  Object.assign(I18N.ja, {
+    rightField: '正解数',
+    ofWord: '/',
+    qPlannedTip: '今日予定の問題数（トピック全体のうち）',
+    scoreModePct: 'パーセントで入力',
+    scoreModeCount: '正解数で入力',
+  });
   return { I18N };
 })();
 const { I18N } = Translations;
@@ -10764,7 +10846,7 @@ const Dashboard = (() => {
             sc = v == null ? 'none' : v >= GOAL ? 'good' : v >= 70 ? 'mid' : 'low';
           const ls = seen[i] ? diffDays(seen[i], today) : null;
           const last = ls == null ? '' : ls <= 0 ? t('todayShort') : tf('ago', ls);
-          return `<div class="task${checkedToday(i) ? ' checked' : ''}" tabindex="0" role="button" data-topic="${i}" aria-label="${esc(x.name)}" title="${esc(x.name)}">${checkHTML(i)}<div class="tname">${esc(x.name)}</div><div class="tmeta"><span>${tf('qn', x.q)}</span><span class="score sc-${sc}" title="${esc(t('editScore'))}">${v == null ? '—' : v + '%'}</span><span class="last">${esc(last)}</span></div></div>`;
+          return `<div class="task${checkedToday(i) ? ' checked' : ''}" tabindex="0" role="button" data-topic="${i}" aria-label="${esc(x.name)}" title="${esc(x.name)}">${checkHTML(i)}<div class="tname">${esc(x.name)}</div><div class="tmeta">${plannedToday(i) ? `<span class="hasplan" title="${esc(t('qPlannedTip'))}"><b class="qplan">${plannedToday(i)}</b><i class="qtot">/${esc(tf('qn', x.q))}</i><i class="qshort">${lang === 'ja' ? '' : ' '}${esc(tf('qn', '').trim())}</i></span>` : `<span>${tf('qn', x.q)}</span>`}<span class="score sc-${sc}" title="${esc(t('editScore'))}">${v == null ? '—' : v + '%'}</span><span class="last">${esc(last)}</span></div></div>`;
         })
         .join('')}${composerHTML(j)}</div></div>`;
     }).join('');
@@ -11034,7 +11116,12 @@ const Dashboard = (() => {
   });
   lanesEl.addEventListener('pointerdown', e => {
     const card = e.target.closest('.task');
-    if (!card || e.button > 0 || e.target.closest('.score,.scorein,.editing,.cardin,[data-cact],[data-tchk]')) return;
+    if (
+      !card ||
+      e.button > 0 ||
+      e.target.closest('.score,.scorein,.scoreedit,.editing,.cardin,[data-cact],[data-tchk]')
+    )
+      return;
     /* a new touch while an older drag never got its "finger up": land the older one first */
     if (drag && drag.active) endDrag(null, false);
     else if (drag) clearTimeout(drag.timer);
@@ -12120,7 +12207,7 @@ const {
    live value (getter): DAY_START (first hour of the plan grid, from Settings)
    public: SLOT, DAY_END, mondayOf, planDays, planTotal, rangesTotal, normRanges, activeFor, todayPlan,
            itemDone, itemMissed, missedTopics, suggestDays, packDay, perQ, conflictsFor, weeklyUnder, clockOf,
-           knapsack, toggleCheck, seedDemoPlan, testMinutes
+           knapsack, toggleCheck, seedDemoPlan, testMinutes, plannedToday
    Saved study plans (state.plans) and the scheduler that fills selected time blocks with topics.
 
    A plan: { id, type: 'daily' | 'weekly', name, start (the date, or the Monday of the week), active,
@@ -12226,6 +12313,14 @@ const Schedule = (() => {
     return { source: src.kind, plan: src.plan, items };
   }
 
+  /* questions of topic i planned for today (today's plan, saved or suggested); null when it is not in the plan.
+     The Kanban card and the score fields use it so you can type how many you got right instead of a percentage. */
+  function plannedToday(i) {
+    const n = todayPlan()
+      .items.filter(it => it.kind === 'topic' && it.i === i && it.reason !== 'extra')
+      .reduce((a, it) => a + (it.n || 0), 0);
+    return n > 0 ? Math.min(n, TOPICS[i].q) : null;
+  }
   /* minutes for one question of topic i on a date (same formula as the daily plan) */
   function perQ(i, date, energy) {
     const m = srModel(i, date, true),
@@ -12744,6 +12839,7 @@ const Schedule = (() => {
     testMinutes,
     itemTitle,
     reflectDetail,
+    plannedToday,
   };
 })();
 const {
@@ -12775,6 +12871,7 @@ const {
   testMinutes,
   itemTitle,
   reflectDetail,
+  plannedToday,
 } = Schedule;
 
 /* ===== module PlanView (js/views/plan.js) =====
@@ -13439,19 +13536,40 @@ const PreviewCarousel = (() => {
   };
   $('#openSR').onclick = () => goView('sr');
 
-  /* inline score edit on the card: updates the latest study/review session */
+  /* inline score edit on the card: updates the latest study/review session.
+     When the topic is in today's plan you type how many you got right of the planned questions ("27" of 30 → 90%);
+     the "/30" button switches to typing the percentage instead. */
   lanesEl.addEventListener('click', e => {
     const pill = e.target.closest('.task .score');
     if (!pill) return;
     e.stopPropagation();
     const i = +pill.closest('.task').dataset.topic,
-      inp = document.createElement('input');
+      N = plannedToday(i),
+      box = document.createElement('span'),
+      inp = document.createElement('input'),
+      mode = document.createElement('button');
+    let byCount = !!N;
+    box.className = 'scoreedit';
     inp.type = 'number';
+    inp.inputMode = 'numeric';
     inp.min = 0;
-    inp.max = 100;
     inp.className = 'scorein';
-    inp.value = state.scores[i] ?? '';
-    pill.replaceWith(inp);
+    mode.type = 'button';
+    mode.className = 'scoremode';
+    const paint = () => {
+      inp.max = byCount ? N : 100;
+      inp.placeholder = byCount ? '✓' : '%';
+      const v = inp.value.trim();
+      mode.textContent = byCount ? `/${N}${v !== '' ? ' = ' + pctOf(+v, N) + '%' : ''}` : '%';
+      mode.title = t(byCount ? 'scoreModePct' : 'scoreModeCount');
+      mode.setAttribute('aria-label', mode.title);
+    };
+    const pctOf = (c, n) => Math.max(0, Math.min(100, Math.round((Math.min(c, n) / n) * 100)));
+    inp.value = byCount ? '' : (state.scores[i] ?? '');
+    box.append(inp);
+    if (N) box.append(mode);
+    paint();
+    pill.replaceWith(box);
     inp.focus();
     inp.select();
     let done = false;
@@ -13459,11 +13577,11 @@ const PreviewCarousel = (() => {
       if (done) return;
       done = true;
       const v = inp.value.trim();
-      if (!ok || v === '' || Math.round(+v) === state.scores[i]) {
+      const n = v === '' ? null : byCount ? pctOf(+v, N) : Math.max(0, Math.min(100, Math.round(+v)));
+      if (!ok || n == null || n === state.scores[i]) {
         renderBoard();
         return;
       }
-      const n = Math.max(0, Math.min(100, Math.round(+v)));
       commit(
         () => {
           state.scores[i] = n;
@@ -13479,12 +13597,22 @@ const PreviewCarousel = (() => {
         tf('scoreSaved', n).replace('{t}', TOPICS[i].name)
       );
     };
+    inp.addEventListener('input', paint);
     inp.addEventListener('keydown', ev => {
       ev.stopPropagation();
       if (ev.key === 'Enter') finish(true);
       else if (ev.key === 'Escape') finish(false);
     });
-    inp.addEventListener('blur', () => finish(true));
+    /* the mode button keeps the editor open (its pointerdown would otherwise blur the input) */
+    mode.addEventListener('pointerdown', ev => ev.preventDefault());
+    mode.addEventListener('click', ev => {
+      ev.stopPropagation();
+      byCount = !byCount;
+      inp.value = '';
+      paint();
+      inp.focus();
+    });
+    inp.addEventListener('blur', () => setTimeout(() => document.activeElement !== inp && finish(true), 0));
   });
 
   /* analysis tab */
@@ -13914,6 +14042,9 @@ const Dialogs = (() => {
     $('#mDesc').textContent =
       tf('qn', x.q) + (state.scores[i] == null ? '' : ` · ${state.scores[i]}%`) + ` · ${label(state.statuses[i])}`;
     $('#mScore').value = state.scores[i] ?? '';
+    /* right answers of the questions planned today (editable); typing them fills the score */
+    $('#mRight').value = '';
+    $('#mOf').value = plannedToday(i) ?? '';
     $('#mScore').placeholder = t('blankInProgress');
     $('#mStatus').innerHTML = STATUS.map(s => `<option value="${esc(s)}">${esc(label(s))}</option>`).join('');
     $('#mStatus').value = state.statuses[i];
@@ -13936,6 +14067,16 @@ const Dialogs = (() => {
     closeModal();
     openNotes(i);
   };
+  /* right answers ÷ questions → score (%); typing the score yourself clears the right answers */
+  const fillFromRight = () => {
+    const r = $('#mRight').value.trim(),
+      n = +$('#mOf').value;
+    if (r === '' || !(n > 0)) return;
+    $('#mScore').value = Math.max(0, Math.min(100, Math.round((Math.min(+r, n) / n) * 100)));
+  };
+  $('#mRight').addEventListener('input', fillFromRight);
+  $('#mOf').addEventListener('input', fillFromRight);
+  $('#mScore').addEventListener('input', () => ($('#mRight').value = ''));
   $('#seg').onclick = e => {
     const b = e.target.closest('button');
     if (b) {

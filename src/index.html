@@ -226,7 +226,10 @@
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
     <div class="mhead"><div><h3 id="mTitle"></h3><div class="muted" id="mDesc"></div></div><button class="x" id="mClose" aria-label="Close">×</button></div>
     <div class="field"><span class="flabel" data-t="activity"></span><div class="seg" id="seg"><button data-kind="study"></button><button data-kind="review"></button><button data-kind="none"></button></div></div>
-    <label class="field"><span class="flabel" data-t="scoreField"></span><input type="number" id="mScore" min="0" max="100" step="1" inputmode="numeric" data-ph="blankInProgress"></label>
+    <div class="row2 scorerow">
+      <div class="field"><span class="flabel" data-t="rightField"></span><div class="rightof"><input type="number" id="mRight" min="0" step="1" inputmode="numeric" aria-label="Right answers"><span data-t="ofWord"></span><input type="number" id="mOf" min="1" step="1" inputmode="numeric" aria-label="Questions"></div></div>
+      <label class="field"><span class="flabel" data-t="scoreField"></span><input type="number" id="mScore" min="0" max="100" step="1" inputmode="numeric" data-ph="blankInProgress"></label>
+    </div>
     <div class="row2">
       <label class="field"><span class="flabel" data-t="status"></span><select id="mStatus"></select></label>
       <label class="field"><span class="flabel" data-t="date"></span><input type="date" id="mDate"></label>
