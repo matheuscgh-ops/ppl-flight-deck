@@ -198,6 +198,11 @@ const Dashboard = (() => {
     return m;
   }
   function renderBoard() {
+    /* never rebuild the board under a finger: a redraw (sync, undo, a new day) waits until the card is dropped */
+    if (drag && drag.active) {
+      drag.redraw = true;
+      return;
+    }
     const keepLane = phoneMQ.matches && lanesEl.children.length ? laneInView() : null;
     const seen = lastSeen(),
       today = todayISO();
@@ -446,15 +451,17 @@ const Dashboard = (() => {
       order = placeCard(orderOf(), i, before),
       moved = own ? own.status !== to : state.statuses[i] !== to,
       same = JSON.stringify(order) === JSON.stringify(state.order);
-    if (!moved && same) return;
-    if (own)
-      return commit(
+    if (!moved && same) return false;
+    if (own) {
+      commit(
         () => {
           own.status = to;
           state.order = order;
         },
         moved ? `${own.title} → ${label(to)}` : t('reordered')
       );
+      return true;
+    }
     commit(
       () => {
         if (moved) {
@@ -473,6 +480,7 @@ const Dashboard = (() => {
       },
       moved ? `${TOPICS[i].name} → ${label(to)}` : t('reordered')
     );
+    return true;
   }
 
   /* pointer drag & drop: mouse drags after 5px, touch after a short press-and-hold */
@@ -484,6 +492,9 @@ const Dashboard = (() => {
   lanesEl.addEventListener('pointerdown', e => {
     const card = e.target.closest('.task');
     if (!card || e.button > 0 || e.target.closest('.score,.scorein,.editing,.cardin,[data-cact],[data-tchk]')) return;
+    /* a new touch while an older drag never got its "finger up": land the older one first */
+    if (drag && drag.active) endDrag(null, false);
+    else if (drag) clearTimeout(drag.timer);
     drag = {
       card,
       id: card.dataset.card ?? +card.dataset.topic,
@@ -608,7 +619,10 @@ const Dashboard = (() => {
             ? (after.dataset.card ?? +after.dataset.topic)
             : null;
       d.gap.remove();
-      if (!cancel && d.lane) dropCard(d.id, STATUS[+d.lane.dataset.lane], before);
+      sweepDrag();
+      const moved = !cancel && d.lane && dropCard(d.id, STATUS[+d.lane.dataset.lane], before);
+      /* the board is always redrawn from the saved order, so nothing of the drag can stay on the screen */
+      if (!moved) renderBoard();
     } else if (!cancel) {
       if (typeof d.id === 'string') {
         /* your own card: a click renames or deletes it */
@@ -618,6 +632,13 @@ const Dashboard = (() => {
         focusCardInput();
       } else openModal(d.id);
     }
+  }
+  /* removes anything a drag left behind (copy, gap, collapsed card, highlighted list) */
+  function sweepDrag() {
+    document.querySelectorAll('.ghost,.task-gap').forEach(el => el.remove());
+    document.querySelectorAll('.task.dragging').forEach(el => el.classList.remove('dragging'));
+    document.querySelectorAll('.lane.over').forEach(el => el.classList.remove('over'));
+    document.body.classList.remove('dragging');
   }
   window.addEventListener('pointerup', e => endDrag(e, false));
   window.addEventListener('pointercancel', e => endDrag(e, true));

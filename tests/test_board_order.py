@@ -84,6 +84,22 @@ with sync_playwright() as p:
                   window.dispatchEvent(new Event('touchend'));await new Promise(r=>setTimeout(r,250));
                   return {hidden:document.querySelectorAll('.task.dragging').length,gap:!!document.querySelector('.task-gap'),ghost:!!document.querySelector('.ghost'),vis:!!document.querySelector('.task[data-topic="5"]').offsetHeight}})()""")
                 check(f'{tag}: if the browser loses the drag, lifting the finger still ends it (card visible, no gap, no ghost)', st['hidden'] == 0 and not st['gap'] and not st['ghost'] and st['vis'], st)
+                # a redraw arrives mid-drag (sync pull, Undo, a new day): the board is not rebuilt under the finger, and after the drop nothing is left hidden
+                st = ev("""(async()=>{const c=document.querySelector('.task[data-topic="5"]');const r=c.getBoundingClientRect(),P=(t,el,x,y)=>el.dispatchEvent(new PointerEvent(t,{bubbles:true,cancelable:true,pointerId:11,pointerType:'touch',clientX:x,clientY:y,isPrimary:true}));
+                  P('pointerdown',c,r.left+20,r.top+10);await new Promise(r=>setTimeout(r,350));P('pointermove',window,r.left+22,r.top+40);await new Promise(r=>setTimeout(r,60));
+                  render();const kept=c.isConnected&&!!document.querySelector('.task-gap');
+                  P('pointerup',window,r.left+22,r.top+40);await new Promise(r=>setTimeout(r,300));
+                  return {kept,hidden:document.querySelectorAll('.task.dragging').length,gap:!!document.querySelector('.task-gap'),ghost:!!document.querySelector('.ghost'),over:document.querySelectorAll('.lane.over').length,vis:!!document.querySelector('.task[data-topic="5"]').offsetHeight}})()""")
+                check(f'{tag}: a redraw during a drag waits for the drop; afterwards the card is visible and no gap, ghost or highlight is left', st['kept'] and st['hidden'] == 0 and not st['gap'] and not st['ghost'] and not st['over'] and st['vis'], st)
+                # the finger-up never arrives at all, then the next touch starts: the old drag lands first, nothing stays hidden
+                st = ev("""(async()=>{let c=document.querySelector('.task[data-topic="5"]');let r=c.getBoundingClientRect();const P=(t,el,x,y,id)=>el.dispatchEvent(new PointerEvent(t,{bubbles:true,cancelable:true,pointerId:id,pointerType:'touch',clientX:x,clientY:y,isPrimary:true}));
+                  P('pointerdown',c,r.left+20,r.top+10,12);await new Promise(r=>setTimeout(r,350));P('pointermove',window,r.left+22,r.top+30,12);await new Promise(r=>setTimeout(r,60));
+                  const o=document.querySelector('.task:not(.dragging)');const q=o.getBoundingClientRect();
+                  P('pointerdown',o,q.left+20,q.top+10,13);await new Promise(r=>setTimeout(r,60));P('pointerup',window,q.left+20,q.top+10,13);await new Promise(r=>setTimeout(r,300));
+                  document.querySelectorAll('#modalbg').forEach(()=>typeof closeModal==='function'&&closeModal());
+                  return {hidden:document.querySelectorAll('.task.dragging').length,gap:!!document.querySelector('.task-gap'),ghost:!!document.querySelector('.ghost'),over:document.querySelectorAll('.lane.over').length,vis:!!document.querySelector('.task[data-topic="5"]').offsetHeight}})()""")
+                check(f'{tag}: a lost finger-up is closed by the next touch: card visible, nothing left behind', st['hidden'] == 0 and not st['gap'] and not st['ghost'] and not st['over'] and st['vis'], st)
+                pg.wait_for_timeout(150)
             # a tap still opens the card
             if touch: pg.tap('.task[data-topic="5"] .tname')
             else: pg.click('.task[data-topic="5"] .tname')
