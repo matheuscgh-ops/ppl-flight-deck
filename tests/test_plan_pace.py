@@ -29,6 +29,7 @@ PLAN = """(()=>{const T=todayISO(),Y=addDays(T,-1),M=mondayOf(T);(state.plans||[
     {id:'y1',date:Y,start:1230,min:40,kind:'topic',i:18,n:30,reason:'weak'},
     {id:'y2',date:Y,start:1270,min:10,kind:'reflect',reason:'reflect',of:'y1',parts:[{i:18,m:8}]},
     {id:'t1',date:T,start:1260,min:29,kind:'topic',i:13,n:20,reason:'due'},
+    {id:'t1r',date:T,start:1289,min:10,kind:'reflect',reason:'reflect',of:'t1',parts:[{i:13,m:5}]},
     {id:'t2',date:T,start:1320,min:28,kind:'topic',i:22,n:20,reason:'due'}]});
   ['t1','t2'].forEach(()=>{});state.events=state.events.filter(e=>!(e.date===T&&(e.topic===13||e.topic===22)));save();render()})()"""
 
@@ -77,6 +78,8 @@ with sync_playwright() as p:
             nowm = 21 * 60 + 30
             done = [x for x in today if x['done']]
             check(f'{tag}: the two blocks done early move before now and do not overlap', len(done) == 2 and all(x['s'] + x['m'] <= nowm + 15 for x in done) and done[0]['s'] + done[0]['m'] <= done[1]['s'], done)
+            rv = [x for x in today if x['id'] == 't1r']
+            check(f'{tag}: the error review of a finished topic is kept and comes right after now', rv and rv[0]['s'] >= nowm and not rv[0]['done'], rv)
             fresh = [x for x in today if not x['done'] and x['k'] == 'topic']
             check(f'{tag}: the rest of today\'s time is filled with new work after now', fresh and all(x['s'] >= nowm for x in fresh), today)
             check(f'{tag}: a topic ticked today is not planned again today', not any(x['i'] in (13, 22) for x in fresh), fresh)
