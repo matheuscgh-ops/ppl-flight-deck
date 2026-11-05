@@ -13060,6 +13060,18 @@ const Schedule = (() => {
             )
               keepIds.add(it.id);
           });
+          /* today: the error reviews still to do of topics you finished come first, from now on (nothing overlaps
+             the blocks moved before now) */
+          if (d === today) {
+            let cur = nowMin;
+            its
+              .filter(it => keepIds.has(it.id) && it.kind === 'reflect' && !itemDone(it) && it.start < cur)
+              .sort((a, b) => a.start - b.start)
+              .forEach(it => {
+                it.start = cur;
+                cur += it.min;
+              });
+          }
           const busy = its.filter(it => keepIds.has(it.id)).map(it => [it.start, it.start + it.min]);
           if (d === today) busy.push([0, nowMin]);
           free[d] = rangesMinus(p.blocks[d], busy);
