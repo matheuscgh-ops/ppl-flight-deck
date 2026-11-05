@@ -78,7 +78,7 @@ const AppState = (() => {
           id: String(n.id || uid()).slice(0, 40),
           topic: n.topic,
           date: n.date,
-          text: n.text.trim().slice(0, 500),
+          text: n.text.trim().slice(0, 2000),
         }))
         .slice(-2000),
       /* Kanban cards ticked "done today": card key (topic number or your card's id) → the date it was ticked */
