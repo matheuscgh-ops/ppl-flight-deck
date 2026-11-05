@@ -15,6 +15,7 @@ const Navigation = (() => {
     $('#viewSR').hidden = !sr;
     $('#viewPlan').hidden = !pl;
     $('#viewTests').hidden = !ts;
+    if (typeof renderNowBar === 'function') renderNowBar();
     document.querySelectorAll('.tabs button').forEach(a => {
       const on = a.dataset.view === v;
       a.classList.toggle('on', on);

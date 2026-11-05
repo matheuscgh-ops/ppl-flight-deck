@@ -6949,6 +6949,243 @@ svg.tick {
     min-height: 14px;
   }
 }
+
+/* ===== next-up bar (phones) and focus mode ===== */
+.planhead .focusbtn {
+  margin-left: auto;
+}
+.planhead .focusbtn + .linkbtn {
+  margin-left: 0;
+}
+.focusbtn {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--line2);
+  background: #20252b;
+  color: var(--ink2);
+  cursor: pointer;
+}
+.focusbtn:hover {
+  color: var(--ink);
+  border-color: #59626e;
+}
+.focusbtn svg,
+.nowgo svg {
+  width: 11px;
+  height: 11px;
+  fill: currentColor;
+}
+
+/* the bar: phones only, fixed at the bottom of the Dashboard and Plan tabs */
+.nowbar {
+  display: none;
+}
+@media (max-width: 640px) {
+  .nowbar:not([hidden]) {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 8px 8px 12px;
+    border-radius: 16px;
+    background: #1f252ce6;
+    border: 1px solid #3d4651;
+    box-shadow: 0 10px 30px #000b;
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+  body.hasnow .app {
+    padding-bottom: 92px;
+  }
+  /* out of the way while the tour, a dialog or focus mode is open */
+  body.focusing .nowbar,
+  body:has(.modalbg:not([hidden])) .nowbar,
+  body:has(.tour-card:not([hidden])) .nowbar {
+    display: none !important;
+  }
+}
+.nowchk {
+  flex: none;
+  position: relative;
+  width: 22px;
+  height: 22px;
+}
+.nowchk::before {
+  content: '';
+  position: absolute;
+  inset: -11px;
+}
+.nowmain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  min-height: 40px;
+}
+.nowtxt {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.nowtxt b {
+  font-size: 14px;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nowtxt small {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nowleft {
+  flex: none;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--muted);
+}
+.nowgo {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--s3);
+  color: #0d0f12;
+}
+.nowgo svg {
+  width: 14px;
+  height: 14px;
+  margin-left: 2px;
+}
+
+/* focus mode: the whole screen, one item */
+.focusbg {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.focusbg[hidden] {
+  display: none;
+}
+.focus {
+  width: min(520px, 100%);
+  max-height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+.focushead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.focusbody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 16px 0 8px;
+}
+.focusbody h2 {
+  margin: 0;
+  font-size: clamp(22px, 6vw, 30px);
+  line-height: 1.2;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.focusmeta {
+  font-size: 13.5px;
+  font-weight: 700;
+}
+.focusring {
+  --f: 0;
+  position: relative;
+  width: min(240px, 62vw);
+  aspect-ratio: 1;
+  margin: 14px 0 8px;
+  border-radius: 50%;
+  background: conic-gradient(var(--s3) calc(var(--f) * 360deg), #262c33 0);
+  display: grid;
+  place-items: center;
+}
+.focusring.over {
+  background: conic-gradient(var(--exam) 360deg, #262c33 0);
+}
+.focusring > div {
+  width: 86%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #0d0f12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.focusring b {
+  font-size: clamp(38px, 12vw, 54px);
+  font-weight: 850;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.focusring small {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 0 12px;
+}
+.focusring.over small {
+  color: var(--exam);
+}
+.focusbtns {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: 360px;
+}
+.focusbtns button {
+  flex: 1;
+  min-height: 48px;
+  font-size: 15px;
+  font-weight: 800;
+}
+.focusnext {
+  font-size: 12.5px;
+  font-weight: 650;
+  min-height: 1em;
+}
 </style>
 </head>
 <body>
@@ -7024,7 +7261,7 @@ svg.tick {
         <div class="seg srrange" data-srr><button data-sr="3d">3D</button><button data-sr="7d">7D</button><button data-sr="2w">2W</button><button data-sr="1m">1M</button><button data-sr="3m">3M</button><button data-sr="6m">6M</button><button data-sr="1y">1Y</button><button data-sr="all" data-t="rAll"></button></div>
         <div class="chart" id="prevChart"></div>
         <div class="chartlegend small" id="srLegend2"></div>
-        <div class="nthen"><div class="qh planhead"><span data-t="planToday"></span><span id="planMiniTot"></span><span class="enpill" id="planMiniMode"></span><button type="button" class="linkbtn" id="openPlan" data-t="planOpen"></button></div><div id="sugg"></div></div>
+        <div class="nthen"><div class="qh planhead"><span data-t="planToday"></span><span id="planMiniTot"></span><span class="enpill" id="planMiniMode"></span><button type="button" class="focusbtn" id="planFocus" data-tt="focusOpen" aria-label="Focus"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5v9l7-4.5z"/></svg></button><button type="button" class="linkbtn" id="openPlan" data-t="planOpen"></button></div><div id="sugg"></div></div>
       </div>
     </div>
   </section>
@@ -7244,6 +7481,23 @@ svg.tick {
       <div class="muted" id="syncLast"></div>
       <div class="mbtns"><button class="primary" id="syncNow" data-t="syncNow"></button><button id="syncOff" data-t="syncDisconnect"></button></div>
       <p class="syncnote" data-t="syncHow"></p>
+    </div>
+  </div>
+</div>
+<div class="nowbar" id="nowBar" hidden>
+  <button type="button" class="pck nowchk" id="nowChk" data-tt="itemCheck" aria-label="Done"></button>
+  <button type="button" class="nowmain" id="nowOpen" data-tt="focusOpen" aria-label="Focus"><span class="nowtxt"><b id="nowName"></b><small id="nowMeta"></small></span><span class="nowleft" id="nowLeft"></span><span class="nowgo"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5v9l7-4.5z"/></svg></span></button>
+</div>
+<div class="focusbg" id="focusbg" hidden>
+  <div class="focus" role="dialog" aria-modal="true" aria-labelledby="focusName">
+    <div class="focushead"><span class="label" data-t="focusTitle"></span><button class="x" id="focusClose" aria-label="Close">×</button></div>
+    <div class="focusbody">
+      <h2 id="focusName"></h2>
+      <div class="muted focusmeta" id="focusMeta"></div>
+      <div class="focusring" id="focusRing"><div><b id="focusClock">0:00</b><small id="focusPlanned"></small></div></div>
+      <div class="focusbtns"><button type="button" id="focusPause"></button><button type="button" class="primary" id="focusDone"></button></div>
+      <button type="button" class="linkbtn" id="focusNotes" hidden></button>
+      <div class="muted focusnext" id="focusNextUp"></div>
     </div>
   </div>
 </div>
@@ -9343,6 +9597,43 @@ const Translations = (() => {
     tsRest: '今は模試なし：試験前は休みましょう',
     tsRestShort: '休息',
   });
+  /* next-up bar (phones) and focus mode */
+  Object.assign(I18N.en, {
+    focusOpen: 'Focus mode: the next item of today',
+    focusTitle: 'Focus',
+    focusStart: 'Start',
+    focusPause: 'Pause',
+    focusResume: 'Resume',
+    focusDone: 'Finished → log score',
+    focusDoneTask: 'Done',
+    focusPlanned: 'of {m} planned',
+    focusOver: '{m} over the plan',
+    focusThen: 'Then: {x}',
+  });
+  Object.assign(I18N.pt, {
+    focusOpen: 'Modo foco: o próximo item de hoje',
+    focusTitle: 'Foco',
+    focusStart: 'Começar',
+    focusPause: 'Pausar',
+    focusResume: 'Continuar',
+    focusDone: 'Terminei → nota',
+    focusDoneTask: 'Feito',
+    focusPlanned: 'de {m} planejados',
+    focusOver: '{m} além do plano',
+    focusThen: 'Depois: {x}',
+  });
+  Object.assign(I18N.ja, {
+    focusOpen: 'フォーカスモード：今日の次の項目',
+    focusTitle: 'フォーカス',
+    focusStart: '開始',
+    focusPause: '一時停止',
+    focusResume: '再開',
+    focusDone: '終了 → スコアを記録',
+    focusDoneTask: '完了',
+    focusPlanned: '予定 {m} のうち',
+    focusOver: '予定より {m} 超過',
+    focusThen: '次：{x}',
+  });
   return { I18N };
 })();
 const { I18N } = Translations;
@@ -10309,6 +10600,7 @@ const Dashboard = (() => {
     if (!$('#viewTests').hidden) renderTestsPage();
     if (!$('#viewErrors').hidden) renderErrorsPage();
     if (typeof renderSyncChip === 'function') renderSyncChip();
+    if (typeof renderNowBar === 'function') renderNowBar();
   }
 
   /* ---------- actions ---------- */
@@ -13038,6 +13330,7 @@ const Navigation = (() => {
     $('#viewSR').hidden = !sr;
     $('#viewPlan').hidden = !pl;
     $('#viewTests').hidden = !ts;
+    if (typeof renderNowBar === 'function') renderNowBar();
     document.querySelectorAll('.tabs button').forEach(a => {
       const on = a.dataset.view === v;
       a.classList.toggle('on', on);
@@ -13999,6 +14292,202 @@ const Readiness = (() => {
   return { readiness, renderReady, openReady, recText };
 })();
 const { readiness, renderReady, openReady, recText } = Readiness;
+
+/* ===== module Focus (js/views/focus.js) =====
+   public: nextItem, renderNowBar, openFocus, closeFocus
+   Two ways to get through today's plan without hunting for it:
+     · the "next up" bar: on phones, a bar fixed at the bottom of the Dashboard and Plan tabs with the next item of
+       today's plan that is not done (time, name, questions). Its circle ticks it; tapping it opens focus mode.
+     · focus mode: a full-screen view of one item — the topic, what is planned, a stopwatch against the planned
+       minutes, and "Finished": a topic opens the log so you type the score (that marks it done, as always), a practice
+       test opens the practice-test log, your own activity or an error review is ticked.
+   The stopwatch lives in this browser only (it survives a reload or a locked phone, it does not sync); the screen
+   is kept awake while focus mode is open where the browser allows it. Nothing here changes a statistic: the score
+   you log goes through the same dialog as before.                                                             */
+const Focus = (() => {
+  const KEY = STORE + '-focus';
+  const itemKey = it => (it.id ? 'id:' + it.id : it.kind + ':' + (it.i ?? 't') + ':' + todayISO());
+  /* today's items, in plan order, that are not done (an extra session you logged off-plan is skipped) */
+  function todayLeft() {
+    return todayPlan().items.filter(it => !it.done && it.reason !== 'extra' && (it.n || it.min));
+  }
+  function nextItem() {
+    return todayLeft()[0] || null;
+  }
+  const nameOf = it => (it.kind === 'topic' || it.kind === 'test' ? planRowName(it) : itemTitle(it));
+  const metaOf = it =>
+    [
+      it.start != null ? clockOf(it.start) : null,
+      it.n ? it.n + ' q' : null,
+      it.min ? fmtMin(it.min) : null,
+      t('rs_' + it.reason) !== 'rs_' + it.reason ? t('rs_' + it.reason) : null,
+    ]
+      .filter(Boolean)
+      .join(' · ');
+  const TICK = '<svg class="tick" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 8.4 6.8 11 12 5.4"/></svg>';
+
+  /* ---------- the "next up" bar (phones) ---------- */
+  function renderNowBar() {
+    const bar = $('#nowBar');
+    if (!bar) return;
+    const it = nextItem(),
+      view = $('#viewDash').hidden && $('#viewPlan').hidden ? null : 'on';
+    bar.hidden = !it || !view;
+    document.body.classList.toggle('hasnow', !bar.hidden);
+    if (!it) return;
+    bar.dataset.key = itemKey(it);
+    $('#nowChk').hidden = !it.id;
+    if (it.id) $('#nowChk').dataset.chk = it.id;
+    $('#nowName').textContent = nameOf(it);
+    $('#nowMeta').textContent = metaOf(it);
+    const left = todayLeft().length;
+    $('#nowLeft').textContent = left > 1 ? '+' + (left - 1) : '';
+  }
+
+  /* ---------- the stopwatch (per item, in this browser) ---------- */
+  const readW = () => {
+    try {
+      return JSON.parse(localStorage.getItem(KEY) || 'null');
+    } catch (e) {
+      return null;
+    }
+  };
+  const writeW = w => {
+    try {
+      if (w) localStorage.setItem(KEY, JSON.stringify(w));
+      else localStorage.removeItem(KEY);
+    } catch (e) {}
+  };
+  let watch = null,
+    cur = null,
+    tick = null,
+    lock = null;
+  const elapsed = () => (watch ? watch.acc + (watch.run ? Date.now() - watch.run : 0) : 0);
+  const mmss = ms => {
+    const s = Math.floor(ms / 1000),
+      h = Math.floor(s / 3600),
+      m = Math.floor((s % 3600) / 60);
+    return (h ? h + ':' + String(m).padStart(2, '0') : String(m)) + ':' + String(s % 60).padStart(2, '0');
+  };
+  function drawClock() {
+    if (!cur) return;
+    const ms = elapsed(),
+      plan = (cur.min || 0) * 60000,
+      f = plan ? Math.min(1, ms / plan) : 0;
+    $('#focusClock').textContent = mmss(ms);
+    $('#focusRing').style.setProperty('--f', f);
+    $('#focusRing').classList.toggle('over', plan > 0 && ms > plan);
+    $('#focusPlanned').textContent = plan
+      ? ms > plan
+        ? t('focusOver').replace('{m}', fmtMin(Math.round((ms - plan) / 60000)))
+        : t('focusPlanned').replace('{m}', fmtMin(cur.min))
+      : '';
+    $('#focusPause').textContent = t(
+      watch && watch.run ? 'focusPause' : watch && watch.acc ? 'focusResume' : 'focusStart'
+    );
+  }
+  async function keepAwake(on) {
+    try {
+      if (on && !lock && navigator.wakeLock) lock = await navigator.wakeLock.request('screen');
+      if (!on && lock) {
+        await lock.release();
+        lock = null;
+      }
+    } catch (e) {
+      lock = null;
+    }
+  }
+
+  /* ---------- focus mode ---------- */
+  function openFocus(it) {
+    it = it || nextItem();
+    if (!it) return;
+    cur = it;
+    const key = itemKey(it),
+      saved = readW();
+    watch = saved && saved.key === key ? saved : { key, acc: 0, run: Date.now() };
+    writeW(watch);
+    $('#focusName').textContent = nameOf(it);
+    $('#focusMeta').textContent = metaOf(it);
+    const isTopic = it.kind === 'topic';
+    $('#focusNotes').hidden = !isTopic;
+    if (isTopic) $('#focusNotes').textContent = '📝 ' + t('notesOpen').replace('{n}', notesOf(it.i).length);
+    $('#focusDone').textContent = t(isTopic || it.kind === 'test' ? 'focusDone' : 'focusDoneTask');
+    const left = todayLeft().filter(x => itemKey(x) !== key);
+    $('#focusNextUp').textContent = left.length ? t('focusThen').replace('{x}', nameOf(left[0])) : '';
+    $('#focusbg').hidden = false;
+    document.body.classList.add('focusing');
+    drawClock();
+    clearInterval(tick);
+    tick = setInterval(drawClock, 500);
+    keepAwake(true);
+    $('#focusDone').focus();
+  }
+  function closeFocus(keep = true) {
+    if ($('#focusbg').hidden) return;
+    $('#focusbg').hidden = true;
+    document.body.classList.remove('focusing');
+    clearInterval(tick);
+    keepAwake(false);
+    if (!keep) writeW(null);
+    cur = null;
+  }
+  function togglePause() {
+    if (!watch) return;
+    if (watch.run) {
+      watch.acc += Date.now() - watch.run;
+      watch.run = 0;
+    } else watch.run = Date.now();
+    writeW(watch);
+    drawClock();
+  }
+  /* "Finished": the same logging as everywhere else, so the statistics only change through the usual dialogs */
+  function finish() {
+    const it = cur;
+    if (!it) return;
+    closeFocus(false);
+    if (it.kind === 'topic') {
+      const m = srModel(it.i);
+      openModal(it.i, m.reps.length ? 'review' : 'study');
+    } else if (it.kind === 'test') openPt();
+    else if (it.id) {
+      if (it.kind === 'notes') goView('errors');
+      toggleCheck(it.id);
+    }
+  }
+  $('#focusClose').onclick = () => closeFocus(true);
+  $('#focusPause').onclick = togglePause;
+  $('#focusDone').onclick = finish;
+  $('#focusNotes').onclick = () => {
+    /* the notes dialog opens over the page; the stopwatch keeps running and focus mode reopens from the bar */
+    if (!cur || cur.kind !== 'topic') return;
+    const i = cur.i;
+    closeFocus(true);
+    openNotes(i);
+  };
+  document.addEventListener('keydown', e => {
+    if ($('#focusbg').hidden) return;
+    if (e.key === 'Escape') closeFocus(true);
+    else if (e.key === ' ' && e.target === document.body) {
+      e.preventDefault();
+      togglePause();
+    }
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && !$('#focusbg').hidden) {
+      keepAwake(true);
+      drawClock();
+    }
+  });
+  $('#nowOpen').onclick = () => openFocus();
+  $('#nowChk').onclick = e => {
+    e.stopPropagation();
+    toggleCheck($('#nowChk').dataset.chk);
+  };
+  $('#planFocus').onclick = () => openFocus();
+  return { nextItem, renderNowBar, openFocus, closeFocus };
+})();
+const { nextItem, renderNowBar, openFocus, closeFocus } = Focus;
 
 /* ===== module VolumeView (js/views/volume.js) =====
    public: weekStart, weeklyVolume, rangeSeries, renderVolume, renderVolPanel

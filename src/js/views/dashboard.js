@@ -423,6 +423,7 @@ const Dashboard = (() => {
     if (!$('#viewTests').hidden) renderTestsPage();
     if (!$('#viewErrors').hidden) renderErrorsPage();
     if (typeof renderSyncChip === 'function') renderSyncChip();
+    if (typeof renderNowBar === 'function') renderNowBar();
   }
 
   /* ---------- actions ---------- */
