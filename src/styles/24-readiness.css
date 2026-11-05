@@ -1,0 +1,146 @@
+/* ===== "Ready for the exam?": the meter in the countdown card and its dialog ===== */
+.readybar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 3px 0;
+  background: none;
+  border: 0;
+  color: var(--ink2);
+  font: inherit;
+  cursor: pointer;
+  min-height: 24px;
+}
+.readybar:hover .rtxt,
+.readybar:focus-visible .rtxt {
+  color: var(--ink);
+}
+.rsegs {
+  flex: 1;
+  display: flex;
+  gap: 3px;
+}
+.rsegs i {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: #343b44;
+}
+.rsegs i.ok {
+  background: var(--s3);
+}
+/* final stretch: the missing checks turn amber */
+.readybar.stretch .rsegs i:not(.ok) {
+  background: #6b4a12;
+}
+.rtxt {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.countdown input {
+  margin-top: 6px;
+}
+.readysheet {
+  width: min(520px, 100%);
+}
+.readyphase {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 12px 0 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #20252b;
+  border: 1px solid var(--line2);
+  font-size: 13px;
+  color: var(--ink2);
+  line-height: 1.4;
+}
+.readyphase b {
+  color: var(--ink);
+  font-size: 13.5px;
+}
+.readyphase.stretch,
+.readyphase.week,
+.readyphase.lastday {
+  background: #2a2112;
+  border-color: #6b4a12;
+}
+.readyphase.stretch b,
+.readyphase.week b,
+.readyphase.lastday b {
+  color: var(--exam);
+}
+.readylist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.readylist li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 8px 2px;
+  border-bottom: 1px solid var(--line);
+}
+.readylist li:last-child {
+  border-bottom: 0;
+}
+.readylist li > span:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.readylist b {
+  font-size: 13.5px;
+  color: var(--ink);
+}
+.readylist small {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.rdot {
+  position: relative;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border-radius: 50%;
+  border: 2px solid #59626e;
+  box-sizing: border-box;
+}
+.readylist li.ok .rdot {
+  background: var(--s3);
+  border-color: var(--s3);
+  color: #0d0f12;
+}
+.rdot svg.tick {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 100%;
+  height: 100%;
+}
+.readyrec {
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: var(--ink2);
+  line-height: 1.45;
+}
+.readyrec h4 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}

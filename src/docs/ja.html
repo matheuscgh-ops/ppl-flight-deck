@@ -12,6 +12,7 @@
         <li><a href="#calendar">カレンダー</a></li>
         <li><a href="#side-panel">予測と今日の計画</a></li>
         <li><a href="#quick-log">クイック記録</a></li>
+        <li><a href="#ready">試験の準備はできていますか？</a></li>
       </ol>
     </li>
     <li><a href="#plans">プラン</a>
@@ -127,6 +128,25 @@
     <li><kbd>Enter</kbd>で学習、<kbd>⇧ Enter</kbd>で復習として記録、<kbd>⌥ Enter</kbd>でカードを開きます。<kbd>Esc</kbd>で閉じます。</li>
   </ol>
   <figure class="mid"><img src="img/palette.jpg" alt="クイック記録のパレット" loading="lazy"></figure>
+
+  <h3 id="ready">試験の準備と最終段階</h3>
+  <p>カウントダウンの下のバーは、チェック項目ごとに1つのセグメントがあり、達成すると緑になります。クリックするとチェックリストが開きます：</p>
+  <ul>
+    <li><span class="ui">模試が目標に到達</span>：採点済みの直近3回の模試の平均が目標（初期値85%）以上。</li>
+    <li><span class="ui">合格の可能性が高い</span>：予測が90%以上。</li>
+    <li><span class="ui">すべてのトピックを学習済み</span>、<span class="ui">苦手なトピックがない</span>（70%未満なし）、<span class="ui">復習が遅れていない</span>（間隔反復で期限切れなし）。</li>
+  </ul>
+  <p>試験が近づくと、プランも自動で切り替わります。何もする必要はありません：</p>
+  <ul>
+    <li><b>最終段階（最後の21日間）：</b>「苦手」は70%未満ではなく目標未満になり、新しい内容は減り、模試は少なくとも3日ごと（最後の10日は2日ごと）、45分以上のセッションの最初に間違いノートを5分多く復習します。バーの未達成セグメントは琥珀色になります。</li>
+    <li><b>最後の1週間（最後の7日間）：</b>新しい内容はまったくありません。</li>
+    <li><b>最終日（前日と試験当日）：</b>模試も新しい内容もなく、短い復習（最大20問）だけで最大90分。詰め込みより休息です。</li>
+  </ul>
+  <p>下の<span class="ui">予測はどれくらい当たっている？</span>では、各模試の前日に予測が示した値と実際のスコアを比べます。</p>
+  <div class="row">
+    <figure><img src="img/ready-meter.jpg" alt="カウントダウンの下の準備バー" loading="lazy"></figure>
+    <figure style="grid-column: span 2"><img src="img/ready.jpg" alt="試験の準備チェックリスト" loading="lazy"><figcaption>試験の段階と予測の実績を含むチェックリスト。</figcaption></figure>
+  </div>
 </section>
 
 <section class="chap" id="plans">
@@ -367,11 +387,16 @@ S  安定度：R が90%まで下がるのにかかる日数</div>
 <div class="formula">模試の重み = 0.5 ^ (経過日数 / 半減期)</div>
   <p><b>傾向</b>はスコアを通る最小二乗法の直線です。上限に近づくとスコアは頭打ちになるため、予測は100%まで伸び続けず、最後の模試のあとで緩やかになります。モデルの精度のグラフは、各模試の日に問題バンクのモデルが予測した値と実際のスコアを比べます。</p>
 
+  <p><b>予測の実績。</b>アプリは各模試について、その前日の時点で分かっていたことだけを使って総合予測を計算し直し、実際のスコアと比べます。直近5回の平均のずれと、合格確率の<b>ブライアスコア</b>を表示します。確率予測を評価する標準的な方法で、0が完璧、0.25は常に50%と言うのと同じです。</p>
+<div class="formula">ブライアスコア = （予測確率 − 結果）² の平均、　結果 = スコアが70%以上なら1、それ以外は0</div>
+
   <h3 id="sci-plan">プランが学ぶ内容を決める方法</h3>
   <p>各トピックには優先度が付きます：試験日にまだ何点取れる余地があるか、復習がどれだけ急ぎか、問題にどれだけ時間がかかるか。</p>
 <div class="formula">優先度 = (1 − 試験日の p) × 緊急度 ÷ 1問あたりの分数</div>
   <p>ブロックを埋めるのは<b>ナップサック問題</b>です：合計時間がブロックに収まり、合計の価値（守れる問題数）が最大になるトピックを選びます。アプリはブロックごとに厳密に解き、集中力が最も高い最初に最も難しいトピックを置きます。</p>
   <p><b>間違いの振り返り。</b>問題を間違え、その理由を学ぶことは最も効果的な学習法の1つで、間違いの直後にフィードバックがあるとさらに効果的です。そのため各トピックのすぐ後に、そのトピックで予想される間違いに比例した長さの振り返りが入ります。別の日ではなく、同じブロックの中で行います。</p>
+
+  <p><b>最終段階。</b>最後の21日間、プランは新しい内容を学ぶことから、すでに知っていることを固めることへ移ります。目標未満のトピックは苦手とみなされ、模試が増え（思い出す練習そのものが最も効果的な学習法の一つです）、自分の間違いノートに時間をかけます。試験前日のプランは短めです。学習後の睡眠は記憶の定着を助け、疲れた脳は思い出しにくくなります。</p>
 
   <h3 id="sci-newport">ディープワークと計画（カル・ニューポート）</h3>
   <p>プランはカル・ニューポートの『Deep Work（大事なことに集中する）』と、彼のタイムブロック計画法の考え方に沿っています：</p>
@@ -393,6 +418,8 @@ S  安定度：R が90%まで下がるのにかかる日数</div>
     <li>Cepeda, N. J., Pashler, H., Vul, E., Wixted, J. T., &amp; Rohrer, D. (2006). Distributed practice in verbal recall tasks: A review and quantitative synthesis. <i>Psychological Bulletin, 132</i>(3), 354–380. <a href="https://doi.org/10.1037/0033-2909.132.3.354" target="_blank" rel="noopener">doi</a></li>
     <li>Roediger, H. L., &amp; Karpicke, J. D. (2006). Test-enhanced learning: Taking memory tests improves long-term retention. <i>Psychological Science, 17</i>(3), 249–255. <a href="https://doi.org/10.1111/j.1467-9280.2006.01693.x" target="_blank" rel="noopener">doi</a></li>
     <li>Metcalfe, J. (2017). Learning from errors. <i>Annual Review of Psychology, 68</i>, 465–489. <a href="https://doi.org/10.1146/annurev-psych-010416-044022" target="_blank" rel="noopener">doi</a></li>
+    <li>Brier, G. W. (1950). Verification of forecasts expressed in terms of probability. <i>Monthly Weather Review, 78</i>(1), 1–3. <a href="https://doi.org/10.1175/1520-0493(1950)078%3C0001:VOFEIT%3E2.0.CO;2" target="_blank" rel="noopener">doi</a></li>
+    <li>Diekelmann, S., &amp; Born, J. (2010). The memory function of sleep. <i>Nature Reviews Neuroscience, 11</i>(2), 114–126. <a href="https://doi.org/10.1038/nrn2762" target="_blank" rel="noopener">doi</a></li>
     <li>Ericsson, K. A., Krampe, R. T., &amp; Tesch-Römer, C. (1993). The role of deliberate practice in the acquisition of expert performance. <i>Psychological Review, 100</i>(3), 363–406. <a href="https://doi.org/10.1037/0033-295X.100.3.363" target="_blank" rel="noopener">doi</a></li>
     <li>Leroy, S. (2009). Why is it so hard to do my work? The challenge of attention residue when switching between work tasks. <i>Organizational Behavior and Human Decision Processes, 109</i>(2), 168–181. <a href="https://doi.org/10.1016/j.obhdp.2009.04.002" target="_blank" rel="noopener">doi</a></li>
     <li>Newport, C. (2016). <i>Deep Work: Rules for Focused Success in a Distracted World.</i> Grand Central. <a href="https://calnewport.com/deep-work-rules-for-focused-success-in-a-distracted-world/" target="_blank" rel="noopener">calnewport.com</a></li>

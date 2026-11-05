@@ -53,7 +53,7 @@ def connect(pg, token=GOOD):
 def remote(): return json.loads(list(gists.values())[0]['files']['ppl-flight-deck.json']) if gists else None
 
 with sync_playwright() as p:
-    b = p.chromium.launch()
+    b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
     A, a, ea = device(b)
     check('sync is off by default; no request is made to GitHub', a.inner_text('#syncChip') == 'Sync off' and not calls, calls)
 

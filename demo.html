@@ -6794,6 +6794,153 @@ svg.tick {
     right: 82px;
   }
 }
+
+/* ===== "Ready for the exam?": the meter in the countdown card and its dialog ===== */
+.readybar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 3px 0;
+  background: none;
+  border: 0;
+  color: var(--ink2);
+  font: inherit;
+  cursor: pointer;
+  min-height: 24px;
+}
+.readybar:hover .rtxt,
+.readybar:focus-visible .rtxt {
+  color: var(--ink);
+}
+.rsegs {
+  flex: 1;
+  display: flex;
+  gap: 3px;
+}
+.rsegs i {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: #343b44;
+}
+.rsegs i.ok {
+  background: var(--s3);
+}
+/* final stretch: the missing checks turn amber */
+.readybar.stretch .rsegs i:not(.ok) {
+  background: #6b4a12;
+}
+.rtxt {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.countdown input {
+  margin-top: 6px;
+}
+.readysheet {
+  width: min(520px, 100%);
+}
+.readyphase {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 12px 0 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #20252b;
+  border: 1px solid var(--line2);
+  font-size: 13px;
+  color: var(--ink2);
+  line-height: 1.4;
+}
+.readyphase b {
+  color: var(--ink);
+  font-size: 13.5px;
+}
+.readyphase.stretch,
+.readyphase.week,
+.readyphase.lastday {
+  background: #2a2112;
+  border-color: #6b4a12;
+}
+.readyphase.stretch b,
+.readyphase.week b,
+.readyphase.lastday b {
+  color: var(--exam);
+}
+.readylist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.readylist li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 8px 2px;
+  border-bottom: 1px solid var(--line);
+}
+.readylist li:last-child {
+  border-bottom: 0;
+}
+.readylist li > span:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.readylist b {
+  font-size: 13.5px;
+  color: var(--ink);
+}
+.readylist small {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.rdot {
+  position: relative;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border-radius: 50%;
+  border: 2px solid #59626e;
+  box-sizing: border-box;
+}
+.readylist li.ok .rdot {
+  background: var(--s3);
+  border-color: var(--s3);
+  color: #0d0f12;
+}
+.rdot svg.tick {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 100%;
+  height: 100%;
+}
+.readyrec {
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: var(--ink2);
+  line-height: 1.45;
+}
+.readyrec h4 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
 .demotag{font-style:normal;font-size:.45em;vertical-align:middle;letter-spacing:.08em;color:#ffd08a;background:#3d2b14;border:1px solid #6b4a1c;border-radius:6px;padding:2px 7px;margin-left:6px}
 #syncChip{display:none!important}
 </style>
@@ -6830,6 +6977,7 @@ svg.tick {
       <div class="panel countdown">
         <div class="label" data-t="exam"></div>
         <div class="cdrow"><div class="big" id="countdown">—</div><div class="unit" id="countLabel"></div></div>
+        <button type="button" class="readybar" id="readyBar"><span class="rsegs" id="readySegs"></span><span class="rtxt" id="readyTxt"></span></button>
         <input type="date" id="examDate" aria-label="Exam date">
       </div>
       <div class="panel vol tscard" id="tsCard">
@@ -7057,6 +7205,7 @@ svg.tick {
 <div class="modalbg" id="calBg" hidden>
   <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="calTitleH">
     <div class="mhead"><div><h3 id="calTitleH" data-t="calTitle"></h3><div class="muted" data-t="calSub"></div></div><button class="x" id="calClose" aria-label="Close">×</button></div>
+    <div class="tstrend" id="recTxt"></div>
     <div class="tstrend" id="calTxt"></div>
     <div class="chart" id="calChart"></div>
     <div class="chartlegend"><span><i style="border-color:#8590a2;border-top-style:dashed"></i><span data-t="calPerfect"></span></span><span><i style="border-color:#ffd08a"></i><span data-t="calFit"></span></span></div>
@@ -7090,6 +7239,15 @@ svg.tick {
       <div class="mbtns"><button class="primary" id="syncNow" data-t="syncNow"></button><button id="syncOff" data-t="syncDisconnect"></button></div>
       <p class="syncnote" data-t="syncHow"></p>
     </div>
+  </div>
+</div>
+<div class="modalbg" id="readybg" hidden>
+  <div class="modal readysheet" role="dialog" aria-modal="true" aria-labelledby="readyTitle">
+    <div class="mhead"><div><h3 id="readyTitle" data-t="readyTitle"></h3><div class="muted" id="readySub"></div></div><button class="x" id="readyClose" aria-label="Close">×</button></div>
+    <div class="readyphase" id="readyPhase"></div>
+    <ul class="readylist" id="readyList"></ul>
+    <div class="readyrec" id="readyRec"></div>
+    <div class="mbtns"><button type="button" class="primary" id="readyPlan" data-t="planOpen"></button></div>
   </div>
 </div>
 <div class="modalbg" id="daybg" hidden>
@@ -9043,6 +9201,142 @@ const Translations = (() => {
   Object.assign(I18N.en, { docsShort: 'Docs', docsTitle: 'Open the user guide (new tab)' });
   Object.assign(I18N.pt, { docsShort: 'Documentação', docsTitle: 'Abrir a documentação (nova aba)' });
   Object.assign(I18N.ja, { docsShort: 'ドキュメント', docsTitle: 'ユーザーガイドを開く（新しいタブ）' });
+  /* "Ready for the exam?", exam phases and the forecast's track record */
+  Object.assign(I18N.en, {
+    readyAria: 'Exam readiness: {k} of {n} — open',
+    readyTitle: 'Ready for the exam?',
+    readySub: '{d} days to go · {k} of {n} ready',
+    readySubPast: 'Exam date passed · {k} of {n} ready',
+    rk_tests: 'Practice tests at your goal',
+    rk_pass: 'High chance to pass',
+    rk_topics: 'Every topic studied',
+    rk_weak: 'No weak topics',
+    rk_due: 'Reviews up to date',
+    rd_tests: 'Average of the last 3: {v}% (goal {g}%)',
+    rd_testsFew: 'Needs 3 scored practice tests (you have {n})',
+    rd_pass: 'Chance to pass: {v} (aim: {a} or more)',
+    rd_topics: '{n} topics without a score yet',
+    rd_topicsOk: 'Every topic has a score',
+    rd_weak: '{n} below 70%: {list}',
+    rd_weakOk: 'None below 70%',
+    rd_due: '{n} reviews due',
+    rd_due1: '1 review due',
+    rd_topics1: '1 topic without a score yet',
+    rd_dueOk: 'Nothing due',
+    phase_normal: 'Final stretch starts on {date}',
+    phase_normal_d:
+      'In the last 21 days the plan changes on its own: weak means below your goal, new material gets less room, a practice test at least every 3 days and a longer error-notes review. The last day is light.',
+    phase_stretch: 'Final stretch',
+    phase_stretch_d:
+      'The plan now counts topics below your goal as weak, gives new material less room, schedules a practice test at least every 3 days (every 2 in the last 10) and opens sessions of 45 min or more with 5 extra minutes of error notes.',
+    phase_week: 'Final week',
+    phase_week_d: 'No new material: reviews, weak topics, error notes and a practice test every 2 days.',
+    phase_lastday: 'Last day',
+    phase_lastday_d: 'Rest beats cramming: no practice test, only short reviews, at most {m} minutes.',
+    phase_after: 'The exam date has passed',
+    phase_after_d: 'The plan is back to normal. Set a new date if you are taking the exam again.',
+    recTitle: 'How right has the forecast been?',
+    recTxt: 'Before your last {n} practice tests the forecast was off by ±{m} points on average ({dir}).',
+    recUnder: 'you scored {v} points more than forecast',
+    recOver: 'you scored {v} points less than forecast',
+    recEven: 'no lean either way',
+    recBrier: 'Pass-chance accuracy (Brier score): {v}; 0 is perfect, 0.25 is no better than a coin flip.',
+    recNone: 'After your first practice test, this shows how close the forecast was.',
+    reason_testStretch: 'Final stretch: a test at least every 3 days',
+    rs_testStretch: 'test',
+    tsRest: 'No practice test now: rest before the exam',
+    tsRestShort: 'Rest',
+  });
+  Object.assign(I18N.pt, {
+    readyAria: 'Pronto para a prova: {k} de {n} — abrir',
+    readyTitle: 'Pronto para a prova?',
+    readySub: 'Faltam {d} dias · {k} de {n} prontos',
+    readySubPast: 'A data da prova passou · {k} de {n} prontos',
+    rk_tests: 'Simulados na sua meta',
+    rk_pass: 'Chance alta de passar',
+    rk_topics: 'Todos os tópicos estudados',
+    rk_weak: 'Nenhum tópico fraco',
+    rk_due: 'Revisões em dia',
+    rd_tests: 'Média dos últimos 3: {v}% (meta {g}%)',
+    rd_testsFew: 'Precisa de 3 simulados com nota (você tem {n})',
+    rd_pass: 'Chance de passar: {v} (meta: {a} ou mais)',
+    rd_topics: '{n} tópicos ainda sem nota',
+    rd_topicsOk: 'Todos os tópicos têm nota',
+    rd_weak: '{n} abaixo de 70%: {list}',
+    rd_weakOk: 'Nenhum abaixo de 70%',
+    rd_due: '{n} revisões vencidas',
+    rd_due1: '1 revisão vencida',
+    rd_topics1: '1 tópico ainda sem nota',
+    rd_dueOk: 'Nada vencido',
+    phase_normal: 'A reta final começa em {date}',
+    phase_normal_d:
+      'Nos últimos 21 dias o plano muda sozinho: fraco passa a ser abaixo da sua meta, matéria nova perde espaço, simulado no mínimo a cada 3 dias e revisão do caderno de erros mais longa. O último dia é leve.',
+    phase_stretch: 'Reta final',
+    phase_stretch_d:
+      'Agora o plano conta como fracos os tópicos abaixo da sua meta, dá menos espaço para matéria nova, marca um simulado no mínimo a cada 3 dias (a cada 2 nos últimos 10) e abre as sessões de 45 min ou mais com 5 minutos a mais de caderno de erros.',
+    phase_week: 'Última semana',
+    phase_week_d: 'Sem matéria nova: revisões, tópicos fracos, caderno de erros e um simulado a cada 2 dias.',
+    phase_lastday: 'Último dia',
+    phase_lastday_d: 'Descansar vale mais que virar a noite: sem simulado, só revisões curtas, no máximo {m} minutos.',
+    phase_after: 'A data da prova passou',
+    phase_after_d: 'O plano voltou ao normal. Marque uma nova data se for fazer a prova de novo.',
+    recTitle: 'A previsão tem acertado?',
+    recTxt: 'Antes dos seus últimos {n} simulados a previsão errou em média ±{m} pontos ({dir}).',
+    recUnder: 'você tirou {v} pontos a mais que o previsto',
+    recOver: 'você tirou {v} pontos a menos que o previsto',
+    recEven: 'sem tendência para cima ou para baixo',
+    recBrier: 'Acerto da chance de passar (Brier): {v}; 0 é perfeito, 0,25 é como jogar uma moeda.',
+    recNone: 'Depois do seu primeiro simulado, aqui aparece o quanto a previsão chegou perto.',
+    reason_testStretch: 'Reta final: simulado no mínimo a cada 3 dias',
+    rs_testStretch: 'simulado',
+    tsRest: 'Sem simulado agora: descanse antes da prova',
+    tsRestShort: 'Descanso',
+  });
+  Object.assign(I18N.ja, {
+    readyAria: '試験の準備：{n}項目中{k}項目 — 開く',
+    readyTitle: '試験の準備はできていますか？',
+    readySub: '試験まであと{d}日 · {n}項目中{k}項目クリア',
+    readySubPast: '試験日を過ぎました · {n}項目中{k}項目クリア',
+    rk_tests: '模試が目標に到達',
+    rk_pass: '合格の可能性が高い',
+    rk_topics: 'すべてのトピックを学習済み',
+    rk_weak: '苦手なトピックがない',
+    rk_due: '復習が遅れていない',
+    rd_tests: '直近3回の平均：{v}%（目標 {g}%）',
+    rd_testsFew: '採点済みの模試が3回必要です（現在{n}回）',
+    rd_pass: '合格の可能性：{v}（目標：{a}以上）',
+    rd_topics: 'スコアのないトピックが{n}件',
+    rd_topicsOk: 'すべてのトピックにスコアがあります',
+    rd_weak: '70%未満が{n}件：{list}',
+    rd_weakOk: '70%未満はありません',
+    rd_due: '期限の来た復習が{n}件',
+    rd_due1: '期限の来た復習が1件',
+    rd_topics1: 'スコアのないトピックが1件',
+    rd_dueOk: '期限の来た復習はありません',
+    phase_normal: '最終段階は{date}から始まります',
+    phase_normal_d:
+      '最後の21日間はプランが自動で切り替わります：目標未満を苦手とみなし、新しい内容を減らし、模試を少なくとも3日ごとに入れ、間違いノートの復習を長くします。最終日は軽めです。',
+    phase_stretch: '最終段階',
+    phase_stretch_d:
+      'プランは目標未満のトピックを苦手とみなし、新しい内容を減らし、模試を少なくとも3日ごと（最後の10日は2日ごと）に入れ、45分以上のセッションの最初に間違いノートを5分多く復習します。',
+    phase_week: '最後の1週間',
+    phase_week_d: '新しい内容はなし：復習、苦手なトピック、間違いノート、2日ごとの模試。',
+    phase_lastday: '最終日',
+    phase_lastday_d: '詰め込みより休息：模試はなし、短い復習だけで最大{m}分。',
+    phase_after: '試験日を過ぎました',
+    phase_after_d: 'プランは通常に戻りました。再受験する場合は新しい日付を設定してください。',
+    recTitle: '予測はどれくらい当たっている？',
+    recTxt: '直近{n}回の模試の前、予測のずれは平均±{m}ポイントでした（{dir}）。',
+    recUnder: '予測より{v}ポイント高い結果',
+    recOver: '予測より{v}ポイント低い結果',
+    recEven: '上下どちらにも偏りなし',
+    recBrier: '合格確率の精度（ブライアスコア）：{v}。0が完璧、0.25はコイン投げと同じ。',
+    recNone: '最初の模試のあと、予測がどれだけ近かったかをここに表示します。',
+    reason_testStretch: '最終段階：少なくとも3日ごとに模試',
+    rs_testStretch: '模試',
+    tsRest: '今は模試なし：試験前は休みましょう',
+    tsRestShort: '休息',
+  });
   return { I18N };
 })();
 const { I18N } = Translations;
@@ -9968,6 +10262,7 @@ const Dashboard = (() => {
           .replace('{last}', pts[pts.length - 1].score + '%')
           .replace('{n}', (state.tests || []).length)
       : t('practiceTests');
+    if (typeof renderReady === 'function') renderReady();
   }
   function lastSeen() {
     const m = {};
@@ -10719,7 +11014,7 @@ const Forecast = (() => {
 const { EXAM_Q, PASS_N, betaBinomTail, binomTail, pRight, forecastMu, forecast } = Forecast;
 
 /* ===== module PracticeTestModel (js/model/practice-tests.js) =====
-   public: TEST_Q, scoredTests, testsSD, blended, linReg, testTrend, calibration, testWhy
+   public: TEST_Q, scoredTests, testsSD, blended, linReg, testTrend, calibration, testWhy, forecastRecord
    shared state (getter/setter): tsRange */
 const PracticeTestModel = (() => {
   /* ===== practice tests: blended score, regression, calibration, cadence =====
@@ -10853,6 +11148,35 @@ const PracticeTestModel = (() => {
       calibrated: usable ? Math.max(0, Math.min(100, reg.at(forecastMu().mu * 100))) : null,
     };
   }
+  /* track record of the overall forecast (the one on the dashboard): for each scored test, what the app forecast the
+     day before — the blended score and the chances, computed only from what you had done until then — against the
+     score you got. Nothing here changes the forecast; it shows how far to trust it.
+       error  = real − forecast (points);  MAE = mean |error| of the last 5 tests;  bias = mean error of the last 5
+       Brier  = mean (chance − outcome)² over all tests, outcome 1 when the score reached 70% (pass) or your goal
+                (0 = perfect, 0.25 = no better than always saying 50%) */
+  let _rec = null;
+  function forecastRecord() {
+    const all = scoredTests(),
+      key = todayISO() + '|' + JSON.stringify(all) + '|' + state.events.length + '|' + state.scores.join() + '|' + GOAL;
+    if (_rec && _rec.k === key) return _rec.v;
+    const rows = all.map(x => {
+      const b = blended(addDays(x.date, -1));
+      return { date: x.date, score: x.score, pred: b.mu * 100, err: x.score - b.mu * 100, pass: b.pass, goal: b.goal };
+    });
+    const l5 = rows.slice(-5),
+      mean = (a, f) => (a.length ? a.reduce((s, r) => s + f(r), 0) / a.length : null);
+    const v = {
+      rows,
+      n: rows.length,
+      nRecent: l5.length,
+      mae: mean(l5, r => Math.abs(r.err)),
+      bias: mean(l5, r => r.err),
+      brierPass: mean(rows, r => (r.pass - (r.score >= 70 ? 1 : 0)) ** 2),
+      brierGoal: mean(rows, r => (r.goal - (r.score >= GOAL ? 1 : 0)) ** 2),
+    };
+    _rec = { k: key, v };
+    return v;
+  }
   function testWhy(asOf, st) {
     st = st || settings();
     asOf = asOf || todayISO();
@@ -10864,7 +11188,12 @@ const PracticeTestModel = (() => {
         .sort(),
       last = prev[prev.length - 1];
     const daysLeft = diffDays(asOf, state.deadline),
-      ev = daysLeft >= 0 && daysLeft <= 10 ? Math.min(every, 2) : every;
+      ev =
+        daysLeft >= 0 && daysLeft <= 10
+          ? Math.min(every, 2)
+          : daysLeft >= 0 && daysLeft <= STRETCH_DAYS
+            ? Math.min(every, 3)
+            : every;
     const since = last ? diffDays(last, asOf) : Infinity;
     const acts = [...state.events.map(e => e.date), ...(state.tests || []).map(x => x.date)]
         .filter(d => d < asOf)
@@ -10875,7 +11204,10 @@ const PracticeTestModel = (() => {
       avgR = wavg(ms),
       nDue = ms.filter(m => m.reps.length && m.over >= 0).length;
     let reason = null;
-    if (!last || since >= ev) reason = ev < every ? 'testFinal' : 'test';
+    /* the day before the exam and the exam day: no practice test (see examPhase) */
+    if (daysLeft >= 0 && daysLeft <= 1)
+      return { due: false, reason: null, every: ev, since, overdue: 0, next: null, rest: true };
+    if (!last || since >= ev) reason = ev < every ? (daysLeft <= 10 ? 'testFinal' : 'testStretch') : 'test';
     else if (idle >= pref('idleDays') && since >= 2) reason = 'testIdle';
     else if (((avgR != null && avgR < 0.75) || nDue >= 5) && since >= 2) reason = 'testRecall';
     return {
@@ -10895,9 +11227,10 @@ const PracticeTestModel = (() => {
       },
     ],
   });
-  return { TEST_Q, scoredTests, testsSD, blended, linReg, testTrend, calibration, testWhy };
+  return { TEST_Q, scoredTests, testsSD, blended, linReg, testTrend, calibration, testWhy, forecastRecord };
 })();
-const { TEST_Q, scoredTests, testsSD, blended, linReg, testTrend, calibration, testWhy } = PracticeTestModel;
+const { TEST_Q, scoredTests, testsSD, blended, linReg, testTrend, calibration, testWhy, forecastRecord } =
+  PracticeTestModel;
 
 /* ===== module ForecastView (js/views/forecast.js) =====
    public: fcCls, renderFcMini, renderForecast */
@@ -11008,7 +11341,8 @@ const ForecastView = (() => {
 const { fcCls, renderFcMini, renderForecast } = ForecastView;
 
 /* ===== module PlanModel (js/model/plan.js) =====
-   public: settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName, reviewSize
+   public: settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName, reviewSize, examPhase,
+           STRETCH_DAYS, LASTDAY_MAX
    shared state (getter/setter): energyMode */
 const PlanModel = (() => {
   /* ================= DAILY PLAN (mechanical, time-based) =================
@@ -11024,6 +11358,20 @@ const PlanModel = (() => {
    Order: 1) practice test when due  2) reviews due today  3) topics never scored, weak topics (< 70%)
           4) new material (skipped in the last 7 days). Each item is cut to what still fits in the remaining minutes.
    Topics left undone in a saved plan during the last 7 days get a 25% priority boost (see Schedule). */
+  /* ================= EXAM PHASES (days left until the exam date) =================
+   normal   > 21 days   the standard plan
+   stretch  8–21 days   final stretch: "weak" means below your goal (not below 70%), new material counts 20% less,
+                        a practice test at least every 3 days (every 2 in the last 10), error-notes review +5 min
+   week     2–7 days    as the stretch, and no new material at all
+   lastday  0–1 day     the day before and the exam day: no practice test, no topic never studied, reviews of at most
+                        20 questions, at most 90 minutes in all — rest beats cramming
+   after    the exam date has passed: the standard plan */
+  const STRETCH_DAYS = 21,
+    LASTDAY_MAX = 90;
+  function examPhase(date) {
+    const d = diffDays(date || todayISO(), state.deadline);
+    return d < 0 ? 'after' : d <= 1 ? 'lastday' : d <= 7 ? 'week' : d <= STRETCH_DAYS ? 'stretch' : 'normal';
+  }
   const DEF_SET = { minutes: 180, qph: 40, testEvery: 3, reviewMin: 1.5 };
   const settings = () => {
     const o = state.settings || {},
@@ -11081,7 +11429,11 @@ const PlanModel = (() => {
       E = ENERGY[mode || 'medium'],
       st = { ...st0, minutes: st0.minutes * E.stretch },
       daysLeft = Math.max(1, diffDays(asOf, state.deadline)),
-      final = daysLeft <= 7;
+      phase = examPhase(asOf),
+      final = daysLeft <= 7,
+      lastDay = phase === 'lastday',
+      weakBelow = phase === 'normal' || phase === 'after' ? 70 : GOAL;
+    if (lastDay) st.minutes = Math.min(st.minutes, LASTDAY_MAX);
     const cap = Math.max(10, Math.round((st.minutes * st.qph) / 60)); /* questions/night with no review (reference) */
     const doneT = new Set(
       state.events.filter(e => e.date === asOf && (e.kind === 'study' || e.kind === 'review')).map(e => e.topic)
@@ -11134,7 +11486,7 @@ const PlanModel = (() => {
     const add = it => cands.push(it);
     const tw = testWhy(asOf, st0),
       man = asOf === todayISO() && manualTest(asOf);
-    if (testsToday || tw.due || man) {
+    if (testsToday || (tw.due && !lastDay) || man) {
       const mu = blended(asOf).mu;
       if (E.test || testsToday || tw.overdue >= 2 || man)
         add({
@@ -11151,20 +11503,23 @@ const PlanModel = (() => {
     const ms = srAll(asOf, true);
     ms.filter(m => m.reps.length && m.over >= 0).forEach(m => {
       used.add(m.i);
-      add(topicItem(m.i, reviewSize(m.i, m), 'due'));
+      add(topicItem(m.i, lastDay ? Math.min(20, reviewSize(m.i, m)) : reviewSize(m.i, m), 'due'));
     });
-    ms.filter(m => !m.reps.length && !used.has(m.i)).forEach(m => {
+    ms.filter(m => !lastDay && !m.reps.length && !used.has(m.i)).forEach(m => {
       used.add(m.i);
       add(topicItem(m.i, Math.min(TOPICS[m.i].q, 40), 'nodata'));
     });
     TOPICS.map((x, i) => i)
       .filter(
-        i => !used.has(i) && ['Not Comfortable', 'To review'].includes(state.statuses[i]) && (state.scores[i] ?? 0) < 70
+        i =>
+          !used.has(i) &&
+          ['Not Comfortable', 'To review'].includes(state.statuses[i]) &&
+          (state.scores[i] ?? 0) < weakBelow
       )
       .sort((a, b) => TOPICS[b].q - TOPICS[a].q)
       .forEach(i => {
         used.add(i);
-        add(topicItem(i, Math.min(TOPICS[i].q, 40), 'weak'));
+        add(topicItem(i, Math.min(TOPICS[i].q, lastDay ? 20 : 40), 'weak'));
       });
     const newOnes = [];
     if (!final)
@@ -11192,7 +11547,13 @@ const PlanModel = (() => {
     /* standard: practice test first, then the most exam questions at stake per minute of study:
      (1 − pExam) × urgency ÷ minutes per question — every bank question is equally likely on the exam, so this is the
      expected exam-day questions protected per minute (urgency: overdue review 1.3, weak 1.15, no data 1.1, new 1.0) */
-    const URG = { due: 1.3, weak: 1.15, nodata: 1.1, new: 1, light: 0.8 },
+    const URG = {
+        due: 1.3,
+        weak: 1.15,
+        nodata: 1.1,
+        new: phase === 'normal' || phase === 'after' ? 1 : 0.8,
+        light: 0.8,
+      },
       missed = typeof missedTopics === 'function' ? missedTopics(asOf) : new Set(),
       val = x => ((1 - x.pExam) * (URG[x.reason] || 1) * (missed.has(x.i) ? 1.25 : 1)) / x.per;
     if (E.order === 'standard') todo.sort((a, b) => (b.kind === 'test') - (a.kind === 'test') || val(b) - val(a));
@@ -11226,6 +11587,7 @@ const PlanModel = (() => {
       ),
       daysLeft,
       final,
+      phase,
       pace: Math.ceil(remaining / daysLeft),
     };
   }
@@ -11256,9 +11618,35 @@ const PlanModel = (() => {
       },
     ],
   });
-  return { settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName, reviewSize };
+  return {
+    settings,
+    easeOf,
+    minutesPerQ,
+    buildPlan,
+    planDay,
+    setEnergy,
+    fmtMin,
+    planRowName,
+    reviewSize,
+    examPhase,
+    STRETCH_DAYS,
+    LASTDAY_MAX,
+  };
 })();
-const { settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName, reviewSize } = PlanModel;
+const {
+  settings,
+  easeOf,
+  minutesPerQ,
+  buildPlan,
+  planDay,
+  setEnergy,
+  fmtMin,
+  planRowName,
+  reviewSize,
+  examPhase,
+  STRETCH_DAYS,
+  LASTDAY_MAX,
+} = PlanModel;
 
 /* ===== module Schedule (js/model/schedule.js) =====
    live value (getter): DAY_START (first hour of the plan grid, from Settings)
@@ -11464,8 +11852,11 @@ const Schedule = (() => {
   /* error-notes review at the start of a session: 10 min for a 1–2 h session, 15 min from 2 h, none under 1 h or when
      there are no notes from earlier days (or the error review is off in Settings) */
   function notesReviewFor(date, cap) {
-    if (!pref('reflect') || cap < 60 || !(state.notes || []).some(n => n.date < date)) return 0;
-    return cap >= 120 ? 15 : 10;
+    const ph = examPhase(date),
+      stretch = ph === 'stretch' || ph === 'week' || ph === 'lastday';
+    /* final stretch: from 45 min, and 5 min longer (your own mistakes are the best review before the exam) */
+    if (!pref('reflect') || cap < (stretch ? 45 : 60) || !(state.notes || []).some(n => n.date < date)) return 0;
+    return (cap >= 120 ? 15 : 10) + (stretch ? 5 : 0);
   }
   const usedBy = pick => pick.reduce((a, c) => a + Math.ceil(c.n * c.per), 0);
   /* the smallest chunk worth placing: 10 minutes (or the whole topic when it is shorter), never under 5 questions */
@@ -11477,6 +11868,17 @@ const Schedule = (() => {
      the same block; only when that is impossible (a practice test or a topic that cannot shrink fills the block) does
      the whole review move to the start of the day's next block. */
   function packDay(date, ranges, energy) {
+    /* the day before the exam and the exam day: at most 90 minutes, the first ones you blocked */
+    if (examPhase(date) === 'lastday') {
+      let room = LASTDAY_MAX;
+      ranges = (ranges || [])
+        .map(([s, e]) => {
+          const len = Math.max(0, Math.min(e - s, room));
+          room -= len;
+          return [s, s + len];
+        })
+        .filter(([s, e]) => e > s);
+    }
     const total = rangesTotal(ranges);
     if (!total) return [];
     const st = settings(),
@@ -11503,6 +11905,7 @@ const Schedule = (() => {
           value:
             (x.kind === 'test' ? TEST_Q * 1.5 : n * (1 - (x.pExam ?? x.p ?? 0.5))) *
             (URGENCY[x.reason] || 1) *
+            (x.reason === 'new' && !['normal', 'after'].includes(examPhase(date)) ? 0.8 : 1) *
             (x.kind === 'topic' && boost.has(x.i) ? MISSED_BOOST : 1),
         };
       })
@@ -12008,9 +12411,11 @@ const PlanView = (() => {
     const parts = [
       !w.every
         ? t('tsOff')
-        : w.due
-          ? t('tsNextToday') + ' · ' + t('reason_' + w.reason)
-          : t('tsNextIn').replace('{n}', diffDays(todayISO(), w.next)),
+        : w.rest
+          ? t('tsRest')
+          : w.due
+            ? t('tsNextToday') + ' · ' + t('reason_' + w.reason)
+            : t('tsNextIn').replace('{n}', diffDays(todayISO(), w.next)),
     ];
     if (last)
       parts.push(
@@ -13661,6 +14066,127 @@ const Notes = (() => {
 })();
 const { notesOf, openNotes, notesBadge, renderErrorsPage, parseSheet, matchTopic, readImport } = Notes;
 
+/* ===== module Readiness (js/views/readiness.js) =====
+   public: readiness, renderReady, openReady
+   "Ready for the exam?": five checks that say what is still missing before the exam, the exam phase the plan is in
+   (see examPhase in js/model/plan.js) and how close the forecast has been to your practice tests (forecastRecord).
+   It only reads your data; nothing here changes a statistic or the forecast.
+
+     tests   the last 3 scored practice tests average at least your goal (85% by default)
+     pass    chance to pass (≥ 70%) of at least 90%, from the overall forecast
+     topics  every topic has a score
+     weak    no topic scored below 70%
+     due     no spaced-repetition review overdue                                                          */
+const Readiness = (() => {
+  const PASS_AIM = 0.9,
+    WEAK = 70;
+  function readiness() {
+    const b = blended(),
+      last = scoredTests().slice(-3),
+      avg = last.length ? last.reduce((a, x) => a + x.score, 0) / last.length : null,
+      unscored = TOPICS.map((_, i) => i).filter(i => state.scores[i] == null),
+      weak = TOPICS.map((_, i) => i).filter(i => state.scores[i] != null && state.scores[i] < WEAK),
+      due = srAll(todayISO(), true).filter(m => m.reps.length && m.over >= 0).length;
+    const checks = [
+      { k: 'tests', ok: last.length >= 3 && avg >= GOAL, avg, n: last.length },
+      { k: 'pass', ok: b.pass >= PASS_AIM, v: b.pass },
+      { k: 'topics', ok: !unscored.length, n: unscored.length },
+      { k: 'weak', ok: !weak.length, list: weak.sort((x, y) => state.scores[x] - state.scores[y]) },
+      { k: 'due', ok: !due, n: due },
+    ];
+    return {
+      checks,
+      ok: checks.filter(c => c.ok).length,
+      phase: examPhase(),
+      days: diffDays(todayISO(), state.deadline),
+    };
+  }
+  const TICK = '<svg class="tick" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 8.4 6.8 11 12 5.4"/></svg>';
+  /* the meter in the exam-countdown card: one segment per check */
+  function renderReady() {
+    const bar = $('#readyBar');
+    if (!bar) return;
+    const R = readiness(),
+      n = R.checks.length;
+    $('#readySegs').innerHTML = R.checks.map(c => `<i class="${c.ok ? 'ok' : ''}"></i>`).join('');
+    $('#readyTxt').textContent = `${R.ok}/${n}`;
+    bar.classList.toggle('stretch', ['stretch', 'week', 'lastday'].includes(R.phase));
+    const lbl = t('readyAria').replace('{k}', R.ok).replace('{n}', n);
+    bar.setAttribute('aria-label', lbl);
+    bar.title = lbl;
+    if (!$('#readybg').hidden) fillDialog(R);
+  }
+  function detail(c) {
+    const pct = v => Math.round(v * 100) + '%';
+    if (c.k === 'tests')
+      return c.n < 3
+        ? t('rd_testsFew').replace('{n}', c.n)
+        : t('rd_tests').replace('{v}', Math.round(c.avg)).replace('{g}', GOAL);
+    if (c.k === 'pass') return t('rd_pass').replace('{v}', pct(c.v)).replace('{a}', pct(PASS_AIM));
+    if (c.k === 'topics') return c.n ? t(c.n === 1 ? 'rd_topics1' : 'rd_topics').replace('{n}', c.n) : t('rd_topicsOk');
+    if (c.k === 'weak')
+      return c.list.length
+        ? t('rd_weak')
+            .replace('{n}', c.list.length)
+            .replace(
+              '{list}',
+              c.list
+                .slice(0, 3)
+                .map(i => `${TOPICS[i].name} ${state.scores[i]}%`)
+                .join(', ') + (c.list.length > 3 ? '…' : '')
+            )
+        : t('rd_weakOk');
+    return c.n ? t(c.n === 1 ? 'rd_due1' : 'rd_due').replace('{n}', c.n) : t('rd_dueOk');
+  }
+  function fillDialog(R) {
+    const n = R.checks.length,
+      df = new Intl.DateTimeFormat(LOCALE[lang], { month: 'short', day: 'numeric' });
+    $('#readySub').textContent = (R.days >= 0 ? t('readySub') : t('readySubPast'))
+      .replace('{d}', R.days)
+      .replace('{k}', R.ok)
+      .replace('{n}', n);
+    const head =
+      R.phase === 'normal'
+        ? t('phase_normal').replace('{date}', df.format(parse(addDays(state.deadline, -STRETCH_DAYS))))
+        : t('phase_' + R.phase);
+    $('#readyPhase').className = 'readyphase ' + R.phase;
+    $('#readyPhase').innerHTML =
+      `<b>${esc(head)}</b><span>${esc(t('phase_' + R.phase + '_d').replace('{m}', LASTDAY_MAX))}</span>`;
+    $('#readyList').innerHTML = R.checks
+      .map(
+        c =>
+          `<li class="${c.ok ? 'ok' : ''}"><span class="rdot">${c.ok ? TICK : ''}</span><span><b>${esc(t('rk_' + c.k))}</b><small>${esc(detail(c))}</small></span></li>`
+      )
+      .join('');
+    const F = forecastRecord(),
+      fmt1 = v => (Math.round(v * 10) / 10).toLocaleString(LOCALE[lang]);
+    $('#readyRec').innerHTML = `<h4>${esc(t('recTitle'))}</h4>${esc(recText(F, fmt1))}`;
+  }
+  /* one sentence on the forecast's track record (also in the calibration dialog) */
+  function recText(F, fmt1) {
+    if (!F.n) return t('recNone');
+    const b = F.bias,
+      dir = Math.abs(b) < 1 ? t('recEven') : (b > 0 ? t('recUnder') : t('recOver')).replace('{v}', fmt1(Math.abs(b)));
+    return (
+      t('recTxt').replace('{n}', F.nRecent).replace('{m}', fmt1(F.mae)).replace('{dir}', dir) +
+      ' ' +
+      t('recBrier').replace('{v}', F.brierPass.toFixed(2))
+    );
+  }
+  const readyDialog = modal('#readybg', { close: '#readyClose' });
+  function openReady() {
+    fillDialog(readiness());
+    readyDialog.open('#readyClose');
+  }
+  $('#readyBar').addEventListener('click', openReady);
+  $('#readyPlan').addEventListener('click', () => {
+    readyDialog.close();
+    goView('plan');
+  });
+  return { readiness, renderReady, openReady, recText };
+})();
+const { readiness, renderReady, openReady, recText } = Readiness;
+
 /* ===== module VolumeView (js/views/volume.js) =====
    public: weekStart, weeklyVolume, rangeSeries, renderVolume, renderVolPanel
    shared state (getter/setter): volRange */
@@ -13989,6 +14515,7 @@ const PracticeTestsView = (() => {
   function nextText() {
     const w = testWhy();
     if (!w.every) return t('tsOff');
+    if (w.rest) return t('tsRest');
     if (w.due) return t('tsNextToday') + ' · ' + t('reason_' + w.reason);
     return t('tsNextIn').replace('{n}', diffDays(todayISO(), w.next));
   }
@@ -14021,9 +14548,11 @@ const PracticeTestsView = (() => {
       w = testWhy();
     nx.textContent = !w.every
       ? t('tsOffShort')
-      : w.due
-        ? t('tsNextShortToday')
-        : t('tsNextShortIn').replace('{n}', diffDays(todayISO(), w.next));
+      : w.rest
+        ? t('tsRestShort')
+        : w.due
+          ? t('tsNextShortToday')
+          : t('tsNextShortIn').replace('{n}', diffDays(todayISO(), w.next));
     nx.title = nextText();
     if (!$('#tsQuickBg').hidden) renderTsQuick();
   }
@@ -14210,6 +14739,8 @@ const PracticeTestsView = (() => {
     if (free > 4) box.innerHTML = tsSVG(Math.round(box.clientWidth || 900), baseH + free, true);
   }
   function renderCal() {
+    const F = forecastRecord();
+    $('#recTxt').textContent = recText(F, v => (Math.round(v * 10) / 10).toLocaleString(LOCALE[lang]));
     const C = calibration();
     $('#calTxt').innerHTML =
       C.pts.length < 2
@@ -18538,6 +19069,10 @@ const STEPS=[
   en:['Error analysis','Everything you got wrong, by topic and date, with the topics of today’s session on top. Search, add notes, or import them from your spreadsheet.'],
   pt:['Análise de erros','Tudo o que você errou, por tópico e data, com os tópicos da sessão de hoje no topo. Busque, adicione notas ou importe da sua planilha.'],
   ja:['間違いの分析','間違えたことをトピックと日付ごとに。今日の学習のトピックが一番上。検索、メモの追加、スプレッドシートからの取り込み。']},
+ {view:'dash',sel:'.countdown',
+  en:['Ready for the exam?','The bar under the countdown has one segment per check (tests at your goal, chance to pass, topics, weak spots, reviews). Tap it for the checklist. In the last 21 days the plan switches to the final stretch on its own.'],
+  pt:['Pronto para a prova?','A barra embaixo da contagem tem um segmento por item (simulados na meta, chance de passar, tópicos, pontos fracos, revisões). Toque nela para ver a lista. Nos últimos 21 dias o plano entra sozinho na reta final.'],
+  ja:['試験の準備はできていますか？','カウントダウンの下のバーはチェック項目ごとのセグメント（目標に届いた模試、合格の可能性、トピック、苦手、復習）。タップでチェックリスト。最後の21日間はプランが自動で最終段階に切り替わります。']},
  {view:'dash',sel:'.flags, #langSel',
   en:['Your data, your language','English, Português or 日本語. Everything stays in your browser; Backup JSON and Save HTML keep a copy.'],
   pt:['Seus dados, seu idioma','English, Português ou 日本語. Tudo fica no seu navegador; Backup JSON e Save HTML guardam uma cópia.'],

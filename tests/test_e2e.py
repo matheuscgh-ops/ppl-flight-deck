@@ -540,7 +540,7 @@ def _(c):
 
 # ---------------------------------------------------------------- runner
 with sync_playwright() as p:
-    browser = p.chromium.launch()
+    browser = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
     for fn in TESTS:
         g, n = fn._meta; c = Ctx(browser); c.browser = browser
         try:

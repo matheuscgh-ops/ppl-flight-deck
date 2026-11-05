@@ -35,7 +35,7 @@ for n, l in (('index.html', 'en'), ('pt.html', 'pt'), ('ja.html', 'ja')):
     check(f'docs {n}: has the science chapter with formulas, references and the Cal Newport principles', 'id="science"' in pages[n] and pages[n].count('doi.org') >= 6 and 'Newport' in pages[n] and 'id="sci-newport"' in pages[n])
 
 with sync_playwright() as p:
-    b = p.chromium.launch()
+    b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
     # ---------- the guide renders on every screen ----------
     for mode, opts in DEV:
         c = b.new_context(**opts); pg = c.new_page(); errs = []

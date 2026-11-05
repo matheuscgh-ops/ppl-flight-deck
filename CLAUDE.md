@@ -19,6 +19,7 @@ python3 build.py                                  # build index.html, demo.html 
 python3 tools/docs_screenshots.py                 # retake the guide's screenshots (en, pt, ja) after a UI change
 cd tests && python3 run_all.py                    # all suites, desktop/laptop/iPad mini/iPhone, both files
 python3 tests/test_plans.py                       # one suite
+PPL_BROWSER=webkit python3 tests/test_mobile.py   # one suite in WebKit (Safari engine); CI runs these on every PR
 npx prettier --config .prettierrc.json --write "src/js/**/*.js" src/i18n/translations.js "src/styles/*.css"
 ```
 Test setup (once, macOS): `python3 -m venv .venv && source .venv/bin/activate && pip install playwright && python -m playwright install chromium` (activate `.venv` before running tests).
@@ -35,6 +36,7 @@ The built-in unit tests run in the page: `selfTest()` (or open the app with `#se
 - `src/js/views` dashboard, plan (week view, wizard), statistics, heat map, volume, carousels
 - `src/js/ui` charts, hover, dialogs/modal, navigation, header, settings · `src/js/sync` Gist sync
 - `src/demo` demo data and tour · `tests/` Playwright suites + `run_all.py`
+- `.github/workflows/tests.yml` CI: every suite in Chromium + touch/layout suites in WebKit (report-only)
 - `src/docs` user guide (template + en/pt/ja content, same section ids) → built into `docs/`; screenshots in `docs/img/<lang>/`.
   A change to a workflow or the math also updates the guide in all three languages.
 

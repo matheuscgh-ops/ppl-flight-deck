@@ -40,6 +40,7 @@
       <div class="panel countdown">
         <div class="label" data-t="exam"></div>
         <div class="cdrow"><div class="big" id="countdown">—</div><div class="unit" id="countLabel"></div></div>
+        <button type="button" class="readybar" id="readyBar"><span class="rsegs" id="readySegs"></span><span class="rtxt" id="readyTxt"></span></button>
         <input type="date" id="examDate" aria-label="Exam date">
       </div>
       <div class="panel vol tscard" id="tsCard">
@@ -267,6 +268,7 @@
 <div class="modalbg" id="calBg" hidden>
   <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="calTitleH">
     <div class="mhead"><div><h3 id="calTitleH" data-t="calTitle"></h3><div class="muted" data-t="calSub"></div></div><button class="x" id="calClose" aria-label="Close">×</button></div>
+    <div class="tstrend" id="recTxt"></div>
     <div class="tstrend" id="calTxt"></div>
     <div class="chart" id="calChart"></div>
     <div class="chartlegend"><span><i style="border-color:#8590a2;border-top-style:dashed"></i><span data-t="calPerfect"></span></span><span><i style="border-color:#ffd08a"></i><span data-t="calFit"></span></span></div>
@@ -300,6 +302,15 @@
       <div class="mbtns"><button class="primary" id="syncNow" data-t="syncNow"></button><button id="syncOff" data-t="syncDisconnect"></button></div>
       <p class="syncnote" data-t="syncHow"></p>
     </div>
+  </div>
+</div>
+<div class="modalbg" id="readybg" hidden>
+  <div class="modal readysheet" role="dialog" aria-modal="true" aria-labelledby="readyTitle">
+    <div class="mhead"><div><h3 id="readyTitle" data-t="readyTitle"></h3><div class="muted" id="readySub"></div></div><button class="x" id="readyClose" aria-label="Close">×</button></div>
+    <div class="readyphase" id="readyPhase"></div>
+    <ul class="readylist" id="readyList"></ul>
+    <div class="readyrec" id="readyRec"></div>
+    <div class="mbtns"><button type="button" class="primary" id="readyPlan" data-t="planOpen"></button></div>
   </div>
 </div>
 <div class="modalbg" id="daybg" hidden>

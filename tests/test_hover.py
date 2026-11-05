@@ -16,7 +16,7 @@ def hover(pg, sel, fx, fy=.5, setup=None):
       tip:document.querySelector('.ctip').hidden?null:document.querySelector('.ctip').innerText}))()""")
 
 with sync_playwright() as p:
-    b = p.chromium.launch()
+    b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
     for f in ['index', 'demo']:
         for mode, vp in [('desktop', (2000, 1190)), ('laptop', (1440, 900))]:
             tag = f'{f} · {mode}'

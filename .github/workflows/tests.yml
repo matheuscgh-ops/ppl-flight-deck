@@ -1,0 +1,64 @@
+# Runs the tests on every pull request and every push to main.
+#   Chromium: every suite, one job each (in parallel) — the same checks as tests/run_all.py on your computer.
+#   WebKit:   the touch and layout suites in WebKit, the engine of Safari on iPhone and iPad, so a bug that only shows
+#             on an iPhone is caught before the merge. Report-only for now: it shows its result on the pull request
+#             but does not block the merge.
+name: tests
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      TZ: America/Los_Angeles
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [unit, test_e2e.py, test_sync.py, test_isolation.py, test_mobile.py, test_calendar.py, test_volume.py,
+                test_srrange.py, test_forecast_plan.py, test_practice_tests.py, test_sr_consistency.py, test_hover.py,
+                test_carousel.py, test_heatmap.py, test_plans.py, test_board_order.py, test_plan_adaptive.py,
+                test_errors.py, test_exam_ready.py, test_settings.py, test_tour.py, test_docs.py, test_audit.py,
+                test_build.py]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install playwright
+      - run: python -m playwright install --with-deps chromium
+      - name: Built files are up to date
+        if: matrix.suite == 'unit'
+        run: python build.py && git diff --exit-code -- index.html demo.html docs
+      - name: Unit tests built into the page (selfTest)
+        if: matrix.suite == 'unit'
+        run: python tests/run_all.py --unit-only
+      - name: ${{ matrix.suite }}
+        if: matrix.suite != 'unit'
+        run: python tests/${{ matrix.suite }}
+  webkit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    continue-on-error: true
+    env:
+      TZ: America/Los_Angeles
+      PPL_BROWSER: webkit
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [test_board_order.py, test_mobile.py, test_plans.py, test_exam_ready.py, test_errors.py, test_tour.py]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install playwright
+      - run: python -m playwright install --with-deps webkit
+      - name: ${{ matrix.suite }} in WebKit (Safari engine)
+        run: python tests/${{ matrix.suite }}

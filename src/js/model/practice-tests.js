@@ -1,5 +1,5 @@
 /* ===== module PracticeTestModel (js/model/practice-tests.js) =====
-   public: TEST_Q, scoredTests, testsSD, blended, linReg, testTrend, calibration, testWhy
+   public: TEST_Q, scoredTests, testsSD, blended, linReg, testTrend, calibration, testWhy, forecastRecord
    shared state (getter/setter): tsRange */
 const PracticeTestModel = (() => {
   /* ===== practice tests: blended score, regression, calibration, cadence =====
@@ -133,6 +133,35 @@ const PracticeTestModel = (() => {
       calibrated: usable ? Math.max(0, Math.min(100, reg.at(forecastMu().mu * 100))) : null,
     };
   }
+  /* track record of the overall forecast (the one on the dashboard): for each scored test, what the app forecast the
+     day before — the blended score and the chances, computed only from what you had done until then — against the
+     score you got. Nothing here changes the forecast; it shows how far to trust it.
+       error  = real − forecast (points);  MAE = mean |error| of the last 5 tests;  bias = mean error of the last 5
+       Brier  = mean (chance − outcome)² over all tests, outcome 1 when the score reached 70% (pass) or your goal
+                (0 = perfect, 0.25 = no better than always saying 50%) */
+  let _rec = null;
+  function forecastRecord() {
+    const all = scoredTests(),
+      key = todayISO() + '|' + JSON.stringify(all) + '|' + state.events.length + '|' + state.scores.join() + '|' + GOAL;
+    if (_rec && _rec.k === key) return _rec.v;
+    const rows = all.map(x => {
+      const b = blended(addDays(x.date, -1));
+      return { date: x.date, score: x.score, pred: b.mu * 100, err: x.score - b.mu * 100, pass: b.pass, goal: b.goal };
+    });
+    const l5 = rows.slice(-5),
+      mean = (a, f) => (a.length ? a.reduce((s, r) => s + f(r), 0) / a.length : null);
+    const v = {
+      rows,
+      n: rows.length,
+      nRecent: l5.length,
+      mae: mean(l5, r => Math.abs(r.err)),
+      bias: mean(l5, r => r.err),
+      brierPass: mean(rows, r => (r.pass - (r.score >= 70 ? 1 : 0)) ** 2),
+      brierGoal: mean(rows, r => (r.goal - (r.score >= GOAL ? 1 : 0)) ** 2),
+    };
+    _rec = { k: key, v };
+    return v;
+  }
   function testWhy(asOf, st) {
     st = st || settings();
     asOf = asOf || todayISO();
@@ -144,7 +173,12 @@ const PracticeTestModel = (() => {
         .sort(),
       last = prev[prev.length - 1];
     const daysLeft = diffDays(asOf, state.deadline),
-      ev = daysLeft >= 0 && daysLeft <= 10 ? Math.min(every, 2) : every;
+      ev =
+        daysLeft >= 0 && daysLeft <= 10
+          ? Math.min(every, 2)
+          : daysLeft >= 0 && daysLeft <= STRETCH_DAYS
+            ? Math.min(every, 3)
+            : every;
     const since = last ? diffDays(last, asOf) : Infinity;
     const acts = [...state.events.map(e => e.date), ...(state.tests || []).map(x => x.date)]
         .filter(d => d < asOf)
@@ -155,7 +189,10 @@ const PracticeTestModel = (() => {
       avgR = wavg(ms),
       nDue = ms.filter(m => m.reps.length && m.over >= 0).length;
     let reason = null;
-    if (!last || since >= ev) reason = ev < every ? 'testFinal' : 'test';
+    /* the day before the exam and the exam day: no practice test (see examPhase) */
+    if (daysLeft >= 0 && daysLeft <= 1)
+      return { due: false, reason: null, every: ev, since, overdue: 0, next: null, rest: true };
+    if (!last || since >= ev) reason = ev < every ? (daysLeft <= 10 ? 'testFinal' : 'testStretch') : 'test';
     else if (idle >= pref('idleDays') && since >= 2) reason = 'testIdle';
     else if (((avgR != null && avgR < 0.75) || nDue >= 5) && since >= 2) reason = 'testRecall';
     return {
@@ -175,6 +212,7 @@ const PracticeTestModel = (() => {
       },
     ],
   });
-  return { TEST_Q, scoredTests, testsSD, blended, linReg, testTrend, calibration, testWhy };
+  return { TEST_Q, scoredTests, testsSD, blended, linReg, testTrend, calibration, testWhy, forecastRecord };
 })();
-const { TEST_Q, scoredTests, testsSD, blended, linReg, testTrend, calibration, testWhy } = PracticeTestModel;
+const { TEST_Q, scoredTests, testsSD, blended, linReg, testTrend, calibration, testWhy, forecastRecord } =
+  PracticeTestModel;

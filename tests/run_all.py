@@ -12,13 +12,16 @@ summary = []
 
 # 1) unit tests built into each HTML file (selfTest)
 with sync_playwright() as p:
-    b = p.chromium.launch()
+    b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
     for f in ['index.html', 'demo.html']:
         pg = b.new_page(); pg.goto('file://' + os.path.join(ROOT, f)); pg.wait_for_timeout(400)
         r = pg.evaluate('selfTest()'); fails = [x for x in r if not x['pass']]
         summary.append((f'Unit tests ({f})', len(r) - len(fails), len(r)))
         for x in fails: print(f'FAIL [unit {f}] {x["group"]}: {x["name"]} → {x["detail"]}')
     b.close()
+if '--unit-only' in sys.argv:
+    for t, ok, n in summary: print(f'{"✅" if ok == n else "❌"} {t}: {ok}/{n}')
+    sys.exit(0 if all(ok == n for _, ok, n in summary) else 1)
 
 # 2) end-to-end, sync, isolation and mobile suites
 suites = [('End-to-end (index.html)', ['test_e2e.py', os.path.join(ROOT, 'index.html')]),
@@ -38,6 +41,7 @@ suites = [('End-to-end (index.html)', ['test_e2e.py', os.path.join(ROOT, 'index.
           ('Kanban: drop a card where you want it', ['test_board_order.py']),
           ('Adaptive plan: sizes, refresh, checks, week/day, done-today tick', ['test_plan_adaptive.py']),
           ('Errors tab and spreadsheet import', ['test_errors.py']),
+          ('Exam phases, readiness checklist & forecast track record', ['test_exam_ready.py']),
           ('Settings', ['test_settings.py']),
           ('Demo guided tour', ['test_tour.py']),
           ('User guide, docs button & tour link', ['test_docs.py']),

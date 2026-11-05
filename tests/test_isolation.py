@@ -12,7 +12,7 @@ BASE='http://127.0.0.1:8765/';res=[]
 def check(n,c,d=''):res.append((n,bool(c),str(d)[:200]))
 gh=[]
 with sync_playwright() as p:
-    b=p.chromium.launch();ctx=b.new_context(viewport={'width':2000,'height':1190})
+    b=getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch();ctx=b.new_context(viewport={'width':2000,'height':1190})
     ctx.route('https://api.github.com/**',lambda r:(gh.append(r.request.url),r.fulfill(status=200,body='{"login":"x"}',headers={'Access-Control-Allow-Origin':'*'}))[1])
     pg=ctx.new_page();errs=[];pg.on('pageerror',lambda e:errs.append(str(e)))
     # personal app: connect a fake token and make a change

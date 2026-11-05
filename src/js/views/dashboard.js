@@ -189,6 +189,7 @@ const Dashboard = (() => {
           .replace('{last}', pts[pts.length - 1].score + '%')
           .replace('{n}', (state.tests || []).length)
       : t('practiceTests');
+    if (typeof renderReady === 'function') renderReady();
   }
   function lastSeen() {
     const m = {};

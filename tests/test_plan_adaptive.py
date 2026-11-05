@@ -25,7 +25,7 @@ SETUP = """(()=>{const T=todayISO(),D=n=>addDays(T,-n),ev=(n,topic,sc,k)=>({id:'
 STATS = "JSON.stringify([forecast().mu, blended().mu, counts(), state.scores, state.events.length, TOPICS.map((_,i)=>{const m=srModel(i);return [m.R,m.S,m.next]})])"
 
 with sync_playwright() as p:
-    b = p.chromium.launch()
+    b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
     for f in ['index', 'demo']:
         for mode, opts in DEV:
             tag = f'{f} · {mode}'; touch = mode in ('phone', 'iPad mini'); W = opts['viewport']['width']

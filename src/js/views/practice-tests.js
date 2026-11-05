@@ -109,6 +109,7 @@ const PracticeTestsView = (() => {
   function nextText() {
     const w = testWhy();
     if (!w.every) return t('tsOff');
+    if (w.rest) return t('tsRest');
     if (w.due) return t('tsNextToday') + ' · ' + t('reason_' + w.reason);
     return t('tsNextIn').replace('{n}', diffDays(todayISO(), w.next));
   }
@@ -141,9 +142,11 @@ const PracticeTestsView = (() => {
       w = testWhy();
     nx.textContent = !w.every
       ? t('tsOffShort')
-      : w.due
-        ? t('tsNextShortToday')
-        : t('tsNextShortIn').replace('{n}', diffDays(todayISO(), w.next));
+      : w.rest
+        ? t('tsRestShort')
+        : w.due
+          ? t('tsNextShortToday')
+          : t('tsNextShortIn').replace('{n}', diffDays(todayISO(), w.next));
     nx.title = nextText();
     if (!$('#tsQuickBg').hidden) renderTsQuick();
   }
@@ -330,6 +333,8 @@ const PracticeTestsView = (() => {
     if (free > 4) box.innerHTML = tsSVG(Math.round(box.clientWidth || 900), baseH + free, true);
   }
   function renderCal() {
+    const F = forecastRecord();
+    $('#recTxt').textContent = recText(F, v => (Math.round(v * 10) / 10).toLocaleString(LOCALE[lang]));
     const C = calibration();
     $('#calTxt').innerHTML =
       C.pts.length < 2
