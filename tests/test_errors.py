@@ -86,6 +86,7 @@ with sync_playwright() as p:
             tap('#viewErrors li.editing [data-esave]'); pg.wait_for_timeout(200)
             nn = ev(f"state.notes.find(n=>n.id==='{eid}')")
             check(f'{tag}: Save keeps the whole text (several lines, over 500 characters) and moves it to the new topic', nn['topic'] == 18 and len(nn['text']) == len(long) and '\n' in nn['text'], (nn['topic'], len(nn['text'])))
+            check(f'{tag}: a long note survives a reload and a backup round trip (not cut at 500)', ev(f"normalize(JSON.parse(JSON.stringify(state))).notes.find(n=>n.id==='{eid}').text.length") == len(long))
             check(f'{tag}: the edited note shows under its new topic', 'Line one about hypoxia' in ev("document.querySelector('[data-etopic=\"18\"]').innerText"))
             ev("document.querySelector('#toast button').click()"); pg.wait_for_timeout(200)
             check(f'{tag}: Undo puts the note back as it was', ev(f"state.notes.find(n=>n.id==='{eid}').topic") == 13 and 'x' * 50 not in ev(f"state.notes.find(n=>n.id==='{eid}').text"))
