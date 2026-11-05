@@ -450,7 +450,8 @@ const Dashboard = (() => {
     const own = typeof i === 'string' ? cardOf(i) : null,
       order = placeCard(orderOf(), i, before),
       moved = own ? own.status !== to : state.statuses[i] !== to,
-      same = JSON.stringify(order) === JSON.stringify(state.order);
+      inLane = o => o.filter(k => (typeof k === 'number' ? state.statuses[k] : cardOf(k)?.status) === to),
+      same = JSON.stringify(inLane(order)) === JSON.stringify(inLane(orderOf()));
     if (!moved && same) return false;
     if (own) {
       commit(

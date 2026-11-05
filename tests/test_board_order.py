@@ -30,7 +30,9 @@ DRAG = """async ([from, toLane, beforeIdx, touch]) => {
   if (beforeIdx < cards.length) { const r = cards[beforeIdx].getBoundingClientRect(); ty = r.top + 3; }
   else { const r = cards.length ? cards[cards.length - 1].getBoundingClientRect() : lane.querySelector('.lanecards').getBoundingClientRect(); ty = r.bottom + 6; }
   for (let k = 1; k <= 6; k++) { P('pointermove', window, x + (tx - x) * k / 6, y + (ty - y) * k / 6); await new Promise(r=>setTimeout(r,40)); }
-  const gap = !!document.querySelector('.task-gap'), ghost = !!document.querySelector('.ghost');
+  const gap = !!document.querySelector('.task-gap'), g = document.querySelector('.ghost'), gr = g && g.getBoundingClientRect();
+  /* the copy must be on screen, under the pointer (a stray position:relative once pushed it below the page) */
+  const ghost = !!g && getComputedStyle(g).position === 'fixed' && gr.left <= tx && gr.right >= tx && gr.top <= ty && gr.bottom >= ty;
   P('pointerup', window, tx, ty); await new Promise(r=>setTimeout(r,250));
   return {gap, ghost};
 }"""
@@ -53,7 +55,7 @@ with sync_playwright() as p:
             ev0 = ev("state.events.length")
             # inside the list: drop card 11 before card 5
             r = ev(DRAG, [11, 1, 1, touch])
-            check(f'{tag}: while dragging, a tilted copy follows the pointer and a gap shows where it lands', r['gap'] and r['ghost'], r)
+            check(f'{tag}: while dragging, a tilted copy stays visible under the pointer and a gap shows where it lands', r['gap'] and r['ghost'], r)
             check(f'{tag}: dropped inside its list, the card stays exactly where it was dropped', ev(LANE + "(1)") == [2, 11, 5, 8], ev(LANE + "(1)"))
             check(f'{tag}: reordering inside a list is not logged as a move', ev("state.events.length") == ev0 and not pg.query_selector('.task-gap') and not pg.query_selector('.ghost'))
             # to another list, at a position: card 8 between 3 and 6 in To review
