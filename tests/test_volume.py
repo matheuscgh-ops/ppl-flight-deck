@@ -34,20 +34,21 @@ with sync_playwright() as p:
             pg.on('pageerror', lambda e: errs.append(str(e)))
             pg.goto(url); pg.wait_for_timeout(400)
             tag = f'{f} · {mode}'
-            check(f'{tag}: volume card shows a 12-week chart with 12 points', pg.evaluate("document.querySelectorAll('#volMini circle.vdot').length") == 12)
+            check(f'{tag}: volume card shows the last 7 days, one point per day', pg.evaluate("document.querySelectorAll('#volMini circle.vdot').length") == 7)
             check(f'{tag}: card fits its box (no overflow)', pg.evaluate("(()=>{const c=document.getElementById('volCard');return c.scrollWidth<=c.clientWidth+1})()"))
             check(f'{tag}: page is not wider than the screen', pg.evaluate('document.documentElement.scrollWidth') == opts['viewport']['width'])
             if mode == 'desktop':
                 check(f'{tag}: still fits on one screen', pg.evaluate('document.documentElement.scrollHeight') == 1190)
             pg.evaluate(SETUP); pg.wait_for_timeout(150)
             wk = pg.evaluate('weeklyVolume(12).map(x=>x.q)')
-            check(f'{tag}: this week = finished sessions + scored test (51+38+60 = 149)', wk[-1] == 149 and pg.inner_text('#volWeek') == '149', wk[-3:])
+            check(f'{tag}: this week = finished sessions + scored test (51+38+60 = 149); the card shows the last 7 days (149, Weather was 7 days ago)', wk[-1] == 149 and pg.inner_text('#volWeek') == '149', wk[-3:])
+            check(f'{tag}: the card\'s 7 points are the days, today last (149 today)', pg.evaluate("rangeSeries('7d').map(x=>x.q).join()") == '0,0,0,0,0,0,149')
             check(f'{tag}: last week = 158 (Weather)', wk[-2] == 158, wk[-3:])
             check(f'{tag}: in-progress sessions/tests and card moves count 0', wk[-1] == 149)
             check(f'{tag}: sessions older than 12 weeks are not in the 12-week view', sum(wk) == 149 + 158, sum(wk))
             check(f'{tag}: "All" range includes the older session', sum(x['q'] for x in pg.evaluate('weeklyVolume(0)')) == 149 + 158 + 41)
             check(f'{tag}: weeks run Monday–Sunday', pg.evaluate("parse(weekStart(todayISO())).getDay()") == 1)
-            check(f'{tag}: current week dot is highlighted', pg.evaluate("document.querySelectorAll('#volMini circle.vdot.cur').length") == 1)
+            check(f'{tag}: today\'s dot is highlighted', pg.evaluate("document.querySelectorAll('#volMini circle.vdot.cur').length") == 1)
             # live update
             before = pg.inner_html('#volMini')
             pg.evaluate("state.events.push({id:uid(),date:todayISO(),topic:16,kind:'review',score:90,partial:false,demo:false});save();render()")
@@ -88,7 +89,7 @@ with sync_playwright() as p:
                 check(f'{tag}: opens as a bottom sheet on the phone', abs(bx['y'] + bx['height'] - 874) < 2)
             pg.keyboard.press('Escape'); pg.wait_for_timeout(100)
             check(f'{tag}: closes with Escape', not pg.is_visible('#volbg'))
-            for L, word in [('pt', 'Esta semana'), ('ja', '今週')]:
+            for L, word in [('pt', 'Últimos 7 dias'), ('ja', '過去7日間')]:
                 pg.evaluate(f"document.querySelector('.flag[data-lang=\"{L}\"]').click()"); pg.wait_for_timeout(80)
                 check(f'{tag}: translated ({L})', pg.evaluate("document.querySelector('#volCard .label').textContent") == word)
             check(f'{tag}: no JavaScript errors', not errs, errs)

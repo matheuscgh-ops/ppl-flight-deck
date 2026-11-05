@@ -97,7 +97,7 @@ with sync_playwright() as p:
                 check(f'{tag}: needs-recall carousel shows a topic from today\'s plan (or lowest recall)', sc == '' or ev(f"(()=>{{const L=carList().filter(i=>i!=null);const n={sc!r};return L.length?L.some(i=>TOPICS[i].name===n):srAll().some(m=>TOPICS[m.i].name===n)}})()"), sc)
                 ev("goView('dash')"); pg.wait_for_timeout(250)
                 wk = pg.inner_text('#volWeek').replace(',', '').replace('.', '').replace(' ', '')
-                check(f'{tag}: "this week" volume = weekly volume', wk == str(ev("weeklyVolume(12).at(-1).q")), wk)
+                check(f'{tag}: the volume card = the last 7 days of the volume series', wk == str(ev("rangeSeries('7d').reduce((a,x)=>a+x.q,0)")), wk)
                 prog = ev("[...document.querySelectorAll('.lg')].map(x=>x.innerText)")
                 cnt = ev("STATUS.map(s=>TOPICS.reduce((a,x,i)=>a+(state.statuses[i]===s?x.q:0),0))")
                 check(f'{tag}: progress legend = question counts per list, totals 1,058', sum(cnt) == 1058 and all(f'{n:,} q'.replace(',', ',') in t or f'{n} q' in t for n, t in zip(cnt, prog)), (cnt, prog))

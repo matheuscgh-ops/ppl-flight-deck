@@ -141,11 +141,12 @@ const VolumeView = (() => {
     }
     return out;
   }
+  /* the dashboard card: the last 7 days, day by day (today last), and their total */
   function renderVolume() {
-    const d = weeklyVolume(12),
+    const d = rangeSeries('7d'),
       box = $('#volMini');
     if (!box) return;
-    $('#volWeek').textContent = fmt(d.at(-1).q);
+    $('#volWeek').textContent = fmt(d.reduce((a, x) => a + x.q, 0));
     const w = Math.max(120, Math.round(box.clientWidth || 240)),
       h = Math.max(30, Math.round(box.clientHeight || 46));
     /* phones: the dashboard card is a full-width chart with axes (Strava style), without the value labels */

@@ -7555,9 +7555,9 @@ svg.tick {
         <div class="volfoot"><span class="tsk" id="tsStripKpis"></span><span class="tsnext" id="tsStripNext"></span></div>
       </div>
       <div class="panel vol" id="volCard">
-        <div class="volhead"><div><span class="label" data-t="thisWeek"></span><div class="volnum"><b id="volWeek">0</b> <span data-t="questionsUnit"></span></div></div><button type="button" class="volmore" id="volOpen" aria-label="Open study volume" data-tt="volTitle">⤢</button></div>
+        <div class="volhead"><div><span class="label" data-t="last7"></span><div class="volnum"><b id="volWeek">0</b> <span data-t="questionsUnit"></span></div></div><button type="button" class="volmore" id="volOpen" aria-label="Open study volume" data-tt="volTitle">⤢</button></div>
         <div class="volchart" id="volMini"></div>
-        <div class="volfoot"><span data-t="past12"></span><span class="ptest" id="ptStat" role="button" tabindex="0"><span data-t="practiceTests"></span> <b id="ptBest">—</b> <b class="addpt">+</b></span></div>
+        <div class="volfoot"><span data-t="dayByDay"></span><span class="ptest" id="ptStat" role="button" tabindex="0"><span data-t="practiceTests"></span> <b id="ptBest">—</b> <b class="addpt">+</b></span></div>
       </div>
   </div>
 
@@ -10102,6 +10102,10 @@ const Translations = (() => {
     paceResetDone: 'ペースを見積もりに戻しました',
     paceNoted: 'ペース用に時間を記録しました',
   });
+  /* dashboard volume card: the last 7 days, day by day */
+  Object.assign(I18N.en, { last7: 'Last 7 days', dayByDay: 'Day by day' });
+  Object.assign(I18N.pt, { last7: 'Últimos 7 dias', dayByDay: 'Dia a dia' });
+  Object.assign(I18N.ja, { last7: '過去7日間', dayByDay: '日ごと' });
   return { I18N };
 })();
 const { I18N } = Translations;
@@ -15806,11 +15810,12 @@ const VolumeView = (() => {
     }
     return out;
   }
+  /* the dashboard card: the last 7 days, day by day (today last), and their total */
   function renderVolume() {
-    const d = weeklyVolume(12),
+    const d = rangeSeries('7d'),
       box = $('#volMini');
     if (!box) return;
-    $('#volWeek').textContent = fmt(d.at(-1).q);
+    $('#volWeek').textContent = fmt(d.reduce((a, x) => a + x.q, 0));
     const w = Math.max(120, Math.round(box.clientWidth || 240)),
       h = Math.max(30, Math.round(box.clientHeight || 46));
     /* phones: the dashboard card is a full-width chart with axes (Strava style), without the value labels */
