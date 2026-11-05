@@ -175,8 +175,11 @@
 .last {
   margin-left: auto;
 }
-.ghost {
+/* the copy under the finger: fixed to the screen (.task.ghost beats the later .task { position: relative }) */
+.ghost,
+.task.ghost {
   position: fixed;
+  margin: 0;
   left: 0;
   top: 0;
   pointer-events: none;
