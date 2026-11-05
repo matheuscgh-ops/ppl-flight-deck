@@ -13898,14 +13898,32 @@ const PreviewCarousel = (() => {
     /* the editor closes (and saves) on Enter, Escape, Tab away, or a tap anywhere outside it. It does not close on
        blur: on iPhone/iPad (WebKit) a tap on the /30 button blurs the input before its click, which used to close
        the editor before it could switch. */
-    mode.addEventListener('pointerdown', ev => ev.preventDefault());
-    mode.addEventListener('mousedown', ev => ev.preventDefault());
-    mode.addEventListener('click', ev => {
-      ev.stopPropagation();
+    /* the switch happens on the press itself (touch or mouse): Safari may not send a click after a tap whose press
+       was cancelled (cancelling it keeps the keyboard open). A click with no press before it (keyboard) also works. */
+    let pressed = 0;
+    const flip = () => {
       byCount = !byCount;
       inp.value = '';
       paint();
       inp.focus();
+    };
+    const press = ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      /* touch sends touchstart and pointerdown for the same press: switch once */
+      if (Date.now() - pressed < 80) return;
+      pressed = Date.now();
+      flip();
+    };
+    mode.addEventListener('pointerdown', press);
+    mode.addEventListener('touchstart', press, { passive: false });
+    mode.addEventListener('mousedown', ev => ev.preventDefault());
+    mode.addEventListener('click', ev => {
+      ev.stopPropagation();
+      /* the click that follows a press was already handled by it */
+      const after = pressed && Date.now() - pressed < 1000;
+      pressed = 0;
+      if (!after) flip();
     });
     const outside = ev => {
       if (box.contains(ev.target)) return;

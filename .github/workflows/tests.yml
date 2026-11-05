@@ -32,7 +32,9 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install playwright
-      - run: python -m playwright install --with-deps chromium
+      - name: Install chromium (a stuck download fails fast and can be re-run)
+        run: python -m playwright install --with-deps chromium
+        timeout-minutes: 10
       - name: Same fonts as the dev machine (Inter, Noto CJK, emoji), so text widths match
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq fonts-inter fonts-noto-cjk fonts-noto-color-emoji
@@ -64,7 +66,9 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install playwright
-      - run: python -m playwright install --with-deps webkit
+      - name: Install webkit (a stuck download fails fast and can be re-run)
+        run: python -m playwright install --with-deps webkit
+        timeout-minutes: 10
       - name: Same fonts as the dev machine (Inter, Noto CJK, emoji), so text widths match
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq fonts-inter fonts-noto-cjk fonts-noto-color-emoji
