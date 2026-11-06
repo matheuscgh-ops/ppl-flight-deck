@@ -50,3 +50,13 @@
   -webkit-backdrop-filter: blur(24px) saturate(150%);
   backdrop-filter: blur(24px) saturate(150%);
 }
+
+/* the maximized calendar / spaced-repetition card: the sheet is the frame, so the card inside drops its own border
+   and background (two nested frames made the day circles look stuck to an edge) */
+.nx .maxbg .inmax {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding-left: 2px;
+  padding-right: 2px;
+}

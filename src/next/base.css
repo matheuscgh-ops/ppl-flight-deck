@@ -2,8 +2,8 @@
 .nx body {
   background: var(--bg);
   font-family: var(--font);
-  font-size: 14.5px;
-  line-height: 1.45;
+  font-size: 14px;
+  line-height: 1.35;
   font-weight: 450;
   letter-spacing: 0.005em;
 }
@@ -15,15 +15,15 @@
   letter-spacing: -0.01em;
 }
 .nx .app {
-  --gut: 24px;
-  gap: 16px;
+  --gut: 20px;
+  gap: 12px;
   padding: 0 var(--gut) 40px;
 }
 /* desktop "fit" mode (the dashboard fits the window): same gutters, less space below */
 @media (min-width: 1100px) and (min-height: 1050px) {
   .nx body:not(.srview) .app {
     --gut: 20px;
-    padding: 0 var(--gut) 14px;
+    padding: 0 var(--gut) 12px;
   }
 }
 
@@ -37,7 +37,7 @@
 
 /* section titles: sentence case, readable size, no tracking */
 .nx .section {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 620;
   letter-spacing: 0;
   text-transform: none;
@@ -54,12 +54,12 @@
 /* controls: a calm filled button, no outline box. :where() keeps this at the weight of a plain button rule, so
    every special button (dots, check circles, chips) keeps its own shape. */
 :where(.nx) button {
-  padding: 7px 14px;
+  padding: 7px 12px;
   border: 0;
   border-radius: var(--r-s);
   background: var(--panel2);
   font-weight: 560;
-  font-size: 13.5px;
+  font-size: 13px;
   color: var(--ink);
   transition:
     background-color 0.15s,
@@ -88,7 +88,7 @@
   background: #151a20;
   border: 1px solid var(--line2);
   border-radius: var(--r-s);
-  padding: 8px 11px;
+  padding: 7px 9px;
   transition:
     border-color 0.15s,
     box-shadow 0.15s;
@@ -108,11 +108,8 @@
   background: #151a20;
   border: 1px solid var(--hair);
   border-radius: var(--r-m);
-  padding: 3px;
-  gap: 2px;
 }
 .nx .seg button {
-  min-height: 30px;
   box-shadow: none;
   background: transparent;
   color: var(--muted);
@@ -174,4 +171,11 @@
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
   }
+}
+
+/* the open list of a select: dark with light text (Windows drew light options with light text) */
+.nx option,
+.nx optgroup {
+  background-color: #1c222a;
+  color: var(--ink);
 }

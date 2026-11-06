@@ -178,8 +178,8 @@ def next_color(m):
     return '#%02x%02x%02x%s' % (round(r * 255), round(g * 255), round(b * 255), alpha)
 
 
-# light surfaces that glare in a dark interface become dark tints of the same hue (calendar active days)
-NEXT_SWAP = {'e2f8eb': '#1f3d32', '7fd8aa': '#2f6550', '0b3321': '#cfeee0', '138a52': '#6fd3a5'}
+# a few colours set by hand: the calendar's active days are a soft white tile with dark text (instead of mint)
+NEXT_SWAP = {'e2f8eb': '#e8edf2', '7fd8aa': '#c3cdd8', '0b3321': '#142131', '138a52': '#1e8a5a'}
 
 
 WEIGHTS = {'900': '760', '850': '700', '800': '660', '750': '620', '700': '600', '650': '560', '600': '520', '500': '450'}

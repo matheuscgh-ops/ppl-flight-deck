@@ -389,9 +389,9 @@ input[type='date']::-webkit-calendar-picker-indicator {
   opacity: 0.33;
 }
 .day.active {
-  background: #1f3d32;
-  border-color: #2f6550;
-  color: #cfeee0;
+  background: #e8edf2;
+  border-color: #c3cdd8;
+  color: #142131;
 }
 .day.exam {
   box-shadow: inset 0 0 0 2px var(--exam);
@@ -417,7 +417,7 @@ input[type='date']::-webkit-calendar-picker-indicator {
   margin-left: auto;
   font-size: 12px;
   font-weight: 760;
-  color: #6fd3a5;
+  color: #1e8a5a;
 }
 .examtag {
   background: var(--exam);
@@ -2474,7 +2474,7 @@ html {
     padding: 0 !important;
   }
   .day.active {
-    background: #1f3d32;
+    background: #e8edf2;
   }
   .day.today .dnum {
     text-decoration: underline;
@@ -7556,8 +7556,8 @@ svg.tick {
 .nx body {
   background: var(--bg);
   font-family: var(--font);
-  font-size: 14.5px;
-  line-height: 1.45;
+  font-size: 14px;
+  line-height: 1.35;
   font-weight: 450;
   letter-spacing: 0.005em;
 }
@@ -7569,15 +7569,15 @@ svg.tick {
   letter-spacing: -0.01em;
 }
 .nx .app {
-  --gut: 24px;
-  gap: 16px;
+  --gut: 20px;
+  gap: 12px;
   padding: 0 var(--gut) 40px;
 }
 /* desktop "fit" mode (the dashboard fits the window): same gutters, less space below */
 @media (min-width: 1100px) and (min-height: 1050px) {
   .nx body:not(.srview) .app {
     --gut: 20px;
-    padding: 0 var(--gut) 14px;
+    padding: 0 var(--gut) 12px;
   }
 }
 
@@ -7591,7 +7591,7 @@ svg.tick {
 
 /* section titles: sentence case, readable size, no tracking */
 .nx .section {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 620;
   letter-spacing: 0;
   text-transform: none;
@@ -7608,12 +7608,12 @@ svg.tick {
 /* controls: a calm filled button, no outline box. :where() keeps this at the weight of a plain button rule, so
    every special button (dots, check circles, chips) keeps its own shape. */
 :where(.nx) button {
-  padding: 7px 14px;
+  padding: 7px 12px;
   border: 0;
   border-radius: var(--r-s);
   background: var(--panel2);
   font-weight: 560;
-  font-size: 13.5px;
+  font-size: 13px;
   color: var(--ink);
   transition:
     background-color 0.15s,
@@ -7642,7 +7642,7 @@ svg.tick {
   background: #151a20;
   border: 1px solid var(--line2);
   border-radius: var(--r-s);
-  padding: 8px 11px;
+  padding: 7px 9px;
   transition:
     border-color 0.15s,
     box-shadow 0.15s;
@@ -7662,11 +7662,8 @@ svg.tick {
   background: #151a20;
   border: 1px solid var(--hair);
   border-radius: var(--r-m);
-  padding: 3px;
-  gap: 2px;
 }
 .nx .seg button {
-  min-height: 30px;
   box-shadow: none;
   background: transparent;
   color: var(--muted);
@@ -7730,14 +7727,20 @@ svg.tick {
   }
 }
 
+/* the open list of a select: dark with light text (Windows drew light options with light text) */
+.nx option,
+.nx optgroup {
+  background-color: #1c222a;
+  color: var(--ink);
+}
+
 /* ===== the new design — chrome: the header (a glass bar that stays on top) and the tabs ===== */
 .nx header.top {
   position: sticky;
   top: 0;
   z-index: 30;
   margin: 0 calc(-1 * var(--gut));
-  padding: 10px var(--gut);
-  min-height: 60px;
+  padding: 4px var(--gut);
   background: rgba(19, 23, 29, 0.72);
   -webkit-backdrop-filter: blur(22px) saturate(170%);
   backdrop-filter: blur(22px) saturate(170%);
@@ -7774,9 +7777,9 @@ svg.tick {
   gap: 2px;
 }
 .nx .tabs button {
-  min-height: 32px;
+  min-height: 30px;
   border-radius: 999px;
-  padding: 6px 15px;
+  padding: 5px 15px;
   font-size: 13.5px;
   font-weight: 560;
   color: var(--muted);
@@ -7948,96 +7951,83 @@ svg.tick {
     center / contain no-repeat;
 }
 
-/* ===== the new design — the Kanban: calm columns on the page surface, cards that lift a step on hover ===== */
+/* ===== the new design — the Kanban, Trello style: lists on a coloured board, cards that sit on the lists.
+   The board colour is a calm, desaturated blue (the original was a bright blue gradient). ===== */
 .nx .board {
-  background: var(--panel);
-  border-color: var(--hair);
-}
-.nx .board .section,
-.nx .board .section .muted,
-.nx .board .hint {
-  color: inherit;
+  background: linear-gradient(135deg, #24466b 0%, #1d3a59 55%, #182f49 100%);
+  border-color: rgba(255, 255, 255, 0.06);
 }
 .nx .board .section {
-  color: var(--ink);
+  color: #f1f4f8;
 }
 .nx .board .hint,
 .nx .board .section .muted {
-  color: var(--muted);
+  color: #c2d0e0;
 }
 .nx .board .kbd {
-  color: var(--ink2);
-  border-color: var(--line2);
-}
-.nx .lanes {
-  gap: 12px;
+  color: #f1f4f8;
+  border-color: #8aa3c2;
 }
 .nx .lane {
-  background: var(--lane);
-  border: 1px solid var(--hair);
-  border-radius: 14px;
-  box-shadow: none;
+  background: #12161b;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0, 10, 25, 0.4);
 }
 .nx .lane.over {
-  outline: 2px dashed color-mix(in srgb, var(--accent) 70%, transparent);
-  background: color-mix(in srgb, var(--accent) 7%, var(--lane));
+  outline: 2px dashed #b9cdea;
+  outline-offset: -3px;
+  background: #161d24;
 }
 .nx .lanehead {
-  color: var(--ink);
+  color: #e6e9ed;
 }
 .nx .lname {
   font-weight: 620;
 }
 .nx .lname:before {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
-}
-.nx .lcount {
-  font-weight: 500;
+  border-radius: 3px;
 }
 .nx .task {
-  background: var(--card);
-  border: 1px solid var(--hair);
-  border-radius: 11px;
-  box-shadow: none;
-  transition:
-    background-color 0.15s,
-    border-color 0.15s;
+  background: #22282f;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
 }
 .nx .task:hover {
-  background: var(--cardh);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: #2a313a;
+  border-color: #3f4854;
 }
 .nx .tname {
   font-weight: 560;
-  color: var(--ink);
+  color: #e6e9ed;
 }
 .nx .tmeta {
   font-weight: 500;
 }
 .nx .task-gap {
-  background: rgba(127, 173, 246, 0.07);
-  box-shadow: inset 0 0 0 1px rgba(127, 173, 246, 0.25);
-  border-radius: 11px;
+  background: rgba(8, 11, 15, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
 }
 .nx .ghost,
 .nx .task.ghost {
-  background: var(--panel3);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+  background: #2a313a;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6);
 }
 .nx .addcard {
   box-shadow: none;
-  color: var(--muted);
+  color: #b3bcc8;
   font-weight: 560;
+  background: transparent;
 }
 .nx .addcard:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.07);
   color: var(--ink);
 }
 .nx .laneadd {
   box-shadow: none;
+  background: transparent;
 }
 .nx .owntag {
   border-radius: var(--r-xs);
@@ -8067,6 +8057,48 @@ svg.tick {
 .nx .pwbtns button {
   padding-left: 12px;
   padding-right: 12px;
+}
+
+/* error notes: edit and delete as clear icons in comfortable round buttons (the ✎ and × glyphs were too small) */
+.nx :is(.errday li, .noterow) .x {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  min-height: 34px;
+  padding: 0;
+  font-size: 0;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink2);
+}
+.nx :is(.errday li, .noterow) .x::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  -webkit-mask: var(--ic) center / contain no-repeat;
+  mask: var(--ic) center / contain no-repeat;
+}
+.nx :is(.errday li, .noterow) .x:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--ink);
+}
+.nx .x[data-eedit] {
+  --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z'/%3E%3Cpath d='M13.5 6.5l4 4'/%3E%3C/svg%3E");
+}
+.nx .x[data-edel],
+.nx .x[data-ndel] {
+  --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13M10 11v5M14 11v5'/%3E%3C/svg%3E");
+}
+.nx .x[data-edel]:hover,
+.nx .x[data-ndel]:hover {
+  color: var(--bad);
+  background: rgba(238, 138, 130, 0.12);
+}
+.nx .errday li {
+  gap: 6px;
 }
 
 /* ===== the new design — dialogs: the page dims and blurs behind a solid sheet (forms stay on a solid surface) ===== */
@@ -8120,6 +8152,16 @@ svg.tick {
   background: rgba(14, 18, 23, 0.92);
   -webkit-backdrop-filter: blur(24px) saturate(150%);
   backdrop-filter: blur(24px) saturate(150%);
+}
+
+/* the maximized calendar / spaced-repetition card: the sheet is the frame, so the card inside drops its own border
+   and background (two nested frames made the day circles look stuck to an edge) */
+.nx .maxbg .inmax {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding-left: 2px;
+  padding-right: 2px;
 }
 
 /* ===== the new design — phones: the tabs become a floating glass bar at the bottom, in thumb reach, with icons;
@@ -8247,6 +8289,25 @@ svg.tick {
   }
   .nx .modal {
     border-radius: 24px;
+  }
+}
+@media (max-width: 640px) {
+  /* the header never gets wider than the screen (the logo adds to the name's width) */
+  .nx header.top > div:first-child,
+  .nx .brandrow {
+    min-width: 0;
+    max-width: 100%;
+    flex: 1 1 auto;
+  }
+  .nx .brand {
+    font-size: 18px !important;
+    gap: 8px;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .nx .brand::before {
+    width: 20px;
+    height: 21px;
   }
 }
 .demotag{font-style:normal;font-size:.45em;vertical-align:middle;letter-spacing:.08em;color:#ffd08a;background:#3d2b14;border:1px solid #6b4a1c;border-radius:6px;padding:2px 7px;margin-left:6px}
@@ -11744,7 +11805,7 @@ const Dashboard = (() => {
     }
     const s = streakInfo();
     $('#callegend').innerHTML =
-      `<span><i style="background:#1f3d32"></i>${esc(t('activeLegend'))}</span><span><i style="background:#23865c"></i>${esc(t('lgDone'))}</span><span><i style="background:#417fcf"></i>${esc(t('study'))}</span><span><i style="background:#7965cf"></i>${esc(t('review'))}</span><span><i style="background:#b57c14"></i>${esc(t('practiceTest'))}</span><span><i style="background:transparent;box-shadow:inset 0 0 0 2px var(--exam)"></i>${esc(t('examLegend'))}</span>`;
+      `<span><i style="background:#e8edf2"></i>${esc(t('activeLegend'))}</span><span><i style="background:#23865c"></i>${esc(t('lgDone'))}</span><span><i style="background:#417fcf"></i>${esc(t('study'))}</span><span><i style="background:#7965cf"></i>${esc(t('review'))}</span><span><i style="background:#b57c14"></i>${esc(t('practiceTest'))}</span><span><i style="background:transparent;box-shadow:inset 0 0 0 2px var(--exam)"></i>${esc(t('examLegend'))}</span>`;
     const mk = `${y}-${pad(m + 1)}`,
       mEv = state.events.filter(e => e.date.startsWith(mk)),
       mDays = new Set(mEv.map(e => e.date)).size,

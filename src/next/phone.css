@@ -125,3 +125,22 @@
     border-radius: 24px;
   }
 }
+@media (max-width: 640px) {
+  /* the header never gets wider than the screen (the logo adds to the name's width) */
+  .nx header.top > div:first-child,
+  .nx .brandrow {
+    min-width: 0;
+    max-width: 100%;
+    flex: 1 1 auto;
+  }
+  .nx .brand {
+    font-size: 18px !important;
+    gap: 8px;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .nx .brand::before {
+    width: 20px;
+    height: 21px;
+  }
+}

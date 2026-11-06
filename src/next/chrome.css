@@ -4,8 +4,7 @@
   top: 0;
   z-index: 30;
   margin: 0 calc(-1 * var(--gut));
-  padding: 10px var(--gut);
-  min-height: 60px;
+  padding: 4px var(--gut);
   background: rgba(19, 23, 29, 0.72);
   -webkit-backdrop-filter: blur(22px) saturate(170%);
   backdrop-filter: blur(22px) saturate(170%);
@@ -42,9 +41,9 @@
   gap: 2px;
 }
 .nx .tabs button {
-  min-height: 32px;
+  min-height: 30px;
   border-radius: 999px;
-  padding: 6px 15px;
+  padding: 5px 15px;
   font-size: 13.5px;
   font-weight: 560;
   color: var(--muted);
