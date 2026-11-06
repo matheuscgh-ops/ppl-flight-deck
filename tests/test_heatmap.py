@@ -16,7 +16,7 @@ SETUP = """(()=>{const T=todayISO(),D=n=>addDays(T,-n),ev=(n,topic,sc)=>({id:'hm
   state.events=[ev(40,18,60),ev(30,18,70),ev(20,18,80),ev(35,12,95),ev(3,12,96)];save();render();})()"""
 with sync_playwright() as p:
     b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
-    for f in ['index', 'demo']:
+    for f in os.environ.get('PPL_FILES', 'index demo').split():
         for mode, opts in DEV:
             tag = f'{f} · {mode}'; touch = mode in ('phone', 'iPad mini'); W = opts['viewport']['width']
             c = b.new_context(**opts); pg = c.new_page(); errs = []

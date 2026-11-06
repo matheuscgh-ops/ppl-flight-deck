@@ -1,0 +1,127 @@
+/* ===== the new design — phones: the tabs become a floating glass bar at the bottom, in thumb reach, with icons;
+   the next-up bar floats just above it. The header scrolls away with the page (only chrome floats). ===== */
+.nx .tabs button[data-view='dash'] {
+  --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linejoin='round'%3E%3Crect x='3.5' y='3.5' width='7' height='9' rx='2'/%3E%3Crect x='13.5' y='3.5' width='7' height='5' rx='2'/%3E%3Crect x='13.5' y='11.5' width='7' height='9' rx='2'/%3E%3Crect x='3.5' y='15.5' width='7' height='5' rx='2'/%3E%3C/svg%3E");
+}
+.nx .tabs button[data-view='plan'] {
+  --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.5' y='5' width='17' height='15.5' rx='3'/%3E%3Cpath d='M3.5 10h17M8 3v4M16 3v4M8 14h3'/%3E%3C/svg%3E");
+}
+.nx .tabs button[data-view='errors'] {
+  --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 3.5h9l4 4v13H6a1.5 1.5 0 0 1-1.5-1.5V5A1.5 1.5 0 0 1 6 3.5z'/%3E%3Cpath d='M8.5 11.5h7M8.5 15.5h4.5'/%3E%3C/svg%3E");
+}
+.nx .tabs button[data-view='tests'] {
+  --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4.5' y='4.5' width='15' height='16' rx='3'/%3E%3Cpath d='M9 3h6v3H9zM8.5 13l2.5 2.5 4.5-5'/%3E%3C/svg%3E");
+}
+.nx .tabs button[data-view='sr'] {
+  --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M4 20.5h16M7 17v-5M12 17V6M17 17v-8'/%3E%3C/svg%3E");
+}
+
+@media (max-width: 640px) {
+  .nx .app {
+    padding: 0 12px calc(100px + env(safe-area-inset-bottom, 0px));
+    gap: 12px;
+  }
+  .nx body.hasnow .app {
+    padding-bottom: calc(168px + env(safe-area-inset-bottom, 0px));
+  }
+  .nx header.top {
+    position: relative;
+    margin: 0;
+    padding: 0 0 4px;
+    margin-top: calc(14px + env(safe-area-inset-top, 0px));
+    min-height: 0;
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-bottom: 0;
+  }
+  .nx .brand {
+    font-size: 20px !important;
+  }
+  .nx .tools > button,
+  .nx .tools > a {
+    min-height: 32px;
+    height: 32px;
+    border-radius: 999px;
+  }
+
+  /* the tab bar */
+  .nx .tabs {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    z-index: 35;
+    margin: 0 !important;
+    padding: 5px !important;
+    gap: 2px;
+    border-radius: 28px !important;
+    background: rgba(30, 36, 45, 0.6);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--glass-line);
+    box-shadow:
+      inset 0 1px 0 var(--glass-hi),
+      0 12px 34px rgba(0, 0, 0, 0.5);
+  }
+  .nx .tabs button {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 54px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 5px 2px !important;
+    border-radius: 22px;
+    font-size: 10.5px !important;
+    font-weight: 560;
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .nx .tabs button::before {
+    content: '';
+    flex: none;
+    width: 23px;
+    height: 23px;
+    background: currentColor;
+    -webkit-mask: var(--ic) center / contain no-repeat;
+    mask: var(--ic) center / contain no-repeat;
+  }
+  .nx .tabs button.on {
+    color: var(--acc);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+  /* out of the way while a dialog, focus mode or the tour is open */
+  .nx body.focusing .tabs,
+  .nx body:has(.modalbg:not([hidden])) .tabs {
+    visibility: hidden;
+  }
+
+  /* the next-up bar sits on top of the tab bar */
+  .nx .nowbar:not([hidden]) {
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    left: 12px;
+    right: 12px;
+    border-radius: 22px;
+    background: rgba(30, 36, 45, 0.66);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--glass-line);
+    box-shadow:
+      inset 0 1px 0 var(--glass-hi),
+      0 10px 28px rgba(0, 0, 0, 0.45);
+  }
+  .nx .toast {
+    bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+  }
+  .nx body.hasnow .toast {
+    bottom: calc(158px + env(safe-area-inset-bottom, 0px));
+  }
+  .nx .modal {
+    border-radius: 24px;
+  }
+}

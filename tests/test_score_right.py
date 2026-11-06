@@ -22,7 +22,7 @@ PLAN = """(()=>{const T=todayISO();(state.plans||[]).forEach(p=>p.active=false);
 
 with sync_playwright() as p:
     b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
-    for f in ['index', 'demo']:
+    for f in os.environ.get('PPL_FILES', 'index demo').split():
         for mode, opts in DEV:
             tag = f'{f} · {mode}'; W = opts['viewport']['width']; touch = opts.get('has_touch')
             c = b.new_context(**opts); pg = c.new_page(); errs = []

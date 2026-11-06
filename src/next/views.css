@@ -1,0 +1,23 @@
+/* ===== the new design — the rest of the views: lighter type, softer separators ===== */
+.nx :is(.big, .sv, .bignum) {
+  letter-spacing: -0.02em;
+}
+.nx table th {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 560;
+  color: var(--muted);
+}
+.nx hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+/* links in the content use the accent */
+.nx .view a:not([class]) {
+  color: var(--acc);
+}
+/* the plan header keeps the original button widths (its row is sized for them, longest in Portuguese) */
+.nx .pwbtns button {
+  padding-left: 12px;
+  padding-right: 12px;
+}

@@ -13,7 +13,7 @@ summary = []
 # 1) unit tests built into each HTML file (selfTest)
 with sync_playwright() as p:
     b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
-    for f in ['index.html', 'demo.html']:
+    for f in ['index.html', 'demo.html', 'demo-next.html']:
         pg = b.new_page(); pg.goto('file://' + os.path.join(ROOT, f)); pg.wait_for_timeout(400)
         r = pg.evaluate('selfTest()'); fails = [x for x in r if not x['pass']]
         summary.append((f'Unit tests ({f})', len(r) - len(fails), len(r)))
@@ -50,6 +50,7 @@ suites = [('End-to-end (index.html)', ['test_e2e.py', os.path.join(ROOT, 'index.
           ('Demo guided tour', ['test_tour.py']),
           ('User guide, docs button & tour link', ['test_docs.py']),
           ('Whole-app audit (text, layout, same numbers everywhere)', ['test_audit.py']),
+          ('New design (demo-next.html)', ['test_next.py']),
           ('Build (single source)', ['test_build.py'])]
 for title, args in suites:
     out = subprocess.run([sys.executable, os.path.join(HERE, args[0]), *args[1:]], capture_output=True, text=True, cwd=ROOT).stdout

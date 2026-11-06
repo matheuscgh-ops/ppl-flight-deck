@@ -19,7 +19,7 @@ BOX = "(s=>{const r=document.querySelector(s).getBoundingClientRect();return [r.
 
 with sync_playwright() as p:
     b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
-    for f in ['index', 'demo']:
+    for f in os.environ.get('PPL_FILES', 'index demo').split():
         for k, (mode, opts) in enumerate(DEV):
             tag = f'{f} · {mode}'; W = opts['viewport']['width']; phone = W <= 640; touch = opts.get('has_touch')
             c = b.new_context(**opts); pg = c.new_page(); errs = []

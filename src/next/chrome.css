@@ -1,0 +1,217 @@
+/* ===== the new design — chrome: the header (a glass bar that stays on top) and the tabs ===== */
+.nx header.top {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  margin: 0 calc(-1 * var(--gut));
+  padding: 10px var(--gut);
+  min-height: 60px;
+  background: rgba(19, 23, 29, 0.72);
+  -webkit-backdrop-filter: blur(22px) saturate(170%);
+  backdrop-filter: blur(22px) saturate(170%);
+  border-bottom: 1px solid var(--hair);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .nx header.top {
+    background: #161a20;
+  }
+}
+.nx .brandrow {
+  gap: 22px;
+}
+.nx .brand {
+  font-size: 19px;
+  font-weight: 760;
+  letter-spacing: -0.015em;
+}
+.nx .brand span {
+  color: #4f5966;
+  font-weight: 450;
+  margin: 0 1px;
+}
+.nx .subtitle {
+  font-weight: 450;
+}
+
+/* tabs: a glass capsule with a lit thumb on the current tab */
+.nx .tabs {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+.nx .tabs button {
+  min-height: 32px;
+  border-radius: 999px;
+  padding: 6px 15px;
+  font-size: 13.5px;
+  font-weight: 560;
+  color: var(--muted);
+  background: transparent;
+  box-shadow: none;
+}
+.nx .tabs button:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.05);
+}
+.nx .tabs button.on {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.11);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* the tools on the right: icon buttons, no boxes around boxes */
+.nx .tools {
+  gap: 6px;
+}
+.nx .tools .sep {
+  background: var(--line2);
+  height: 20px;
+}
+.nx .docsbtn,
+.nx .gear,
+.nx .syncchip {
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 0 1px var(--hair);
+  min-height: 34px;
+}
+.nx .docsbtn:hover,
+.nx .gear:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.nx .gear {
+  width: 36px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+}
+.nx .flags {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  padding: 2px;
+}
+.nx .flag {
+  min-height: 0;
+  box-shadow: none;
+  border-radius: 999px;
+  font-size: 17px;
+  padding: 3px 8px;
+}
+.nx .flag.on {
+  background: rgba(255, 255, 255, 0.11);
+}
+
+/* the toast: a small glass pill at the bottom, not a bright green slab */
+.nx .toast {
+  background: rgba(38, 45, 56, 0.82);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  color: var(--ink);
+  border: 1px solid var(--glass-line);
+  border-radius: 999px;
+  padding: 8px 8px 8px 18px;
+  font-weight: 560;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+.nx .toast button {
+  background: transparent;
+  color: var(--acc);
+  box-shadow: none;
+  min-height: 30px;
+  border-radius: 999px;
+  font-weight: 650;
+}
+.nx .toast button:hover {
+  background: var(--acc-soft);
+}
+
+/* the next-up bar in the header (tablets and computers): today's next item, a tick to mark it done, and the play
+   button that opens focus mode with its stopwatch. Phones keep it floating at the bottom (phone.css). */
+@media (min-width: 641px) {
+  .nx header.top .nowbar:not([hidden]) {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 1 380px;
+    min-width: 170px;
+    margin: 0 auto;
+    padding: 3px 4px 3px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--hair);
+  }
+  .nx header.top .nowbar .nowmain {
+    min-height: 34px;
+    gap: 8px;
+  }
+  .nx header.top .nowtxt {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+    overflow: hidden;
+  }
+  .nx header.top .nowtxt b {
+    font-size: 13.5px;
+    font-weight: 600;
+    flex: 0 1 auto;
+  }
+  .nx header.top .nowtxt small {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .nx header.top .nowgo {
+    width: 30px;
+    height: 30px;
+  }
+}
+/* laptops: the name and the play button only (the details are in focus mode), so the tabs stay on one line */
+@media (min-width: 1300px) and (max-width: 1599px) {
+  .nx header.top .nowbar:not([hidden]) {
+    flex-basis: 260px;
+  }
+  .nx header.top .nowtxt small,
+  .nx header.top .nowleft {
+    display: none;
+  }
+  .nx .brandrow {
+    flex-wrap: nowrap;
+  }
+}
+/* tablets: the header wraps, the bar takes its own row */
+@media (min-width: 641px) and (max-width: 1299px) {
+  .nx header.top {
+    flex-wrap: wrap;
+  }
+  .nx header.top .nowbar:not([hidden]) {
+    order: 3;
+    flex: 1 1 100%;
+    max-width: none;
+  }
+}
+
+/* the logo (the navigation arrow) before the name; drawn in the text colour so it reads on the dark header */
+.nx .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.nx .brand::before {
+  content: '';
+  flex: none;
+  width: 24px;
+  height: 25px;
+  background: var(--ink);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='100 40 920 945'%3E%3Cpath fill-rule='evenodd' d='M560 48 1015 980 560 812 105 980ZM558 205 558 742 240 858Z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='100 40 920 945'%3E%3Cpath fill-rule='evenodd' d='M560 48 1015 980 560 812 105 980ZM558 205 558 742 240 858Z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}

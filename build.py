@@ -1,7 +1,8 @@
 """Build the two published files from the sources in src/.
 
-    index.html  personal app (your data, cloud sync)
-    demo.html   fictional data, sync off, guided tour
+    index.html      personal app (your data, cloud sync)
+    demo.html       fictional data, sync off, guided tour
+    demo-next.html  the demo with the new design (src/next/): same features, a design layer on top
 
 Both are single, self-contained HTML files (GitHub Pages serves them as they are). The sources are split by concern:
 
@@ -88,15 +89,22 @@ def build_script(demo):
     return '\n'.join([header] + [read(DATA[demo] if name == '@@DATA@@' else name) for name in SCRIPTS])
 
 
-def build_page(demo=False):
+def build_page(demo=False, next_design=False):
     page = read('index.html')
     css = '\n'.join(read('styles', name) for name in STYLES)
     js = build_script(demo)
+    if next_design:
+        css = next_css(css) + '\n' + '\n'.join(read('next', name) for name in NEXT_STYLES)
+        js = next_js(js) + '\n' + read('next', 'layout.js')
     for marker, content in (('@@CSS@@', css), ('@@JS@@', js)):
         if page.count(marker) != 1:
             raise SystemExit(f'build: {marker} must appear exactly once in src/index.html')
         page = page.replace(marker, content)
-    return page if not demo else apply_demo_markup(page)
+    if demo:
+        page = apply_demo_markup(page)
+    if next_design:
+        page = apply_markup(page, NEXT_MARKUP)
+    return page
 
 
 def build_personal():
@@ -120,12 +128,105 @@ def build_demo(_unused=None):
 
 
 def apply_demo_markup(page):
-    for old, new in demo_markup():
+    return apply_markup(page, demo_markup())
+
+
+def apply_markup(page, pairs):
+    for old, new in pairs:
         n = page.count(old)
         if n != 1:
             raise SystemExit(f'build: expected 1 match, found {n}: {old[:70]}')
         page = page.replace(old, new)
     return page
+
+
+# the new design (demo-next.html): the demo's markup and code, plus a design layer. Nothing here changes behaviour:
+# next_css/next_js map the palette (and type weights) of the existing styles, src/next/*.css restyles the components,
+# src/next/layout.js moves a few elements (the next-up bar into the header, so desktops get it too).
+NEXT_STYLES = ['tokens.css', 'base.css', 'chrome.css', 'board.css', 'views.css', 'dialogs.css', 'phone.css']
+
+
+def _hsl(h):
+    import colorsys
+    r, g, b = (int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))
+    hh, l, ss = colorsys.rgb_to_hls(r, g, b)
+    return hh, ss, l
+
+
+def next_color(m):
+    """The new palette, as a function of the old one: neutrals turn to a cool slate with the near-blacks lifted (less
+    contrast to tire the eyes), saturated colours keep their hue (their meaning) but lose some intensity."""
+    import colorsys
+    raw = m.group(0)[1:]
+    if len(raw) == 3:
+        raw = ''.join(c * 2 for c in raw)
+    rgb, alpha = raw[:6].lower(), raw[6:]
+    if rgb in NEXT_SWAP:
+        return NEXT_SWAP[rgb] + alpha
+    h, sat, l = _hsl(rgb)
+    if sat < 0.2 or (max(l, 1 - l) > 0.9 and sat < 0.5):
+        h, sat = 215 / 360, (0.16 if l < 0.5 else 0.12)
+        if l < 0.3:
+            l = 0.05 + l * 0.9
+        elif l > 0.9:
+            l = 0.91 + (l - 0.9) * 0.4
+    else:
+        sat *= 0.8
+        if l > 0.72:
+            l = 0.72 + (l - 0.72) * 0.7
+    r, g, b = colorsys.hls_to_rgb(h, l, sat)
+    return '#%02x%02x%02x%s' % (round(r * 255), round(g * 255), round(b * 255), alpha)
+
+
+# light surfaces that glare in a dark interface become dark tints of the same hue (calendar active days)
+NEXT_SWAP = {'e2f8eb': '#1f3d32', '7fd8aa': '#2f6550', '0b3321': '#cfeee0', '138a52': '#6fd3a5'}
+
+
+WEIGHTS = {'900': '760', '850': '700', '800': '660', '750': '620', '700': '600', '650': '560', '600': '520', '500': '450'}
+
+
+def next_css(css):
+    import re
+    css = re.sub(r'#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b', next_color, css)
+    css = re.sub(r'(font-weight:\s*)(\d{3})', lambda m: m.group(1) + WEIGHTS.get(m.group(2), m.group(2)), css)
+    css = re.sub(r'(font:\s*)(\d{3})', lambda m: m.group(1) + WEIGHTS.get(m.group(2), m.group(2)), css)
+    css = css.replace('text-transform: uppercase', 'text-transform: none')
+    css = re.sub(r'letter-spacing:\s*0\.0[4-9]em', 'letter-spacing: 0', css)
+    return css
+
+
+def next_js(js):
+    """the colours the code draws with (lists, charts) follow the same palette; only 6/8-digit hex strings in quotes or
+    template strings are colours here (ids are words, and #fff-style ones are left alone)"""
+    import re
+    js = re.sub(r"(?<=['\"`(,:\s])#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6})\b", next_color, js)
+    # fixed rgb() colours (heat-map ends)
+    def rgb(m):
+        hx = next_color(re.match('.*', '#%02x%02x%02x' % tuple(int(v) for v in m.groups())))
+        return 'rgb(%d,%d,%d)' % tuple(int(hx[i:i + 2], 16) for i in (1, 3, 5))
+    js = re.sub(r'rgb\((\d{1,3}),(\d{1,3}),(\d{1,3})\)', rgb, js)
+    # the heat map's colour stops ([value, [r, g, b]])
+    a = js.index('HEAT_STOPS = [')
+    b = js.index('];', a)
+    stops = re.sub(r'\[(\d{1,3}), (\d{1,3}), (\d{1,3})\]', lambda m: '[%s]' % ', '.join(rgb(m)[4:-1].split(',')), js[a:b])
+    return js[:a] + stops + js[b:]
+NEXT_MARKUP = [
+    ('<html lang="en">', '<html lang="en" class="nx">'),
+    # the logo: a navigation arrow (half outlined, half filled), on a light tile so it reads on any tab strip
+    ('<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 64 64\'%3E%3Ccircle cx=\'32\' cy=\'32\' r=\'31\' fill=\'%23000\'/%3E%3Cpath d=\'M32 14 L50 46 H14 Z\' fill=\'%23fff\'/%3E%3C/svg%3E">',
+     '<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 64 64\'%3E%3Crect width=\'64\' height=\'64\' rx=\'14\' fill=\'%23eef1f6\'/%3E%3Csvg x=\'9\' y=\'9\' width=\'46\' height=\'46\' viewBox=\'100 40 920 945\'%3E%3Cpath fill=\'%2321365c\' fill-rule=\'evenodd\' d=\'M560 48 1015 980 560 812 105 980ZM558 205 558 742 240 858Z\'/%3E%3C/svg%3E%3C/svg%3E">'),
+    ('<title>PPL Progress — Demo</title>', '<title>PPL Progress — Demo (new design)</title>'),
+    ('<meta name="viewport" content="width=device-width, initial-scale=1">',
+     '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
+     '<meta name="theme-color" content="#12171e">\n'
+     '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
+     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
+     '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400..800&display=swap">'),
+]
+
+
+def build_next():
+    return build_page(demo=True, next_design=True)
 
 
 # user guide: English is the default page (index.html), each other language has its own page
@@ -161,8 +262,10 @@ if __name__ == '__main__':
         f.write(personal)
     with open(os.path.join(ROOT, 'demo.html'), 'w', encoding='utf-8') as f:
         f.write(build_demo())
+    with open(os.path.join(ROOT, 'demo-next.html'), 'w', encoding='utf-8') as f:
+        f.write(build_next())
     os.makedirs(os.path.join(ROOT, 'docs'), exist_ok=True)
     for name, page in build_docs().items():
         with open(os.path.join(ROOT, 'docs', name), 'w', encoding='utf-8') as f:
             f.write(page)
-    print('built index.html, demo.html and docs/ (en, pt, ja) from src/')
+    print('built index.html, demo.html, demo-next.html and docs/ (en, pt, ja) from src/')

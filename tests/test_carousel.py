@@ -17,7 +17,7 @@ SETUP = """(()=>{const T=todayISO(),D=n=>addDays(T,-n),ev=(n,topic,sc)=>({id:'c'
 
 with sync_playwright() as p:
     b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
-    for f in ['index', 'demo']:
+    for f in os.environ.get('PPL_FILES', 'index demo').split():
         for mode, opts in DEV:
             tag = f'{f} · {mode}'; touch = mode in ('phone', 'iPad mini')
             c = b.new_context(**opts); pg = c.new_page(); errs = []

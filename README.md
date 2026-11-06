@@ -4,6 +4,7 @@ A study tracker for the **FAA Private Pilot (PPL) Knowledge Test**. It is a sing
 
 **Live app:** https://matheuscgh-ops.github.io/ppl-flight-deck/
 **Demo with fictional data and a guided tour:** https://matheuscgh-ops.github.io/ppl-flight-deck/demo.html  
+**The same demo with the new design (preview):** https://matheuscgh-ops.github.io/ppl-flight-deck/demo-next.html  
 **User guide (English, Português, 日本語):** https://matheuscgh-ops.github.io/ppl-flight-deck/docs/
 
 The app follows the 26 topics of the Sporty's question bank (1,058 questions). It turns your study history into a plan and an exam forecast, with a target of **85%** on the 60-question test (passing is 70%).
@@ -71,6 +72,7 @@ The *How it is calculated* sections in the app list every formula.
 ```
 index.html              personal app (generated, publish this)
 demo.html               demo with fictional data and a guided tour (generated, publish this)
+demo-next.html          the demo with the new design: src/next/ on top of the same code (generated, publish this)
 build.py                builds both files and the user guide from src/
 docs/                   user guide (generated): index.html (English), pt.html, ja.html; screenshots in docs/img/<lang>/
 src/index.html          page markup (placeholders @@CSS@@ and @@JS@@)
@@ -95,7 +97,7 @@ Each JavaScript file is one module (an IIFE) that keeps its internals private an
 Edit the files in `src/`, then rebuild:
 
 ```bash
-python3 build.py        # writes index.html, demo.html and docs/
+python3 build.py        # writes index.html, demo.html, demo-next.html and docs/
 ```
 
 After a UI change that shows in the user guide, retake its screenshots (all languages, or one: `pt`):

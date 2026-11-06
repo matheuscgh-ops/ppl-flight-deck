@@ -19,7 +19,7 @@ def check(name, cond, detail=''):
 
 with sync_playwright() as p:
     b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
-    for f in ['index', 'demo']:
+    for f in os.environ.get('PPL_FILES', 'index demo').split():
         url = 'file://' + os.path.join(ROOT, f + '.html')
         for dev, opts in DEVICES.items():
             c = b.new_context(**opts); pg = c.new_page(); errs = []
