@@ -89,6 +89,8 @@ with sync_playwright() as p:
             # ---------- 2) log a review today: 90% ----------
             dash()
             tap('.task[data-topic="18"] .tname'); pg.wait_for_timeout(250)
+            if not pg.is_visible('#modalbg'):   # say where it went (CI log) before the next step fails
+                print('DEBUG', tag, ev("(()=>{const e=document.querySelector('.task[data-topic=\"18\"] .tname'),r=e.getBoundingClientRect(),h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return JSON.stringify({r:[r.left,r.top,r.width,r.height],hit:h&&(h.className||h.tagName),view:curView,scrollY,ih:innerHeight,lane:document.querySelector('.task[data-topic=\"18\"]').closest('.lane')&&document.querySelector('.task[data-topic=\"18\"]').closest('.lane').dataset.status})})()"), flush=True)
             check(f'{tag}: tapping the card opens the log dialog as a review', pg.is_visible('#modalbg'))
             pg.fill('#mScore', '90'); tap('#mSave'); pg.wait_for_timeout(350)
             S18b, R18b, nx18b, _ = model([(10, 60), (6, 72), (0, 90)], 0)
