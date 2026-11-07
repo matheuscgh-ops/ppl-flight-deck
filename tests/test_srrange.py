@@ -19,7 +19,7 @@ SPAN = """(sel=>{const svg=document.querySelector(sel+' svg');if(!svg)return nul
 
 with sync_playwright() as p:
     b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
-    for f in ['index', 'demo']:
+    for f in os.environ.get('PPL_FILES', 'index demo').split():
         url = 'file://' + os.path.join(ROOT, f + '.html')
         for mode, opts in [('desktop', dict(viewport={'width': 2000, 'height': 1190})),
                            ('phone', dict(viewport={'width': 402, 'height': 874}, is_mobile=True, has_touch=True, user_agent=UA))]:

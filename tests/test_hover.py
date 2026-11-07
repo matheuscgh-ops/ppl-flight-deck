@@ -17,7 +17,7 @@ def hover(pg, sel, fx, fy=.5, setup=None):
 
 with sync_playwright() as p:
     b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
-    for f in ['index', 'demo']:
+    for f in os.environ.get('PPL_FILES', 'index demo').split():
         for mode, vp in [('desktop', (2000, 1190)), ('laptop', (1440, 900))]:
             tag = f'{f} · {mode}'
             c = b.new_context(viewport={'width': vp[0], 'height': vp[1]}); pg = c.new_page(); errs = []

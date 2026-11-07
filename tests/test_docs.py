@@ -53,7 +53,7 @@ with sync_playwright() as p:
         c.close()
 
     # ---------- app: header button, tour link, name ----------
-    for f in ['index', 'demo']:
+    for f in os.environ.get('PPL_FILES', 'index demo').split():
         for mode, opts in DEV:
             tag = f'{f} · {mode}'; W = opts['viewport']['width']
             c = b.new_context(**opts); pg = c.new_page(); errs = []

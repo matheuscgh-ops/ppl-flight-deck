@@ -16777,7 +16777,8 @@ const PlanWeek = (() => {
     const rows = parseFloat(body.style.height.match(/\*\s*([\d.]+)/)?.[1]) || 32,
       below = ($('#pwLegend').offsetHeight || 0) + (($('#pwGrid .pwempty') || {}).offsetHeight || 0) + 44,
       avail = Math.max(260, Math.floor(innerHeight - (sc.getBoundingClientRect().top + window.scrollY) - below));
-    const rowh = Math.max(14, Math.floor(avail / rows));
+    /* never under 18 px: a one-row block (a 2-question topic) must still hold its 16 px check circle; the grid scrolls */
+    const rowh = Math.max(18, Math.floor(avail / rows));
     sc.closest('.wk').style.setProperty('--rowh', rowh + 'px');
     sc.style.maxHeight = sc.style.height = avail + 'px';
   }

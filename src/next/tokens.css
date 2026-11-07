@@ -1,0 +1,42 @@
+/* ===== the new design (demo-next.html) — tokens =====
+   Dark, low-fatigue: a cool slate base instead of near-black, elevation shown by lighter surfaces (not shadows),
+   text a step off pure white, one accent for actions (blue), the five list colours softened but kept (they carry
+   meaning). Glass is for chrome only — the header, the tab bar, the next-up bar, the toast — never for content. */
+.nx {
+  --bg: #13171d;
+  --panel: #1a1f26;
+  --panel2: #232932;
+  --panel3: #2b323c;
+  --lane: #161b21;
+  --card: #242a33;
+  --cardh: #2b323c;
+  --line: #262d36;
+  --line2: #333b46;
+  --hair: rgba(255, 255, 255, 0.06);
+  --ink: #e5e9ef;
+  --ink2: #b3bcc8;
+  --muted: #8a94a3;
+  --s0: #8791a0;
+  --s1: #68a0ee;
+  --s2: #e0a039;
+  --s3: #58c195;
+  --s4: #a295e5;
+  --acc: #7fadf6;
+  --acc-ink: #0b1a30;
+  --acc-soft: rgba(127, 173, 246, 0.14);
+  --ok: #58c195;
+  --warn: #e0a039;
+  --bad: #ee8a82;
+  --r-xs: 6px;
+  --r-s: 9px;
+  --r-m: 12px;
+  --r-l: 18px;
+  --glass: rgba(29, 35, 44, 0.66);
+  --glass-line: rgba(255, 255, 255, 0.1);
+  --glass-hi: rgba(255, 255, 255, 0.14);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --font:
+    'Atkinson Hyperlegible Next', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable Text',
+    'Segoe UI', system-ui, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+  color-scheme: dark;
+}

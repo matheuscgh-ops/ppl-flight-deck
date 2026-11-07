@@ -1,0 +1,83 @@
+/* ===== the new design — the Kanban, Trello style: lists on a coloured board, cards that sit on the lists.
+   The board colour is a calm, desaturated blue (the original was a bright blue gradient). ===== */
+.nx .board {
+  background: linear-gradient(135deg, #24466b 0%, #1d3a59 55%, #182f49 100%);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+.nx .board .section {
+  color: #f1f4f8;
+}
+.nx .board .hint,
+.nx .board .section .muted {
+  color: #c2d0e0;
+}
+.nx .board .kbd {
+  color: #f1f4f8;
+  border-color: #8aa3c2;
+}
+.nx .lane {
+  background: #12161b;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0, 10, 25, 0.4);
+}
+.nx .lane.over {
+  outline: 2px dashed #b9cdea;
+  outline-offset: -3px;
+  background: #161d24;
+}
+.nx .lanehead {
+  color: #e6e9ed;
+}
+.nx .lname {
+  font-weight: 620;
+}
+.nx .lname:before {
+  border-radius: 3px;
+}
+.nx .task {
+  background: #22282f;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
+}
+.nx .task:hover {
+  background: #2a313a;
+  border-color: #3f4854;
+}
+.nx .tname {
+  font-weight: 560;
+  color: #e6e9ed;
+}
+.nx .tmeta {
+  font-weight: 500;
+}
+.nx .task-gap {
+  background: rgba(8, 11, 15, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+.nx .ghost,
+.nx .task.ghost {
+  background: #2a313a;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6);
+}
+.nx .addcard {
+  box-shadow: none;
+  color: #b3bcc8;
+  font-weight: 560;
+  background: transparent;
+}
+.nx .addcard:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--ink);
+}
+.nx .laneadd {
+  box-shadow: none;
+  background: transparent;
+}
+.nx .owntag {
+  border-radius: var(--r-xs);
+  font-weight: 620;
+  letter-spacing: 0;
+}

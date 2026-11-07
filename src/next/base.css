@@ -1,0 +1,181 @@
+/* ===== the new design — base: type, surfaces, controls ===== */
+.nx body {
+  background: var(--bg);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 450;
+  letter-spacing: 0.005em;
+}
+/* clip, not hidden: a hidden overflow makes the body its own scroll box and the header could not stay on top */
+.nx body {
+  overflow-x: clip;
+}
+.nx :is(h1, h2, h3, h4) {
+  letter-spacing: -0.01em;
+}
+.nx .app {
+  --gut: 20px;
+  gap: 12px;
+  padding: 0 var(--gut) 40px;
+}
+/* desktop "fit" mode (the dashboard fits the window): same gutters, less space below */
+@media (min-width: 1100px) and (min-height: 1050px) {
+  .nx body:not(.srview) .app {
+    --gut: 20px;
+    padding: 0 var(--gut) 12px;
+  }
+}
+
+/* surfaces: one hairline, a larger radius, no drop shadow */
+.nx .panel {
+  background: var(--panel);
+  border: 1px solid var(--hair);
+  border-radius: var(--r-l);
+  box-shadow: none;
+}
+
+/* section titles: sentence case, readable size, no tracking */
+.nx .section {
+  font-size: 14px;
+  font-weight: 620;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+}
+.nx .section .muted {
+  font-weight: 450;
+}
+.nx .hint,
+.nx .muted {
+  color: var(--muted);
+}
+
+/* controls: a calm filled button, no outline box. :where() keeps this at the weight of a plain button rule, so
+   every special button (dots, check circles, chips) keeps its own shape. */
+:where(.nx) button {
+  padding: 7px 12px;
+  border: 0;
+  border-radius: var(--r-s);
+  background: var(--panel2);
+  font-weight: 560;
+  font-size: 13px;
+  color: var(--ink);
+  transition:
+    background-color 0.15s,
+    box-shadow 0.15s,
+    color 0.15s;
+}
+:where(.nx) button:hover {
+  background: var(--panel3);
+  border-color: transparent;
+}
+.nx .primary,
+.nx button.primary {
+  background: var(--acc);
+  color: var(--acc-ink);
+  box-shadow: none;
+  font-weight: 620;
+}
+.nx .primary:hover {
+  background: #93bbf8;
+}
+.nx :is(button, input, select, textarea, a, .task, [tabindex]):focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}
+:where(.nx) :is(input, select, textarea) {
+  background: #151a20;
+  border: 1px solid var(--line2);
+  border-radius: var(--r-s);
+  padding: 7px 9px;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+:where(.nx) :is(input, select, textarea):focus {
+  border-color: var(--acc);
+  box-shadow: 0 0 0 3px var(--acc-soft);
+  outline: none;
+}
+.nx input[type='checkbox'],
+.nx input[type='radio'] {
+  accent-color: var(--acc);
+}
+
+/* segmented controls (week/day, ranges, tabs inside cards): a soft track and a raised thumb */
+.nx .seg {
+  background: #151a20;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-m);
+}
+.nx .seg button {
+  box-shadow: none;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 9px;
+}
+.nx .seg button:hover {
+  color: var(--ink);
+  background: transparent;
+}
+.nx .seg button.on {
+  background: var(--panel3);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* chips/badges: quieter, sentence case */
+.nx .demo,
+.nx .demotag {
+  background: rgba(224, 160, 57, 0.12);
+  color: #e9c27e;
+  border: 0;
+  box-shadow: none;
+  border-radius: 999px;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+.nx .score {
+  border-radius: var(--r-xs);
+  font-weight: 620;
+  padding: 1px 7px;
+}
+.nx .sc-good {
+  background: rgba(88, 193, 149, 0.14);
+  color: #8fd9b6;
+}
+.nx .sc-mid {
+  background: rgba(224, 160, 57, 0.14);
+  color: #ecc178;
+}
+.nx .sc-low {
+  background: rgba(238, 138, 130, 0.14);
+  color: #f2a7a0;
+}
+.nx .sc-none {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+}
+
+/* scrollbars that don't shout */
+.nx * {
+  scrollbar-width: thin;
+  scrollbar-color: #3a424e transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nx *,
+  .nx *::before,
+  .nx *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* the open list of a select: dark with light text (Windows drew light options with light text) */
+.nx option,
+.nx optgroup {
+  background-color: #1c222a;
+  color: var(--ink);
+}

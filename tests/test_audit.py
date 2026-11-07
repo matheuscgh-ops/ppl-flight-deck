@@ -44,7 +44,7 @@ CLOSE = "document.querySelectorAll('.modalbg').forEach(m=>m.hidden=true);window.
 
 with sync_playwright() as p:
     b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
-    for f in ['index', 'demo']:
+    for f in os.environ.get('PPL_FILES', 'index demo').split():
         for mode, opts in DEV:
             c = b.new_context(**opts); pg = c.new_page(); errs = []; pops = []
             pg.on('pageerror', lambda e: errs.append(str(e))); pg.on('dialog', lambda d: pops.append(d.message) or d.dismiss())
