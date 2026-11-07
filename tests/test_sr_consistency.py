@@ -70,6 +70,14 @@ with sync_playwright() as p:
                 ch = ev("document.getElementById('heatNow').innerHTML")
                 return k, ch
             def dash(): tap('.tabs button[data-view="dash"]'); pg.wait_for_timeout(250)
+            def open_card(i):
+                """tap a card the way a person does: on a phone, swipe to its list first and let the list settle
+                (the lists snap into place; a tap while one is still moving can miss)"""
+                ev(f"(()=>{{const c=document.querySelector('.task[data-topic=\"{i}\"]');if(typeof goLane==='function'&&phoneMQ.matches)goLane(STATUS.indexOf(state.statuses[{i}]),false);c.scrollIntoView({{block:'center',inline:'center'}})}})()")
+                # wait until nothing scrolls any more (a touch during a scroll only stops it, like on any phone)
+                pg.wait_for_function("""(()=>{const l=document.querySelector('.lanes'),k=l.scrollLeft+','+scrollY;
+                  if(window.__st===k){window.__n=(window.__n||0)+1}else{window.__st=k;window.__n=0}return window.__n>=6})""", polling=50, timeout=5000)
+                tap(f'.task[data-topic="{i}"] .tname'); pg.wait_for_timeout(250)
 
             # ---------- 1) known history ----------
             S18, R18, nx18, n18 = model([(10, 60), (6, 72)], 0)
@@ -88,7 +96,10 @@ with sync_playwright() as p:
 
             # ---------- 2) log a review today: 90% ----------
             dash()
-            tap('.task[data-topic="18"] .tname'); pg.wait_for_timeout(250)
+            open_card(18)
+            if not pg.is_visible('#modalbg'):   # say where it went (CI log) before the next step fails
+                print('DEBUG errors', errs, 'modalbg hidden:', ev("document.getElementById('modalbg').hidden"), 'active:', ev("document.activeElement&&document.activeElement.className"), flush=True)
+                print('DEBUG', tag, ev("(()=>{const e=document.querySelector('.task[data-topic=\"18\"] .tname'),r=e.getBoundingClientRect(),h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return JSON.stringify({r:[r.left,r.top,r.width,r.height],hit:h&&(h.className||h.tagName),view:curView,scrollY,ih:innerHeight,lane:document.querySelector('.task[data-topic=\"18\"]').closest('.lane')&&document.querySelector('.task[data-topic=\"18\"]').closest('.lane').dataset.status})})()"), flush=True)
             check(f'{tag}: tapping the card opens the log dialog as a review', pg.is_visible('#modalbg'))
             pg.fill('#mScore', '90'); tap('#mSave'); pg.wait_for_timeout(350)
             S18b, R18b, nx18b, _ = model([(10, 60), (6, 72), (0, 90)], 0)
@@ -121,7 +132,7 @@ with sync_playwright() as p:
             check(f'{tag}: the dashboard picker lists the new topic', ev("[...document.querySelectorAll('#prevPick option')].some(o=>o.value==='13')"))
 
             # ---------- 5) delete today's Weather review → back to the earlier numbers; undo → forward again ----------
-            tap('.task[data-topic="18"] .tname'); pg.wait_for_timeout(250)
+            open_card(18)
             tid = ev("state.events.find(e=>e.topic===18&&e.date===todayISO()).id")
             tap(f'#mHist [data-del="{tid}"]'); pg.wait_for_timeout(300)
             pg.keyboard.press('Escape') if not touch else ev("closeModal()"); pg.wait_for_timeout(150)

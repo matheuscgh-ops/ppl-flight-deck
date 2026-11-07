@@ -30,7 +30,7 @@ with sync_playwright() as p:
             check(f'{f} · {dev}: text inputs are 16px (iOS does not auto-zoom)', pg.evaluate("getComputedStyle(document.querySelector('#examDate')).fontSize") == '16px')
             ed = pg.evaluate("(()=>{const i=document.getElementById('examDate').getBoundingClientRect(),c=document.querySelector('.countdown').getBoundingClientRect();return {inside:i.left>=c.left+4&&i.right<=c.right-4,gapL:Math.round(i.left-c.left),gapR:Math.round(c.right-i.right)}})()")
             check(f'{f} · {dev}: exam date field sits inside its card with even margins', ed['inside'] and abs(ed['gapL'] - ed['gapR']) <= 2, ed)
-            check(f'{f} · {dev}: all 26 cards rendered', pg.evaluate("document.querySelectorAll('.task').length") == 26)
+            check(f'{f} · {dev}: all 28 cards rendered', pg.evaluate("document.querySelectorAll('.task').length") == 28)
             if w <= 640:  # phones: the preview lives in the spaced-repetition card and opens maximized
                 pg.evaluate("openSrMax()"); pg.wait_for_timeout(150)
                 check(f'{f} · {dev}: spaced-repetition topic picker is shown (in the maximized card)', pg.is_visible('#prevPick'))

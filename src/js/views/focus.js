@@ -115,6 +115,9 @@ const Focus = (() => {
     $('#focusName').textContent = nameOf(it);
     $('#focusMeta').textContent = metaOf(it);
     const isTopic = it.kind === 'topic';
+    /* where to find this topic in the other app (ASA Prepware), when that is on in Settings */
+    $('#focusAsa').textContent = isTopic ? asaLong(it.i) : '';
+    $('#focusAsa').hidden = !$('#focusAsa').textContent;
     $('#focusNotes').hidden = !isTopic;
     if (isTopic) $('#focusNotes').textContent = '📝 ' + t('notesOpen').replace('{n}', notesOf(it.i).length);
     $('#focusDone').textContent = t(isTopic || it.kind === 'test' ? 'focusDone' : 'focusDoneTask');

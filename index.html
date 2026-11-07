@@ -1122,6 +1122,35 @@ body.dragging * {
     display: inline;
   }
 }
+/* the matching ASA Prepware chapter (Settings › Display): a quiet line under the topic name */
+.tasa {
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 520;
+  color: #a4acb7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.qasa {
+  display: block;
+  font-size: 11px;
+  font-weight: 520;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.asaline {
+  margin-top: 4px;
+  font-size: 12.5px;
+  font-weight: 520;
+  color: #9ebdea;
+}
+.focusasa {
+  margin-top: 6px;
+  font-size: 14px;
+}
 
 /* modal */
 .modalbg {
@@ -1386,7 +1415,11 @@ body.dragging * {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 5px 10px;
+    padding: 4px 10px;
+  }
+  /* one-line cards have no room for the ASA chapter: it is in the card's tooltip and in the log dialog */
+  .tasa {
+    display: none;
   }
   .tname {
     flex: 1;
@@ -2409,6 +2442,16 @@ html {
   .tmeta > span:first-child,
   .tmeta .last {
     display: none;
+  }
+  /* the ASA chapter takes its own line under the name (the row keeps the name and the score) */
+  .task:has(.tasa) {
+    flex-wrap: wrap;
+    row-gap: 2px;
+  }
+  .tasa {
+    order: 3;
+    flex: 1 0 100%;
+    margin-top: 0;
   }
   .lanedots {
     display: flex;
@@ -7732,6 +7775,18 @@ svg.tick {
   color: var(--ink);
 }
 
+/* the header stays on top (and on phones the tab bar at the bottom): anything scrolled into view — a focused card,
+   a jump to a section — stops clear of them instead of underneath. layout.js sets the top padding to the header's real
+   height (2–3 rows on tablets); this is the starting value. */
+.nx {
+  scroll-padding-top: 76px;
+}
+@media (max-width: 640px) {
+  .nx {
+    scroll-padding-bottom: 170px;
+  }
+}
+
 /* ===== the new design — chrome: the header (a glass bar that stays on top) and the tabs ===== */
 .nx header.top {
   position: sticky;
@@ -8569,7 +8624,7 @@ svg.tick {
 
 <div class="modalbg" id="modalbg" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
-    <div class="mhead"><div><h3 id="mTitle"></h3><div class="muted" id="mDesc"></div></div><button class="x" id="mClose" aria-label="Close">×</button></div>
+    <div class="mhead"><div><h3 id="mTitle"></h3><div class="muted" id="mDesc"></div><div class="asaline" id="mAsa" hidden></div></div><button class="x" id="mClose" aria-label="Close">×</button></div>
     <div class="field"><span class="flabel" data-t="activity"></span><div class="seg" id="seg"><button data-kind="study"></button><button data-kind="review"></button><button data-kind="none"></button></div></div>
     <div class="row2 scorerow">
       <div class="field"><span class="flabel" data-t="rightField"></span><div class="rightof"><input type="number" id="mRight" min="0" step="1" inputmode="numeric" aria-label="Right answers"><span data-t="ofWord"></span><input type="number" id="mOf" min="1" step="1" inputmode="numeric" aria-label="Questions"></div></div>
@@ -8674,6 +8729,7 @@ svg.tick {
     <div class="focusbody">
       <h2 id="focusName"></h2>
       <div class="muted focusmeta" id="focusMeta"></div>
+      <div class="asaline focusasa" id="focusAsa" hidden></div>
       <div class="focusring" id="focusRing"><div><b id="focusClock">0:00</b><small id="focusPlanned"></small></div></div>
       <div class="focusbtns"><button type="button" id="focusPause"></button><button type="button" class="primary" id="focusDone"></button></div>
       <button type="button" class="linkbtn" id="focusNotes" hidden></button>
@@ -8775,7 +8831,8 @@ function expose(vars) {
 }
 
 /* ===== module Config (js/core/config.js) =====
-   public: TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE, DOCS_URL, docsUrl
+   public: TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE, DOCS_URL, docsUrl, ASA_CHAPTERS,
+           asaOf
    live values (getters on window, they follow your Settings): GOAL */
 const Config = (() => {
   const TEMPLATE = '<!doctype html>\n' + document.documentElement.outerHTML;
@@ -8816,7 +8873,62 @@ const Config = (() => {
     { name: 'Maneuvering During Slow Flight', q: 7, score: 75, status: 'Doing' },
     { name: 'Power-Off Stalls', q: 17, score: 80, status: 'Doing' },
     { name: 'Spin Awareness', q: 7, score: 100, status: 'Todo' },
+    /* Sporty's "Takeoffs, Landings, and Go-Arounds": added later, so they go at the end (saved data and every event point
+       at topics by position; state.normalize fills them in for data saved with the first 26) */
+    { name: 'Approach and Landing', q: 48, score: null, status: 'Todo' },
+    { name: 'Takeoff and Climb', q: 19, score: null, status: 'Todo' },
   ];
+  /* ASA's Prepware app (Private Pilot Airplane) groups the FAA questions in 10 broad chapters, without the Sporty's topics
+     inside them. ASA_OF gives, for each topic above (same order), its main chapter and the ones it also shows up in, so a
+     topic of the plan can be found there. Chapter names stay as in the Prepware app (they are not translated). */
+  const ASA_CHAPTERS = [
+    { name: 'Aerodynamics', q: 33 },
+    { name: 'Aircraft Systems', q: 52 },
+    { name: 'Flight Instruments', q: 59 },
+    { name: 'Aircraft Performance', q: 73 },
+    { name: 'Regulations', q: 172 },
+    { name: 'Airspace and Airport Operations', q: 144 },
+    { name: 'Enroute Flight and Navigation', q: 65 },
+    { name: 'Weather', q: 60 },
+    { name: 'Weather Service', q: 42 },
+    { name: 'Human Factors', q: 36 },
+  ];
+  const [AERO, SYS, INST, PERF, REGS, AIRSPACE, NAV, WX, WXS, HF] = ASA_CHAPTERS.map((_, k) => k);
+  const ASA_OF = [
+    [AIRSPACE], // Communications, Lights and Runways
+    [AIRSPACE], // Traffic Patterns
+    [AERO], // Emergency Approach and Landing
+    [AERO], // Emergency Descent
+    [REGS], // Emergency Equipment and Survival Gear
+    [SYS, INST], // Systems and Equipment Malfunctions
+    [NAV], // Navigation Systems and Radar Services
+    [NAV], // Pilotage and Dead Reckoning
+    [HF, REGS], // Night Preparation
+    [AERO], // Ground Reference Maneuvers
+    [AERO], // Steep Turns
+    [REGS], // Airworthiness Requirements
+    [NAV, PERF], // Cross-Country Flight Planning
+    [HF], // Human Factors
+    [AIRSPACE, REGS], // National Airspace System
+    [SYS, INST], // Operation of Systems
+    [PERF, AERO], // Performance and Limitations
+    [REGS], // Pilot Qualifications
+    [WX, WXS], // Weather Information
+    [SYS], // Before Takeoff Check
+    [HF], // Flight Deck Management
+    [REGS, HF], // Preflight Assessment
+    [AIRSPACE], // Taxiing
+    [AERO], // Maneuvering During Slow Flight
+    [AERO], // Power-Off Stalls
+    [AERO], // Spin Awareness
+    [PERF, AERO], // Approach and Landing
+    [PERF, AERO], // Takeoff and Climb
+  ];
+  /* { main, also: [...] } chapter names for topic i, or null */
+  const asaOf = i => {
+    const c = ASA_OF[i];
+    return c ? { main: ASA_CHAPTERS[c[0]].name, also: c.slice(1).map(k => ASA_CHAPTERS[k].name) } : null;
+  };
   const STATUS = ['Todo', 'Doing', 'Not Comfortable', 'Very Comfortable', 'To review'];
   const COLORS = ['#8791a0', '#68a0ee', '#e0a039', '#58c195', '#a295e5'];
   /* darker variants for tags drawn on the light "active day" background */
@@ -8838,6 +8950,7 @@ const Config = (() => {
     gridStart: 6, // first hour of the plan grid
     deepMin: 45, // minutes of block per topic (deep work); 0 = no limit
     reflect: true, // an error-review item closes each study block in a plan
+    asa: !BUILD.demo, // show the matching ASA Prepware chapter on each topic (off in the demo)
     ranges: {}, // default chart intervals
   };
   /* the goal follows Settings (read at the moment it is used) */
@@ -8846,9 +8959,39 @@ const Config = (() => {
   /* the user guide on GitHub Pages: English is index.html, the other languages have their own page */
   const DOCS_URL = 'https://matheuscgh-ops.github.io/ppl-flight-deck/docs/';
   const docsUrl = l => DOCS_URL + ({ pt: 'pt.html', ja: 'ja.html' }[l] || '');
-  return { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE, DOCS_URL, docsUrl };
+  return {
+    TEMPLATE,
+    STORE,
+    fitMQ,
+    fitH,
+    TOPICS,
+    STATUS,
+    COLORS,
+    DEF_SET0,
+    PREF_DEF,
+    LOCALE,
+    DOCS_URL,
+    docsUrl,
+    ASA_CHAPTERS,
+    asaOf,
+  };
 })();
-const { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE, DOCS_URL, docsUrl } = Config;
+const {
+  TEMPLATE,
+  STORE,
+  fitMQ,
+  fitH,
+  TOPICS,
+  STATUS,
+  COLORS,
+  DEF_SET0,
+  PREF_DEF,
+  LOCALE,
+  DOCS_URL,
+  docsUrl,
+  ASA_CHAPTERS,
+  asaOf,
+} = Config;
 
 /* ===== module Translations (i18n/translations.js) =====
    public: I18N */
@@ -9384,7 +9527,7 @@ const Translations = (() => {
     fcGoalLine: 'Goal {G}%',
     fcLostTitle: 'Where you lose the most questions',
     fcFormula:
-      'p(topic) = last score × recall now      (no score yet → 50%)\nweight(topic) = topic questions / 1,058\nexpected score μ = Σ weight × p\nright answers X ~ Binomial(60, μ)\nchance to pass = P(X ≥ 42)   ·   chance of {G}% = P(X ≥ {GN})\nLost questions (topic) = 60 × weight × (1 − p)',
+      'p(topic) = last score × recall now      (no score yet → 50%)\nweight(topic) = topic questions / {Q}\nexpected score μ = Σ weight × p\nright answers X ~ Binomial(60, μ)\nchance to pass = P(X ≥ 42)   ·   chance of {G}% = P(X ≥ {GN})\nLost questions (topic) = 60 × weight × (1 − p)',
     planToday: "Today's plan",
     planOpen: 'Plan →',
     planTitle: "Today's plan",
@@ -9428,7 +9571,7 @@ const Translations = (() => {
     fcGoalLine: 'Meta {G}%',
     fcLostTitle: 'Onde você perde mais questões',
     fcFormula:
-      'p(tópico) = última nota × retenção hoje      (sem nota → 50%)\npeso(tópico) = questões do tópico / 1.058\nnota esperada μ = Σ peso × p\nacertos X ~ Binomial(60, μ)\nchance de passar = P(X ≥ 42)   ·   chance de {G}% = P(X ≥ {GN})\nQuestões perdidas (tópico) = 60 × peso × (1 − p)',
+      'p(tópico) = última nota × retenção hoje      (sem nota → 50%)\npeso(tópico) = questões do tópico / {Q}\nnota esperada μ = Σ peso × p\nacertos X ~ Binomial(60, μ)\nchance de passar = P(X ≥ 42)   ·   chance de {G}% = P(X ≥ {GN})\nQuestões perdidas (tópico) = 60 × peso × (1 − p)',
     planToday: 'Plano de hoje',
     planOpen: 'Plano →',
     planTitle: 'Plano de hoje',
@@ -9472,7 +9615,7 @@ const Translations = (() => {
     fcGoalLine: '目標 {G}%',
     fcLostTitle: '失点が多いトピック',
     fcFormula:
-      'p(トピック) = 最新の正答率 × 現在の保持率   （正答率なし → 50%）\n重み = トピックの問題数 / 1,058\n予想正答率 μ = Σ 重み × p\n正解数 X ~ 二項分布(60, μ)\n合格確率 = P(X ≥ 42) · {G}%以上 = P(X ≥ {GN})\n失点（トピック）= 60 × 重み × (1 − p)',
+      'p(トピック) = 最新の正答率 × 現在の保持率   （正答率なし → 50%）\n重み = トピックの問題数 / {Q}\n予想正答率 μ = Σ 重み × p\n正解数 X ~ 二項分布(60, μ)\n合格確率 = P(X ≥ 42) · {G}%以上 = P(X ≥ {GN})\n失点（トピック）= 60 × 重み × (1 − p)',
     planToday: '今日のプラン',
     planOpen: 'プラン →',
     planTitle: '今日のプラン',
@@ -10284,6 +10427,11 @@ const Translations = (() => {
     setCarousel: 'Carousels move on their own',
     setCarouselHint: 'Dashboard preview and “Needs recall”, every 3 s',
     setHeatNums: 'Numbers on the heat-map squares',
+    setAsa: 'Matching ASA Prepware chapter',
+    setAsaHint: 'On each topic (cards, plan, focus mode, log), the chapter of the ASA Prepware app with its questions',
+    asaShort: 'ASA · {c}',
+    asaLong: 'In ASA Prepware: {c}',
+    asaAlso: '(also {c})',
     setSyncTitle: 'Sync between devices',
     setSyncOpen: 'Manage sync…',
     setDataTitle: 'Your data',
@@ -10330,6 +10478,12 @@ const Translations = (() => {
     setCarousel: 'Carrosséis passam sozinhos',
     setCarouselHint: 'Prévia do dashboard e “Precisa revisar”, a cada 3 s',
     setHeatNums: 'Números nos quadrados do mapa de calor',
+    setAsa: 'Capítulo equivalente no ASA Prepware',
+    setAsaHint:
+      'Em cada tópico (cards, plano, modo foco, registro), o capítulo do app ASA Prepware com as questões dele',
+    asaShort: 'ASA · {c}',
+    asaLong: 'No ASA Prepware: {c}',
+    asaAlso: '(também {c})',
     setSyncTitle: 'Sync entre aparelhos',
     setSyncOpen: 'Gerenciar sync…',
     setDataTitle: 'Seus dados',
@@ -10376,6 +10530,11 @@ const Translations = (() => {
     setCarousel: 'カルーセルを自動で切替',
     setCarouselHint: 'ダッシュボードのプレビューと「復習が必要」、3秒ごと',
     setHeatNums: 'ヒートマップに数値を表示',
+    setAsa: 'ASA Prepwareの対応する章',
+    setAsaHint: '各トピック（カード、プラン、フォーカスモード、記録）に、ASA Prepwareアプリで同じ問題がある章を表示',
+    asaShort: 'ASA · {c}',
+    asaLong: 'ASA Prepwareでは：{c}',
+    asaAlso: '（{c}にも）',
     setSyncTitle: '端末間の同期',
     setSyncOpen: '同期を管理…',
     setDataTitle: 'データ',
@@ -11110,10 +11269,22 @@ const PersonalData = (() => {
 const { REAL_EVENTS, defaultState } = PersonalData;
 
 /* ===== module AppState (js/core/state.js) =====
-   public: normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs, normOrder
+   public: normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs, normOrder, asaShort, asaLong
    shared state (getter/setter): embedded, state, loadedFromFile, lang, shown, sel, mKind, prevIds */
 const AppState = (() => {
+  /* data saved before topics were added (26 of them) gets the new ones at the end, with their starting status and no
+     score; a list longer than the app's topics is not ours */
+  const OLD_TOPIC_COUNT = 26;
+  const padTopics = (arr, fill) =>
+    Array.isArray(arr) && arr.length >= OLD_TOPIC_COUNT && arr.length < TOPICS.length
+      ? arr.concat(TOPICS.slice(arr.length).map(fill))
+      : arr;
   function normalize(o) {
+    if (o && typeof o === 'object' && Array.isArray(o.statuses) && o.statuses.length < TOPICS.length) {
+      const n = o.statuses.length;
+      o = { ...o, statuses: padTopics(o.statuses, x => x.status) };
+      if (Array.isArray(o.scores) && o.scores.length === n) o.scores = padTopics(o.scores, () => null);
+    }
     if (
       !o ||
       typeof o !== 'object' ||
@@ -11250,6 +11421,7 @@ const AppState = (() => {
     gridStart: v => [5, 6, 7, 8, 9].includes(v),
     deepMin: v => [0, 30, 45, 60, 90].includes(v),
     reflect: v => typeof v === 'boolean',
+    asa: v => typeof v === 'boolean',
   };
   const RANGE_OK = {
     sr: ['3d', '7d', '2w', '1m', '3m', '6m', '1y', 'all'],
@@ -11389,6 +11561,18 @@ const AppState = (() => {
       : v;
   };
   const tf = (k, n) => t(k).replace('{n}', n);
+  /* the matching ASA Prepware chapter of topic i (Settings › Display › ASA), short for cards and plan rows,
+     long (with the chapters it also shows up in) for the log dialog and focus mode; '' when off */
+  const asaShort = i => {
+    const a = pref('asa') && asaOf(i);
+    return a ? t('asaShort').replace('{c}', a.main) : '';
+  };
+  const asaLong = i => {
+    const a = pref('asa') && asaOf(i);
+    if (!a) return '';
+    const also = a.also.length ? (lang === 'ja' ? '' : ' ') + t('asaAlso').replace('{c}', a.also.join(', ')) : '';
+    return t('asaLong').replace('{c}', a.main) + also;
+  };
   const label = s => t('labels')[STATUS.indexOf(s)];
   const fmt = (n, d = 0) =>
     new Intl.NumberFormat(LOCALE[lang], { minimumFractionDigits: d, maximumFractionDigits: d }).format(n);
@@ -11520,9 +11704,10 @@ const AppState = (() => {
       },
     ],
   });
-  return { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs, normOrder };
+  return { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs, normOrder, asaShort, asaLong };
 })();
-const { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs, normOrder } = AppState;
+const { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs, normOrder, asaShort, asaLong } =
+  AppState;
 
 /* ===== module Dashboard (js/views/dashboard.js) =====
    public: counts, streakInfo, renderCalendar, fitTags, renderSide, renderBoard, phoneMQ, laneInView, goLane, renderDash, render, moveCard, lanesEl
@@ -11751,7 +11936,7 @@ const Dashboard = (() => {
             sc = v == null ? 'none' : v >= GOAL ? 'good' : v >= 70 ? 'mid' : 'low';
           const ls = seen[i] ? diffDays(seen[i], today) : null;
           const last = ls == null ? '' : ls <= 0 ? t('todayShort') : tf('ago', ls);
-          return `<div class="task${checkedToday(i) ? ' checked' : ''}" tabindex="0" role="button" data-topic="${i}" aria-label="${esc(x.name)}" title="${esc(x.name)}">${checkHTML(i)}<div class="tname">${esc(x.name)}</div><div class="tmeta">${plannedToday(i) ? `<span class="hasplan" title="${esc(t('qPlannedTip'))}"><b class="qplan">${plannedToday(i)}</b><i class="qtot">/${esc(tf('qn', x.q))}</i><i class="qshort">${lang === 'ja' ? '' : ' '}${esc(tf('qn', '').trim())}</i></span>` : `<span>${tf('qn', x.q)}</span>`}<span class="score sc-${sc}" title="${esc(t('editScore'))}">${v == null ? '—' : v + '%'}</span><span class="last">${esc(last)}</span></div></div>`;
+          return `<div class="task${checkedToday(i) ? ' checked' : ''}" tabindex="0" role="button" data-topic="${i}" aria-label="${esc(x.name)}" title="${esc(x.name + (asaShort(i) ? '\n' + asaLong(i) : ''))}">${checkHTML(i)}<div class="tname">${esc(x.name)}</div>${asaShort(i) ? `<div class="tasa">${esc(asaShort(i))}</div>` : ''}<div class="tmeta">${plannedToday(i) ? `<span class="hasplan" title="${esc(t('qPlannedTip'))}"><b class="qplan">${plannedToday(i)}</b><i class="qtot">/${esc(tf('qn', x.q))}</i><i class="qshort">${lang === 'ja' ? '' : ' '}${esc(tf('qn', '').trim())}</i></span>` : `<span>${tf('qn', x.q)}</span>`}<span class="score sc-${sc}" title="${esc(t('editScore'))}">${v == null ? '—' : v + '%'}</span><span class="last">${esc(last)}</span></div></div>`;
         })
         .join('')}${composerHTML(j)}</div></div>`;
     }).join('');
@@ -12373,7 +12558,7 @@ const Forecast = (() => {
   /* ================= EXAM FORECAST (mechanical) =================
    p_i  = chance of answering a question of topic i right
         = last score_i × recall_i + 1/3 × (1 − recall_i)         (unknown score → 50%; 1/3 = guessing among 3 options)
-   The FAA test draws 60 questions; here each one comes from topic i with probability w_i = q_i / 1,058.
+   The FAA test draws 60 questions; here each one comes from topic i with probability w_i = q_i / (all questions, 1,125).
    μ    = Σ w_i · p_i                         expected score
    X    ~ Binomial(60, μ)                     number of right answers
    P(pass) = P(X ≥ 42) (70%),  P(goal) = P(X ≥ 51) (85%)
@@ -12796,7 +12981,8 @@ const ForecastView = (() => {
           `<div class="lostrow" data-q="${x.i}"><span class="n">${esc(TOPICS[x.i].name)}</span><span class="bar"><i style="width:${(x.lost / mx) * 100}%"></i></span><span class="v">−${x.lost.toFixed(1)} q</span><span class="pp">${x.known ? Math.round(x.p * 100) + '%' : '?'}</span></div>`
       )
       .join('');
-    $('#fcFormula').innerHTML = `<pre>${esc(t('fcFormula'))}</pre>`;
+    $('#fcFormula').innerHTML =
+      `<pre>${esc(t('fcFormula').replace('{Q}', fmt(TOPICS.reduce((a, x) => a + x.q, 0))))}</pre>`;
   }
   return { fcCls, renderFcMini, renderForecast };
 })();
@@ -14072,7 +14258,7 @@ const PlanView = (() => {
       ? P.items
           .map(
             it =>
-              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}${noteBtn(it)}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' || it.kind === 'reflect' || it.kind === 'notes' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
+              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}${noteBtn(it)}${it.kind === 'topic' && asaShort(it.i) ? `<small class="qasa">${esc(asaShort(it.i))}</small>` : ''}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' || it.kind === 'reflect' || it.kind === 'notes' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
           )
           .join('')
       : `<div class="muted">${esc(t(fromPlan ? 'planRestDay' : 'allClear'))}</div>`;
@@ -15213,6 +15399,8 @@ const Dialogs = (() => {
     $('#mTitle').textContent = x.name;
     $('#mDesc').textContent =
       tf('qn', x.q) + (state.scores[i] == null ? '' : ` · ${state.scores[i]}%`) + ` · ${label(state.statuses[i])}`;
+    $('#mAsa').textContent = asaLong(i);
+    $('#mAsa').hidden = !asaLong(i);
     $('#mScore').value = state.scores[i] ?? '';
     /* right answers of the questions planned today (editable); typing them fills the score */
     $('#mRight').value = '';
@@ -16148,6 +16336,9 @@ const Focus = (() => {
     $('#focusName').textContent = nameOf(it);
     $('#focusMeta').textContent = metaOf(it);
     const isTopic = it.kind === 'topic';
+    /* where to find this topic in the other app (ASA Prepware), when that is on in Settings */
+    $('#focusAsa').textContent = isTopic ? asaLong(it.i) : '';
+    $('#focusAsa').hidden = !$('#focusAsa').textContent;
     $('#focusNotes').hidden = !isTopic;
     if (isTopic) $('#focusNotes').textContent = '📝 ' + t('notesOpen').replace('{n}', notesOf(it.i).length);
     $('#focusDone').textContent = t(isTopic || it.kind === 'test' ? 'focusDone' : 'focusDoneTask');
@@ -17462,7 +17653,7 @@ const PlanWeek = (() => {
                  on one line (name · time) so its name is never cut in half */
               const share = rev ? Math.max(0.28, Math.min(0.5, rev.min / total)) : 0,
                 compact = !tiny && rows * (1 - share) < 2.5;
-              const tip = `${clockOf(it.start)} · ${itemName(it)} · ${sizeOf(it)}${it.kind === 'reflect' ? ' · ' + reflectDetail(it) : ''}`;
+              const tip = `${clockOf(it.start)} · ${itemName(it)} · ${sizeOf(it)}${it.kind === 'reflect' ? ' · ' + reflectDetail(it) : ''}${it.kind === 'topic' && asaShort(it.i) ? '\n' + asaLong(it.i) : ''}`;
               let band = '';
               if (rev) {
                 const rd = itemDone(rev);
@@ -19216,6 +19407,7 @@ const Settings = (() => {
       section('setDisplayTitle', [
         row('setCarousel', toggle('setCarousel', pref('carousel')), 'setCarouselHint'),
         row('setHeatNums', toggle('setHeatNums', pref('heatNums'))),
+        row('setAsa', toggle('setAsa', pref('asa')), 'setAsaHint'),
       ]),
     ].join('');
     $('#setSync').hidden = BUILD.demo;
@@ -19254,6 +19446,7 @@ const Settings = (() => {
     else if (id.startsWith('setRange_')) setRange(id.slice(9), v);
     else if (id === 'setCarousel') setPref('carousel', v);
     else if (id === 'setHeatNums') setPref('heatNums', v);
+    else if (id === 'setAsa') setPref('asa', v);
     else if (id === 'setReflect') setPref('reflect', v);
     renderSettings();
   });
@@ -19490,15 +19683,15 @@ const SelfTest = (() => {
         const c = counts();
         ok(
           'Progress',
-          'column totals add up to 1,058 questions',
-          c.reduce((a, b) => a + b, 0) === 1058,
+          'column totals add up to 1,125 questions (28 topics)',
+          c.reduce((a, b) => a + b, 0) === 1125,
           c.reduce((a, b) => a + b, 0)
         );
         ok('Progress', 'Very Comfortable = 457 q with the real board', c[3] === 457, c[3]);
         state.statuses = state.statuses.map(() => 'Very Comfortable');
-        ok('Progress', 'all cards Very Comfortable → 100%', counts()[3] === 1058);
+        ok('Progress', 'all cards Very Comfortable → 100%', counts()[3] === 1125);
         state.statuses[18] = 'Todo';
-        ok('Progress', 'moving Weather (158 q) to To Do moves 158 q', counts()[0] === 158 && counts()[3] === 900);
+        ok('Progress', 'moving Weather (158 q) to To Do moves 158 q', counts()[0] === 158 && counts()[3] === 967);
       }
       /* --- streak --- */
       fixture([
@@ -19565,6 +19758,35 @@ const SelfTest = (() => {
         ok('Data', 'backup without scores uses the original Sporty’s scores', n.scores[0] === TOPICS[0].score);
       }
       {
+        /* data saved when the app had 26 topics: the two added later come in at the end, nothing else moves */
+        const old = {
+          statuses: TOPICS.slice(0, 26).map(() => 'Very Comfortable'),
+          scores: TOPICS.slice(0, 26).map((_, i) => 50 + i),
+          events: [{ date: '2026-10-01', topic: 25, kind: 'study', score: 90 }],
+        };
+        const n = normalize(old);
+        ok(
+          'Data',
+          'a backup from before the new topics keeps its 26 and gets Approach and Landing, Takeoff and Climb at the end',
+          n &&
+            n.statuses.length === TOPICS.length &&
+            n.statuses[25] === 'Very Comfortable' &&
+            n.statuses[26] === 'Todo' &&
+            n.scores[25] === 75 &&
+            n.scores[26] === null &&
+            n.scores[27] === null &&
+            n.events.length === 1 &&
+            n.events[0].topic === 25,
+          n && [n.statuses.length, n.statuses[26], n.scores[26]]
+        );
+        ok('Data', 'the backup object itself is not changed', old.statuses.length === 26);
+        ok(
+          'Data',
+          'a list longer than the topics is still rejected',
+          normalize({ statuses: TOPICS.concat(TOPICS).map(t => t.status), events: [] }) === null
+        );
+      }
+      {
         fixture([{ date: D(0), topic: 1, kind: 'study', score: 70 }]);
         const round = normalize(JSON.parse(JSON.stringify(state)));
         const canon = o =>
@@ -19622,7 +19844,7 @@ const SelfTest = (() => {
       state.scores = TOPICS.map(() => 50);
       state.scores[18] = 100;
       {
-        const w = 158 / 1058;
+        const w = 158 / 1125;
         ok(
           'Forecast',
           'Weather at 100% (just studied) raises μ by its weight × 50%',
@@ -19636,7 +19858,7 @@ const SelfTest = (() => {
       {
         const f = forecast(),
           R = recall(10, 2),
-          w = 158 / 1058;
+          w = 158 / 1125;
         ok(
           'Forecast',
           'recall decay pulls the topic toward guessing: score × recall + 1/3 × (1 − recall)',
@@ -19760,8 +19982,8 @@ const SelfTest = (() => {
         );
         ok(
           'Plan',
-          'each topic shows the exam-day questions at stake = 60 × n / 1,058 × (1 − p on exam day)',
-          P.items.filter(x => x.kind === 'topic' && x.n).every(x => near(x.stake, ((60 * x.n) / 1058) * (1 - x.pExam)))
+          'each topic shows the exam-day questions at stake = 60 × n / 1,125 × (1 − p on exam day)',
+          P.items.filter(x => x.kind === 'topic' && x.n).every(x => near(x.stake, ((60 * x.n) / 1125) * (1 - x.pExam)))
         );
       }
       ok(
@@ -20358,10 +20580,10 @@ const SelfTest = (() => {
         const d = heatData('3m');
         ok(
           'Heat map',
-          '3M = 13 weekly periods ending today; all 26 topics, coldest first, no history last',
+          '3M = 13 weekly periods ending today; all topics, coldest first, no history last',
           d.ends.length === 13 &&
             d.ends[12] === T &&
-            d.rows.length === 26 &&
+            d.rows.length === TOPICS.length &&
             d.rows[0].i === 5 &&
             d.rows[25].cells.every(c => c === null)
         );
@@ -21164,12 +21386,24 @@ const Boot = (() => {
    Moves a few existing elements to where the new design wants them; their code and ids stay the same:
      · the "next up" bar (with focus mode and its stopwatch behind it) goes into the header, so it is also there on
        tablets and computers (it was a phones-only bar at the bottom). On phones the CSS still floats it at the bottom,
-       above the tab bar.                                                                                          */
+       above the tab bar.
+     · the page's scroll padding follows the header's height, so nothing scrolls into view underneath it.                                                                                          */
 (() => {
   const bar = $('#nowBar'),
     tools = $('header.top .tools');
   if (bar && tools) tools.parentNode.insertBefore(bar, tools);
   if (typeof renderNowBar === 'function') renderNowBar();
+  /* anything scrolled into view (a focused card, a jump to a section) stops below the header that stays on top: the
+     scroll padding follows the header's real height (it wraps to 2–3 rows on tablets and in longer languages) */
+  const head = $('header.top');
+  if (head && typeof ResizeObserver === 'function') {
+    const fit = () => {
+      const sticky = getComputedStyle(head).position === 'sticky';
+      document.documentElement.style.scrollPaddingTop = sticky ? Math.ceil(head.offsetHeight + 8) + 'px' : '';
+    };
+    new ResizeObserver(fit).observe(head);
+    fit();
+  }
 })();
 </script>
 </body>

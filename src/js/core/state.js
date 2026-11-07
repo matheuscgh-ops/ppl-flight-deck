@@ -1,8 +1,20 @@
 /* ===== module AppState (js/core/state.js) =====
-   public: normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs, normOrder
+   public: normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs, normOrder, asaShort, asaLong
    shared state (getter/setter): embedded, state, loadedFromFile, lang, shown, sel, mKind, prevIds */
 const AppState = (() => {
+  /* data saved before topics were added (26 of them) gets the new ones at the end, with their starting status and no
+     score; a list longer than the app's topics is not ours */
+  const OLD_TOPIC_COUNT = 26;
+  const padTopics = (arr, fill) =>
+    Array.isArray(arr) && arr.length >= OLD_TOPIC_COUNT && arr.length < TOPICS.length
+      ? arr.concat(TOPICS.slice(arr.length).map(fill))
+      : arr;
   function normalize(o) {
+    if (o && typeof o === 'object' && Array.isArray(o.statuses) && o.statuses.length < TOPICS.length) {
+      const n = o.statuses.length;
+      o = { ...o, statuses: padTopics(o.statuses, x => x.status) };
+      if (Array.isArray(o.scores) && o.scores.length === n) o.scores = padTopics(o.scores, () => null);
+    }
     if (
       !o ||
       typeof o !== 'object' ||
@@ -139,6 +151,7 @@ const AppState = (() => {
     gridStart: v => [5, 6, 7, 8, 9].includes(v),
     deepMin: v => [0, 30, 45, 60, 90].includes(v),
     reflect: v => typeof v === 'boolean',
+    asa: v => typeof v === 'boolean',
   };
   const RANGE_OK = {
     sr: ['3d', '7d', '2w', '1m', '3m', '6m', '1y', 'all'],
@@ -278,6 +291,18 @@ const AppState = (() => {
       : v;
   };
   const tf = (k, n) => t(k).replace('{n}', n);
+  /* the matching ASA Prepware chapter of topic i (Settings › Display › ASA), short for cards and plan rows,
+     long (with the chapters it also shows up in) for the log dialog and focus mode; '' when off */
+  const asaShort = i => {
+    const a = pref('asa') && asaOf(i);
+    return a ? t('asaShort').replace('{c}', a.main) : '';
+  };
+  const asaLong = i => {
+    const a = pref('asa') && asaOf(i);
+    if (!a) return '';
+    const also = a.also.length ? (lang === 'ja' ? '' : ' ') + t('asaAlso').replace('{c}', a.also.join(', ')) : '';
+    return t('asaLong').replace('{c}', a.main) + also;
+  };
   const label = s => t('labels')[STATUS.indexOf(s)];
   const fmt = (n, d = 0) =>
     new Intl.NumberFormat(LOCALE[lang], { minimumFractionDigits: d, maximumFractionDigits: d }).format(n);
@@ -409,6 +434,7 @@ const AppState = (() => {
       },
     ],
   });
-  return { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs, normOrder };
+  return { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs, normOrder, asaShort, asaLong };
 })();
-const { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs, normOrder } = AppState;
+const { normalize, local, t, tf, label, fmt, save, toast, commit, pref, normPrefs, normOrder, asaShort, asaLong } =
+  AppState;

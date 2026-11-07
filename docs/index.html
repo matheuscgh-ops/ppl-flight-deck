@@ -192,7 +192,7 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
   <p class="intro">A snapshot of right now: where you are in the question bank, what to study today and how each topic's memory is holding up.</p>
 
   <h3>Question bank progress</h3>
-  <p>The bar splits the 1,058 questions across the Kanban lists. Each color is a list, and the legend shows the questions and percentage in each one.</p>
+  <p>The bar splits the 1,125 questions across the Kanban lists. Each color is a list, and the legend shows the questions and percentage in each one.</p>
   <figure><img src="img/en/dash-progress.jpg" alt="Question bank progress bar" loading="lazy"></figure>
 
   <h3>Countdown, practice tests and volume</h3>
@@ -206,6 +206,8 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
   <h3 id="kanban">Kanban and sessions</h3>
   <p>One card per topic, in 5 lists: <span class="ui">To Do</span>, <span class="ui">Doing</span>, <span class="ui">Not Comfortable</span>, <span class="ui">Very Comfortable</span> and <span class="ui">To Review</span>. The number on each card is your last score on that topic.</p>
   <figure><img src="img/en/dash-board.jpg" alt="Kanban with the five lists" loading="lazy"></figure>
+  <p><b>28 topics:</b> the cards follow the Sporty's categories, including <i>Approach and Landing</i> and <i>Takeoff and Climb</i> (added later; data saved before keeps everything and gets them in To Do).</p>
+  <p><b>ASA Prepware:</b> if you also practice in ASA's Prepware app, each topic shows the Prepware chapter with its questions, such as <span class="ui">ASA · Aerodynamics</span>: under the card's name, in the plan, in focus mode and, with the chapters it also appears in, in the log dialog. Prepware has 10 broad chapters without the Sporty's topics inside, so this is a pointer to where to look, not a one-to-one match. Turn it off in <span class="ui">Settings › Display</span>. It never changes your statistics.</p>
   <p><b>Move a card:</b> drag it with the mouse, or press and hold it on a touch screen. The other cards slide aside to open a gap, and the card lands exactly where you drop it: in another list or in a new place in the same list. The order is saved and syncs. Every change shows a notice with <span class="ui">Undo</span>.</p>
   <p><b>Done today:</b> point at a card and a circle appears left of its name; tap it and it turns into a green check, like Trello. On a phone the circle is always there. The check clears itself the next day, and a topic checked today also counts as done in today's plan. It never changes your statistics.</p>
   <p><b>Log a session:</b></p>
@@ -424,7 +426,7 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
       <tr><td>Deep work</td><td>Block minutes per topic (or off).</td><td>45 min</td></tr>
       <tr><td>Error review</td><td>The error-review item at the end of each plan block.</td><td>on</td></tr>
       <tr><td>Default chart intervals</td><td>The starting interval of each chart.</td><td>—</td></tr>
-      <tr><td>Display</td><td>Automatic carousels and numbers on the heat map.</td><td>on</td></tr>
+      <tr><td>Display</td><td>Automatic carousels, numbers on the heat map, and the matching ASA Prepware chapter on each topic.</td><td>on (ASA off in the demo)</td></tr>
       <tr><td>Your data</td><td>Backup JSON, Import, Save HTML, Clear examples and Reset everything (asks first, can be undone).</td><td>—</td></tr>
     </tbody>
   </table></div>
@@ -477,7 +479,7 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
 <div class="formula">memory            R(t) = 1 / (1 + t / 9S)        S = stability, grows after good sessions
 next review       when R falls to the review point  (90% → S days)
 right answer      p = score × R + 1/3 × (1 − R)   (forgetting = guessing among 3)
-bank model        μ = Σ (topic questions / 1,058) × p
+bank model        μ = Σ (topic questions / 1,125) × p
 forecast          bank μ blended with the last 3 practice tests (10-day half-life)
 pass / goal       beta-binomial over 60 questions: P(X ≥ 42) and P(X ≥ 51)
 plan order        (1 − p on exam day) × urgency ÷ minutes per question
@@ -509,7 +511,7 @@ S  stability: how many days it takes for R to fall to 90%</div>
   <p>FAA questions have 3 options. If you remember a topic you answer at your last score's level; if you have forgotten it, you still get about 1 in 3 right by guessing. So the chance of a right answer on a topic is a mix of the two:</p>
 <div class="formula">p = score × R + 1/3 × (1 − R)</div>
   <p>The test draws its 60 questions roughly in proportion to how many questions each topic has in the bank, so the expected score is the weighted average:</p>
-<div class="formula">μ = Σ (questions in topic / 1,058) × p</div>
+<div class="formula">μ = Σ (questions in topic / 1,125) × p</div>
   <p><b>Chance to pass.</b> The number of right answers out of 60 follows a binomial distribution if every question has the same chance μ. But μ is itself an estimate, and the app knows how far off it has been: its error against your real practice tests. So it uses a <b>beta-binomial</b> distribution, which spreads the chances by that uncertainty instead of pretending μ is exact. Passing is 42 of 60 (70%), and the default goal is 51 of 60 (85%):</p>
 <div class="formula">chance to pass = P(X ≥ 42)        chance of the goal = P(X ≥ 51)        X ~ BetaBinomial(60, μ)</div>
   <p><b>"If you stop reviewing"</b> runs the same calculation on exam day, letting every curve decay with no more sessions. The gap between today's score and that line is what your reviews are protecting.</p>

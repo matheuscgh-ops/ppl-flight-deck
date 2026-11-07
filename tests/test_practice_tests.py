@@ -59,7 +59,9 @@ with sync_playwright() as p:
             if mode == 'desktop':
                 check(f'{tag}: dashboard still fits one screen', ev('document.documentElement.scrollHeight') == H, ev('document.documentElement.scrollHeight'))
                 ch = ev("document.querySelector('.cal').getBoundingClientRect().height")
-                check(f'{tag}: calendar keeps its full height (no footer squeezing it)', ch >= (480 if f == 'index' else 440), ch)
+                # 440 px holds the 6 weeks of the month without cutting a row (the board above grows with the longest list,
+                # which got 2 more cards with the 28 topics)
+                check(f'{tag}: calendar keeps its full height (no footer squeezing it)', ch >= 440, ch)
                 check(f'{tag}: top row height unchanged (≈134 px)', ev("document.querySelector('.toprow').getBoundingClientRect().height") <= 140, ev("document.querySelector('.toprow').getBoundingClientRect().height"))
                 cal = ev("Math.max(...[...document.querySelectorAll('.cell .evs, .cell')].map(c=>c.scrollWidth-c.clientWidth))")
                 check(f'{tag}: calendar cells do not overflow sideways', cal <= 1, cal)
