@@ -98,6 +98,7 @@ with sync_playwright() as p:
             dash()
             open_card(18)
             if not pg.is_visible('#modalbg'):   # say where it went (CI log) before the next step fails
+                print('DEBUG errors', errs, 'modalbg hidden:', ev("document.getElementById('modalbg').hidden"), 'active:', ev("document.activeElement&&document.activeElement.className"), flush=True)
                 print('DEBUG', tag, ev("(()=>{const e=document.querySelector('.task[data-topic=\"18\"] .tname'),r=e.getBoundingClientRect(),h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return JSON.stringify({r:[r.left,r.top,r.width,r.height],hit:h&&(h.className||h.tagName),view:curView,scrollY,ih:innerHeight,lane:document.querySelector('.task[data-topic=\"18\"]').closest('.lane')&&document.querySelector('.task[data-topic=\"18\"]').closest('.lane').dataset.status})})()"), flush=True)
             check(f'{tag}: tapping the card opens the log dialog as a review', pg.is_visible('#modalbg'))
             pg.fill('#mScore', '90'); tap('#mSave'); pg.wait_for_timeout(350)
