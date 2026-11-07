@@ -162,9 +162,9 @@ def _(c):
     check(status(c, 4) == 'Doing', 'older file overwrote newer browser data')
 
 # ---------------------------------------------------------------- progress bar
-@T('Progress bar', 'segments match question counts (27.7 / 9.1 / 20.0 / 43.2 / 0.0 %)')
+@T('Progress bar', 'segments match question counts (32.0 / 8.5 / 18.8 / 40.6 / 0.0 %)')
 def _(c):
-    w = [round(x, 1) for x in track_pct(c)]; check(w == [27.7, 9.1, 20.0, 43.2, 0.0], w)
+    w = [round(x, 1) for x in track_pct(c)]; check(w == [32.0, 8.5, 18.8, 40.6, 0.0], w)
     check(abs(sum(track_pct(c)) - 100) < 0.01, 'sum')
     check(c.pg.inner_text('#total').replace(' ', ',') in ('1,125 questions',), c.pg.inner_text('#total'))
 
@@ -172,7 +172,7 @@ def _(c):
 def _(c):
     drag(c, '.task[data-topic="18"]', 0)
     w = [round(x, 1) for x in track_pct(c)]; check(w[0] == round((360 + 158) / 1125 * 100, 1) and w[3] == round((457 - 158) / 1125 * 100, 1), w)
-    check('451 q' in c.pg.inner_text('.lg[data-i="0"]'), c.pg.inner_text('.lg[data-i="0"]'))
+    check('518 q' in c.pg.inner_text('.lg[data-i="0"]'), c.pg.inner_text('.lg[data-i="0"]'))
 
 @T('Progress bar', 'moving cards does not change the average score')
 def _(c):

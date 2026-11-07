@@ -71,7 +71,7 @@ with sync_playwright() as p:
             check(f'{tag}: drop at the end of a list', want == [11, 5, 8, 2], want)
             pg.reload(); pg.wait_for_timeout(500); ev("window.pplTour&&pplTour.end()"); ev("goView('dash')"); pg.wait_for_timeout(150)
             check(f'{tag}: the order is saved (same after reload)', ev(LANE + "(1)") == want)
-            check(f'{tag}: the order goes into the backup and survives a broken one', ev("normalize(JSON.parse(JSON.stringify(state))).order.join()") == ev("state.order.join()") and ev("normalize({...JSON.parse(JSON.stringify(state)),order:[1,1,2]}).order.length") == 26)
+            check(f'{tag}: the order goes into the backup and survives a broken one', ev("normalize(JSON.parse(JSON.stringify(state))).order.join()") == ev("state.order.join()") and ev("normalize({...JSON.parse(JSON.stringify(state)),order:[1,1,2]}).order.length") == ev("TOPICS.length"))
             # phones: a card can never disappear. Press and hold, then lift without moving → the card is back where it was
             if touch:
                 st = ev("""(async()=>{const c=document.querySelector('.task[data-topic="5"]');c.scrollIntoView({block:'center',inline:'center'});await new Promise(r=>setTimeout(r,250));
