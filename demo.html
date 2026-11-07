@@ -2443,6 +2443,16 @@ html {
   .tmeta .last {
     display: none;
   }
+  /* the ASA chapter takes its own line under the name (the row keeps the name and the score) */
+  .task:has(.tasa) {
+    flex-wrap: wrap;
+    row-gap: 2px;
+  }
+  .tasa {
+    order: 3;
+    flex: 1 0 100%;
+    margin-top: 0;
+  }
   .lanedots {
     display: flex;
     justify-content: center;
