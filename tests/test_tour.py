@@ -46,6 +46,7 @@ with sync_playwright() as p:
                 if not (h[0] <= vis[0] + 1 and h[1] <= vis[1] + 1 and h[2] >= vis[2] - 1 and h[3] >= vis[3] - 5): bad.append((k, 'highlight misses target', h, vis))
         check(f'{tag}: every step highlights its element and keeps the card on screen', not bad, bad)
         # the tour scrolls by itself: start each step from the far end of the page, then the element must be visible and not under the card
+        # (above it, or below it when it is fixed at the bottom of the screen, like the tab bar on phones)
         hidden = []
         for k in range(n):
             ev("window.scrollTo(0,document.documentElement.scrollHeight)"); pg.wait_for_timeout(80)
@@ -54,7 +55,7 @@ with sync_playwright() as p:
               const vis=Math.max(0,Math.min(hr.bottom,innerHeight)-Math.max(hr.top,0))/Math.max(1,Math.min(hr.height,innerHeight));
               const freeBot=innerWidth<=640?c.top:innerHeight,fits=innerWidth<=640?hr.height<=freeBot-8:hr.height+c.height+24<=innerHeight;
               const ov=Math.max(0,Math.min(hr.bottom,c.bottom)-Math.max(hr.top,c.top))*Math.max(0,Math.min(hr.right,c.right)-Math.max(hr.left,c.left))/Math.max(1,hr.width*Math.min(hr.height,innerHeight));
-              return {vis:+vis.toFixed(2),covered:+ov.toFixed(2),fits,topOk:hr.top>=-1&&hr.top<freeBot-40}})()""")
+              return {vis:+vis.toFixed(2),covered:+ov.toFixed(2),fits,topOk:(hr.top>=-1&&hr.top<freeBot-40)||(hr.top>=c.bottom&&hr.bottom<=innerHeight)}})()""")
             if r and (r['vis'] < .9 and r['fits'] or (r['fits'] and r['covered'] > .05) or not r['topOk']): hidden.append((k, r))
         check(f'{tag}: the tour scrolls by itself so each highlighted element is visible and not under the card', not hidden, hidden)
         check(f'{tag}: page never wider than the screen during the tour', ev('document.documentElement.scrollWidth') == W)

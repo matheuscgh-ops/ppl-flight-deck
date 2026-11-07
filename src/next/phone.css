@@ -135,13 +135,13 @@
   }
   .nx .brand {
     font-size: 18px !important;
-    gap: 8px;
     max-width: 100%;
     box-sizing: border-box;
   }
   .nx .brand::before {
     width: 20px;
     height: 21px;
+    margin-right: 8px;
   }
 }
 @media (max-width: 640px) {
@@ -152,5 +152,22 @@
   .nx .tools #syncChip {
     flex: 0 0 auto;
     padding: 4px 12px !important;
+  }
+}
+@media (max-width: 380px) {
+  /* small phones: a smaller name so it clears the guide, settings and language buttons */
+  .nx .brand {
+    font-size: 16px !important;
+  }
+  .nx .brand::before {
+    width: 17px;
+    height: 18px;
+    margin-right: 6px;
+  }
+}
+@media (max-width: 640px) {
+  /* the guided tour's panel docks just above the tab bar, so a step can point at a tab (and the tab can be tapped) */
+  .nx .tour-card {
+    bottom: calc(88px + env(safe-area-inset-bottom, 0px));
   }
 }

@@ -96,7 +96,7 @@ def build_page(demo=False, next_design=False):
     css = '\n'.join(read('styles', name) for name in STYLES)
     js = build_script(demo)
     if next_design:
-        css = next_css(css) + '\n' + '\n'.join(read('next', name) for name in NEXT_STYLES)
+        css = next_css(css) + '\n' + next_font() + '\n' + '\n'.join(read('next', name) for name in NEXT_STYLES)
         js = next_js(js) + '\n' + read('next', 'layout.js')
     for marker, content in (('@@CSS@@', css), ('@@JS@@', js)):
         if page.count(marker) != 1:
@@ -146,6 +146,18 @@ def apply_markup(page, pairs):
 # next_css/next_js map the palette (and type weights) of the existing styles, src/next/*.css restyles the components,
 # src/next/layout.js moves a few elements (the next-up bar into the header, so desktops get it too).
 NEXT_STYLES = ['tokens.css', 'base.css', 'chrome.css', 'board.css', 'views.css', 'dialogs.css', 'phone.css']
+
+
+def next_font():
+    """Atkinson Hyperlegible Next (variable weight, Latin subset, SIL Open Font License: src/next/fonts/OFL.txt) embedded in
+    the page, so the apps work offline and never call a font server"""
+    import base64
+    with open(os.path.join(SRC, 'next', 'fonts', 'atkinson-hyperlegible-next-latin-wght-normal.woff2'), 'rb') as f:
+        data = base64.b64encode(f.read()).decode()
+    return ("@font-face{font-family:'Atkinson Hyperlegible Next';font-style:normal;font-display:swap;font-weight:200 800;"
+            f"src:url(data:font/woff2;base64,{data}) format('woff2');"
+            "unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,"
+            "U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}")
 
 
 def _hsl(h):
@@ -219,10 +231,7 @@ NEXT_MARKUP = [
      '<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 64 64\'%3E%3Crect width=\'64\' height=\'64\' rx=\'14\' fill=\'%23eef1f6\'/%3E%3Csvg x=\'9\' y=\'9\' width=\'46\' height=\'46\' viewBox=\'100 40 920 945\'%3E%3Cpath fill=\'%2321365c\' fill-rule=\'evenodd\' d=\'M560 48 1015 980 560 812 105 980ZM558 205 558 742 240 858Z\'/%3E%3C/svg%3E%3C/svg%3E">'),
     ('<meta name="viewport" content="width=device-width, initial-scale=1">',
      '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
-     '<meta name="theme-color" content="#12171e">\n'
-     '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
-     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
-     '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400..800&display=swap">'),
+     '<meta name="theme-color" content="#12171e">'),
 ]
 
 

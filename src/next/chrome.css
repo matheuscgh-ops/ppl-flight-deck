@@ -197,15 +197,16 @@
   }
 }
 
-/* the logo (the navigation arrow) before the name; drawn in the text colour so it reads on the dark header */
+/* the logo (the navigation arrow) before the name; drawn in the text colour so it reads on the dark header.
+   The name stays plain inline text (a flex box would split "PPL / PROGRESS" into separate lines for screen readers). */
 .nx .brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
+  white-space: nowrap;
 }
 .nx .brand::before {
   content: '';
-  flex: none;
+  display: inline-block;
+  vertical-align: -0.2em;
+  margin-right: 10px;
   width: 24px;
   height: 25px;
   background: var(--ink);
