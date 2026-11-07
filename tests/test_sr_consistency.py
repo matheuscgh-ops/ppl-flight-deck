@@ -74,7 +74,9 @@ with sync_playwright() as p:
                 """tap a card the way a person does: on a phone, swipe to its list first and let the list settle
                 (the lists snap into place; a tap while one is still moving can miss)"""
                 ev(f"(()=>{{const c=document.querySelector('.task[data-topic=\"{i}\"]');if(typeof goLane==='function'&&phoneMQ.matches)goLane(STATUS.indexOf(state.statuses[{i}]),false);c.scrollIntoView({{block:'center',inline:'center'}})}})()")
-                pg.wait_for_timeout(300)
+                # wait until nothing scrolls any more (a touch during a scroll only stops it, like on any phone)
+                pg.wait_for_function("""(()=>{const l=document.querySelector('.lanes'),k=l.scrollLeft+','+scrollY;
+                  if(window.__st===k){window.__n=(window.__n||0)+1}else{window.__st=k;window.__n=0}return window.__n>=6})""", polling=50, timeout=5000)
                 tap(f'.task[data-topic="{i}"] .tname'); pg.wait_for_timeout(250)
 
             # ---------- 1) known history ----------
