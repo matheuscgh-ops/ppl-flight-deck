@@ -1,5 +1,6 @@
 /* ===== module Config (js/core/config.js) =====
-   public: TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE, DOCS_URL, docsUrl
+   public: TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE, DOCS_URL, docsUrl, ASA_CHAPTERS,
+           asaOf
    live values (getters on window, they follow your Settings): GOAL */
 const Config = (() => {
   const TEMPLATE = '<!doctype html>\n' + document.documentElement.outerHTML;
@@ -40,7 +41,62 @@ const Config = (() => {
     { name: 'Maneuvering During Slow Flight', q: 7, score: 75, status: 'Doing' },
     { name: 'Power-Off Stalls', q: 17, score: 80, status: 'Doing' },
     { name: 'Spin Awareness', q: 7, score: 100, status: 'Todo' },
+    /* Sporty's "Takeoffs, Landings, and Go-Arounds": added later, so they go at the end (saved data and every event point
+       at topics by position; state.normalize fills them in for data saved with the first 26) */
+    { name: 'Approach and Landing', q: 48, score: null, status: 'Todo' },
+    { name: 'Takeoff and Climb', q: 19, score: null, status: 'Todo' },
   ];
+  /* ASA's Prepware app (Private Pilot Airplane) groups the FAA questions in 10 broad chapters, without the Sporty's topics
+     inside them. ASA_OF gives, for each topic above (same order), its main chapter and the ones it also shows up in, so a
+     topic of the plan can be found there. Chapter names stay as in the Prepware app (they are not translated). */
+  const ASA_CHAPTERS = [
+    { name: 'Aerodynamics', q: 33 },
+    { name: 'Aircraft Systems', q: 52 },
+    { name: 'Flight Instruments', q: 59 },
+    { name: 'Aircraft Performance', q: 73 },
+    { name: 'Regulations', q: 172 },
+    { name: 'Airspace and Airport Operations', q: 144 },
+    { name: 'Enroute Flight and Navigation', q: 65 },
+    { name: 'Weather', q: 60 },
+    { name: 'Weather Service', q: 42 },
+    { name: 'Human Factors', q: 36 },
+  ];
+  const [AERO, SYS, INST, PERF, REGS, AIRSPACE, NAV, WX, WXS, HF] = ASA_CHAPTERS.map((_, k) => k);
+  const ASA_OF = [
+    [AIRSPACE], // Communications, Lights and Runways
+    [AIRSPACE], // Traffic Patterns
+    [AERO], // Emergency Approach and Landing
+    [AERO], // Emergency Descent
+    [REGS], // Emergency Equipment and Survival Gear
+    [SYS, INST], // Systems and Equipment Malfunctions
+    [NAV], // Navigation Systems and Radar Services
+    [NAV], // Pilotage and Dead Reckoning
+    [HF, REGS], // Night Preparation
+    [AERO], // Ground Reference Maneuvers
+    [AERO], // Steep Turns
+    [REGS], // Airworthiness Requirements
+    [NAV, PERF], // Cross-Country Flight Planning
+    [HF], // Human Factors
+    [AIRSPACE, REGS], // National Airspace System
+    [SYS, INST], // Operation of Systems
+    [PERF, AERO], // Performance and Limitations
+    [REGS], // Pilot Qualifications
+    [WX, WXS], // Weather Information
+    [SYS], // Before Takeoff Check
+    [HF], // Flight Deck Management
+    [REGS, HF], // Preflight Assessment
+    [AIRSPACE], // Taxiing
+    [AERO], // Maneuvering During Slow Flight
+    [AERO], // Power-Off Stalls
+    [AERO], // Spin Awareness
+    [PERF, AERO], // Approach and Landing
+    [PERF, AERO], // Takeoff and Climb
+  ];
+  /* { main, also: [...] } chapter names for topic i, or null */
+  const asaOf = i => {
+    const c = ASA_OF[i];
+    return c ? { main: ASA_CHAPTERS[c[0]].name, also: c.slice(1).map(k => ASA_CHAPTERS[k].name) } : null;
+  };
   const STATUS = ['Todo', 'Doing', 'Not Comfortable', 'Very Comfortable', 'To review'];
   const COLORS = ['#8590a2', '#579dff', '#f5a524', '#4bce97', '#9f8fef'];
   /* darker variants for tags drawn on the light "active day" background */
@@ -62,6 +118,7 @@ const Config = (() => {
     gridStart: 6, // first hour of the plan grid
     deepMin: 45, // minutes of block per topic (deep work); 0 = no limit
     reflect: true, // an error-review item closes each study block in a plan
+    asa: !BUILD.demo, // show the matching ASA Prepware chapter on each topic (off in the demo)
     ranges: {}, // default chart intervals
   };
   /* the goal follows Settings (read at the moment it is used) */
@@ -70,6 +127,36 @@ const Config = (() => {
   /* the user guide on GitHub Pages: English is index.html, the other languages have their own page */
   const DOCS_URL = 'https://matheuscgh-ops.github.io/ppl-flight-deck/docs/';
   const docsUrl = l => DOCS_URL + ({ pt: 'pt.html', ja: 'ja.html' }[l] || '');
-  return { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE, DOCS_URL, docsUrl };
+  return {
+    TEMPLATE,
+    STORE,
+    fitMQ,
+    fitH,
+    TOPICS,
+    STATUS,
+    COLORS,
+    DEF_SET0,
+    PREF_DEF,
+    LOCALE,
+    DOCS_URL,
+    docsUrl,
+    ASA_CHAPTERS,
+    asaOf,
+  };
 })();
-const { TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE, DOCS_URL, docsUrl } = Config;
+const {
+  TEMPLATE,
+  STORE,
+  fitMQ,
+  fitH,
+  TOPICS,
+  STATUS,
+  COLORS,
+  DEF_SET0,
+  PREF_DEF,
+  LOCALE,
+  DOCS_URL,
+  docsUrl,
+  ASA_CHAPTERS,
+  asaOf,
+} = Config;

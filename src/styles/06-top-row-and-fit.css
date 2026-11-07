@@ -118,6 +118,10 @@
     gap: 8px;
     padding: 5px 10px;
   }
+  /* one-line cards have no room for the ASA chapter: it is in the card's tooltip and in the log dialog */
+  .tasa {
+    display: none;
+  }
   .tname {
     flex: 1;
     min-width: 0;

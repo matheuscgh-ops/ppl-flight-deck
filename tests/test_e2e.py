@@ -43,9 +43,9 @@ def status(c, i): return c.ev(f'state.statuses[{i}]')
 def track_pct(c): return c.ev("[...document.querySelectorAll('#track .chunk')].map(x=>parseFloat(x.style.width))")
 
 # ---------------------------------------------------------------- load & persistence
-@T('Load', 'opens with the real data: 26 cards, 6 sessions, 3 practice tests, no example badge')
+@T('Load', 'opens with the real data: 28 cards, 6 sessions, 3 practice tests, no example badge')
 def _(c):
-    check(c.ev("document.querySelectorAll('.task').length") == 26, 'cards')
+    check(c.ev("document.querySelectorAll('.task').length") == 28, 'cards')
     check(c.ev('state.events.length') == 6 and c.ev('state.tests.length') == 3, 'history')
     check(not c.pg.is_visible('#demoBadge') and not c.pg.is_visible('#clearDemo'), 'demo UI hidden')
 
@@ -96,7 +96,7 @@ def _(c):
     with c.pg.expect_download() as d: c.pg.evaluate("document.getElementById('backup').click()")
     data = json.load(open(d.value.path()))
     for k in ['statuses', 'scores', 'events', 'tests', 'deadline', 'lang']: check(k in data, 'missing ' + k)
-    check(len(data['statuses']) == 26 and len(data['events']) == 6 and len(data['tests']) == 3, 'counts')
+    check(len(data['statuses']) == 28 and len(data['events']) == 6 and len(data['tests']) == 3, 'counts')
     check(d.value.suggested_filename.startswith('PPL_backup_') and d.value.suggested_filename.endswith('.json'), d.value.suggested_filename)
 
 @T('Files', 'Import restores a backup exactly (fresh browser)')
@@ -137,7 +137,7 @@ def _(c):
     html = open(path).read(); check('"tests":[' in html and html.count('<script id="embedded" type="application/json">') == 1, 'embedded state')
     c2ctx = c.browser.new_context(); p2 = c2ctx.new_page(); errs = []; p2.on('pageerror', lambda e: errs.append(str(e)))
     p2.goto('file://' + path); p2.wait_for_timeout(300)
-    ok = p2.evaluate('state.statuses[7]') == 'To review' and p2.evaluate('state.scores[9]') == 91 and p2.evaluate("document.querySelectorAll('.task').length") == 26
+    ok = p2.evaluate('state.statuses[7]') == 'To review' and p2.evaluate('state.scores[9]') == 91 and p2.evaluate("document.querySelectorAll('.task').length") == 28
     c2ctx.close(); check(ok and not errs, errs)
 
 @T('Files', 'Save HTML twice: second copy also works (no nested embedding)')
@@ -166,12 +166,12 @@ def _(c):
 def _(c):
     w = [round(x, 1) for x in track_pct(c)]; check(w == [27.7, 9.1, 20.0, 43.2, 0.0], w)
     check(abs(sum(track_pct(c)) - 100) < 0.01, 'sum')
-    check(c.pg.inner_text('#total').replace(' ', ',') in ('1,058 questions',), c.pg.inner_text('#total'))
+    check(c.pg.inner_text('#total').replace(' ', ',') in ('1,125 questions',), c.pg.inner_text('#total'))
 
 @T('Progress bar', 'dragging Weather (158 q) to To Do updates bar and legend instantly')
 def _(c):
     drag(c, '.task[data-topic="18"]', 0)
-    w = [round(x, 1) for x in track_pct(c)]; check(w[0] == round((293 + 158) / 1058 * 100, 1) and w[3] == round((457 - 158) / 1058 * 100, 1), w)
+    w = [round(x, 1) for x in track_pct(c)]; check(w[0] == round((360 + 158) / 1125 * 100, 1) and w[3] == round((457 - 158) / 1125 * 100, 1), w)
     check('451 q' in c.pg.inner_text('.lg[data-i="0"]'), c.pg.inner_text('.lg[data-i="0"]'))
 
 @T('Progress bar', 'moving cards does not change the average score')
@@ -447,7 +447,7 @@ def _(c):
 def _(c):
     c.pg.click('.tabs button[data-view="sr"]'); c.pg.wait_for_timeout(200)
     check(c.ev("document.querySelectorAll('.srcard').length") == c.ev('srAll().length') == 11, c.ev("document.querySelectorAll('.srcard').length"))
-    check(c.ev("document.getElementById('srAvgChart')") is None and c.ev("document.querySelectorAll('#heatNow .hnt').length") == 26, 'heat map (today) instead of the average chart')
+    check(c.ev("document.getElementById('srAvgChart')") is None and c.ev("document.querySelectorAll('#heatNow .hnt').length") == 28, 'heat map (today) instead of the average chart')
     c.pg.click('#formula summary'); check('R(t) = 1 / (1 + t / (9·S))' in c.pg.inner_text('#formulaBody'), 'formula')
 
 @T('SR analysis tab', 'filters: Due / Not Comfortable / Very Comfortable / To Review')

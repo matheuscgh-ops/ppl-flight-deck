@@ -121,7 +121,7 @@ const PlanWeek = (() => {
                  on one line (name · time) so its name is never cut in half */
               const share = rev ? Math.max(0.28, Math.min(0.5, rev.min / total)) : 0,
                 compact = !tiny && rows * (1 - share) < 2.5;
-              const tip = `${clockOf(it.start)} · ${itemName(it)} · ${sizeOf(it)}${it.kind === 'reflect' ? ' · ' + reflectDetail(it) : ''}`;
+              const tip = `${clockOf(it.start)} · ${itemName(it)} · ${sizeOf(it)}${it.kind === 'reflect' ? ' · ' + reflectDetail(it) : ''}${it.kind === 'topic' && asaShort(it.i) ? '\n' + asaLong(it.i) : ''}`;
               let band = '';
               if (rev) {
                 const rd = itemDone(rev);

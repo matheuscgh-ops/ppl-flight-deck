@@ -1,7 +1,7 @@
 /* ===== module DemoData (demo/state.js) =====
    public: demoState, defaultState */
 const DemoData = (() => {
-  /* DEMO data: about a year of fictional study (all 26 topics) generated with the same spaced-repetition rules the app uses,
+  /* DEMO data: about a year of fictional study (every topic) generated with the same spaced-repetition rules the app uses,
    so the heat map is filled for every interval up to 1Y: reviews at most 3 weeks apart, a two-week break ~5 months ago
    (everything cools, then warms again) and a few topics left alone lately (they cool at the end). */
   function demoState() {
@@ -70,6 +70,8 @@ const DemoData = (() => {
       [24, Y + 12, 62, 77, 'Doing'],
       [7, Y + 9, 48, 63, 'Doing'],
       [25, Y + 16, 58, 76, 'Doing'],
+      [26, Y + 23, 54, 72, 'NC'], // Approach and Landing
+      [27, Y + 18, 62, 88, 'VC', 9], // Takeoff and Climb
     ];
     plan.forEach(([i, start, s0, s1, fin, vc, drop]) => {
       const scoreAt = d => {

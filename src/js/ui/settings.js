@@ -219,6 +219,7 @@ const Settings = (() => {
       section('setDisplayTitle', [
         row('setCarousel', toggle('setCarousel', pref('carousel')), 'setCarouselHint'),
         row('setHeatNums', toggle('setHeatNums', pref('heatNums'))),
+        row('setAsa', toggle('setAsa', pref('asa')), 'setAsaHint'),
       ]),
     ].join('');
     $('#setSync').hidden = BUILD.demo;
@@ -257,6 +258,7 @@ const Settings = (() => {
     else if (id.startsWith('setRange_')) setRange(id.slice(9), v);
     else if (id === 'setCarousel') setPref('carousel', v);
     else if (id === 'setHeatNums') setPref('heatNums', v);
+    else if (id === 'setAsa') setPref('asa', v);
     else if (id === 'setReflect') setPref('reflect', v);
     renderSettings();
   });

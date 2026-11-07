@@ -187,15 +187,15 @@ const SelfTest = (() => {
         const c = counts();
         ok(
           'Progress',
-          'column totals add up to 1,058 questions',
-          c.reduce((a, b) => a + b, 0) === 1058,
+          'column totals add up to 1,125 questions (28 topics)',
+          c.reduce((a, b) => a + b, 0) === 1125,
           c.reduce((a, b) => a + b, 0)
         );
         ok('Progress', 'Very Comfortable = 457 q with the real board', c[3] === 457, c[3]);
         state.statuses = state.statuses.map(() => 'Very Comfortable');
-        ok('Progress', 'all cards Very Comfortable → 100%', counts()[3] === 1058);
+        ok('Progress', 'all cards Very Comfortable → 100%', counts()[3] === 1125);
         state.statuses[18] = 'Todo';
-        ok('Progress', 'moving Weather (158 q) to To Do moves 158 q', counts()[0] === 158 && counts()[3] === 900);
+        ok('Progress', 'moving Weather (158 q) to To Do moves 158 q', counts()[0] === 158 && counts()[3] === 967);
       }
       /* --- streak --- */
       fixture([
@@ -262,6 +262,35 @@ const SelfTest = (() => {
         ok('Data', 'backup without scores uses the original Sporty’s scores', n.scores[0] === TOPICS[0].score);
       }
       {
+        /* data saved when the app had 26 topics: the two added later come in at the end, nothing else moves */
+        const old = {
+          statuses: TOPICS.slice(0, 26).map(() => 'Very Comfortable'),
+          scores: TOPICS.slice(0, 26).map((_, i) => 50 + i),
+          events: [{ date: '2026-10-01', topic: 25, kind: 'study', score: 90 }],
+        };
+        const n = normalize(old);
+        ok(
+          'Data',
+          'a backup from before the new topics keeps its 26 and gets Approach and Landing, Takeoff and Climb at the end',
+          n &&
+            n.statuses.length === TOPICS.length &&
+            n.statuses[25] === 'Very Comfortable' &&
+            n.statuses[26] === 'Todo' &&
+            n.scores[25] === 75 &&
+            n.scores[26] === null &&
+            n.scores[27] === null &&
+            n.events.length === 1 &&
+            n.events[0].topic === 25,
+          n && [n.statuses.length, n.statuses[26], n.scores[26]]
+        );
+        ok('Data', 'the backup object itself is not changed', old.statuses.length === 26);
+        ok(
+          'Data',
+          'a list longer than the topics is still rejected',
+          normalize({ statuses: TOPICS.concat(TOPICS).map(t => t.status), events: [] }) === null
+        );
+      }
+      {
         fixture([{ date: D(0), topic: 1, kind: 'study', score: 70 }]);
         const round = normalize(JSON.parse(JSON.stringify(state)));
         const canon = o =>
@@ -319,7 +348,7 @@ const SelfTest = (() => {
       state.scores = TOPICS.map(() => 50);
       state.scores[18] = 100;
       {
-        const w = 158 / 1058;
+        const w = 158 / 1125;
         ok(
           'Forecast',
           'Weather at 100% (just studied) raises μ by its weight × 50%',
@@ -333,7 +362,7 @@ const SelfTest = (() => {
       {
         const f = forecast(),
           R = recall(10, 2),
-          w = 158 / 1058;
+          w = 158 / 1125;
         ok(
           'Forecast',
           'recall decay pulls the topic toward guessing: score × recall + 1/3 × (1 − recall)',
@@ -457,8 +486,8 @@ const SelfTest = (() => {
         );
         ok(
           'Plan',
-          'each topic shows the exam-day questions at stake = 60 × n / 1,058 × (1 − p on exam day)',
-          P.items.filter(x => x.kind === 'topic' && x.n).every(x => near(x.stake, ((60 * x.n) / 1058) * (1 - x.pExam)))
+          'each topic shows the exam-day questions at stake = 60 × n / 1,125 × (1 − p on exam day)',
+          P.items.filter(x => x.kind === 'topic' && x.n).every(x => near(x.stake, ((60 * x.n) / 1125) * (1 - x.pExam)))
         );
       }
       ok(
@@ -1055,10 +1084,10 @@ const SelfTest = (() => {
         const d = heatData('3m');
         ok(
           'Heat map',
-          '3M = 13 weekly periods ending today; all 26 topics, coldest first, no history last',
+          '3M = 13 weekly periods ending today; all topics, coldest first, no history last',
           d.ends.length === 13 &&
             d.ends[12] === T &&
-            d.rows.length === 26 &&
+            d.rows.length === TOPICS.length &&
             d.rows[0].i === 5 &&
             d.rows[25].cells.every(c => c === null)
         );

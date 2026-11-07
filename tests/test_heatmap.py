@@ -36,7 +36,7 @@ with sync_playwright() as p:
             check(f'{tag}: the 3 spaced-repetition numbers (average recall, due, tracked) are in the heat map header', ev("document.querySelectorAll('#heatPanel #srKpis b').length") == 3)
             # compact heat map: today only
             tiles = ev("[...document.querySelectorAll('#heatNow .hnt')].map(x=>({i:+x.dataset.hi,v:x.querySelector('b').textContent,e:x.classList.contains('empty'),bg:getComputedStyle(x).backgroundColor}))")
-            check(f'{tag}: compact heat map: one tile per topic (26), no past periods on the page, no legend', len(tiles) == 26 and ev("document.querySelectorAll('#statBank .hmc').length") == 0 and not ev("document.getElementById('heatLegend')"), len(tiles))
+            check(f'{tag}: compact heat map: one tile per topic (28), no past periods on the page, no legend', len(tiles) == 28 and ev("document.querySelectorAll('#statBank .hmc').length") == 0 and not ev("document.getElementById('heatLegend')"), len(tiles))
             check(f'{tag}: compact: coldest first, topics without history last', tiles[0]['i'] == 18 and tiles[1]['i'] == 12 and all(x['e'] for x in tiles[2:]), tiles[:3])
             h0 = ev("heatAt(18,todayISO())")
             check(f'{tag}: compact tile = heat today, with its color', tiles[0]['v'] == str(h0['heat']) and ev(f"heatColor({h0['heat']})").replace(' ', '') == tiles[0]['bg'].replace(' ', ''), (tiles[0], h0))
@@ -103,7 +103,7 @@ with sync_playwright() as p:
     # demo data covers every interval
     c = b.new_context(viewport={'width': 1440, 'height': 900}); pg = c.new_page()
     pg.goto('file://' + os.path.join(ROOT, 'demo.html')); pg.wait_for_timeout(500); pg.evaluate("window.pplTour&&pplTour.end()"); pg.evaluate("goView('sr')"); pg.wait_for_timeout(400)
-    check('demo: compact heat map fully covered (26 tiles with a value)', pg.evaluate("document.querySelectorAll('#heatNow .hnt:not(.empty)').length") == 26)
+    check('demo: compact heat map fully covered (28 tiles with a value)', pg.evaluate("document.querySelectorAll('#heatNow .hnt:not(.empty)').length") == 28)
     t0 = pg.evaluate("document.getElementById('scTitle').textContent"); pg.mouse.move(3, 3); pg.wait_for_timeout(3300)
     check('demo: the needs-recall carousel turns every 3 s', pg.evaluate("document.getElementById('scTitle').textContent") != t0, t0)
     pg.hover('#scPanel'); t1 = pg.evaluate("document.getElementById('scTitle').textContent"); pg.wait_for_timeout(3300)
@@ -111,7 +111,7 @@ with sync_playwright() as p:
     pg.mouse.move(3, 3); pg.click('#heatPanel'); pg.wait_for_timeout(200)
     for r in ['2w', '1m', '3m', '6m', '1y']:
         pg.click(f'[data-heatr] [data-hr="{r}"]'); pg.wait_for_timeout(200)
-        check(f'demo: heat map fully covered at {r.upper()} (26 topics, no empty square)', pg.evaluate("document.querySelectorAll('#heatGrid .hmc.empty').length") == 0 and pg.evaluate("document.querySelectorAll('#heatGrid .hmrow:not(.hmhead)').length") == 26)
+        check(f'demo: heat map fully covered at {r.upper()} (28 topics, no empty square)', pg.evaluate("document.querySelectorAll('#heatGrid .hmc.empty').length") == 0 and pg.evaluate("document.querySelectorAll('#heatGrid .hmrow:not(.hmhead)').length") == 28)
     c.close()
     b.close()
 ok = sum(r[1] for r in results)

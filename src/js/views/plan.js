@@ -58,7 +58,7 @@ const PlanView = (() => {
       ? P.items
           .map(
             it =>
-              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}${noteBtn(it)}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' || it.kind === 'reflect' || it.kind === 'notes' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
+              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}${noteBtn(it)}${it.kind === 'topic' && asaShort(it.i) ? `<small class="qasa">${esc(asaShort(it.i))}</small>` : ''}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' || it.kind === 'reflect' || it.kind === 'notes' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
           )
           .join('')
       : `<div class="muted">${esc(t(fromPlan ? 'planRestDay' : 'allClear'))}</div>`;

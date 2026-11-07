@@ -439,3 +439,32 @@ body.dragging * {
     display: inline;
   }
 }
+/* the matching ASA Prepware chapter (Settings › Display): a quiet line under the topic name */
+.tasa {
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9fadbc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.qasa {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.asaline {
+  margin-top: 4px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #9fc2f5;
+}
+.focusasa {
+  margin-top: 6px;
+  font-size: 14px;
+}
