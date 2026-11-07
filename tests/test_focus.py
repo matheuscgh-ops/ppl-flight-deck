@@ -45,7 +45,8 @@ with sync_playwright() as p:
                 return {shown:!b.hidden&&cs.display!=='none',fixed:cs.position,bottom:Math.round(innerHeight-r.bottom),l:r.left,r:r.right,name:document.getElementById('nowName').textContent,meta:document.getElementById('nowMeta').textContent,left:document.getElementById('nowLeft').textContent}})()""")
             if phone:
                 # the new design (demo-next) floats it just above its bottom tab bar
-                lo, hi = (70, 110) if f == 'demo-next' else (0, 40)
+                nx = ev("document.documentElement.classList.contains('nx')")
+                lo, hi = (70, 110) if nx else (0, 40)   # the design floats it above the bottom tab bar
                 check(f'{tag}: the next-up bar is fixed at the bottom with the first item not done', bar['shown'] and bar['fixed'] == 'fixed' and lo <= bar['bottom'] <= hi and bar['l'] >= 0 and bar['r'] <= W and bar['name'] == ev("TOPICS[6].name") and '30 q' in bar['meta'] and bar['left'] == '+2', bar)
                 pad = ev("parseFloat(getComputedStyle(document.querySelector('.app')).paddingBottom)")
                 check(f'{tag}: the page leaves room for the bar (nothing hidden under it)', pad >= 80, pad)
@@ -63,7 +64,7 @@ with sync_playwright() as p:
                 ev("toggleCheck('f1')"); pg.wait_for_timeout(200)
                 check(f'{tag}: unticking brings it back', ev("document.getElementById('nowName').textContent") == ev("TOPICS[6].name"))
             else:
-                if f == 'demo-next':   # the new design puts it in the header on every screen
+                if ev("document.documentElement.classList.contains('nx')"):   # the design puts it in the header
                     check(f'{tag}: the next-up bar is in the header with the first item not done', bar['shown'] and ev("!!document.getElementById('nowBar').closest('header.top')") and bar['name'] == ev("TOPICS[6].name"), bar)
                 else:
                     check(f'{tag}: no next-up bar on larger screens', not bar['shown'], bar)

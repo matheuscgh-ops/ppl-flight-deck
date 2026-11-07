@@ -1,4 +1,4 @@
-"""The new design (demo-next.html): the demo with a design layer on top. Checks that the layer restyles without changing
+"""The design layer (both apps, html.nx). Checks that the layer restyles without changing
 behaviour: unit tests pass, every tab opens from its control, dialogs open and close, nothing overflows, no errors — and
 the design itself: dark slate palette, sentence-case labels, a glass header that stays on top (desktop), a glass tab bar at
 the bottom within thumb reach (phones), the next-up bar above it. Desktop, laptop, iPad mini and iPhone."""
@@ -17,11 +17,11 @@ def check(n, c, d=''): results.append((n, bool(c), str(d)[:300]))
 
 with sync_playwright() as p:
     b = getattr(p, os.environ.get("PPL_BROWSER", "chromium")).launch()
-    for mode, opts in DEV:
-        tag = mode; W = opts['viewport']['width']; H = opts['viewport']['height']; touch = opts.get('has_touch'); phone = W <= 640
+    for f, mode, opts in [(f, m, o) for f in os.environ.get('PPL_FILES', 'index demo').split() for m, o in DEV]:
+        tag = f'{f} · {mode}'; W = opts['viewport']['width']; H = opts['viewport']['height']; touch = opts.get('has_touch'); phone = W <= 640
         c = b.new_context(**opts); pg = c.new_page(); errs = []
         pg.on('pageerror', lambda e: errs.append(str(e))); pg.on('dialog', lambda d: errs.append('browser dialog: ' + d.message) or d.dismiss())
-        pg.goto('file://' + os.path.join(ROOT, 'demo-next.html')); pg.wait_for_timeout(600)
+        pg.goto('file://' + os.path.join(ROOT, f + '.html')); pg.wait_for_timeout(600)
         ev = pg.evaluate
         ev("window.pplTour&&pplTour.end()"); ev("goView('dash')"); pg.wait_for_timeout(200)
         tap = (lambda s: pg.tap(s)) if touch else (lambda s: pg.click(s))
@@ -29,7 +29,8 @@ with sync_playwright() as p:
         check(f'{tag}: the logo (navigation arrow) is in the header and is the tab icon', 'svg' in ev("getComputedStyle(document.querySelector('.brand'),'::before').maskImage || getComputedStyle(document.querySelector('.brand'),'::before').webkitMaskImage") and '21365c' in ev("document.querySelector('link[rel=icon]').getAttribute('href')"))
         r = ev("selfTest()")
         check(f'{tag}: the built-in unit tests all pass', all(x['pass'] for x in r), [x['name'] for x in r if not x['pass']])
-        check(f'{tag}: it is the demo (own storage key, no sync)', ev("BUILD.demo") is True and ev("STORE") == ev("(()=>{return STORE})()") and 'demo' in ev("STORE"), ev("STORE"))
+        if f == 'demo': check(f'{tag}: the demo keeps its own storage key', ev("BUILD.demo") is True and 'demo' in ev("STORE"), ev("STORE"))
+        else: check(f'{tag}: the personal app keeps its storage key (your data)', ev("BUILD.demo") is False and 'demo' not in ev("STORE"), ev("STORE"))
         check(f'{tag}: the design layer is on (html.nx) and the page is dark', ev("document.documentElement.classList.contains('nx')") and ev("getComputedStyle(document.body).backgroundColor") == 'rgb(19, 23, 29)', ev("getComputedStyle(document.body).backgroundColor"))
         check(f'{tag}: section titles are in sentence case (not upper case)', ev("getComputedStyle(document.querySelector('.section')).textTransform") == 'none')
 

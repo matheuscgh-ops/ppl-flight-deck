@@ -2,7 +2,8 @@
 
 Study tracker for the FAA Private Pilot knowledge test. Two single-file apps are built from `src/`:
 `index.html` (personal data, optional GitHub Gist sync) and `demo.html` (fictional data, sync off, guided tour),
-plus `demo-next.html`: the demo with the new design (a palette map in `build.py` + the layer in `src/next/`, classes under `.nx`).
+plus `demo-next.html` (a copy of the demo, kept for an old link). Both apps carry the design layer: a palette map in
+`build.py` + `src/next/` (styles under `html.nx`, `layout.js` moves the next-up bar into the header).
 
 ## Rules
 - Code, comments, tests and internal files in English. Portuguese and Japanese exist only as app translations
@@ -21,7 +22,7 @@ python3 tools/docs_screenshots.py                 # retake the guide's screensho
 cd tests && python3 run_all.py                    # all suites, desktop/laptop/iPad mini/iPhone, both files
 python3 tests/test_plans.py                       # one suite
 PPL_BROWSER=webkit python3 tests/test_mobile.py   # one suite in WebKit (Safari engine); CI runs these on every PR
-PPL_FILES=demo-next python3 tests/test_mobile.py   # a suite against the new design (default: index demo)
+PPL_FILES=demo python3 tests/test_mobile.py        # a suite against one file (default: index demo)
 npx prettier --config .prettierrc.json --write "src/js/**/*.js" src/i18n/translations.js "src/styles/*.css"
 ```
 Test setup (once, macOS): `python3 -m venv .venv && source .venv/bin/activate && pip install playwright && python -m playwright install chromium` (activate `.venv` before running tests).

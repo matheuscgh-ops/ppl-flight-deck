@@ -144,3 +144,13 @@
     height: 21px;
   }
 }
+@media (max-width: 640px) {
+  /* the sync status is a small pill under the name, not a full-width bar */
+  .nx .tools {
+    justify-content: flex-start;
+  }
+  .nx .tools #syncChip {
+    flex: 0 0 auto;
+    padding: 4px 12px !important;
+  }
+}
