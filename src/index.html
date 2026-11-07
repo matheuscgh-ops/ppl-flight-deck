@@ -224,7 +224,7 @@
 
 <div class="modalbg" id="modalbg" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
-    <div class="mhead"><div><h3 id="mTitle"></h3><div class="muted" id="mDesc"></div></div><button class="x" id="mClose" aria-label="Close">×</button></div>
+    <div class="mhead"><div><h3 id="mTitle"></h3><div class="muted" id="mDesc"></div><div class="asaline" id="mAsa" hidden></div></div><button class="x" id="mClose" aria-label="Close">×</button></div>
     <div class="field"><span class="flabel" data-t="activity"></span><div class="seg" id="seg"><button data-kind="study"></button><button data-kind="review"></button><button data-kind="none"></button></div></div>
     <div class="row2 scorerow">
       <div class="field"><span class="flabel" data-t="rightField"></span><div class="rightof"><input type="number" id="mRight" min="0" step="1" inputmode="numeric" aria-label="Right answers"><span data-t="ofWord"></span><input type="number" id="mOf" min="1" step="1" inputmode="numeric" aria-label="Questions"></div></div>
@@ -329,6 +329,7 @@
     <div class="focusbody">
       <h2 id="focusName"></h2>
       <div class="muted focusmeta" id="focusMeta"></div>
+      <div class="asaline focusasa" id="focusAsa" hidden></div>
       <div class="focusring" id="focusRing"><div><b id="focusClock">0:00</b><small id="focusPlanned"></small></div></div>
       <div class="focusbtns"><button type="button" id="focusPause"></button><button type="button" class="primary" id="focusDone"></button></div>
       <button type="button" class="linkbtn" id="focusNotes" hidden></button>

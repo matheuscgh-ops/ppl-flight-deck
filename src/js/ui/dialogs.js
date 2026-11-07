@@ -29,6 +29,8 @@ const Dialogs = (() => {
     $('#mTitle').textContent = x.name;
     $('#mDesc').textContent =
       tf('qn', x.q) + (state.scores[i] == null ? '' : ` · ${state.scores[i]}%`) + ` · ${label(state.statuses[i])}`;
+    $('#mAsa').textContent = asaLong(i);
+    $('#mAsa').hidden = !asaLong(i);
     $('#mScore').value = state.scores[i] ?? '';
     /* right answers of the questions planned today (editable); typing them fills the score */
     $('#mRight').value = '';

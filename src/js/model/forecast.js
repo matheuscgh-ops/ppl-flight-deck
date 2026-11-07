@@ -5,7 +5,7 @@ const Forecast = (() => {
   /* ================= EXAM FORECAST (mechanical) =================
    p_i  = chance of answering a question of topic i right
         = last score_i × recall_i + 1/3 × (1 − recall_i)         (unknown score → 50%; 1/3 = guessing among 3 options)
-   The FAA test draws 60 questions; here each one comes from topic i with probability w_i = q_i / 1,058.
+   The FAA test draws 60 questions; here each one comes from topic i with probability w_i = q_i / (all questions, 1,125).
    μ    = Σ w_i · p_i                         expected score
    X    ~ Binomial(60, μ)                     number of right answers
    P(pass) = P(X ≥ 42) (70%),  P(goal) = P(X ≥ 51) (85%)

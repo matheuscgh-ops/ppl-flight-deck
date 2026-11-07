@@ -100,7 +100,8 @@ const ForecastView = (() => {
           `<div class="lostrow" data-q="${x.i}"><span class="n">${esc(TOPICS[x.i].name)}</span><span class="bar"><i style="width:${(x.lost / mx) * 100}%"></i></span><span class="v">−${x.lost.toFixed(1)} q</span><span class="pp">${x.known ? Math.round(x.p * 100) + '%' : '?'}</span></div>`
       )
       .join('');
-    $('#fcFormula').innerHTML = `<pre>${esc(t('fcFormula'))}</pre>`;
+    $('#fcFormula').innerHTML =
+      `<pre>${esc(t('fcFormula').replace('{Q}', fmt(TOPICS.reduce((a, x) => a + x.q, 0))))}</pre>`;
   }
   return { fcCls, renderFcMini, renderForecast };
 })();
