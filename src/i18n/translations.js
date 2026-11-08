@@ -1419,6 +1419,8 @@ const Translations = (() => {
     setEnergyHint: 'Used when you have not picked one today',
     setPlansTitle: 'Plans',
     setGridStart: 'Plan grid starts at',
+    setGridStartHint:
+      'Your study day runs from this hour to the same hour next morning: studying past midnight still counts for the day you started',
     setDeep: 'Deep work: one topic per',
     setDeepN: '{n} min of block',
     setDeepHint: 'Fewer topic switches inside a block (Cal Newport)',
@@ -1470,6 +1472,8 @@ const Translations = (() => {
     setEnergyHint: 'Usada quando você não escolheu uma hoje',
     setPlansTitle: 'Planos',
     setGridStart: 'A grade do plano começa às',
+    setGridStartHint:
+      'Seu dia de estudo vai desta hora até a mesma hora da manhã seguinte: estudar depois da meia-noite ainda conta para o dia em que você começou',
     setDeep: 'Deep work: um tópico a cada',
     setDeepN: '{n} min de bloco',
     setDeepHint: 'Menos trocas de tópico dentro de um bloco (Cal Newport)',
@@ -1522,6 +1526,7 @@ const Translations = (() => {
     setEnergyHint: '今日まだ選んでいないときに使用',
     setPlansTitle: 'プラン',
     setGridStart: 'プラン表の開始時刻',
+    setGridStartHint: '学習日はこの時刻から翌朝の同じ時刻まで。深夜0時を過ぎて勉強しても、始めた日の分として数えます',
     setDeep: 'ディープワーク：1トピックあたり',
     setDeepN: 'ブロック{n}分',
     setDeepHint: 'ブロック内のトピック切替を減らす（カル・ニューポート）',

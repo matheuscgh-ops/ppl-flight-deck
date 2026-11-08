@@ -42,7 +42,7 @@ const Dashboard = (() => {
   }
   function streakInfo() {
     const set = new Set(state.events.map(e => e.date).concat((state.tests || []).map(x => x.date)));
-    const d = new Date();
+    const d = studyNow();
     const todayDone = set.has(iso(d));
     if (!todayDone) d.setDate(d.getDate() - 1);
     let n = 0;

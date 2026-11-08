@@ -302,6 +302,7 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
   <ol class="steps">
     <li><b>種類。</b><span class="ui">Daily plan</span>（1日）か<span class="ui">Weekly plan</span>（月曜〜日曜）を選びます。日付か週を選び、必要なら名前を付けます。</li>
     <li><b>時間ブロック。</b>日の上でクリックして下にドラッグすると、15分単位で時間を確保します。ドラッグは始めた日にとどまり、マウスが別の日にずれても変わらず、離すと止まります。確保済みの時間の上をドラッグすると削除します。タッチでは開始、次に終了をタップ。<span class="ui">Undo</span> / <span class="ui">Redo</span>、<span class="ui">Clear</span>、<span class="ui">Copy … to the other days</span>も使えます。</li>
+    <li><b>深夜0時以降。</b>グリッドは24時間で、06:00から翌朝06:00まで（開始時刻は設定で変更できます）。点線の0時の線より後の時間には<span class="ui">+1</span>が付きます。20:00から01:30のブロックは同じ日の夜の1つの時間です。06:00までは、アプリはその日として扱います：今日のプラン、次の項目バー、フォーカスモード、チェック、記録するセッション（00:30に記録したセッションは前日の分になり、連続記録やカレンダーも同じです）。プランの週表示はブロックがある時間だけを表示するので、空いた深夜の時間は場所を取りません。</li>
     <li><b>トピック。</b>アプリが各ブロックで学ぶ内容を提案します。確認して調整します（下記参照）。</li>
     <li><b>確認。</b>週の様子を見て<span class="ui">Save &amp; activate</span>か<span class="ui">Save without activating</span>をクリック。</li>
   </ol>
@@ -422,7 +423,7 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
       <tr><td>Questions per hour · Review min</td><td>あなたの速さと、1問の間違いを見直す時間。</td><td>40 · 1.5分</td></tr>
       <tr><td>Practice test every</td><td>模試の間隔（またはオフ）。</td><td>3日</td></tr>
       <tr><td>Default energy</td><td>今日エネルギーを選んでいないときの提案プランのエネルギー。</td><td>Medium</td></tr>
-      <tr><td>Plan grid starts at</td><td>ブロックのグリッドの開始時刻。</td><td>06:00</td></tr>
+      <tr><td>Plan grid starts at</td><td>ブロックのグリッドと学習日の開始時刻。グリッドは24時間で、翌朝の同じ時刻まで続きます。</td><td>06:00</td></tr>
       <tr><td>Deep work</td><td>トピック1つあたりのブロックの分数（またはオフ）。</td><td>45分</td></tr>
       <tr><td>Error review</td><td>プランの各ブロックの最後の振り返り項目。</td><td>オン</td></tr>
       <tr><td>Default chart intervals</td><td>各グラフの最初の期間。</td><td>—</td></tr>

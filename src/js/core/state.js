@@ -177,7 +177,7 @@ const AppState = (() => {
   /* a saved study plan (see Schedule); anything malformed is dropped */
   function normPlan(p) {
     const ok = s => /^\d{4}-\d{2}-\d{2}$/.test(s || ''),
-      mins = v => Number.isInteger(v) && v >= 0 && v <= 1440;
+      mins = v => Number.isInteger(v) && v >= 0 && v <= 48 * 60; /* a block may run past midnight (the study day) */
     if (!p || typeof p !== 'object' || !['daily', 'weekly'].includes(p.type) || !ok(p.start)) return null;
     const blocks = {};
     Object.entries(p.blocks && typeof p.blocks === 'object' ? p.blocks : {}).forEach(([d, rs]) => {

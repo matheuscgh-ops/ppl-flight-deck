@@ -1,5 +1,8 @@
 /* ===== module Util (js/core/util.js) =====
-   public: $, pad, iso, parse, todayISO, diffDays, esc, uid, TOTAL, flip */
+   public: $, pad, iso, parse, todayISO, nowMinutes, studyNow, setDayStart, diffDays, esc, uid, TOTAL, flip
+   The study day: it starts at the plan grid's first hour (Settings, 6:00 by default) and runs 24 hours, so studying
+   past midnight still belongs to the day you started (like the plan grid, which runs from 6:00 to 6:00). todayISO()
+   is that day; nowMinutes() counts from its midnight (00:30 after midnight is 24 × 60 + 30). */
 const Util = (() => {
   const $ = s => document.querySelector(s);
   const pad = n => String(n).padStart(2, '0');
@@ -8,7 +11,26 @@ const Util = (() => {
     const [y, m, d] = s.split('-').map(Number);
     return new Date(y, m - 1, d, 12);
   };
-  const todayISO = () => iso(new Date());
+  /* minutes after midnight that still belong to the day before: the grid's first hour (Settings); 0 until the settings
+     are loaded, or where a test sets it */
+  let fixedStart = null;
+  const setDayStart = m => (fixedStart = m);
+  const dayStartMin = () => {
+    if (fixedStart != null) return fixedStart;
+    try {
+      return typeof pref === 'function' ? pref('gridStart') * 60 : 0;
+    } catch (e) {
+      return 0;
+    }
+  };
+  /* a Date whose calendar day is the study day (its clock time is shifted: only use its date) */
+  const studyNow = () => new Date(Date.now() - dayStartMin() * 60000);
+  const todayISO = () => iso(studyNow());
+  const nowMinutes = () => {
+    const n = new Date(),
+      m = n.getHours() * 60 + n.getMinutes();
+    return m < dayStartMin() ? m + 24 * 60 : m;
+  };
   const diffDays = (a, b) => Math.round((parse(b) - parse(a)) / 864e5);
   const esc = s =>
     String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -37,6 +59,6 @@ const Util = (() => {
       el._flipT = setTimeout(() => (el.style.transition = ''), 200);
     });
   }
-  return { $, pad, iso, parse, todayISO, diffDays, esc, uid, TOTAL, flip };
+  return { $, pad, iso, parse, todayISO, nowMinutes, studyNow, setDayStart, diffDays, esc, uid, TOTAL, flip };
 })();
-const { $, pad, iso, parse, todayISO, diffDays, esc, uid, TOTAL, flip } = Util;
+const { $, pad, iso, parse, todayISO, nowMinutes, studyNow, setDayStart, diffDays, esc, uid, TOTAL, flip } = Util;
