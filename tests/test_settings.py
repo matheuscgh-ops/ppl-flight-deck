@@ -85,7 +85,7 @@ with sync_playwright() as p:
             # ---------- plans ----------
             choose('#setGridStart', 8)
             ev("openWizard({mode:'new'})"); pg.wait_for_timeout(150); ev("document.getElementById('wzNext').click()"); pg.wait_for_timeout(200)
-            check(f'{tag}: plan grid starting at 08:00 → 64 slots, the first one at 8:00', ev("document.querySelectorAll('#wzGrid .wkcol .wks').length") == 64 and ev("+document.querySelector('#wzGrid .wks').dataset.s") == 480)
+            check(f'{tag}: plan grid starting at 08:00 → 96 slots from 8:00 to 8:00 the next morning', ev("document.querySelectorAll('#wzGrid .wkcol .wks').length") == 96 and ev("+document.querySelector('#wzGrid .wks').dataset.s") == 480)
             ev("closeWizard()"); pg.wait_for_timeout(150)
             choose('#setGridStart', 6)
             choose('#setDeep', 90)

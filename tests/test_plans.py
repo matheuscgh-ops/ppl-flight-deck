@@ -45,7 +45,7 @@ with sync_playwright() as p:
             tap('#pwNew'); pg.wait_for_timeout(200)
             check(f'{tag}: + New plan opens the wizard on step 1 (type)', pg.is_visible('#wizbg') and ev("wizardState().step") == 1 and ev("document.querySelectorAll('[data-wtype]').length") == 2)
             tap('#wzNext'); pg.wait_for_timeout(200)
-            check(f'{tag}: step 2 shows the day in 15-minute slots from 6:00 to 24:00', ev("document.querySelectorAll('#wzGrid .wkcol').length") == 1 and ev("document.querySelectorAll('#wzGrid .wkcol .wks').length") == 72)
+            check(f'{tag}: step 2 shows the day in 15-minute slots from 6:00 to 6:00 the next morning', ev("document.querySelectorAll('#wzGrid .wkcol').length") == 1 and ev("document.querySelectorAll('#wzGrid .wkcol .wks').length") == 96)
             check(f'{tag}: Next stays off until some time is blocked', ev("document.getElementById('wzNext').disabled"))
             if touch:
                 a = pg.locator('#wzGrid .wks[data-s="1140"]'); a.scroll_into_view_if_needed(); a.tap(); pg.wait_for_timeout(80)

@@ -24,7 +24,7 @@ jobs:
         suite: [unit, test_e2e.py, test_sync.py, test_isolation.py, test_mobile.py, test_calendar.py, test_volume.py,
                 test_srrange.py, test_forecast_plan.py, test_practice_tests.py, test_sr_consistency.py, test_hover.py,
                 test_carousel.py, test_heatmap.py, test_plans.py, test_board_order.py, test_plan_adaptive.py,
-                test_errors.py, test_exam_ready.py, test_focus.py, test_phone_dash.py, test_score_right.py, test_plan_pace.py, test_settings.py, test_tour.py, test_docs.py, test_audit.py, test_next.py, test_asa.py,
+                test_errors.py, test_exam_ready.py, test_focus.py, test_phone_dash.py, test_score_right.py, test_plan_pace.py, test_settings.py, test_tour.py, test_docs.py, test_audit.py, test_next.py, test_asa.py, test_study_day.py,
                 test_build.py]
     steps:
       - uses: actions/checkout@v4

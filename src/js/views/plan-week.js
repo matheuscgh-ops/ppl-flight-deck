@@ -50,10 +50,13 @@ const PlanWeek = (() => {
     });
     if (lo === Infinity)
       return [Math.max(DAY_START, 22 * 60 - minSpan), Math.max(DAY_START, 22 * 60 - minSpan) + minSpan];
+    /* the night after midnight only shows when something is planned in it; otherwise the view stops at midnight and
+       grows into the earlier hours instead */
+    const end = hi > 24 * 60 ? DAY_END : Math.min(DAY_END, 24 * 60);
     let from = Math.max(DAY_START, Math.floor((lo - 30) / 60) * 60),
-      to = Math.min(DAY_END, Math.ceil((hi + 30) / 60) * 60);
+      to = Math.min(end, Math.ceil((hi + 30) / 60) * 60);
     while (to - from < minSpan) {
-      if (to < DAY_END) to += 60;
+      if (to < end) to += 60;
       else if (from > DAY_START) from -= 60;
       else break;
     }
@@ -65,8 +68,11 @@ const PlanWeek = (() => {
       [from, to] = mode === 'select' ? [DAY_START, DAY_END] : viewHours(days, data, opts.minSpan),
       nRows = (to - from) / SLOT,
       rowOf = m => (Math.max(from, Math.min(to, m)) - from) / SLOT;
+    /* past midnight the hours belong to the next morning: marked "+1" under a line (the study day runs on) */
     for (let m = from; m < to; m += 60)
-      hours.push(`<span class="wkh" style="top:calc(var(--rowh) * ${rowOf(m)})">${clockOf(m)}</span>`);
+      hours.push(
+        `<span class="wkh${m === 24 * 60 ? ' mid' : ''}" style="top:calc(var(--rowh) * ${rowOf(m)})">${clockOf(m)}${m >= 24 * 60 ? '<sup>+1</sup>' : ''}</span>`
+      );
     const cols = days
       .map(d => {
         const ranges = (data.blocks || {})[d] || [],
@@ -83,6 +89,7 @@ const PlanWeek = (() => {
                 'wks',
                 on.has(m) ? 'on' : '',
                 m % 60 === 0 ? 'hr' : '',
+                m === 24 * 60 ? 'mid' : '',
                 opts.anchor && opts.anchor.date === d && opts.anchor.s === m ? 'anchor' : '',
               ]
                 .filter(Boolean)
@@ -91,6 +98,8 @@ const PlanWeek = (() => {
           }
         } else {
           for (let r = 0; r < nRows; r += 4) inner += `<i class="wkline" style="top:calc(var(--rowh) * ${r})"></i>`;
+          if (from < 24 * 60 && to > 24 * 60)
+            inner += `<i class="wkmid" style="top:calc(var(--rowh) * ${rowOf(24 * 60)})"></i>`;
           ranges.forEach(([s, e]) => (inner += `<i class="wkblk" style="${at(rowOf(s), rowOf(e) - rowOf(s))}"></i>`));
           /* a topic and the error review of its misses are drawn as one block (the review is its bottom band), and
              blocks are laid out one under the other so a short item never covers the one before it */
@@ -130,8 +139,7 @@ const PlanWeek = (() => {
               inner += `<div role="button" tabindex="0" class="wki r-${it.kind === 'test' ? 'test' : it.reason || 'custom'}${done ? ' done' : ''}${missed ? ' missed' : ''}${tiny ? ' tiny' : ''}${compact ? ' compact' : ''}${rev ? ' hasrev' : ''}" style="${at(top, rows)}" data-wi="${esc(it.id)}" title="${esc(tip)}"><div class="wkmain">${chk(it, done)}<b>${missed ? '! ' : ''}${esc(itemName(it))}</b><span>${clockOf(it.start)} · ${sizeOf(it)}</span></div>${band}</div>`;
             });
           if (d === today) {
-            const now = new Date(),
-              m = now.getHours() * 60 + now.getMinutes();
+            const m = nowMinutes();
             if (m >= from && m <= to) inner += `<i class="wknow" style="top:calc(var(--rowh) * ${rowOf(m)})"></i>`;
           }
         }

@@ -188,7 +188,8 @@ const Settings = (() => {
             'setGridStart',
             [5, 6, 7, 8, 9].map(v => [v, clockOf(v * 60)]),
             pref('gridStart')
-          )
+          ),
+          'setGridStartHint'
         ),
         row(
           'setDeep',

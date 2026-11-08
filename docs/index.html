@@ -302,6 +302,7 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
   <ol class="steps">
     <li><b>Type.</b> Choose <span class="ui">Daily plan</span> (one date) or <span class="ui">Weekly plan</span> (Monday to Sunday). Pick the date or week and, if you like, give it a name.</li>
     <li><b>Time blocks.</b> Click and drag down on a day to book time, in 15-minute steps. The drag stays on the day where it started, even if the mouse slips onto another, and stops when you let go. Dragging over booked time removes it. On touch: tap the start, then the end. Use <span class="ui">Undo</span> / <span class="ui">Redo</span>, <span class="ui">Clear</span> and <span class="ui">Copy … to the other days</span>.</li>
+    <li><b>Past midnight.</b> The grid runs 24 hours, from 06:00 to 06:00 the next morning (the hour is in Settings). Hours after the dashed midnight line are marked <span class="ui">+1</span>: a block from 20:00 to 01:30 is one evening of the same day. Until 06:00 the app still counts it as that day: today's plan, the next-up bar, focus mode, check marks, and the sessions you log (a session logged at 00:30 counts for the day before, like your streak and calendar). The plan's week view only shows the hours that have blocks, so empty night hours never take space.</li>
     <li><b>Topics.</b> The app suggests what to study in each block. Review and adjust (see below).</li>
     <li><b>Review.</b> See how the week will look and click <span class="ui">Save &amp; activate</span> or <span class="ui">Save without activating</span>.</li>
   </ol>
@@ -422,7 +423,7 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
       <tr><td>Questions per hour · Review min</td><td>Your speed and the time to review each mistake.</td><td>40 · 1.5 min</td></tr>
       <tr><td>Practice test every</td><td>The interval between practice tests (or off).</td><td>3 days</td></tr>
       <tr><td>Default energy</td><td>The energy of the suggested plan when you haven't picked one today.</td><td>Medium</td></tr>
-      <tr><td>Plan grid starts at</td><td>The first hour of the block grid.</td><td>06:00</td></tr>
+      <tr><td>Plan grid starts at</td><td>The first hour of the block grid, and of your study day: the grid runs 24 hours, to the same hour next morning.</td><td>06:00</td></tr>
       <tr><td>Deep work</td><td>Block minutes per topic (or off).</td><td>45 min</td></tr>
       <tr><td>Error review</td><td>The error-review item at the end of each plan block.</td><td>on</td></tr>
       <tr><td>Default chart intervals</td><td>The starting interval of each chart.</td><td>—</td></tr>

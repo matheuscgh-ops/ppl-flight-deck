@@ -1,6 +1,6 @@
 /* ===== module Schedule (js/model/schedule.js) =====
-   live value (getter): DAY_START (first hour of the plan grid, from Settings)
-   public: SLOT, DAY_END, mondayOf, planDays, planTotal, rangesTotal, normRanges, activeFor, todayPlan,
+   live values (getters): DAY_START, DAY_END (the plan grid: the hour chosen in Settings to the same hour next morning)
+   public: SLOT, mondayOf, planDays, planTotal, rangesTotal, normRanges, activeFor, todayPlan,
            itemDone, itemMissed, missedTopics, suggestDays, packDay, perQ, conflictsFor, weeklyUnder, clockOf,
            knapsack, toggleCheck, seedDemoPlan, testMinutes, plannedToday
    Saved study plans (state.plans) and the scheduler that fills selected time blocks with topics.
@@ -30,7 +30,6 @@
         so a topic reviewed on Monday is not due again on Tuesday. A topic appears at most once per day. */
 const Schedule = (() => {
   const SLOT = 15,
-    DAY_END = 24 * 60,
     MIN_CHUNK_Q = 20 /* the smallest session of a big topic (Weather 158 q is studied 40 at a time, never 12) */,
     MISSED_BOOST = 1.25,
     URGENCY = { due: 1.3, carried: 2, weak: 1.15, nodata: 1.1, new: 1, light: 0.8, test: 1.4, testDue: 1.4, custom: 1 };
@@ -587,8 +586,12 @@ const Schedule = (() => {
       ? plans().find(p => p.active && p.type === 'weekly' && plan.start >= p.start && plan.start <= addDays(p.start, 6))
       : null;
 
-  /* the plan grid starts at the hour chosen in Settings (default 6:00) */
-  expose({ DAY_START: [() => pref('gridStart') * 60, () => {}] });
+  /* the plan grid starts at the hour chosen in Settings (default 6:00) and runs 24 hours, to the same hour the next
+     morning: a block after midnight belongs to the day it started (the study day, see Util.todayISO) */
+  expose({
+    DAY_START: [() => pref('gridStart') * 60, () => {}],
+    DAY_END: [() => pref('gridStart') * 60 + 24 * 60, () => {}],
+  });
   /* ---------- refresh: re-plan the days ahead with your latest results ----------
      For every day from today on that an active plan drives: what is done, your own activities, items you edited by hand
      and the error reviews that belong to them stay where they are; the rest of the time (from now on, for today) is
@@ -626,8 +629,7 @@ const Schedule = (() => {
   }
   function refreshPlans() {
     const today = todayISO(),
-      now = new Date(),
-      nowMin = Math.ceil((now.getHours() * 60 + now.getMinutes()) / SLOT) * SLOT;
+      nowMin = Math.ceil(nowMinutes() / SLOT) * SLOT;
     let days = 0;
     /* 1) topic blocks left undone in the last 7 days move forward: they leave their old day (with their error
           reviews) and the re-plan below puts them first */
@@ -733,7 +735,6 @@ const Schedule = (() => {
     canRefresh,
     rangesMinus,
     SLOT,
-    DAY_END,
     mondayOf,
     planDays,
     planTotal,
@@ -765,7 +766,6 @@ const {
   canRefresh,
   rangesMinus,
   SLOT,
-  DAY_END,
   mondayOf,
   planDays,
   planTotal,

@@ -52,6 +52,7 @@ suites = [('End-to-end (index.html)', ['test_e2e.py', os.path.join(ROOT, 'index.
           ('Whole-app audit (text, layout, same numbers everywhere)', ['test_audit.py']),
           ('Design layer: glass header and tab bar, palette, logo', ['test_next.py']),
           ('28 topics and the ASA Prepware chapter', ['test_asa.py']),
+          ('The study day runs past midnight', ['test_study_day.py']),
           ('Build (single source)', ['test_build.py'])]
 for title, args in suites:
     out = subprocess.run([sys.executable, os.path.join(HERE, args[0]), *args[1:]], capture_output=True, text=True, cwd=ROOT).stdout
