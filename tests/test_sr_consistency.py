@@ -109,7 +109,8 @@ with sync_playwright() as p:
             k1, ch1 = stats()
             avg1 = (158 * 1 + 56 * R12) / 214
             check(f'{tag}: Statistics card updated: recall 100%, S {fmt1(S18b)}, 3 sessions, last 90%', card(pg, 18)[:2] == ['100%', fmt1(S18b)] and card(pg, 18)[3] == '3' and card(pg, 18)[4] == '90%', card(pg, 18))
-            df = dt.date.today() + dt.timedelta(days=max(1, round(S18b)))
+            # the app's day runs until 06:00 (study day), so count from its today, not the machine date; JS rounds .5 up
+            df = dt.date.fromisoformat(ev('todayISO()')) + dt.timedelta(days=max(1, int(S18b + 0.5)))
             check(f'{tag}: next review on the card = today + round(S) days', ev(f"srModel(18).next") == df.isoformat(), (ev('srModel(18).next'), df))
             check(f'{tag}: KPIs updated: average recall {pct(avg1)}', k1[0] == pct(avg1), k1)
             check(f'{tag}: heat map changed (Weather warmed up)', ch1 != ch0)
