@@ -100,7 +100,8 @@ with sync_playwright() as p:
             check(f'{tag}: refresh keeps your own activities in place', ev("state.plans[0].items.some(x=>x.id==='mine'&&x.start===1290)"))
             check(f'{tag}: refresh never touches past days, and blocks stay the same', ev("JSON.stringify(state.plans[0].items.filter(x=>x.date<todayISO()))") == past and ev("Object.values(state.plans[0].blocks).every(r=>JSON.stringify(r)==='[[1140,1260],[1290,1350]]')"))
             lay2 = ev("""(()=>{const its=state.plans[0].items;return Object.entries(state.plans[0].blocks).every(([d,rs])=>{const x=its.filter(i=>i.date===d).sort((a,b)=>a.start-b.start);
-                return x.every((i,k)=>(!k||i.start>=x[k-1].start+x[k-1].min-0.01)&&(itemDone(i)||rs.some(([s,e])=>i.start>=s&&i.start+i.min<=e+0.01)))})})()""")
+                const over=d===todayISO()&&rs.every(([s,e])=>e<=nowMinutes());   /* today's blocks are all over */
+                return x.every((i,k)=>(!k||i.start>=x[k-1].start+x[k-1].min-0.01)&&(itemDone(i)||(over&&i.kind==='reflect')||rs.some(([s,e])=>i.start>=s&&i.start+i.min<=e+0.01)))})})()""")
             check(f'{tag}: after refresh every item still fits its block, one after another (a block already done may move before now, whatever the time of day)', lay2)
             ev("document.querySelector('#toast button').click()"); pg.wait_for_timeout(200)
             check(f'{tag}: one Undo restores the plan as it was', ev("state.plans[0].items.filter(x=>x.date===addDays(todayISO(),1)&&x.i===window.__t&&x.kind==='topic').reduce((a,x)=>a+x.n,0)") == tomorrow0)
@@ -126,6 +127,26 @@ with sync_playwright() as p:
             check(f'{tag}: the next day the tick is gone by itself', not ev(f"document.querySelector('{card}').classList.contains('checked')"))
             check(f'{tag}: no script errors or browser pop-ups', not errs, errs)
             c.close()
+    # Refresh plan at fixed clock times: between two blocks (21:01, blocks 19:00-21:00 and 21:30-22:30) and after the
+    # last block (22:40). The error reviews still to do of a topic you finished go to the next block time, never into
+    # the gap; once the day's blocks are over they stay right after now.
+    import datetime
+    LAY = """(()=>{const its=state.plans[0].items,T=todayISO(),rs=state.plans[0].blocks[T],over=rs.every(([s,e])=>e<=nowMinutes());
+      const x=its.filter(i=>i.date===T).sort((a,b)=>a.start-b.start);
+      return x.every((i,k)=>(!k||i.start>=x[k-1].start+x[k-1].min-0.01)&&(itemDone(i)||(over&&i.kind==='reflect')||rs.some(([s,e])=>i.start>=s&&i.start+i.min<=e+0.01)))})()"""
+    for at in ('21:01', '22:40'):
+        c = b.new_context(viewport={'width': 1440, 'height': 900}); pg = c.new_page(); errs = []
+        pg.on('pageerror', lambda e: errs.append(str(e)))
+        pg.clock.install(time=f'{datetime.date.today().isoformat()}T{at}:00')
+        pg.goto('file://' + os.path.join(ROOT, 'index.html')); pg.wait_for_timeout(500)
+        ev = pg.evaluate; ev(SETUP); pg.wait_for_timeout(150)
+        ev("(()=>{const T=todayISO();state.plans[0].items.filter(i=>i.date===T&&i.kind==='topic').forEach(i=>{i.check=true});save();render()})()")
+        pend = ev("state.plans[0].items.some(i=>i.date===todayISO()&&i.kind==='reflect'&&!itemDone(i))")
+        ev("refreshPlans();save();render()"); pg.wait_for_timeout(150)
+        check(f'index · refresh at {at}: every item of today still fits a block, one after another (error reviews never land between blocks)', ev(LAY), ev("JSON.stringify(state.plans[0].items.filter(i=>i.date===todayISO()).map(i=>[i.kind,i.start,i.min,itemDone(i)]))"))
+        check(f'index · refresh at {at}: the error reviews still to do stay in today\'s plan', not pend or ev("state.plans[0].items.some(i=>i.date===todayISO()&&i.kind==='reflect'&&!itemDone(i))"))
+        check(f'index · refresh at {at}: no script errors', not errs, errs)
+        c.close()
     b.close()
 
 ok = sum(r[1] for r in results)
