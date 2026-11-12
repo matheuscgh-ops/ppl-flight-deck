@@ -39,7 +39,7 @@ with sync_playwright() as p:
             sizes = ev("state.plans[0].items.filter(x=>x.kind==='topic').map(x=>[x.i,x.n,TOPICS[x.i].q,x.reason])")
             # a review after a good score is a deliberate sample (10-19 questions); anything else is never cut under 20
             check(f'{tag}: no chunk of a big topic is under 20 questions unless it is a review sample (and none over a 40-question session)', all((n >= min(q, 20) or (r == 'due' and n >= 10)) and n <= 40 for i, n, q, r in sizes), sizes)
-            check(f'{tag}: a review after a good score is smaller than after a weak one', ev("reviewSize(13,{reps:[{p:90}],R:0.9})<reviewSize(13,{reps:[{p:62}],R:0.9})"))
+            check(f'{tag}: a review after a good score is smaller than after a weak one', ev("reviewSize(13,{reps:[{p:90}],mastery:0.9,R:0.9})<reviewSize(13,{reps:[{p:62}],mastery:0.62,R:0.9})"))
 
             # ---------- Week view: blocks never overlap, titles stay on one line inside their block ----------
             ev("goView('plan')"); pg.wait_for_timeout(250)

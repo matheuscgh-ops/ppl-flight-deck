@@ -215,8 +215,10 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
     <li>Click the card's name (or select it and press <kbd>Enter</kbd>).</li>
     <li>Choose <span class="ui">Studied</span> (first time), <span class="ui">Reviewed</span> (a review) or <span class="ui">Status only</span> (just change the list).</li>
     <li>Type the session's score, or how many you got right in <span class="ui">Right answers</span>: when the topic is in today's plan, the number of questions is already filled in ("27 of 30" gives 90%, and you can change the 30). Leave the score blank if the session is still in progress: it counts as started but doesn't feed the memory model.</li>
+    <li>Choose the <span class="ui">Attempt</span>: <span class="ui">First try / new questions</span>, <span class="ui">Repeat of the same questions</span> or <span class="ui">After seeing the answers</span>. A first try counts fully; a repeat counts 30% (you partly remember the answers); a score after seeing the answers is not evidence and is not a review.</li>
     <li>Adjust the list and the date if needed, then click <span class="ui">Save</span>.</li>
   </ol>
+  <p><b>Right answers keep the sample.</b> "27 of 30" is saved as 27/30, so the app knows how much evidence it is. A typed percentage (and every session saved before) keeps an unknown sample: the app never invents one.</p>
   <figure class="mid"><img src="img/en/log.jpg" alt="Session log dialog" loading="lazy"><figcaption>The topic's history is at the bottom. The × deletes an entry, with undo.</figcaption></figure>
   <p><b>Questions for today and a quick score:</b> a card in today's plan shows the questions planned for it, for example <b>30</b>/158 q for Weather. Tap its score to type how many you got right of those 30 (27 → 90%, shown while you type) and press <kbd>Enter</kbd>. The <span class="ui">/30</span> button switches to typing the percentage. A card that is not in today's plan asks for the percentage, as before. Either way it updates the topic's latest session.</p>
   <p><b>Your own cards:</b> <span class="ui">+ Add a card</span> at the end of a list adds a task of your own, such as "Review the theory" or "Radio calls: ground". Enter adds it and keeps the box open for the next one; Esc closes it. Your cards drag like any card; click one to rename or delete it. They are only reminders: they never count in the progress bar, the statistics or the forecast.</p>
@@ -366,6 +368,30 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
     <li><b>Trend:</b> the line through your results, with the projection to the exam and the date you reach your goal.</li>
     <li>Tests left in progress for days show a notice, so you can complete or delete them.</li>
   </ul>
+  <h3 id="ai-import">Import results analysed by an AI</h3>
+  <p>An AI (ChatGPT or another) can sort the questions of a Sporty's practice test into the app's topics. The AI only classifies and explains; the app computes every score and priority itself, and ignores any weight or difficulty the AI might add.</p>
+  <ol class="steps">
+    <li>Take the practice test on Sporty's.</li>
+    <li>In <span class="ui">Practice tests</span>, click <span class="ui">Import AI results</span>, then <span class="ui">Copy the prompt for the AI</span>. Paste it in the AI with your results (the score report, the questions, or only the ones you missed).</li>
+    <li>Paste the JSON it answers (or pick the .json / .txt file) in the box.</li>
+    <li>Check the preview: every question can be moved to another topic; uncertain ones are outlined in yellow. Errors block the import; warnings explain what will be left out.</li>
+    <li>Click <span class="ui">Import</span>. The notice offers <span class="ui">Undo</span>.</li>
+  </ol>
+  <ul>
+    <li><b>Full result</b> (every answer, or right/total per topic): each topic gets a result with its sample (5/10), and the overall score goes to your practice tests.</li>
+    <li><b>Misses only</b>: no topic score is computed (there is no denominator); a topic not listed is not taken as known, and none is taken as zero right. The topics with misses come up for review. The overall score is saved only if the total and the number wrong are known.</li>
+    <li>The same test can't be imported twice (same id or same content). Nothing changes until you confirm, and a failed import changes nothing.</li>
+    <li>Your Sporty's scores on the cards are not overwritten: an imported result is separate evidence, with its date and origin.</li>
+    <li>Examples: <a href="examples/exam-full.json">full result</a> · <a href="examples/exam-errors-only.json">misses only</a>.</li>
+  </ul>
+<div class="formula">{ "schemaVersion": 1, "examId": "sportys-2026-11-08-a", "date": "2026-11-08", "platform": "Sporty's",
+  "mode": "full" | "errorsOnly",  "coverage": "complete" | "partial",
+  "overall": { "total": 60, "right": 47, "wrong": 13 },
+  "topics": [ { "topicId": "weather-information", "total": 10, "right": 5, "wrong": 5, "seconds": null } ],
+  "questions": [ { "qid": "Q07", "topicId": "weather-information", "tags": ["TAF"], "acs": null,
+                   "correct": false, "classificationConfidence": 0.9, "doubt": null,
+                   "errorType": "concept", "explanation": "…", "seconds": null } ] }
+unknown → null (never guessed) · a question has one topic and counts once, whatever its tags</div>
 </section>
 
 <section class="chap" id="statistics">
@@ -477,19 +503,26 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
 <section class="chap" id="math">
   <h2><span class="n">09</span>How the numbers are calculated</h2>
   <p class="intro">A single statistics engine feeds every screen, so the same number reads the same everywhere. The "How it is calculated" sections in the app have the full formulas.</p>
-<div class="formula">memory            R(t) = 1 / (1 + t / 9S)        S = stability, grows after good sessions
-next review       when R falls to the review point  (90% → S days)
-right answer      p = score × R + 1/3 × (1 − R)   (forgetting = guessing among 3)
-bank model        μ = Σ (topic questions / 1,125) × p
-forecast          bank μ blended with the last 3 practice tests (10-day half-life)
+<div class="formula">evidence          each result: score p, sample n (unknown → weighs as 15), attempt (first 1 · repeat 0.3 · after the answers 0)
+mastery           m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4)     w = attempt × 0.5^(age / 45 d),  p̄ = your overall level
+confidence        effective questions: low &lt; 10 · medium &lt; 30 · high ≥ 30 (never high with only unknown samples)
+memory            R(t) = 1 / (1 + t / 9S)  — an estimate, not a measurement
+stability         first: 1 / 1.5 / 2 by score;  later: ≥ 70 grows, 60–69 stays, &lt; 60 × 0.4;  moved by min(1, n/15) × attempt
+next review       when R falls to the review point  (90% → S days); fewer than 8 questions is not a review
+right answer      p = m × R + 1/3 × (1 − R)   (forgetting = guessing among 3)
+test share        ACS area share (PSI PAR bulletin) split inside the area by bank size; 9% of areas with no topic
+bank model        μ = Σ share × p + unmapped × average
+forecast          bank μ (without the topic results of those same tests) blended with the last 3 practice tests
 pass / goal       beta-binomial over 60 questions: P(X ≥ 42) and P(X ≥ 51)
-plan order        (1 − p on exam day) × urgency ÷ minutes per question
-session size      review: 15 / 20 / 25 / 40 by last score (≥ 85 / 75 / 70 / below) × (1 + forgotten share), 10 … 40
-                  new or weak topic: up to 40 · never a chunk under 20 for a big topic
-blocks            knapsack per block, hardest first, 1 topic per ~45 min
+risk              60 × share × (1 − p on exam day)  — questions likely missed, not a score gain
+value             risk × (n / session needed) × 1.2 if due × 1.25 if left undone × 0.8 new in the final stretch
+coverage          the 2 topics idle longest (≥ 14 days or never) → at least the day's median value per minute
+choice            densest value per minute first, cut to fit; never past your time
+energy            low: ≤ 20 q, easiest first, no test · medium: ≤ 40 q, most valuable first · high: ≤ 40 q, hardest first
+minutes           (answer + review of misses) × your pace — the same factor for both
+week              projected sessions repeat your current mastery (no floor) and are never evidence
 error review      expected mistakes = Σ questions × (1 − p) × difficulty
-                  block minutes = mistakes × min per mistake  (≥ 10, ≤ ¼ of the block, only if ≥ 3 mistakes)
-                  each topic's review = block minutes × its mistakes ÷ the block's mistakes  (5-min steps)</div>
+                  block minutes = mistakes × min per mistake  (≥ 10, ≤ ¼ of the block, only if ≥ 3 mistakes)</div>
   <p>In the practice-test trend, the projection slows down after the last test instead of running up to 100%.</p>
 </section>
 <section class="chap" id="science">
@@ -509,10 +542,13 @@ S  stability: how many days it takes for R to fall to 90%</div>
   <p>A higher review point means shorter intervals and more reviews; a lower one means fewer reviews and more forgetting in between.</p>
 
   <h3 id="sci-score">From memory to an expected score</h3>
-  <p>FAA questions have 3 options. If you remember a topic you answer at your last score's level; if you have forgotten it, you still get about 1 in 3 right by guessing. So the chance of a right answer on a topic is a mix of the two:</p>
-<div class="formula">p = score × R + 1/3 × (1 − R)</div>
-  <p>The test draws its 60 questions roughly in proportion to how many questions each topic has in the bank, so the expected score is the weighted average:</p>
-<div class="formula">μ = Σ (questions in topic / 1,125) × p</div>
+  <p><b>What a result is worth.</b> The app keeps four things apart: the <b>observed result</b> (5/10), the estimated <b>mastery</b> of the topic, the <b>confidence</b> in that estimate, and the estimated <b>retention</b> today. A few questions say little, so mastery starts from your overall level and moves toward your results as they add up: 2/2 is not 40/40. Retaking the same questions counts 30% and a score typed after seeing the answers counts nothing, so 50% followed by 100% on the same set stays near 60%. Records saved with only a percentage keep an unknown sample; they weigh like a usual 15-question session and never reach "high" confidence.</p>
+<div class="formula">mastery m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4)</div>
+  <p><b>Weak results.</b> A score from 60 to 69% no longer lengthens the interval, and a small sample barely moves it. A miss while recall was still high points to understanding (the plan suggests reviewing the concept); a miss after a long gap points to forgetting (recall without notes). That label only chooses the activity: the low score is counted once.</p>
+  <p>FAA questions have 3 options. If you remember a topic you answer at your mastery level; if you have forgotten it, you still get about 1 in 3 right by guessing:</p>
+<div class="formula">p = m × R + 1/3 × (1 − R)</div>
+  <p><b>Share of the test.</b> The FAA draws the 60 questions by ACS area of operation, with official shares (PSI PAR bulletin): Preflight Preparation 22%, Takeoffs, Landings and Go-Arounds 20%, Preflight Procedures 13%, and so on. The Sporty's topics are the ACS tasks themselves, so each belongs to one area; inside an area the share is split by the size of the Sporty's bank, an approximation marked "estimated" in the plan. Basic Instrument Maneuvers (7%) and Postflight Procedures (2%) have no Sporty's topic: the forecast scores them with the average of the others. The shares add up to 100% and are used once — 60 × share is only a rough guide to how many questions may come from a topic.</p>
+<div class="formula">μ = Σ share × p  +  9% × (average of the mapped topics)</div>
   <p><b>Chance to pass.</b> The number of right answers out of 60 follows a binomial distribution if every question has the same chance μ. But μ is itself an estimate, and the app knows how far off it has been: its error against your real practice tests. So it uses a <b>beta-binomial</b> distribution, which spreads the chances by that uncertainty instead of pretending μ is exact. Passing is 42 of 60 (70%), and the default goal is 51 of 60 (85%):</p>
 <div class="formula">chance to pass = P(X ≥ 42)        chance of the goal = P(X ≥ 51)        X ~ BetaBinomial(60, μ)</div>
   <p><b>"If you stop reviewing"</b> runs the same calculation on exam day, letting every curve decay with no more sessions. The gap between today's score and that line is what your reviews are protecting.</p>
@@ -520,15 +556,21 @@ S  stability: how many days it takes for R to fall to 90%</div>
   <h3 id="sci-tests">Practice tests and the blended forecast</h3>
   <p>Practice tests measure the whole thing directly, but each one is noisy. The forecast averages your last 3 tests with <b>exponential decay weights</b>: a test loses half its weight every 10 days (the half-life, in Settings). It then blends that average with the question-bank model μ, so a single good or bad day doesn't swing the forecast.</p>
 <div class="formula">weight of a test = 0.5 ^ (age in days / half-life)</div>
+  <p>An imported test counts once: its overall score enters the average, so the model part leaves out that test's topic results (otherwise the same test would look like two independent observations).</p>
   <p>The <b>trend</b> is a least-squares line through your scores. Its projection slows down after the last test instead of running to 100%, because scores level off as you approach your ceiling. The model's accuracy chart compares what the bank model predicted on each test day with the score you actually got.</p>
 
   <p><b>Track record.</b> For each practice test the app recomputes the overall forecast as it was the day before, using only what you had done until then, and compares it with your score. It shows the average miss of the last 5 tests and the <b>Brier score</b> of the pass chance, the standard way to grade probability forecasts: 0 is perfect, and 0.25 is what you get by always saying 50%.</p>
 <div class="formula">Brier = average of (forecast chance − outcome)²,   outcome = 1 if the score reached 70%, else 0</div>
 
   <h3 id="sci-plan">How the plan decides what you study</h3>
-  <p>Each topic gets a priority: how many points it can still give you on exam day, how urgent its review is, and how long its questions take.</p>
-<div class="formula">priority = (1 − p on exam day) × urgency ÷ minutes per question</div>
-  <p>Filling a block is a <b>knapsack problem</b>: choose the topics whose total time fits the block and whose total value (questions protected) is as large as possible. The app solves it exactly for each block, then puts the hardest topic first, when your attention is freshest.</p>
+  <p>One set of rules decides for the daily suggestion, the plan with times, the week and <span class="ui">Refresh plan</span>. Each topic is worth the test questions you are likely to miss on it if you do not study it again — not a promised score gain, since the app does not model how much a session teaches:</p>
+<div class="formula">risk  = 60 × share × (1 − p on exam day)
+value = risk × (n / session the topic needs) × timing
+timing: × 1.2 review due · × 1.25 left undone in a plan · × 0.8 new material in the final stretch</div>
+  <p>Mastery already carries low scores and recent misses, so nothing adds a separate "weak" or "difficult" penalty. Each day the two topics untouched longest (14 days or more, or never) are lifted to at least the day's median value, so small, rarely tested or hard topics keep coming back without crowding out the reviews due. Values are linear in the number of questions, so taking the most value per minute first and cutting the last chunk to fit is the best use of the time (a fractional knapsack). The time you give is a hard limit.</p>
+  <p><b>Energy</b> changes the format, never the value or the time: low energy uses chunks of 20 questions at most, easiest first, guided examples instead of a timed set for hard topics, and no practice test unless one is overdue; medium uses up to 40 (one question-bank session), most valuable first; high also up to 40, hardest first. The daily list and the calendar follow the same rules.</p>
+  <p><b>Each suggestion explains itself:</b> the activity (new questions, review the concept, guided examples, recall without notes, a fluency drill or a short diagnostic) and the main reasons — your last result with its sample, a review due, misses imported from a test, the topic's share of the test (marked when estimated), and how much evidence there is.</p>
+  <p><b>The week.</b> Planning several days ahead assumes the earlier days are done, but a projected session only repeats your current mastery (no 70% floor, no learning assumed) and never becomes evidence. A weak topic keeps coming back; <span class="ui">Refresh plan</span> re-plans from your real results.</p>
   <p><b>Error review.</b> Getting a question wrong and then studying why is one of the most effective ways to learn, especially when the feedback comes soon after the mistake. That is why each topic is followed right away by a review of its own mistakes, sized in proportion to the mistakes you are expected to make on it, inside the same block rather than another day.</p>
 
   <p><b>The final stretch.</b> In the last 21 days the plan shifts from learning new material to consolidating what you know: topics below your goal count as weak, practice tests come more often (retrieval practice is itself one of the best ways to study), and your own error notes get more time. On the day before the exam the plan stays short. Sleep after studying helps memory consolidate, and a tired brain recalls less.</p>
@@ -560,7 +602,8 @@ S  stability: how many days it takes for R to fall to 90%</div>
     <li>Newport, C. (2016). <i>Deep Work: Rules for Focused Success in a Distracted World.</i> Grand Central. <a href="https://calnewport.com/deep-work-rules-for-focused-success-in-a-distracted-world/" target="_blank" rel="noopener">calnewport.com</a></li>
     <li>Newport, C. <i>Time-block planning.</i> <a href="https://www.timeblockplanner.com/" target="_blank" rel="noopener">timeblockplanner.com</a></li>
     <li>Concepts: <a href="https://en.wikipedia.org/wiki/Forgetting_curve" target="_blank" rel="noopener">forgetting curve</a> · <a href="https://en.wikipedia.org/wiki/Spacing_effect" target="_blank" rel="noopener">spacing effect</a> · <a href="https://en.wikipedia.org/wiki/Testing_effect" target="_blank" rel="noopener">testing effect</a> · <a href="https://en.wikipedia.org/wiki/Binomial_distribution" target="_blank" rel="noopener">binomial</a> · <a href="https://en.wikipedia.org/wiki/Beta-binomial_distribution" target="_blank" rel="noopener">beta-binomial</a> · <a href="https://en.wikipedia.org/wiki/Exponential_smoothing" target="_blank" rel="noopener">exponential weighting</a> · <a href="https://en.wikipedia.org/wiki/Least_squares" target="_blank" rel="noopener">least squares</a> · <a href="https://en.wikipedia.org/wiki/Knapsack_problem" target="_blank" rel="noopener">knapsack problem</a></li>
-    <li>FAA. <i>Private Pilot – Airplane Airman Certification Standards.</i> <a href="https://www.faa.gov/training_testing/testing/acs" target="_blank" rel="noopener">faa.gov</a></li>
+    <li>FAA. <i>Private Pilot for Airplane Category Airman Certification Standards</i>, FAA-S-ACS-6C (November 2023). <a href="https://www.faa.gov/training_testing/testing/acs/private_airplane_acs_6.pdf" target="_blank" rel="noopener">faa.gov</a></li>
+    <li>PSI. <i>FAA Airman Knowledge Test — PAR Information Bulletin</i> (© March 2024): shares by area of operation. <a href="https://media.psiexams.com/faa/PAR_Information_Bulletin.pdf" target="_blank" rel="noopener">psiexams.com</a> — checked 2026-11-11 through an independent copy; the PDF refuses automated access.</li>
   </ul>
   <p style="color: var(--muted); font-size: 14px; margin-top: 40px">A personal study tool, not affiliated with the FAA or Sporty's. Forecasts are estimates, not guarantees.</p>
 </section>

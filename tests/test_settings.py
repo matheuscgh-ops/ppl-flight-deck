@@ -63,7 +63,7 @@ with sync_playwright() as p:
             choose('#setHalfLife', 21); mu21 = ev("blended().mu")
             check(f'{tag}: practice-test half-life changes the blended forecast (older test weighs more at 21 days)', mu21 < mu7, (mu7, mu21))
             choose('#setHalfLife', 10)
-            ev("state.tests=[{id:'t3',date:addDays(todayISO(),-4),q:60,score:80}];state.events=state.events.map(e=>({...e,date:addDays(todayISO(),-4)}));state.settings.testEvery=7;save();render()")
+            ev("state.tests=[{id:'t3',date:addDays(todayISO(),-4),q:60,score:80}];state.events=state.events.map(e=>({...e,date:addDays(todayISO(),-4)}));state.settings.testEvery=7;state.deadline=addDays(todayISO(),60);save();render()")  # far from the exam: no final-stretch cadence
             choose('#setIdle', 5)
             check(f'{tag}: 4 idle days with the trigger at 5 → no early practice test', ev("testWhy().reason") != 'testIdle', ev("testWhy()"))
             choose('#setIdle', 3)

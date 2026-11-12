@@ -406,8 +406,14 @@ def _(c):
     order = c.ev("buildPlan().items.map(x=>x.kind==='test'?'T':String(x.i)).slice(0,4)")
     shown = c.ev("[...document.querySelectorAll('#sugg .qrow')].slice(0,4).map(r=>r.dataset.q??'T')")
     check(order == shown, (order, shown))
-    c.pg.click('#sugg .qrow[data-q] >> nth=0'); c.pg.wait_for_timeout(200)
-    first = c.ev("buildPlan().items.find(x=>x.kind==='topic').i"); check(c.pg.is_visible('#viewSR') and c.ev(f"document.getElementById('sr-{first}').classList.contains('flash')"), 'focus')
+    # the first topic of the plan that has a spaced-repetition card (new material has none yet)
+    first = c.ev("(buildPlan().items.find(x=>x.kind==='topic'&&isTracked(x.i))||{}).i")
+    if first is None:
+        c.ev("state.statuses[12]='Very Comfortable';state.events.push({id:uid(),date:addDays(todayISO(),-30),topic:12,kind:'study',score:60,partial:false,demo:false});save();render()")
+        first = c.ev("(buildPlan().items.find(x=>x.kind==='topic'&&isTracked(x.i))||{}).i")
+    # (the row may sit below the fold of the side panel, so it is clicked by script)
+    c.ev("(i => document.querySelector('#sugg .qrow[data-q=\"' + i + '\"]').click())(%d)" % first); c.pg.wait_for_timeout(200)
+    check(c.pg.is_visible('#viewSR') and c.ev(f"document.getElementById('sr-{first}').classList.contains('flash')"), 'focus')
 
 @T('SR charts', 'topic chart draws: one session line per scored session, today line, recall, projection, exam-day line')
 def _(c):

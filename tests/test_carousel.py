@@ -12,7 +12,7 @@ results = []
 def check(n, c, d=''): results.append((n, bool(c), str(d)[:220]))
 SETUP = """(()=>{const T=todayISO(),D=n=>addDays(T,-n),ev=(n,topic,sc)=>({id:'c'+topic+'_'+n,date:D(n),topic,kind:n>8?'study':'review',from:null,to:null,score:sc,partial:false,demo:false});
   state.statuses=TOPICS.map(()=> 'Todo');state.statuses[18]='Not Comfortable';state.statuses[13]='Not Comfortable';state.statuses[12]='Very Comfortable';
-  state.events=[ev(12,18,60),ev(6,18,70),ev(11,13,70),ev(5,13,80),ev(10,12,90),ev(3,12,95)];state.tests=[];state.plan=null;
+  state.events=[ev(12,18,60),ev(6,18,70),ev(11,13,70),ev(5,13,80),ev(14,12,90),ev(9,12,95)]; /* Cross-Country due too: 3 topics with a curve */state.tests=[];state.plan=null;
   state.settings={minutes:600,qph:40,testEvery:0,reviewMin:1.5};pinned=null;preview=null;carTopic=null;try{localStorage.removeItem(STORE+'-pick')}catch(e){};save();render();})()"""
 
 with sync_playwright() as p:

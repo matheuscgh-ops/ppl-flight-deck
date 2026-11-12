@@ -1,21 +1,21 @@
 /* ===== module PlanModel (js/model/plan.js) =====
    public: settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName, reviewSize, examPhase,
-           STRETCH_DAYS, LASTDAY_MAX
+           STRETCH_DAYS, LASTDAY_MAX, paceFactor, paceTable, notePace, baseMinutesPerQ, minutesSplit, diffOf
    shared state (getter/setter): energyMode */
 const PlanModel = (() => {
   /* ================= DAILY PLAN (mechanical, time-based) =================
-   Budget = your minutes per night.
-   Minutes for one question of topic i:
-       answer  = (60 / questions-per-hour) × difficulty_i × ease_i
-       review  = (1 − p_i) × review-minutes-per-wrong-answer × difficulty_i      (you study every miss)
-       minutes = answer + review
-   p_i          = chance you get it right now = last score × recall (as in the exam forecast; unknown → 50%)
+   Budget = your minutes per night — a hard limit: the list never adds up to more.
+   Minutes for one question of topic i (one unit: minutes, one pace factor for all of them):
+       answer  = (60 / questions-per-hour) × difficulty_i × ease_i × pace_i
+       review  = (1 − p_i) × review-minutes-per-wrong-answer × difficulty_i × pace_i      (you study every miss)
+       daily list: minutes = answer + review (one row) · plan with times: answer in the topic block, review in its own
+       "error review" block right after — the same two numbers, laid out differently
+   p_i          = chance you get it right now (mastery × recall, as in the exam forecast; unknown → 50%)
    difficulty_i = 2.0 calculation topics (E6B, cross-country, performance charts), 1.6 navigation / weather charts,
-                  1.3 chart-reading topics, 1.0 everything else
+                  1.3 chart-reading topics, 0.8 plain recall, 1.0 everything else
    ease_i       = from spaced-repetition stability S: 1.15 (no data) … 0.75 (S ≥ 30 days) — well-known topics go faster
-   Order: 1) practice test when due  2) reviews due today  3) topics never scored, weak topics (< 70%)
-          4) new material (skipped in the last 7 days). Each item is cut to what still fits in the remaining minutes.
-   Topics left undone in a saved plan during the last 7 days get a 25% priority boost (see Schedule). */
+   pace_i       = how long YOU take against these estimates (see "Your pace"); it changes durations only, never a score
+   What goes in and in which order: Policy (the same rules as the plan with times and the weekly plan). */
   /* ================= EXAM PHASES (days left until the exam date) =================
    normal   > 21 days   the standard plan
    stretch  8–21 days   final stretch: "weak" means below your goal (not below 70%), new material counts 20% less,
@@ -72,17 +72,28 @@ const PlanModel = (() => {
   };
   const diffOf = i => DIFF[i] || 1;
   const easeOf = m => (!m || !m.reps.length ? 1.15 : Math.max(0.75, Math.min(1.15, 1.15 - 0.12 * Math.log2(1 + m.S))));
-  /* the estimate before your own pace is applied (what a pace observation is compared with) */
+  /* the estimates before your own pace is applied (what a pace observation is compared with) */
+  const answerBase = (i, st, m) => (60 / st.qph) * diffOf(i) * easeOf(m);
+  const reviewBase = (i, st, p) => (1 - p) * st.reviewMin * diffOf(i);
   function baseMinutesPerQ(i, st, m, p) {
-    return (60 / st.qph) * diffOf(i) * easeOf(m) + (1 - p) * st.reviewMin * diffOf(i);
+    return answerBase(i, st, m) + reviewBase(i, st, p);
   }
   function minutesPerQ(i, st, m, p) {
     return baseMinutesPerQ(i, st, m, p) * paceFactor(i);
   }
+  /* { answer, review } minutes per question of topic i, with your pace */
+  function minutesSplit(i, st, m, p) {
+    const f = paceFactor(i);
+    return { answer: answerBase(i, st, m) * f, review: reviewBase(i, st, p) * f };
+  }
 
   /* ================= YOUR PACE (learned from your check marks and focus mode) =================
      Every time a topic block of today's plan is ticked (or finished in focus mode) the time it took is compared with
-     the estimate: r = minutes it took ÷ minutes estimated. The time is the focus-mode stopwatch when there is one;
+     the estimate OF THE SAME WORK: r = minutes it took ÷ minutes estimated. A block of a plan with times holds only the
+     answering (its error review is another block), so it is compared with the answering estimate; a row of the
+     suggested daily list holds answering and review, so it is compared with both (basis 'answer' or 'all').
+     Observations saved before the basis was recorded compared a block of answering with answering + review (different
+     units), so they are kept in your data but not used. The time is the focus-mode stopwatch when there is one;
      otherwise from your previous tick today (or the block's planned start for the first one) to this tick. A ratio
      outside 0.25–4 is ignored (a forgotten tick, a break).
        weight of an observation  w = 0.5^(age in days / 30)
@@ -105,7 +116,7 @@ const PlanModel = (() => {
       S = 0;
     const per = {};
     obs.forEach(o => {
-      if (!(o.est > 0 && o.min > 0)) return;
+      if (!(o.est > 0 && o.min > 0) || !o.basis) return;
       const ww = w(o),
         l = lr(o);
       W += ww;
@@ -116,7 +127,7 @@ const PlanModel = (() => {
       x.n++;
     });
     const lg = S / (W + PACE_K_ALL),
-      v = { all: Math.exp(lg), n: obs.length, topic: {} };
+      v = { all: Math.exp(lg), n: obs.filter(o => o.basis && o.est > 0 && o.min > 0).length, topic: {} };
     Object.entries(per).forEach(([i, x]) => {
       v.topic[i] = { f: Math.exp((x.S + PACE_K_TOPIC * lg) / (x.W + PACE_K_TOPIC)), n: x.n };
     });
@@ -128,199 +139,100 @@ const PlanModel = (() => {
       f = P.topic[i] ? P.topic[i].f : P.all;
     return Math.max(0.35, Math.min(2.5, f));
   }
-  /* record how long n questions of topic i took (minutes); est = the estimate without your pace */
-  function notePace(i, n, min, src) {
+  /* record how long n questions of topic i took (minutes); est = the estimate of the same work without your pace:
+     basis 'answer' (a topic block of a plan with times) or 'all' (a row of the suggested list: answering and review) */
+  function notePace(i, n, min, src, basis) {
     if (!(n > 0) || !(min > 0) || !TOPICS[i]) return false;
+    basis = basis === 'all' ? 'all' : 'answer';
     const m = srModel(i, todayISO(), true),
-      est = n * baseMinutesPerQ(i, settings(), m, topicPNow(i, m));
+      st = settings(),
+      est = n * (basis === 'all' ? baseMinutesPerQ(i, st, m, topicPNow(i, m)) : answerBase(i, st, m));
     const r = min / est;
     if (r < 0.25 || r > 4) return false;
     state.paces = [
       ...(state.paces || []),
-      { id: uid(), topic: i, date: todayISO(), n, min: Math.round(min * 10) / 10, est: Math.round(est * 10) / 10, src },
+      {
+        id: uid(),
+        topic: i,
+        date: todayISO(),
+        n,
+        min: Math.round(min * 10) / 10,
+        est: Math.round(est * 10) / 10,
+        src,
+        basis,
+      },
     ].slice(-400);
     return true;
   }
-  function topicPNow(i, m) {
-    const sc = m && m.reps.length ? m.reps[m.reps.length - 1].p : state.scores[i];
-    return pRight(sc, m && m.reps.length ? m.R : 1);
-  }
-  /* ENERGY MODES (v1)
-   low   : skips the practice test, picks the easiest/fastest items first (high chance of being right, known topics),
-           and assumes you go 15% slower.
-   medium: the standard order (test → reviews due → no data → weak → new).
-   high  : practice test first, then the hardest work (most expected misses × difficulty), assumes you go 10% faster
-           and stretches the evening 10%.
-   Workload (1–10) = average of (chance of missing × difficulty) over the planned questions, scaled.            */
-  const ENERGY = {
-    low: { speed: 1.15, stretch: 1, test: false, order: 'easy' },
-    medium: { speed: 1, stretch: 1, test: true, order: 'standard' },
-    high: { speed: 0.9, stretch: 1.1, test: true, order: 'hard' },
-  };
+  const topicPNow = (i, m) => chanceAt(m || srModel(i, todayISO(), true), todayISO());
   /* how many questions a session takes, the way the question bank is used: a category is studied in sessions of up to
      SESSION questions (Weather, 158 q, is 40 at a time). A review is sized by how well you know the topic: a sample when
-     your last score was good, a full session when it was not, a bit more the more you have forgotten since.
-       last score ≥ goal → 15 · ≥ 75% → 20 · ≥ 70% → 25 · below → 40   × (1 + forgotten share), between 10 and 40 */
+     your estimated mastery is good, a full session when it is not, a bit more the more you have forgotten since.
+       mastery ≥ goal → 15 · ≥ 75% → 20 · ≥ 70% → 25 · below → 40   × (1 + forgotten share), between 10 and 40 */
   const SESSION = 40;
   function reviewSize(i, m) {
     const q = TOPICS[i].q,
-      last = m.reps.length ? m.reps[m.reps.length - 1].p : 0 /* last session score, in % */,
+      last = m.mastery != null ? m.mastery * 100 : 0,
       base = last >= GOAL ? 15 : last >= 75 ? 20 : last >= 70 ? 25 : SESSION,
       n = Math.round(base * (1 + Math.max(0, 1 - (m.R ?? 1))));
     return Math.min(q, Math.max(10, Math.min(SESSION, n)));
   }
   function buildPlan(asOf, over, mode, carry) {
     asOf = asOf || todayISO();
-    const st0 = over || settings(),
-      E = ENERGY[mode || 'medium'],
-      st = { ...st0, minutes: st0.minutes * E.stretch },
+    mode = ENERGY[mode] ? mode : 'medium';
+    const st = { ...(over || settings()) },
       daysLeft = Math.max(1, diffDays(asOf, state.deadline)),
       phase = examPhase(asOf),
       final = daysLeft <= 7,
-      lastDay = phase === 'lastday',
-      weakBelow = phase === 'normal' || phase === 'after' ? 70 : GOAL;
+      lastDay = phase === 'lastday';
     if (lastDay) st.minutes = Math.min(st.minutes, LASTDAY_MAX);
     const cap = Math.max(10, Math.round((st.minutes * st.qph) / 60)); /* questions/night with no review (reference) */
-    const doneT = new Set(
-      state.events.filter(e => e.date === asOf && (e.kind === 'study' || e.kind === 'review')).map(e => e.topic)
-    );
-    /* a topic block of a saved plan ticked that day counts as done too (no need to log the session first) */
-    (state.plans || []).forEach(p =>
-      (p.items || []).forEach(it => {
-        if (it.date === asOf && it.kind === 'topic' && it.check) doneT.add(it.i);
-      })
-    );
-    const testsToday = (state.tests || []).filter(x => x.date === asOf).length,
-      items = [],
-      used = new Set(),
-      planned = new Set();
-    let left = st.minutes;
-    const models = {};
-    const M = i => (models[i] ??= srModel(i, asOf, true));
-    const push = it => {
-      const per = it.per,
-        want = it.n;
-      if (!it.done) {
-        if (left < per * Math.min(5, want) - 1e-9) return false;
-        it.n = Math.max(1, Math.min(want, Math.floor((left + 1e-9) / per)));
-      }
-      it.min = Math.round(it.n * per);
-      left -= it.n * per;
-      if (it.kind === 'topic' && it.pExam != null) it.stake = ((EXAM_Q * it.n) / TOTAL) * (1 - it.pExam);
-      items.push(it);
-      if (it.kind === 'topic') planned.add(it.i);
-      return true;
-    };
-    const xDay = state.deadline > asOf ? state.deadline : asOf;
-    /* pExam = chance of getting a question of the topic right ON EXAM DAY if you do not study it again (memory keeps decaying) */
-    const topicItem = (i, n, reason) => {
-      const m = M(i),
-        p = topicPNow(i, m),
-        pExam = m.reps.length
-          ? pRight(
-              m.reps[m.reps.length - 1].p,
-              recall(diffDays(m.reps[m.reps.length - 1].date, xDay), m.reps[m.reps.length - 1].S)
-            )
-          : p;
-      return {
-        kind: 'topic',
-        i,
-        n,
-        reason,
-        done: doneT.has(i),
-        per: minutesPerQ(i, st, m, p) * E.speed,
-        diff: diffOf(i),
-        p,
-        pExam,
-      };
-    };
-    const cands = [];
-    const add = it => cands.push(it);
-    const tw = testWhy(asOf, st0),
-      man = asOf === todayISO() && manualTest(asOf);
-    if (testsToday || (tw.due && !lastDay) || man) {
-      const mu = blended(asOf).mu;
-      if (E.test || testsToday || tw.overdue >= 2 || man)
-        add({
-          kind: 'test',
-          forced: man || (!E.test && tw.overdue >= 2),
-          n: TEST_Q,
-          reason: tw.due ? tw.reason : man ? 'testManual' : 'test',
-          done: !!testsToday,
-          per: ((60 / st.qph) * 1.1 + (1 - mu) * st.reviewMin) * E.speed,
-          diff: 1.1,
-          p: mu,
-        });
-    }
-    /* topics left undone on earlier days and moved here by "Refresh plan" (before reviews due: they were due already) */
-    (carry ? [...carry] : [])
-      .filter(i => TOPICS[i] && !used.has(i))
-      .forEach(i => {
-        used.add(i);
-        add(topicItem(i, Math.min(TOPICS[i].q, 40), 'carried'));
-      });
-    const ms = srAll(asOf, true);
-    ms.filter(m => m.reps.length && m.over >= 0 && !used.has(m.i)).forEach(m => {
-      used.add(m.i);
-      add(topicItem(m.i, lastDay ? Math.min(20, reviewSize(m.i, m)) : reviewSize(m.i, m), 'due'));
-    });
-    ms.filter(m => !lastDay && !m.reps.length && !used.has(m.i)).forEach(m => {
-      used.add(m.i);
-      add(topicItem(m.i, Math.min(TOPICS[m.i].q, 40), 'nodata'));
-    });
-    TOPICS.map((x, i) => i)
-      .filter(
-        i =>
-          !used.has(i) &&
-          ['Not Comfortable', 'To review'].includes(state.statuses[i]) &&
-          (state.scores[i] ?? 0) < weakBelow
-      )
-      .sort((a, b) => TOPICS[b].q - TOPICS[a].q)
-      .forEach(i => {
-        used.add(i);
-        add(topicItem(i, Math.min(TOPICS[i].q, lastDay ? 20 : 40), 'weak'));
-      });
-    const newOnes = [];
-    if (!final)
-      TOPICS.map((x, i) => i)
-        .filter(i => !used.has(i) && ['Todo', 'Doing'].includes(state.statuses[i]))
-        .sort((a, b) => (state.statuses[b] === 'Doing') - (state.statuses[a] === 'Doing') || TOPICS[b].q - TOPICS[a].q)
-        .forEach(i => {
-          used.add(i);
-          newOnes.push(topicItem(i, Math.min(TOPICS[i].q, 40), 'new'));
-        });
-    /* low energy: easiest first — also topics you already know (Very Comfortable, recently reviewed) as light reviews */
-    if (E.order === 'easy')
-      TOPICS.map((x, i) => i)
-        .filter(i => !used.has(i) && state.statuses[i] === 'Very Comfortable')
-        .forEach(i => {
-          used.add(i);
-          const it = topicItem(i, Math.min(TOPICS[i].q, 20), 'light');
-          if (it.p >= 0.6) add(it);
-        });
-    cands.push(...newOnes);
+    /* a session logged that day, or a topic block of a saved plan ticked that day (no need to log it first) */
+    const doneT = doneOn(asOf);
+    /* the candidates and their values: Policy, the same as the plan with times */
+    const minutesFor = (i, m, p) => minutesSplit(i, st, m, p),
+      cands = topicCands(asOf, {
+        mode,
+        carry: carry ? new Set(carry) : null,
+        done: doneT,
+        minutesFor,
+        withReview: true,
+      }),
+      tc = testCand(asOf, mode, st, true);
+    if (tc) cands.unshift(tc);
+    /* what you already did today keeps its place (and its minutes); the rest of the time goes by value per minute */
     const done = cands.filter(x => x.done),
-      todo = cands.filter(x => !x.done);
-    const tRank = x => (x.kind !== 'test' ? 1 : x.forced ? 0 : 2);
-    if (E.order === 'easy') todo.sort((a, b) => tRank(a) - tRank(b) || a.per - b.per || b.p - a.p);
-    /* standard: practice test first, then the most exam questions at stake per minute of study:
-     (1 − pExam) × urgency ÷ minutes per question — every bank question is equally likely on the exam, so this is the
-     expected exam-day questions protected per minute (urgency: overdue review 1.3, weak 1.15, no data 1.1, new 1.0) */
-    const URG = {
-        due: 1.3,
-        weak: 1.15,
-        nodata: 1.1,
-        new: phase === 'normal' || phase === 'after' ? 1 : 0.8,
-        light: 0.8,
-      },
-      missed = typeof missedTopics === 'function' ? missedTopics(asOf) : new Set(),
-      val = x => ((1 - x.pExam) * (URG[x.reason] || 1) * (missed.has(x.i) ? 1.25 : 1)) / x.per;
-    if (E.order === 'standard') todo.sort((a, b) => (b.kind === 'test') - (a.kind === 'test') || val(b) - val(a));
-    if (E.order === 'hard')
-      todo.sort((a, b) => (b.kind === 'test') - (a.kind === 'test') || (1 - b.p) * b.diff - (1 - a.p) * a.diff);
-    [...done, ...todo].forEach(push);
+      budget = st.minutes;
+    let left = budget;
+    const items = [];
+    done.forEach(c => {
+      /* what was done: the questions logged today when the count is known, otherwise a review-sized session (not a
+         whole 40-question chunk the app never saw) */
+      const logged = state.events
+          .filter(e => e.date === asOf && e.topic === c.i && e.total > 0)
+          .reduce((a, e) => a + e.total, 0),
+        n0 = c.kind === 'test' ? c.n : logged || Math.min(c.n, reviewSize(c.i, srModel(c.i, asOf, true))),
+        n = c.kind === 'test' ? c.n : Math.max(1, Math.min(n0, Math.floor((left + 1e-9) / c.per)));
+      const min = Math.min(Math.max(0, left), Math.ceil(n * c.per - 1e-9));
+      items.push({ ...c, n, min });
+      left -= min;
+    });
+    const pick = orderCands(
+      selectCands(
+        cands.filter(x => !x.done),
+        Math.max(0, left),
+        5
+      ),
+      mode
+    );
+    pick.forEach(c => items.push({ ...c, min: Math.ceil(c.n * c.per - 1e-9) }));
+    items.forEach(it => {
+      if (it.kind === 'topic') it.stake = 60 * examShare(it.i).share * Math.min(1, it.n / it.nRef) * (1 - it.pExam);
+    });
+    const planned = new Set(items.filter(x => x.kind === 'topic').map(x => x.i));
     doneT.forEach(i => {
-      if (!planned.has(i)) items.push({ kind: 'topic', i, n: 0, min: 0, reason: 'extra', done: true, diff: diffOf(i) });
+      if (!planned.has(i))
+        items.push({ kind: 'topic', i, n: 0, min: 0, reason: 'extra', done: true, diff: diffOf(i), why: [] });
     });
     const remaining = TOPICS.reduce((a, x, i) => a + (state.statuses[i] === 'Very Comfortable' ? 0 : x.q), 0);
     const sum = (arr, k) => arr.reduce((a, x) => a + (x[k] || 0), 0);
@@ -331,9 +243,9 @@ const PlanModel = (() => {
     return {
       items,
       cap,
-      mode: mode || 'medium',
+      mode,
       workload,
-      budget: Math.round(st.minutes),
+      budget: Math.round(budget),
       total: sum(items, 'n'),
       minutes: sum(items, 'min'),
       done: sum(
@@ -394,6 +306,8 @@ const PlanModel = (() => {
     paceTable,
     notePace,
     baseMinutesPerQ,
+    minutesSplit,
+    diffOf,
   };
 })();
 const {
@@ -413,4 +327,6 @@ const {
   paceTable,
   notePace,
   baseMinutesPerQ,
+  minutesSplit,
+  diffOf,
 } = PlanModel;

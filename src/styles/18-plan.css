@@ -74,6 +74,10 @@
   background: #43301a;
   color: #ffbe7a;
 }
+.rchip.coverage {
+  background: #23343a;
+  color: #9fdcef;
+}
 .rchip.nodata {
   background: #2f2a45;
   color: #c3b6ff;

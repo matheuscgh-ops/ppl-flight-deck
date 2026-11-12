@@ -47,7 +47,8 @@ with sync_playwright() as p:
             before = mu
             pg.evaluate("state.events.push({id:uid(),date:todayISO(),topic:18,kind:'review',score:95,partial:false,demo:false});state.scores[18]=95;save();render()")
             after = pg.evaluate('blended().mu')
-            check(f'{tag}: logging a 95% Weather review raises the forecast', after > before + 0.03, (before, after))
+            # Weather is about 6% of the test (ACS area I split by bank size), so one good review moves the forecast by under 2 points
+            check(f'{tag}: logging a 95% Weather review raises the forecast', after > before + 0.005, (before, after))
             check(f'{tag}: preview updates live', pg.inner_text('#fcMiniVal') == f'{round(after*100)}%')
             pg.evaluate("state.events.pop();state.scores[18]=55;save();render()")
             # inline score edit (desktop: click pill)

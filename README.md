@@ -6,7 +6,7 @@ A study tracker for the **FAA Private Pilot (PPL) Knowledge Test**. It is a sing
 **Demo with fictional data and a guided tour:** https://matheuscgh-ops.github.io/ppl-flight-deck/demo.html  
 **User guide (English, Português, 日本語):** https://matheuscgh-ops.github.io/ppl-flight-deck/docs/
 
-The app follows the 26 topics of the Sporty's question bank (1,058 questions). It turns your study history into a plan and an exam forecast, with a target of **85%** on the 60-question test (passing is 70%).
+The app follows the 28 topics of the Sporty's question bank (1,125 questions). It turns your study history into a plan and an exam forecast, with a target of **85%** on the 60-question test (passing is 70%).
 
 ---
 
@@ -15,7 +15,7 @@ The app follows the 26 topics of the Sporty's question bank (1,058 questions). I
 | | When | What it does |
 |---|---|---|
 | **Dashboard (Kanban)** | Every day — it drives your decisions | One card per topic. Drag cards from *To Do* → *Doing* → *Not Comfortable* / *Very Comfortable* / *To Review*, and tap a card to log a session and its score. |
-| **Plan** | Planning your day or week ahead | A week view of your saved plans and **My plans** (create, view, edit, activate / deactivate, copy to next week, delete). New plans take 4 steps: type (daily / weekly) → **time blocks** (click and drag in 15-minute steps; tap a start and an end on touch; Undo / Redo) → **topics** placed by your statistics (editable, plus your own activities such as *Simulator*) → review and save. **⇄ Sync with Kanban** proposes moving today's topics to *Doing* and applies only the moves you approve. Today's list comes from the active daily plan, else the active weekly plan, else the suggestion (topics ordered by **exam-day questions at stake per minute**, sized to your time and energy). |
+| **Plan** | Planning your day or week ahead | A week view of your saved plans and **My plans** (create, view, edit, activate / deactivate, copy to next week, delete). New plans take 4 steps: type (daily / weekly) → **time blocks** (click and drag in 15-minute steps; tap a start and an end on touch; Undo / Redo) → **topics** placed by your statistics (editable, plus your own activities such as *Simulator*) → review and save. **⇄ Sync with Kanban** proposes moving today's topics to *Doing* and applies only the moves you approve. Today's list comes from the active daily plan, else the active weekly plan, else the suggestion (topics ordered by **test questions at risk per minute**, sized to your time and energy, each with what to do and why). |
 | **Practice tests** | After each FAA practice test (always 60 questions) | Log the score, see the trend line, the date you reach 85% and the next suggested test. |
 | **Statistics** | When you want to analyse | *Question bank*: forecast model, where you lose questions, a *needs recall* carousel, today's heat map (click for its history), study volume and a spaced-repetition curve per topic. *Practice tests*: trend, histogram, test-based forecast and model accuracy. |
 
@@ -23,14 +23,19 @@ One statistics engine feeds every screen, so the dashboard, the plan and the sta
 
 ## The math (short version)
 
-- **Memory (spaced repetition):** recall `R(t) = 1 / (1 + t / 9S)`. Stability `S` grows after good sessions (score ≥ 70%), grows a little at 60–69% and shrinks below 60%.
-- **Chance of a right answer per topic:** `score × R + 1/3 × (1 − R)`. When you forget a topic you fall back to guessing among 3 options, not to zero.
-- **Question-bank model:** questions weighted like the bank (`q_i / 1,058`).
-- **Exam forecast:** the question-bank model blended with your last 3 practice tests. Newer tests weigh more (half-life of 10 days).
+- **Evidence → mastery → confidence → retention, kept apart:** each result is a score with its sample (27/30; a bare % keeps an unknown sample, never invented) and a kind of attempt (first try 1 · repeat of the same questions 0.3 · after seeing the answers 0). Mastery `m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4)`, pulled toward your overall level `p̄`; confidence = effective questions (2/2 ≠ 40/40).
+- **Memory (spaced repetition):** estimated recall `R(t) = 1 / (1 + t / 9S)`. A review is the day's **first** attempt (never the best score). Stability grows after ≥ 70%, **stays** at 60–69% and shrinks below 60%, moved in proportion to the sample (`min(1, n/15)`); under 8 questions is evidence but not a review.
+- **Chance of a right answer per topic:** `mastery × R + 1/3 × (1 − R)`. When you forget a topic you fall back to guessing among 3 options, not to zero.
+- **Share of the test:** the official share of each ACS area (PSI PAR bulletin, checked 2026-11-11), split inside the area by bank size (an approximation, marked as estimated); the 9% of areas with no Sporty's topic is scored with the average. Used once, in the forecast and in the plan.
+- **Exam forecast:** the question-bank model blended with your last 3 practice tests (newer tests weigh more, half-life 10 days). An imported test counts once: the model part leaves out its topic results.
 - **Chance to pass / reach 85%:** a beta-binomial over 60 questions, so the uncertainty of the estimate is included.
 - **Trend:** least-squares line over practice-test scores (R² is shown as a tooltip). After the last test the projection slows down instead of running to 100%.
-- **Plan order:** `(1 − p on exam day) × urgency ÷ minutes per question`. Topics you missed in a plan during the last 7 days get a 25% boost.
-- **Filling time blocks:** each continuous block is a knapsack (most exam-day questions protected within its minutes, then the leftover time goes to part of the next topic). Following Cal Newport's deep work, a block holds at most one topic per ~45 minutes, and the hardest or longest-unreviewed topic goes first while you are fresh. A weekly plan fills the days in order and assumes the earlier days were done, so a topic reviewed on Monday is not due again on Tuesday. Each topic is followed right away by the **error review** of its own misses, like the question bank shows a category's misses when you finish it. The block's review time is sized by the misses expected in it (questions × (1 − p) × difficulty × review minutes per miss; at least 10 min, at most a quarter of the block, none when fewer than 3 misses are expected) and split among its topics in proportion to their expected misses, in 5-minute steps. The topics are trimmed, easiest first, to keep the reviews in the same block; only when a practice test or a topic that cannot shrink fills the block does the review open the next block, as one item. In the wizard you drag topics to reorder them (grip ⠿ on touch screens; a topic moves with its review) and click a card to edit it. 20+ free minutes get one more topic, and no topic chunk is shorter than 10 minutes.
+- **One policy for every plan** (daily list, calendar, week, Refresh): risk = `60 × share × (1 − p on exam day)` — questions likely missed, not a score gain — × the part of the session the topic needs × timing (1.2 due · 1.25 left undone · 0.8 new in the final stretch). Each day the two topics idle longest (14+ days or never studied) are lifted to the day's median value (coverage). Densest value per minute first, cut to fit; your time is a hard limit.
+- **Energy** changes the format, not the value or the time: low ≤ 20 q, easiest first, guided examples, no test; medium ≤ 40 q, most valuable first; high ≤ 40 q, hardest first — the same in the daily list and the calendar. Minutes per question = (answer + review of misses) × your pace, one factor for both.
+- **Week:** projected sessions repeat your current mastery (no 70% floor) and never become evidence.
+- **Each suggestion explains itself:** the activity (new questions, concept review, guided examples, recall without notes, fluency, short diagnostic) and the main reasons, with the evidence behind them.
+- **AI-analysed practice tests:** import a JSON (schema v1, full result or misses only) from ChatGPT or another AI; preview, validation, duplicates refused, atomic apply, Undo. The app copies a ready-made prompt with its real topics. Examples in `docs/examples/`.
+- **Filling time blocks:** each continuous block is filled by value per minute (then the leftover time goes to part of the next topic). Following Cal Newport's deep work, a block holds at most one topic per ~45 minutes; the order follows your energy. Each topic is followed right away by the **error review** of its own misses, like the question bank shows a category's misses when you finish it. The block's review time is sized by the misses expected in it (questions × (1 − p) × difficulty × review minutes per miss; at least 10 min, at most a quarter of the block, none when fewer than 3 misses are expected) and split among its topics in proportion to their expected misses, in 5-minute steps. The least valuable topics are trimmed first to keep the reviews in the same block; only when a practice test or a topic that cannot shrink fills the block does the review open the next block, as one item. In the wizard you drag topics to reorder them (grip ⠿ on touch screens; a topic moves with its review) and click a card to edit it. 20+ free minutes get one more topic, and no topic chunk is shorter than 10 minutes.
 
 The *How it is calculated* sections in the app list every formula.
 
@@ -52,7 +57,7 @@ The *How it is calculated* sections in the app list every formula.
 - Calendar with study streak, activity per day and practice tests.
 - Charts with hover: a dashed crosshair to both axes, a dot on each line and the values. On practice tests the cursor snaps to each test. Tap and drag on phones.
 - Range selectors (3D → All) on every chart, with a separate one for all the small topic charts.
-- **Heat map by topic:** one tile per topic for today, coloured cold → hot by the **chance of a right answer** (`score × recall + 1/3 × (1 − recall)`, the same number the forecast uses), coldest first. Click the card for the history (days, weeks or months, with interval filters and hover details).
+- **Heat map by topic:** one tile per topic for today, coloured cold → hot by the **chance of a right answer** (`mastery × recall + 1/3 × (1 − recall)`, the same number the forecast uses), coldest first. Click the card for the history (days, weeks or months, with interval filters and hover details).
 - **Plans and weekly review:** planned vs done for the week, missed blocks marked, and a nudge from Friday on to plan next week. A daily plan over an active weekly plan asks before replacing that day; a second weekly plan for the same week asks before replacing the week.
 - **Carousels:** every 3 s the dashboard preview and the *Needs recall* card on Statistics move through the topics left in today's plan (most urgent first). They pause on hover.
 - **Study volume** is always open on Statistics, and in a dialog from the dashboard.
@@ -79,7 +84,7 @@ src/styles/             CSS, one file per component, concatenated in order
 src/i18n/               translations (English, Português, 日本語)
 src/js/core/            config, helpers, state and saving
 src/js/data/            your study history (personal app only)
-src/js/model/           spaced repetition, forecast, practice tests, plan
+src/js/model/           spaced repetition, forecast, practice tests, plan, policy (what to study), exam import
 src/js/views/           dashboard, plan, statistics, heat map, volume, carousels …
 src/js/ui/              charts, hover, dialogs (shared modal wiring), navigation, header, settings
 src/js/sync/            GitHub Gist sync
@@ -116,7 +121,7 @@ To run a suite in WebKit (the engine of Safari on iPhone) instead of Chromium: `
 
 **Continuous integration:** `.github/workflows/tests.yml` runs every suite in Chromium on each pull request and push to `main` (one job per suite, in parallel), and the touch and layout suites in WebKit. The WebKit jobs are report-only for now: they show their result on the pull request without blocking the merge.
 
-The suites cover the built-in unit tests (formulas checked against independent calculations and scipy), end to end, sync with a mocked GitHub API, demo/personal isolation, layouts, calendar, volume, spaced repetition everywhere, forecast and plan, practice tests, chart hover, the Statistics layout and heat map, the carousels, saved plans and the Kanban sync, exam phases and the readiness checklist, the next-up bar and focus mode, the phone dashboard cards, your pace and the dynamic refresh, Settings, the guided tour, the user guide and its links, and the build itself.
+The suites cover the built-in unit tests (formulas checked against independent calculations and scipy), end to end, sync with a mocked GitHub API, demo/personal isolation, layouts, calendar, volume, spaced repetition everywhere, forecast and plan, practice tests, chart hover, the Statistics layout and heat map, the carousels, saved plans and the Kanban sync, exam phases and the readiness checklist, the next-up bar and focus mode, the phone dashboard cards, your pace and the dynamic refresh, the study day, planner v2 (evidence, ACS shares, energy and time, AI test import), Settings, the guided tour, the user guide and its links, and the build itself.
 
 ## Publishing on GitHub Pages
 

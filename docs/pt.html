@@ -215,8 +215,10 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
     <li>Clique no nome do cartão (ou selecione e aperte <kbd>Enter</kbd>).</li>
     <li>Escolha <span class="ui">Studied</span> (primeira vez), <span class="ui">Reviewed</span> (revisão) ou <span class="ui">Status only</span> (só mudar a lista).</li>
     <li>Digite a nota da sessão, ou quantas você acertou em <span class="ui">Acertos</span>: quando o tópico está no plano de hoje, o número de questões já vem preenchido ("27 de 30" dá 90%, e dá para trocar o 30). Deixe a nota em branco se a sessão ainda está em andamento: ela conta como iniciada, mas não entra na memória.</li>
+    <li>Escolha a <span class="ui">Tentativa</span>: <span class="ui">Primeira tentativa / questões novas</span>, <span class="ui">Repetição das mesmas questões</span> ou <span class="ui">Depois de ver as respostas</span>. A primeira tentativa conta inteira; a repetição conta 30% (você lembra parte das respostas); uma nota depois de ver as respostas não é evidência nem revisão.</li>
     <li>Ajuste a lista e a data, se precisar, e clique em <span class="ui">Save</span>.</li>
   </ol>
+  <p><b>Acertos guardam a amostra.</b> "27 de 30" fica salvo como 27/30, então o app sabe quanta evidência é. Uma porcentagem digitada (e toda sessão salva antes) fica com amostra desconhecida: o app nunca inventa uma.</p>
   <figure class="mid"><img src="img/pt/log.jpg" alt="Diálogo de registro de sessão" loading="lazy"><figcaption>O histórico do tópico fica embaixo. O × apaga uma entrada, com desfazer.</figcaption></figure>
   <p><b>Questões de hoje e nota rápida:</b> um card que está no plano de hoje mostra as questões planejadas para ele, por exemplo <b>30</b>/158 q em Weather. Toque na nota para digitar quantas você acertou dessas 30 (27 → 90%, mostrado enquanto você digita) e aperte <kbd>Enter</kbd>. O botão <span class="ui">/30</span> troca para digitar a porcentagem. Um card fora do plano de hoje pede a porcentagem, como antes. Nos dois casos atualiza a última sessão do tópico.</p>
   <p><b>Seus cards:</b> <span class="ui">+ Add a card</span> no fim de uma lista cria uma tarefa sua, como "Revisar a teoria" ou "Fraseologia: solo". O Enter adiciona e deixa a caixa aberta para o próximo; o Esc fecha. Seus cards se arrastam como qualquer card; clique num deles para renomear ou apagar. Eles são só lembretes: nunca entram na barra de progresso, nas estatísticas nem na previsão.</p>
@@ -366,6 +368,30 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
     <li><b>Tendência:</b> a reta dos seus resultados, com a projeção até a prova e a data em que você chega na meta.</li>
     <li>Simulados deixados em andamento por dias aparecem com um aviso, para você completar ou apagar.</li>
   </ul>
+  <h3 id="ai-import">Importar resultados analisados por IA</h3>
+  <p>Uma IA (ChatGPT ou outra) pode classificar as questões de um simulado da Sporty's nos tópicos do app. A IA só classifica e explica; o app calcula sozinho todas as notas e prioridades, e ignora qualquer peso ou dificuldade que a IA acrescente.</p>
+  <ol class="steps">
+    <li>Faça o simulado na Sporty's.</li>
+    <li>Em <span class="ui">Simulados</span>, clique em <span class="ui">Importar resultado da IA</span> e depois em <span class="ui">Copiar o prompt para a IA</span>. Cole na IA junto com seus resultados (o relatório, as questões ou só as que você errou).</li>
+    <li>Cole o JSON que ela responder (ou escolha o arquivo .json / .txt) na caixa.</li>
+    <li>Confira a prévia: toda questão pode mudar de tópico; as incertas ficam com contorno amarelo. Erros bloqueiam a importação; avisos explicam o que fica de fora.</li>
+    <li>Clique em <span class="ui">Importar</span>. O aviso oferece <span class="ui">Desfazer</span>.</li>
+  </ol>
+  <ul>
+    <li><b>Resultado completo</b> (todas as respostas, ou acertos/total por tópico): cada tópico recebe um resultado com a amostra (5/10), e a nota geral entra nos seus simulados.</li>
+    <li><b>Somente erros</b>: nenhuma nota por tópico é calculada (não há denominador); tópico ausente não conta como dominado, e nenhum conta como zero acertos. Os tópicos com erros entram para revisão. A nota geral só é salva se o total e o número de erros forem conhecidos.</li>
+    <li>O mesmo simulado não entra duas vezes (mesmo id ou mesmo conteúdo). Nada muda até você confirmar, e uma importação que falha não altera nada.</li>
+    <li>As notas Sporty's dos cartões não são sobrescritas: o resultado importado é uma evidência à parte, com data e origem.</li>
+    <li>Exemplos: <a href="examples/exam-full.json">resultado completo</a> · <a href="examples/exam-errors-only.json">somente erros</a>.</li>
+  </ul>
+<div class="formula">{ "schemaVersion": 1, "examId": "sportys-2026-11-08-a", "date": "2026-11-08", "platform": "Sporty's",
+  "mode": "full" | "errorsOnly",  "coverage": "complete" | "partial",
+  "overall": { "total": 60, "right": 47, "wrong": 13 },
+  "topics": [ { "topicId": "weather-information", "total": 10, "right": 5, "wrong": 5, "seconds": null } ],
+  "questions": [ { "qid": "Q07", "topicId": "weather-information", "tags": ["TAF"], "acs": null,
+                   "correct": false, "classificationConfidence": 0.9, "doubt": null,
+                   "errorType": "concept", "explanation": "…", "seconds": null } ] }
+desconhecido → null (nunca chutado) · uma questão tem um tópico e conta uma vez, com quaisquer etiquetas</div>
 </section>
 
 <section class="chap" id="statistics">
@@ -477,19 +503,26 @@ ul.refs li { margin-bottom: 6px; font-size: 15.5px; }
 <section class="chap" id="math">
   <h2><span class="n">09</span>Como os números são calculados</h2>
   <p class="intro">Um único motor de estatísticas alimenta todas as telas, então o mesmo número aparece igual em todo lugar. As seções "How it is calculated" do app trazem as fórmulas completas.</p>
-<div class="formula">memória         R(t) = 1 / (1 + t / 9S)        S = estabilidade, cresce após boas sessões
-próxima revisão quando R cai ao ponto de revisão  (90% → S dias)
-chance de acertar  p = nota × R + 1/3 × (1 − R)   (esquecer = chutar entre 3)
-modelo do banco    μ = Σ (questões do tópico / 1.125) × p
-previsão           μ do banco misturado com os 3 últimos simulados (meia-vida de 10 dias)
-passar / meta      beta-binomial em 60 questões: P(X ≥ 42) e P(X ≥ 51)
-ordem do plano     (1 − p no dia da prova) × urgência ÷ minutos por questão
-tamanho da sessão  revisão: 15 / 20 / 25 / 40 pela última nota (≥ 85 / 75 / 70 / abaixo) × (1 + parte esquecida), 10 … 40
-                   tópico novo ou fraco: até 40 · nunca um pedaço abaixo de 20 num tópico grande
-blocos             knapsack por bloco, mais difícil primeiro, 1 tópico a cada ~45 min
-revisão dos erros  erros esperados = Σ questões × (1 − p) × dificuldade
-                   minutos do bloco = erros × min por erro  (≥ 10, ≤ ¼ do bloco, só se ≥ 3 erros)
-                   revisão de cada tópico = minutos do bloco × erros dele ÷ erros do bloco  (passos de 5 min)</div>
+<div class="formula">evidência         cada resultado: nota p, amostra n (desconhecida → pesa como 15), tentativa (primeira 1 · repetição 0,3 · depois das respostas 0)
+domínio           m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4)     w = tentativa × 0,5^(idade / 45 d),  p̄ = seu nível geral
+confiança         questões efetivas: baixa &lt; 10 · média &lt; 30 · alta ≥ 30 (nunca alta só com amostras desconhecidas)
+memória           R(t) = 1 / (1 + t / 9S)  — uma estimativa, não uma medição
+estabilidade      primeira: 1 / 1,5 / 2 pela nota;  depois: ≥ 70 cresce, 60–69 fica, &lt; 60 × 0,4;  movida por min(1, n/15) × tentativa
+próxima revisão   quando R cai ao ponto de revisão (90% → S dias); menos de 8 questões não é revisão
+acerto            p = m × R + 1/3 × (1 − R)   (esquecer = chutar entre 3)
+peso na prova     % da área ACS (boletim PSI PAR) dividido dentro da área pelo tamanho do banco; 9% de áreas sem tópico
+modelo do banco   μ = Σ peso × p + sem tópico × média
+previsão          μ do banco (sem os resultados por tópico desses mesmos simulados) combinado com os 3 últimos simulados
+aprovar / meta    beta-binomial em 60 questões: P(X ≥ 42) e P(X ≥ 51)
+risco             60 × peso × (1 − p no dia da prova)  — questões que provavelmente erraria, não ganho de nota
+valor             risco × (n / sessão necessária) × 1,2 se vencida × 1,25 se ficou pendente × 0,8 matéria nova na reta final
+cobertura         os 2 tópicos parados há mais tempo (≥ 14 dias ou nunca) → no mínimo o valor por minuto mediano do dia
+escolha           mais valor por minuto primeiro, cortado para caber; nunca passa do seu tempo
+energia           baixa: ≤ 20 q, mais fácil primeiro, sem simulado · média: ≤ 40 q, mais valioso primeiro · alta: ≤ 40 q, mais difícil primeiro
+minutos           (resposta + revisão dos erros) × seu ritmo — o mesmo fator para os dois
+semana            sessões projetadas repetem seu domínio atual (sem piso) e nunca viram evidência
+revisão de erros  erros esperados = Σ questões × (1 − p) × dificuldade
+                  minutos do bloco = erros × min por erro  (≥ 10, ≤ ¼ do bloco, só se ≥ 3 erros)</div>
   <p>Na tendência dos simulados, a projeção desacelera depois do último simulado em vez de correr até 100%.</p>
 </section>
 <section class="chap" id="science">
@@ -509,10 +542,13 @@ S  estabilidade: quantos dias leva para R cair a 90%</div>
   <p>Um ponto de revisão maior significa intervalos menores e mais revisões; um menor significa menos revisões e mais esquecimento no meio.</p>
 
   <h3 id="sci-score">Da memória para uma nota esperada</h3>
-  <p>As questões da FAA têm 3 alternativas. Se você lembra um tópico, acerta no nível da sua última nota; se esqueceu, ainda acerta cerca de 1 em 3 no chute. Então a chance de acertar num tópico é uma mistura das duas coisas:</p>
-<div class="formula">p = nota × R + 1/3 × (1 − R)</div>
-  <p>A prova sorteia as 60 questões mais ou menos na proporção de quantas questões cada tópico tem no banco, então a nota esperada é a média ponderada:</p>
-<div class="formula">μ = Σ (questões do tópico / 1.125) × p</div>
+  <p><b>Quanto vale um resultado.</b> O app separa quatro coisas: o <b>resultado observado</b> (5/10), o <b>domínio</b> estimado do tópico, a <b>confiança</b> nessa estimativa e a <b>retenção</b> estimada hoje. Poucas questões dizem pouco, então o domínio parte do seu nível geral e vai em direção aos seus resultados conforme eles se acumulam: 2/2 não é 40/40. Refazer as mesmas questões conta 30% e uma nota digitada depois de ver as respostas não conta, então 50% seguido de 100% no mesmo conjunto fica perto de 60%. Registros salvos só com porcentagem ficam com amostra desconhecida; pesam como uma sessão comum de 15 questões e nunca chegam a confiança "alta".</p>
+<div class="formula">domínio m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4)</div>
+  <p><b>Resultados fracos.</b> Uma nota de 60 a 69% não aumenta mais o intervalo, e uma amostra pequena quase não o mexe. Um erro com a memória ainda alta indica compreensão (o plano sugere rever o conceito); um erro depois de muito tempo indica esquecimento (recuperação sem consulta). Esse rótulo só escolhe a atividade: a nota baixa conta uma vez só.</p>
+  <p>As questões da FAA têm 3 alternativas. Se você lembra um tópico, acerta no nível do seu domínio; se esqueceu, ainda acerta cerca de 1 em 3 no chute:</p>
+<div class="formula">p = m × R + 1/3 × (1 − R)</div>
+  <p><b>Peso na prova.</b> A FAA sorteia as 60 questões por área de operação do ACS, com percentuais oficiais (boletim PSI PAR): Preflight Preparation 22%, Takeoffs, Landings and Go-Arounds 20%, Preflight Procedures 13% e assim por diante. Os tópicos da Sporty's são as próprias tasks do ACS, então cada um pertence a uma área; dentro da área o percentual é dividido pelo tamanho do banco da Sporty's, uma aproximação marcada como "estimado" no plano. Basic Instrument Maneuvers (7%) e Postflight Procedures (2%) não têm tópico na Sporty's: a previsão usa a média dos outros para elas. Os pesos somam 100% e são usados uma vez só — 60 × peso é só uma referência aproximada de quantas questões podem vir de um tópico.</p>
+<div class="formula">μ = Σ peso × p  +  9% × (média dos tópicos mapeados)</div>
   <p><b>Chance de passar.</b> O número de acertos em 60 segue uma distribuição binomial se toda questão tiver a mesma chance μ. Mas μ também é uma estimativa, e o app sabe o quanto ela já errou: o erro dela contra os seus simulados reais. Por isso ele usa uma distribuição <b>beta-binomial</b>, que espalha as chances por essa incerteza em vez de fingir que μ é exato. Passar é 42 de 60 (70%), e a meta padrão é 51 de 60 (85%):</p>
 <div class="formula">chance de passar = P(X ≥ 42)        chance da meta = P(X ≥ 51)        X ~ BetaBinomial(60, μ)</div>
   <p><b>"Se você parar de revisar"</b> faz a mesma conta no dia da prova, deixando todas as curvas caírem sem novas sessões. A distância entre a nota de hoje e essa linha é o que as suas revisões estão protegendo.</p>
@@ -520,15 +556,21 @@ S  estabilidade: quantos dias leva para R cair a 90%</div>
   <h3 id="sci-tests">Simulados e a previsão combinada</h3>
   <p>Os simulados medem tudo de uma vez, mas cada um tem ruído. A previsão faz a média dos seus 3 últimos simulados com <b>pesos de decaimento exponencial</b>: um simulado perde metade do peso a cada 10 dias (a meia-vida, em Ajustes). Depois ela combina essa média com o modelo do banco μ, para um único dia bom ou ruim não balançar a previsão.</p>
 <div class="formula">peso de um simulado = 0,5 ^ (idade em dias / meia-vida)</div>
+  <p>Um simulado importado conta uma vez só: a nota geral entra na média, então a parte do modelo deixa de fora os resultados por tópico desse mesmo simulado (senão o mesmo simulado pareceria duas observações independentes).</p>
   <p>A <b>tendência</b> é uma reta de mínimos quadrados pelas suas notas. A projeção desacelera depois do último simulado em vez de correr até 100%, porque as notas se estabilizam perto do seu teto. O gráfico de precisão do modelo compara o que o modelo do banco previu em cada dia de simulado com a nota que você realmente tirou.</p>
 
   <p><b>Histórico da previsão.</b> Para cada simulado o app recalcula a previsão geral como ela era na véspera, usando só o que você tinha feito até então, e compara com a sua nota. Ele mostra o erro médio dos últimos 5 simulados e o <b>Brier score</b> da chance de passar, a forma padrão de avaliar previsões de probabilidade: 0 é perfeito, e 0,25 é o que você teria dizendo sempre 50%.</p>
 <div class="formula">Brier = média de (chance prevista − resultado)²,   resultado = 1 se a nota chegou a 70%, senão 0</div>
 
   <h3 id="sci-plan">Como o plano decide o que você estuda</h3>
-  <p>Cada tópico recebe uma prioridade: quantos pontos ele ainda pode te dar no dia da prova, quão urgente é a revisão dele e quanto tempo as questões dele levam.</p>
-<div class="formula">prioridade = (1 − p no dia da prova) × urgência ÷ minutos por questão</div>
-  <p>Preencher um bloco é um <b>problema da mochila</b> (knapsack): escolher os tópicos cujo tempo total cabe no bloco e cujo valor total (questões protegidas) é o maior possível. O app resolve isso de forma exata para cada bloco e depois coloca o tópico mais difícil primeiro, quando a sua atenção está mais fresca.</p>
+  <p>Um único conjunto de regras decide a sugestão do dia, o plano com horários, a semana e o <span class="ui">Atualizar plano</span>. Cada tópico vale as questões da prova que você provavelmente erraria nele se não estudar de novo — não um ganho de nota prometido, já que o app não modela quanto uma sessão ensina:</p>
+<div class="formula">risco = 60 × peso × (1 − p no dia da prova)
+valor = risco × (n / sessão que o tópico precisa) × momento
+momento: × 1,2 revisão vencida · × 1,25 pendente num plano · × 0,8 matéria nova na reta final</div>
+  <p>O domínio já carrega notas baixas e erros recentes, então nada soma uma penalidade separada de "fraco" ou "difícil". A cada dia, os dois tópicos parados há mais tempo (14 dias ou mais, ou nunca estudados) sobem para pelo menos o valor mediano do dia, para que tópicos pequenos, pouco cobrados ou difíceis voltem sempre sem tirar o lugar das revisões vencidas. O valor é proporcional ao número de questões, então pegar primeiro o que dá mais valor por minuto e cortar o último pedaço para caber é o melhor uso do tempo (mochila fracionária). O tempo que você dá é um limite rígido.</p>
+  <p><b>Energia</b> muda o formato, nunca o valor nem o tempo: energia baixa usa pedaços de no máximo 20 questões, o mais fácil primeiro, exemplos guiados em vez de série cronometrada nos tópicos difíceis, e sem simulado a menos que esteja atrasado; média usa até 40 (uma sessão do banco), o mais valioso primeiro; alta também até 40, o mais difícil primeiro. A lista do dia e o calendário seguem as mesmas regras.</p>
+  <p><b>Cada sugestão se explica:</b> a atividade (questões novas, rever o conceito, exemplos guiados, recuperação sem consulta, prática de fluência ou diagnóstico curto) e os motivos principais — seu último resultado com a amostra, revisão vencida, erros importados de um simulado, o peso do tópico na prova (marcado quando estimado) e quanta evidência existe.</p>
+  <p><b>A semana.</b> Planejar vários dias supõe que os dias anteriores foram feitos, mas uma sessão projetada só repete seu domínio atual (sem piso de 70%, sem supor aprendizado) e nunca vira evidência. Um tópico fraco continua voltando; o <span class="ui">Atualizar plano</span> replaneja a partir dos seus resultados reais.</p>
   <p><b>Revisão dos erros.</b> Errar uma questão e depois estudar o porquê é uma das formas mais eficazes de aprender, principalmente quando o retorno vem logo depois do erro. Por isso cada tópico é seguido na hora por uma revisão dos próprios erros, proporcional aos erros esperados nele, dentro do mesmo bloco e não em outro dia.</p>
 
   <p><b>A reta final.</b> Nos últimos 21 dias o plano troca aprender matéria nova por consolidar o que você já sabe: tópicos abaixo da sua meta contam como fracos, os simulados vêm com mais frequência (praticar a recuperação já é uma das melhores formas de estudar) e o seu caderno de erros ganha mais tempo. Na véspera o plano é curto. Dormir depois de estudar ajuda a memória a se consolidar, e um cérebro cansado lembra menos.</p>
@@ -560,7 +602,8 @@ S  estabilidade: quantos dias leva para R cair a 90%</div>
     <li>Newport, C. (2016). <i>Deep Work: Rules for Focused Success in a Distracted World.</i> Grand Central. <a href="https://calnewport.com/deep-work-rules-for-focused-success-in-a-distracted-world/" target="_blank" rel="noopener">calnewport.com</a></li>
     <li>Newport, C. <i>Time-block planning.</i> <a href="https://www.timeblockplanner.com/" target="_blank" rel="noopener">timeblockplanner.com</a></li>
     <li>Conceitos: <a href="https://pt.wikipedia.org/wiki/Curva_do_esquecimento" target="_blank" rel="noopener">curva do esquecimento</a> · <a href="https://en.wikipedia.org/wiki/Spacing_effect" target="_blank" rel="noopener">efeito do espaçamento</a> · <a href="https://en.wikipedia.org/wiki/Testing_effect" target="_blank" rel="noopener">efeito de teste</a> · <a href="https://pt.wikipedia.org/wiki/Distribui%C3%A7%C3%A3o_binomial" target="_blank" rel="noopener">binomial</a> · <a href="https://en.wikipedia.org/wiki/Beta-binomial_distribution" target="_blank" rel="noopener">beta-binomial</a> · <a href="https://en.wikipedia.org/wiki/Exponential_smoothing" target="_blank" rel="noopener">peso exponencial</a> · <a href="https://pt.wikipedia.org/wiki/M%C3%A9todo_dos_m%C3%ADnimos_quadrados" target="_blank" rel="noopener">mínimos quadrados</a> · <a href="https://pt.wikipedia.org/wiki/Problema_da_mochila" target="_blank" rel="noopener">problema da mochila</a></li>
-    <li>FAA. <i>Private Pilot – Airplane Airman Certification Standards.</i> <a href="https://www.faa.gov/training_testing/testing/acs" target="_blank" rel="noopener">faa.gov</a></li>
+    <li>FAA. <i>Private Pilot for Airplane Category Airman Certification Standards</i>, FAA-S-ACS-6C (novembro de 2023). <a href="https://www.faa.gov/training_testing/testing/acs/private_airplane_acs_6.pdf" target="_blank" rel="noopener">faa.gov</a></li>
+    <li>PSI. <i>FAA Airman Knowledge Test — PAR Information Bulletin</i> (© março de 2024): percentuais por área de operação. <a href="https://media.psiexams.com/faa/PAR_Information_Bulletin.pdf" target="_blank" rel="noopener">psiexams.com</a> — conferido em 2026-11-11 por uma cópia independente; o PDF recusa acesso automatizado.</li>
   </ul>
   <p style="color: var(--muted); font-size: 14px; margin-top: 40px">Ferramenta pessoal de estudo, sem vínculo com a FAA nem com a Sporty's. As previsões são estimativas, não garantias.</p>
 </section>

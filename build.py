@@ -50,6 +50,8 @@ SCRIPTS = [
     'js/model/practice-tests.js',
     'js/views/forecast.js',
     'js/model/plan.js',
+    'js/model/policy.js',   # what is worth studying: one set of rules for the daily list, the calendar and the week
+    'js/model/exam-import.js',   # practice tests analysed by an AI: schema, checks, atomic apply
     'js/model/schedule.js',
     'js/views/plan.js',
     'js/ui/charts.js',
@@ -65,6 +67,7 @@ SCRIPTS = [
     'js/views/phone-dash.js',   # phones: streak, training log and spaced-repetition cards (Strava style)
     'js/views/volume.js',
     'js/views/practice-tests.js',
+    'js/views/exam-import.js',   # the import dialog (after the dialogs and practice-test views)
     'js/views/heatmap.js',
     'js/views/histogram-calibration.js',
     'js/views/plan-week.js',

@@ -25,9 +25,10 @@ const HeatMap = (() => {
   function heatAt(i, d) {
     const m = srModel(i, d);
     if (!m.reps.length) return null;
+    /* the same chance as the forecast: estimated mastery × recall + 1/3 × (1 − recall); score = the last result */
     const R = m.R,
       sc = m.reps[m.reps.length - 1].p;
-    return { heat: Math.round(100 * pRight(sc, R)), R, score: sc };
+    return { heat: Math.round(100 * chanceAt(m, d)), R, score: sc };
   }
   function heatData(range) {
     const H = HEAT_R[range || heatRange],

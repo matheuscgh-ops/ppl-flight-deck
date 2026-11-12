@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "examId": "sportys-2026-11-09-a",
+  "date": "2026-11-09",
+  "platform": "Sporty's",
+  "mode": "errorsOnly",
+  "coverage": "partial",
+  "overall": {
+    "total": 60,
+    "right": null,
+    "wrong": 9
+  },
+  "topics": [],
+  "questions": [
+    {
+      "qid": "Q04",
+      "topicId": "weather-information",
+      "tags": [
+        "METAR",
+        "ceiling"
+      ],
+      "acs": null,
+      "correct": false,
+      "classificationConfidence": 0.95,
+      "doubt": null,
+      "errorType": "concept",
+      "explanation": "Counted a SCT layer as the ceiling.",
+      "seconds": null
+    },
+    {
+      "qid": "Q12",
+      "topicId": "national-airspace-system",
+      "tags": [
+        "Class D"
+      ],
+      "acs": null,
+      "correct": false,
+      "classificationConfidence": 0.9,
+      "doubt": null,
+      "errorType": "memory",
+      "explanation": null,
+      "seconds": null
+    },
+    {
+      "qid": "Q22",
+      "topicId": "performance-and-limitations",
+      "tags": [
+        "density altitude"
+      ],
+      "acs": null,
+      "correct": false,
+      "classificationConfidence": 0.8,
+      "doubt": null,
+      "errorType": "calculation",
+      "explanation": null,
+      "seconds": null
+    },
+    {
+      "qid": "Q40",
+      "topicId": null,
+      "tags": [
+        "VOR"
+      ],
+      "acs": null,
+      "correct": false,
+      "classificationConfidence": 0.4,
+      "doubt": "Navigation Systems or Pilotage and Dead Reckoning.",
+      "errorType": "other",
+      "explanation": null,
+      "seconds": null
+    }
+  ]
+}

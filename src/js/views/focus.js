@@ -118,6 +118,8 @@ const Focus = (() => {
     /* where to find this topic in the other app (ASA Prepware), when that is on in Settings */
     $('#focusAsa').textContent = isTopic ? asaLong(it.i) : '';
     $('#focusAsa').hidden = !$('#focusAsa').textContent;
+    $('#focusWhy').textContent = isTopic ? whyText(it, true) : '';
+    $('#focusWhy').hidden = !$('#focusWhy').textContent;
     $('#focusNotes').hidden = !isTopic;
     if (isTopic) $('#focusNotes').textContent = '📝 ' + t('notesOpen').replace('{n}', notesOf(it.i).length);
     $('#focusDone').textContent = t(isTopic || it.kind === 'test' ? 'focusDone' : 'focusDoneTask');
@@ -155,7 +157,9 @@ const Focus = (() => {
     if (!it) return;
     /* the stopwatch is the most exact measure of your pace */
     const min = elapsed() / 60000;
-    if (it.kind === 'topic' && it.n && min >= 2) commit(() => notePace(it.i, it.n, min, 'focus'), t('paceNoted'));
+    /* a block of a plan with times holds the answering only; a row of the suggested list also its review */
+    if (it.kind === 'topic' && it.n && min >= 2)
+      commit(() => notePace(it.i, it.n, min, 'focus', it.id ? 'answer' : 'all'), t('paceNoted'));
     closeFocus(false);
     if (it.kind === 'topic') {
       const m = srModel(it.i);

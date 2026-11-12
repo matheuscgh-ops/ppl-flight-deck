@@ -91,7 +91,7 @@ with sync_playwright() as p:
             check(f'{tag}: Statistics card for Weather: recall, stability, 2 sessions, last score 72%', card(pg, 18)[:2] == [pct(R18), fmt1(S18)] and card(pg, 18)[3] == '2' and card(pg, 18)[4] == '72%', card(pg, 18))
             check(f'{tag}: KPIs: average recall {pct(avg0)} (weighted by questions), 2 tracked', k0[0] == pct(avg0) and k0[2] == '2', k0)
             check(f'{tag}: heat map drawn', len(ch0) > 0)
-            fc0 = ev('forecast().mu'); plan0 = ev("buildPlan().items.find(x=>x.i===18)")
+            fc0 = ev('forecast().mu'); plan0 = ev("buildPlan(todayISO(),{...settings(),minutes:900}).items.find(x=>x.i===18)")
             check(f'{tag}: plan has the overdue Weather review', plan0 and plan0['reason'] == 'due', plan0)
 
             # ---------- 2) log a review today: 90% ----------

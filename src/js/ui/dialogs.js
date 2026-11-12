@@ -17,7 +17,7 @@ const Dialogs = (() => {
       ? list
           .map(
             e =>
-              `<div class="hrow"><span class="k" style="background:${kc(e)}"></span><span>${esc(df.format(parse(e.date)))} · ${esc(t(e.kind))}${e.kind === 'move' && e.to ? ' → ' + esc(label(e.to)) : ''}${e.score != null ? ' · ' + e.score + '%' : ''}${e.partial ? ' · ' + esc(t('inProgress')) : ''}</span>${e.demo ? `<span class="ex">${esc(t('example'))}</span>` : ''}<button type="button" data-del="${e.id}" aria-label="${esc(t('del'))}">×</button></div>`
+              `<div class="hrow"><span class="k" style="background:${kc(e)}"></span><span>${esc(df.format(parse(e.date)))} · ${esc(t(e.kind))}${e.kind === 'move' && e.to ? ' → ' + esc(label(e.to)) : ''}${e.score != null ? ' · ' + e.score + '%' : ''}${e.total ? ` (${e.right}/${e.total})` : ''}${e.attempt && e.attempt !== 'first' ? ' · ' + esc(t('att_' + e.attempt)) : ''}${e.partial ? ' · ' + esc(t('inProgress')) : ''}</span>${e.demo ? `<span class="ex">${esc(t('example'))}</span>` : ''}<button type="button" data-del="${e.id}" aria-label="${esc(t('del'))}">×</button></div>`
           )
           .join('')
       : `<div class="muted">${esc(t('inactive'))}</div>`;
@@ -35,6 +35,7 @@ const Dialogs = (() => {
     /* right answers of the questions planned today (editable); typing them fills the score */
     $('#mRight').value = '';
     $('#mOf').value = plannedToday(i) ?? '';
+    $('#mAttempt').value = 'first';
     $('#mScore').placeholder = t('blankInProgress');
     $('#mStatus').innerHTML = STATUS.map(s => `<option value="${esc(s)}">${esc(label(s))}</option>`).join('');
     $('#mStatus').value = state.statuses[i];
@@ -82,6 +83,12 @@ const Dialogs = (() => {
     const moving = to !== state.statuses[i];
     const sv = $('#mScore').value.trim(),
       score = sv === '' ? null : Math.max(0, Math.min(100, Math.round(+sv)));
+    /* the sample behind the score, when you typed right answers of N questions (a typed % keeps it unknown) */
+    const rv = $('#mRight').value.trim(),
+      of = Math.round(+$('#mOf').value),
+      counts =
+        score != null && rv !== '' && of > 0 && +rv >= 0 && +rv <= of ? { right: Math.round(+rv), total: of } : {},
+      attempt = $('#mAttempt').value;
     const scoreChanged = score != null && score !== state.scores[i];
     if (mKind === 'none' && !moving && !scoreChanged) {
       toast(t('nothing'));
@@ -99,8 +106,11 @@ const Dialogs = (() => {
           score,
           partial: score == null,
           demo: false,
+          ...counts,
+          ...(score != null && ['first', 'repeat', 'after'].includes(attempt) ? { attempt } : {}),
         });
-      if (score != null) state.scores[i] = score;
+      /* the card's score follows a new result, not a retake of the same questions or one after seeing the answers */
+      if (score != null && (attempt === 'first' || mKind === 'none')) state.scores[i] = score;
       if (moving) {
         state.events.push({ id: uid(), date, topic: i, kind: 'move', from: state.statuses[i], to, demo: false });
         state.statuses[i] = to;

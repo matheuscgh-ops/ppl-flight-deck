@@ -15,24 +15,23 @@
    built from your statistics (buildPlan).
 
    Filling the time (suggestDays):
-     1. candidates = buildPlan for that day with the day's blocked minutes as the budget (same scoring as the daily
-        plan: overdue reviews, topics without data, weak topics, new material; minutes per question from your speed,
-        the topic's difficulty and the review time for misses). Topics missed in a plan during the last 7 days get
-        a 25% priority boost.
-     2. each continuous block is a knapsack: pick the chunks that protect the most exam-day questions
-        (n × (1 − p on exam day) × urgency) within the block's minutes (dynamic programming, 1-minute steps); any
-        time left is filled with part of the best remaining topic (at least 5 questions).
-        Deep work (Cal Newport): few context switches, so a block holds at most one topic per ~45 minutes (Settings); the
-        topics kept grow into the freed time (up to the topic's question count).
-     3. inside a block the hardest work goes first, while you are fresh: practice test, then
-        (1 − p now) × difficulty, plus a boost for overdue reviews and for topics not seen in a long time.
-     4. for a week, the days are filled in order and each day assumes the earlier days were done (simulated sessions),
-        so a topic reviewed on Monday is not due again on Tuesday. A topic appears at most once per day. */
+     1. candidates and their values come from Policy — the same rules as the daily suggestion (questions likely missed
+        on the test × timing, coverage of idle topics, energy). Here each topic chunk holds only the answering; the
+        review of its misses is its own block right after (same minutes as in the daily list, laid out in time).
+     2. each continuous block is filled by value per minute (Policy.selectCands); the smallest chunk of a topic is 20
+        questions or 10 minutes. Deep work (Cal Newport): few context switches, so a block holds at most one topic per
+        ~45 minutes (Settings); the topics kept grow into the freed time (up to one 40-question session).
+     3. inside a block the order follows the day's energy (Policy.orderCands): low → easiest first, medium → most
+        valuable first, high → hardest first; a practice test opens the block.
+     4. for a week, the days are filled in order and each day assumes the earlier days' sessions happen — PROJECTED, never
+        evidence: a projected session repeats your CURRENT estimated mastery (no score floor, no learning assumed), so a
+        topic reviewed on Monday is not due again on Tuesday, a weak one (under 70%) does not get a longer interval, and
+        nothing projected ever reaches your statistics or makes a topic "known". A topic appears at most once per day.
+        Refresh plan re-plans the days ahead from your real results (done work and your own activities stay). */
 const Schedule = (() => {
   const SLOT = 15,
     MIN_CHUNK_Q = 20 /* the smallest session of a big topic (Weather 158 q is studied 40 at a time, never 12) */,
-    MISSED_BOOST = 1.25,
-    URGENCY = { due: 1.3, carried: 2, weak: 1.15, nodata: 1.1, new: 1, light: 0.8, test: 1.4, testDue: 1.4, custom: 1 };
+    MAX_SESSION = 40;
 
   const plans = () => state.plans || (state.plans = []);
   function mondayOf(date) {
@@ -116,12 +115,10 @@ const Schedule = (() => {
     return n > 0 ? Math.min(n, TOPICS[i].q) : null;
   }
   /* minutes for one question of topic i on a date (same formula as the daily plan) */
-  function perQ(i, date, energy) {
+  function perQ(i, date) {
     const m = srModel(i, date, true),
-      sc = m.reps.length ? m.reps[m.reps.length - 1].p : state.scores[i],
-      p = pRight(sc, m.reps.length ? m.R : 1),
-      speed = { low: 1.15, medium: 1, high: 0.9 }[energy || 'medium'];
-    return { per: minutesPerQ(i, settings(), m, p) * speed, p };
+      p = chanceAt(m, date);
+    return { per: minutesPerQ(i, settings(), m, p), p };
   }
 
   /* 0/1 knapsack over whole chunks, then fill what is left with part of the best remaining splittable chunk */
@@ -157,13 +154,8 @@ const Schedule = (() => {
     return pick;
   }
 
-  const hardness = c => {
-    if (c.kind === 'test') return 99;
-    const m = srModel(c.i, c.date, true),
-      last = m.reps.length ? m.reps[m.reps.length - 1].date : null,
-      idle = last ? Math.min(0.5, diffDays(last, c.date) / 60) : 0.3;
-    return (1 - c.p) * (c.diff || 1) + (c.reason === 'due' ? 0.3 : 0) + idle;
-  };
+  /* trimming to make room: the least valuable per minute goes first */
+  const density = c => (c.kind === 'test' || c.forced ? Infinity : c.value / Math.max(0.1, c.n * c.per));
 
   /* ---------- error review (reflection) ----------
      Expected misses of a topic chunk = questions × (1 − p) × difficulty (a test counts 60 × (1 − p)).
@@ -239,35 +231,17 @@ const Schedule = (() => {
     const total = rangesTotal(ranges);
     if (!total) return [];
     const st = settings(),
-      speed = { low: 1.15, medium: 1, high: 0.9 }[energy || 'medium'],
-      boost = missedTopics(date),
-      /* candidates from a generous budget, so a long practice test never crowds out the topics that fit a short block */
-      P = buildPlan(date, { ...st, minutes: Math.max(total * 4, 480) }, energy || 'medium', carryNow);
-    /* the review of misses is its own item, so each question here counts only the time to answer it */
-    let cands = P.items
-      .filter(x => !x.done && x.n > 0 && (x.kind === 'test' || x.kind === 'topic'))
-      .map((x, k) => {
-        const n = x.kind === 'test' ? TEST_Q : x.n,
-          review = (1 - (x.p ?? 0.5)) * st.reviewMin * (x.kind === 'test' ? 1 : x.diff || 1) * speed;
-        return {
-          key: x.kind + (x.i ?? 't') + '_' + k,
-          kind: x.kind,
-          i: x.i,
-          n,
-          full: x.kind === 'test' ? TEST_Q : TOPICS[x.i].q,
-          per: Math.max(0.2, x.per - review),
-          p: x.p,
-          diff: x.diff,
-          reason: x.reason,
-          date,
-          value:
-            (x.kind === 'test' ? TEST_Q * 1.5 : n * (1 - (x.pExam ?? x.p ?? 0.5))) *
-            (URGENCY[x.reason] || 1) *
-            (x.reason === 'new' && !['normal', 'after'].includes(examPhase(date)) ? 0.8 : 1) *
-            (x.kind === 'topic' && boost.has(x.i) ? MISSED_BOOST : 1),
-        };
-      })
-      .filter(c => c.per > 0);
+      mode = energy || 'medium',
+      minutesFor = (i, m, p) => minutesSplit(i, st, m, p),
+      done = doneOn(date);
+    /* the candidates of the day: Policy, the same as the daily suggestion; each chunk counts only the time to answer
+       it (the review of its misses is its own item) */
+    let cands = topicCands(date, { mode, carry: carryNow, done, minutesFor, withReview: false, seen: simSeen }).filter(
+      c => !c.done
+    );
+    const tc = testCand(date, mode, st, false);
+    if (tc && !tc.done) cands.unshift(tc);
+    cands = cands.map((c, k) => ({ ...c, key: c.kind + (c.i ?? 't') + '_' + k }));
     const out = [];
     let carry = null;
     ranges.forEach(([s, e], bi) => {
@@ -298,17 +272,20 @@ const Schedule = (() => {
         carry = null;
       }
       if (!cands.length || capT < MIN_ITEM) return;
-      let pick = knapsack(cands, capT);
+      let pick = selectCands(cands, capT, MIN_CHUNK_Q);
       /* deep work: few topic switches — at most one topic per ~45 min; the kept topics grow into the freed time */
       const deep = pref('deepMin'),
         maxTopics = deep ? Math.max(1, Math.round(cap / deep)) : Infinity;
       if (pick.length > maxTopics) {
-        pick = pick.sort((a, b) => b.value - a.value).slice(0, maxTopics);
+        pick = pick.sort((a, b) => density(b) - density(a)).slice(0, maxTopics);
         let left = capT - usedBy(pick);
         pick.forEach(c => {
           if (c.kind !== 'topic') return;
           /* never past one session of the question bank (40 questions) */
-          const more = Math.min(Math.min(c.full, 40) - c.n, Math.floor((left + 1e-9) / c.per));
+          const more = Math.min(
+            Math.min(c.full, MAX_SESSION, energyOf(mode).chunk) - c.n,
+            Math.floor((left + 1e-9) / c.per)
+          );
           if (more > 0) {
             c.n += more;
             left -= Math.ceil(more * c.per);
@@ -320,7 +297,7 @@ const Schedule = (() => {
       if (leftAfter() >= LEFTOVER_TOPIC) {
         const next = cands
           .filter(x => x.kind === 'topic' && !pick.some(p => p.kind === x.kind && p.i === x.i))
-          .sort((a, b) => b.value / b.n - a.value / a.n)
+          .sort((a, b) => density(b) - density(a))
           .find(x => Math.floor(leftAfter() / x.per) >= minN(x));
         if (next) {
           const fit = Math.floor((leftAfter() - 5) / next.per),
@@ -332,7 +309,7 @@ const Schedule = (() => {
           for (let guard = 0; usedBy(trial) + RT.min > capT && guard < 400; guard++) {
             const c = trial
               .slice()
-              .sort((a, b) => hardness(a) - hardness(b))
+              .sort((a, b) => density(a) - density(b))
               .find(x => x.kind === 'topic' && x.n > minN(x));
             if (!c) break;
             c.n -= 1;
@@ -341,27 +318,28 @@ const Schedule = (() => {
           if (usedBy(trial) + RT.min <= capT) pick.push(add);
         }
       }
-      /* room for the review in the same block: trim the easiest topics first, never under their smallest chunk */
-      pick.sort((a, b) => hardness(b) - hardness(a));
+      /* room for the review in the same block: trim the least valuable topics first, never under their smallest chunk */
       let R = reflectFor(pick, cap);
       for (let guard = 0; usedBy(pick) + R.min > capT && guard < 400; guard++) {
         const c = pick
           .slice()
-          .reverse()
+          .sort((a, b) => density(a) - density(b))
           .find(x => x.kind === 'topic' && x.n > minN(x));
         if (!c) break;
         c.n -= 1;
         R = reflectFor(pick, cap);
       }
-      /* still no room: drop the easiest topic (it comes back on another day) rather than lose the reviews */
+      /* still no room: drop the least valuable topic (it comes back on another day) rather than lose the reviews */
       while (usedBy(pick) + R.min > capT && pick.filter(x => x.kind === 'topic').length > 1) {
         const c = pick
           .slice()
-          .reverse()
+          .sort((a, b) => density(a) - density(b))
           .find(x => x.kind === 'topic');
         pick = pick.filter(x => x !== c);
         R = reflectFor(pick, cap);
       }
+      /* the order of the block follows the day's energy */
+      pick = orderCands(pick, mode);
       const fits = usedBy(pick) + R.min <= capT,
         hasNext = bi < ranges.length - 1,
         share = fits ? splitReflect(R, pick) : pick.map(() => 0);
@@ -377,6 +355,7 @@ const Schedule = (() => {
           i: c.kind === 'topic' ? c.i : null,
           n: c.n,
           reason: c.reason,
+          ...(c.kind === 'topic' ? { activity: c.activity, why: c.why, conf: c.conf } : {}),
         });
         t0 += min;
         if (share[k]) {
@@ -421,46 +400,52 @@ const Schedule = (() => {
 
   /* fill several days in order, simulating the earlier days as done; returns { date: items } */
   function suggestDays(days, blocks, energies) {
-    const saved = { events: state.events, tests: state.tests, statuses: state.statuses },
+    const saved = { events: state.events, tests: state.tests },
       out = {};
+    simSeen = {};
     try {
       state.events = state.events.slice();
       state.tests = (state.tests || []).slice();
-      state.statuses = state.statuses.slice();
       days
         .slice()
         .sort()
         .forEach(d => {
           const items = d < todayISO() ? [] : packDay(d, blocks[d] || [], (energies || {})[d]);
+          /* new material projected on earlier days is not new again: the next days continue through the bank */
+          items.forEach(it => {
+            if (it.kind === 'topic' && it.reason === 'new') simSeen[it.i] = (simSeen[it.i] || 0) + it.n;
+          });
           out[d] = items;
           /* a topic moved forward is placed once, on the first day it fits */
           if (carryNow) items.forEach(it => it.kind === 'topic' && carryNow.delete(it.i));
           items.forEach(it => {
             if (it.kind === 'reflect' || it.kind === 'notes') return;
+            /* projected, never evidence: a test keeps the cadence (no score), a session repeats your current estimated
+               mastery as its score (no floor) and is marked proj, so mastery, statistics and lists ignore it */
             if (it.kind === 'test')
-              state.tests.push({ id: 'sim' + it.id, date: d, q: TEST_Q, score: Math.round(blended(d).mu * 100) });
+              state.tests.push({ id: 'sim' + it.id, date: d, q: TEST_Q, score: null, proj: true });
             else {
               const m = srModel(it.i, d, true),
-                last = m.reps.length ? m.reps[m.reps.length - 1].p : 0;
+                mp = Math.round(m.mastery * 100);
               state.events.push({
                 id: 'sim' + it.id,
                 date: d,
                 topic: it.i,
                 kind: m.reps.length ? 'review' : 'study',
-                score: Math.min(95, Math.max(70, last)),
+                score: mp,
+                total: it.n,
+                attempt: 'new',
+                proj: true,
                 partial: false,
                 demo: false,
               });
-              /* a new topic studied whole is not new any more on the next days (it comes back as a review) */
-              if (it.n >= TOPICS[it.i].q && ['Todo', 'Doing'].includes(state.statuses[it.i]))
-                state.statuses[it.i] = 'Very Comfortable';
             }
           });
         });
     } finally {
       state.events = saved.events;
       state.tests = saved.tests;
-      state.statuses = saved.statuses;
+      simSeen = null;
     }
     return out;
   }
@@ -608,6 +593,8 @@ const Schedule = (() => {
   }
   /* topics moved forward by "Refresh plan" from earlier days, while it re-plans (see refreshPlans) */
   let carryNow = null;
+  /* new questions of each topic already placed on earlier days of the week being planned (see suggestDays) */
+  let simSeen = null;
   /* minutes from midnight → today's timestamp, and back */
   const clockMs = (date, min) => {
     const d = parse(date);
@@ -625,7 +612,7 @@ const Schedule = (() => {
         .reduce((a, x) => Math.max(a, x.checkedAt), 0),
       start = prev && now - prev < 4 * 3600e3 ? prev : clockMs(it.date, it.start);
     const min = (now - start) / 60000;
-    if (min >= 2) notePace(it.i, it.n, min, 'tick');
+    if (min >= 2) notePace(it.i, it.n, min, 'tick', 'answer');
   }
   function refreshPlans() {
     const today = todayISO(),

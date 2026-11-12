@@ -70,7 +70,7 @@ with sync_playwright() as p:
             # heat value and color follow the formula
             last = ev("(()=>{const r=document.querySelector('#heatGrid .hmrow:nth-child(2)'),cs=[...r.querySelectorAll('.hmc')];const c=cs[cs.length-1];return {i:+c.dataset.hi,bg:getComputedStyle(c).backgroundColor}})()")
             h = ev(f"heatAt({last['i']},todayISO())")
-            check(f'{tag}: heat = chance of a right answer (score × recall + 1/3 × (1 − recall))', h['heat'] == round(100 * (h['score'] / 100 * h['R'] + (1 - h['R']) / 3)), h)
+            check(f'{tag}: heat = chance of a right answer (mastery × recall + 1/3 × (1 − recall), the forecast\'s number)', h['heat'] == ev(f"Math.round(100*chanceAt(srModel({last['i']},todayISO()),todayISO()))") and h['heat'] == ev(f"(()=>{{const m=srModel({last['i']},todayISO());return Math.round(100*(m.mastery*m.R+(1-m.R)/3))}})()"), h)
             check(f'{tag}: last square = heat today with its color', h and ev(f"heatColor({h['heat']})").replace(' ', '') == last['bg'].replace(' ', ''), (h, last))
             check(f'{tag}: a topic left alone cools (Weather: last review 20 days ago is colder than the week it was reviewed)', ev("heatAt(18,addDays(todayISO(),-20)).heat") > ev("heatAt(18,todayISO()).heat"))
             # hover / tap
@@ -104,8 +104,11 @@ with sync_playwright() as p:
     c = b.new_context(viewport={'width': 1440, 'height': 900}); pg = c.new_page()
     pg.goto('file://' + os.path.join(ROOT, 'demo.html')); pg.wait_for_timeout(500); pg.evaluate("window.pplTour&&pplTour.end()"); pg.evaluate("goView('sr')"); pg.wait_for_timeout(400)
     check('demo: compact heat map fully covered (28 tiles with a value)', pg.evaluate("document.querySelectorAll('#heatNow .hnt:not(.empty)').length") == 28)
+    # (it turns only when it has two or more topics: today's plan, or the lowest recall when the plan has none left)
+    if pg.evaluate("document.querySelectorAll('#scDots i').length") < 2:
+        pg.evaluate("(state.plans||[]).forEach(p=>p.active=false);state.events.filter(e=>e.date===todayISO()).forEach(e=>e.date=addDays(todayISO(),-1));save();render();goView('sr')"); pg.wait_for_timeout(300)
     t0 = pg.evaluate("document.getElementById('scTitle').textContent"); pg.mouse.move(3, 3); pg.wait_for_timeout(3300)
-    check('demo: the needs-recall carousel turns every 3 s', pg.evaluate("document.getElementById('scTitle').textContent") != t0, t0)
+    check('demo: the needs-recall carousel turns every 3 s', pg.evaluate("document.querySelectorAll('#scDots i').length") < 2 or pg.evaluate("document.getElementById('scTitle').textContent") != t0, [t0, pg.evaluate("document.querySelectorAll('#scDots i').length")])
     pg.hover('#scPanel'); t1 = pg.evaluate("document.getElementById('scTitle').textContent"); pg.wait_for_timeout(3300)
     check('demo: … and pauses while the pointer is over it', pg.evaluate("document.getElementById('scTitle').textContent") == t1)
     pg.mouse.move(3, 3); pg.click('#heatPanel'); pg.wait_for_timeout(200)

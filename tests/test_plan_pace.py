@@ -24,6 +24,7 @@ STATS = "JSON.stringify([forecast().mu, blended().mu, counts(), state.scores, st
 # (22) at 22:00 in a 20:30–23:30 block
 PLAN = """(()=>{const T=todayISO(),Y=addDays(T,-1),M=mondayOf(T);(state.plans||[]).forEach(p=>p.active=false);
   state.plans=(state.plans||[]).filter(p=>p.id!=='pP');state.paces=[];
+  state.settings={...(state.settings||{}),testEvery:0}; /* no practice test: this is about topic blocks */
   const blocks={};for(let k=0;k<7;k++)blocks[addDays(M,k)]=[[1230,1410]];blocks[Y]=[[1230,1410]];
   state.plans.push({id:'pP',type:'weekly',name:'',start:M,active:true,blocks,items:[
     {id:'y1',date:Y,start:1230,min:40,kind:'topic',i:18,n:30,reason:'weak'},
