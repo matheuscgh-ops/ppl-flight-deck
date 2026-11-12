@@ -15809,13 +15809,22 @@ const Schedule = (() => {
           /* today: the error reviews still to do of topics you finished come first, from now on (nothing overlaps
              the blocks moved before now) */
           if (d === today) {
+            /* first time at or after `t` where `min` minutes fit inside one of the day's blocks (now may fall
+               between two blocks); none left → right after `t`, like before */
+            const fitAt = (t, min) => {
+              for (const [s, e] of p.blocks[d]) {
+                const at = Math.max(s, t);
+                if (at + min <= e + 0.01) return at;
+              }
+              return t;
+            };
             let cur = nowMin;
             its
               .filter(it => keepIds.has(it.id) && it.kind === 'reflect' && !itemDone(it) && it.start < cur)
               .sort((a, b) => a.start - b.start)
               .forEach(it => {
-                it.start = cur;
-                cur += it.min;
+                it.start = fitAt(cur, it.min);
+                cur = it.start + it.min;
               });
           }
           const busy = its.filter(it => keepIds.has(it.id)).map(it => [it.start, it.start + it.min]);
