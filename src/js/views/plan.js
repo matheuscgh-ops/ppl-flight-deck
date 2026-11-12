@@ -1,5 +1,5 @@
 /* ===== module PlanView (js/views/plan.js) =====
-   public: renderPlanMini, renderPlanPage, renderPlanPt, manualTest, setManualTest */
+   public: whyText, renderPlanMini, renderPlanPage, renderPlanPt, manualTest, setManualTest */
 const PlanView = (() => {
   /* totals of today's list, whatever drives it (a saved plan or the suggestion) */
   function todayList() {
@@ -29,6 +29,43 @@ const PlanView = (() => {
         : it.kind === 'custom' || it.kind === 'reflect'
           ? `data-cid="${esc(it.id)}"`
           : `data-q="${it.i}"`;
+  /* why a topic is suggested: the activity, then the main reasons — only what the data supports (a % of unknown
+     sample is never shown as right/total, a share inside an ACS area is marked as estimated).
+     short = the line under the row; full = the tooltip and focus mode (adds the share of the test and the evidence) */
+  function whyParts(it) {
+    if (it.kind !== 'topic' || !it.why) return null;
+    const pct = x => Math.round(x * 100) + '%',
+      R = [];
+    let share = null;
+    it.why.forEach(w => {
+      const f = (k, o) => Object.entries(o || {}).reduce((s, [a, b]) => s.replace('{' + a + '}', b), t(k));
+      if (w.k === 'last') R.push(f(w.src === 'exam' ? 'why_lastExam' : 'why_last', { r: w.right, n: w.total }));
+      else if (w.k === 'lastPct') R.push(f(w.src === 'exam' ? 'why_lastExamPct' : 'why_lastPct', { p: w.p }));
+      else if (w.k === 'sportys') R.push(f('why_sportys', { p: w.p }));
+      else if (w.k === 'examMisses')
+        R.push(
+          f('why_examMisses', { n: w.n }) +
+            (w.tags && w.tags.length ? ' — ' + f('why_tags', { t: w.tags.join(', ') }) : '')
+        );
+      else if (w.k === 'missTags') R.push(f('why_missTags', { t: w.tags.join(', ') }));
+      else if (w.k === 'due') R.push(w.d > 0 ? f('why_dueOver', { d: w.d }) : t('why_due'));
+      else if (w.k === 'mastery') R.push(f('why_mastery', { p: w.p }));
+      else if (w.k === 'idle') R.push(f('why_idle', { d: w.d }));
+      else if (w.k === 'share')
+        share = f(w.est ? 'why_shareEst' : 'why_share', { s: (w.s * 100).toFixed(1).replace(/\.0$/, ''), a: w.area });
+      else R.push(t('why_' + w.k));
+    });
+    const act = it.activity ? t('act_' + it.activity) : '',
+      conf = it.conf ? t('why_conf_' + it.conf) : '';
+    return { act, reasons: R, share, conf };
+  }
+  function whyText(it, full) {
+    const w = whyParts(it);
+    if (!w) return '';
+    const dur = it.min ? fmtMin(it.min) + ' — ' : '',
+      main = dur + (w.act ? w.act + (w.reasons.length ? ': ' : '') : '') + w.reasons.slice(0, full ? 8 : 3).join(', ');
+    return full ? [main, w.share, w.conf].filter(Boolean).join(' · ') : main;
+  }
   const rowName = it => (it.kind === 'topic' || it.kind === 'test' ? planRowName(it) : itemTitle(it));
   const checkBtn = it =>
     it.id
@@ -58,7 +95,7 @@ const PlanView = (() => {
       ? P.items
           .map(
             it =>
-              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}${noteBtn(it)}${it.kind === 'topic' && asaShort(it.i) ? `<small class="qasa">${esc(asaShort(it.i))}</small>` : ''}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' || it.kind === 'reflect' || it.kind === 'notes' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
+              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(whyText(it, true) || t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}${noteBtn(it)}${it.kind === 'topic' && asaShort(it.i) ? `<small class="qasa">${esc(asaShort(it.i))}</small>` : ''}${it.kind === 'topic' && !it.done && whyText(it) ? `<small class="qwhy">${esc(whyText(it))}</small>` : ''}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' || it.kind === 'reflect' || it.kind === 'notes' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
           )
           .join('')
       : `<div class="muted">${esc(t(fromPlan ? 'planRestDay' : 'allClear'))}</div>`;
@@ -207,6 +244,6 @@ const PlanView = (() => {
     closeFcTop();
     goView('sr', 'fc');
   };
-  return { renderPlanMini, renderPlanPage, renderPlanPt, manualTest, setManualTest };
+  return { whyText, renderPlanMini, renderPlanPage, renderPlanPt, manualTest, setManualTest };
 })();
-const { renderPlanMini, renderPlanPage, renderPlanPt, manualTest, setManualTest } = PlanView;
+const { whyText, renderPlanMini, renderPlanPage, renderPlanPt, manualTest, setManualTest } = PlanView;

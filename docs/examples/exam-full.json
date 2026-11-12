@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "examId": "sportys-2026-11-08-a",
+  "date": "2026-11-08",
+  "platform": "Sporty's",
+  "mode": "full",
+  "coverage": "complete",
+  "overall": {
+    "total": 60,
+    "right": 47,
+    "wrong": 13
+  },
+  "topics": [
+    {
+      "topicId": "weather-information",
+      "total": 10,
+      "right": 5,
+      "wrong": 5,
+      "seconds": null
+    },
+    {
+      "topicId": "approach-and-landing",
+      "total": 8,
+      "right": 6,
+      "wrong": 2,
+      "seconds": null
+    },
+    {
+      "topicId": "performance-and-limitations",
+      "total": 6,
+      "right": 5,
+      "wrong": 1,
+      "seconds": null
+    },
+    {
+      "topicId": "national-airspace-system",
+      "total": 6,
+      "right": 5,
+      "wrong": 1,
+      "seconds": null
+    },
+    {
+      "topicId": "pilot-qualifications",
+      "total": 5,
+      "right": 4,
+      "wrong": 1,
+      "seconds": null
+    },
+    {
+      "topicId": "operation-of-systems",
+      "total": 5,
+      "right": 4,
+      "wrong": 1,
+      "seconds": null
+    },
+    {
+      "topicId": "taxiing",
+      "total": 4,
+      "right": 3,
+      "wrong": 1,
+      "seconds": null
+    },
+    {
+      "topicId": "takeoff-and-climb",
+      "total": 4,
+      "right": 4,
+      "wrong": 0,
+      "seconds": null
+    },
+    {
+      "topicId": "navigation-systems-and-radar-services",
+      "total": 3,
+      "right": 3,
+      "wrong": 0,
+      "seconds": null
+    },
+    {
+      "topicId": "communications-lights-and-runways",
+      "total": 3,
+      "right": 3,
+      "wrong": 0,
+      "seconds": null
+    },
+    {
+      "topicId": "power-off-stalls",
+      "total": 2,
+      "right": 2,
+      "wrong": 0,
+      "seconds": null
+    },
+    {
+      "topicId": "human-factors",
+      "total": 2,
+      "right": 1,
+      "wrong": 1,
+      "seconds": null
+    },
+    {
+      "topicId": "systems-and-equipment-malfunctions",
+      "total": 2,
+      "right": 2,
+      "wrong": 0,
+      "seconds": null
+    }
+  ],
+  "questions": [
+    {
+      "qid": "Q07",
+      "topicId": "weather-information",
+      "tags": [
+        "TAF",
+        "FM/BECMG"
+      ],
+      "acs": null,
+      "correct": false,
+      "classificationConfidence": 0.9,
+      "doubt": null,
+      "errorType": "concept",
+      "explanation": "Read BECMG as an immediate change.",
+      "seconds": null
+    },
+    {
+      "qid": "Q15",
+      "topicId": "weather-information",
+      "tags": [
+        "TAF"
+      ],
+      "acs": null,
+      "correct": false,
+      "classificationConfidence": 0.85,
+      "doubt": null,
+      "errorType": "misread",
+      "explanation": null,
+      "seconds": null
+    },
+    {
+      "qid": "Q31",
+      "topicId": "approach-and-landing",
+      "tags": [
+        "crosswind"
+      ],
+      "acs": null,
+      "correct": false,
+      "classificationConfidence": 0.6,
+      "doubt": "Could also be Performance and Limitations (crosswind chart).",
+      "errorType": "calculation",
+      "explanation": null,
+      "seconds": null
+    }
+  ]
+}

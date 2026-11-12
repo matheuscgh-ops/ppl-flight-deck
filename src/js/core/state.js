@@ -9,6 +9,70 @@ const AppState = (() => {
     Array.isArray(arr) && arr.length >= OLD_TOPIC_COUNT && arr.length < TOPICS.length
       ? arr.concat(TOPICS.slice(arr.length).map(fill))
       : arr;
+  const ATTEMPTS = ['first', 'new', 'repeat', 'after'];
+  const WHY_ACTIVITIES = ['newQ', 'concept', 'guided', 'retrieval', 'fluency', 'diagnostic'];
+  const WHY_KEYS = [
+    'last',
+    'lastPct',
+    'sportys',
+    'examMisses',
+    'missTags',
+    'due',
+    'mastery',
+    'understanding',
+    'forgetting',
+    'pending',
+    'idle',
+    'newMat',
+    'share',
+  ];
+  /* an imported practice test as stored: unknown values stay unknown (null), never filled in */
+  function normExams(list) {
+    const ok = s => /^\d{4}-\d{2}-\d{2}$/.test(s || ''),
+      int = v => (Number.isInteger(v) && v >= 0 ? v : null),
+      str = (v, n) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, n) : null);
+    return (Array.isArray(list) ? list : [])
+      .filter(x => x && ok(x.date) && str(x.examId, 80) && (x.mode === 'full' || x.mode === 'errors'))
+      .map(x => ({
+        id: String(x.id || uid()).slice(0, 40),
+        examId: str(x.examId, 80),
+        date: x.date,
+        platform: str(x.platform, 60),
+        mode: x.mode,
+        coverage: x.coverage === 'complete' ? 'complete' : 'partial',
+        total: int(x.total),
+        right: int(x.right),
+        wrong: int(x.wrong),
+        topics: (Array.isArray(x.topics) ? x.topics : [])
+          .filter(t => t && Number.isInteger(t.i) && TOPICS[t.i])
+          .map(t => ({
+            i: t.i,
+            total: int(t.total),
+            right: int(t.right),
+            wrong: int(t.wrong),
+            seconds: int(t.seconds),
+          })),
+        misses: (Array.isArray(x.misses) ? x.misses : [])
+          .filter(q => q && Number.isInteger(q.i) && TOPICS[q.i])
+          .slice(0, 300)
+          .map(q => ({
+            i: q.i,
+            qid: str(q.qid, 80),
+            tags: (Array.isArray(q.tags) ? q.tags : [])
+              .map(tg => str(tg, 40))
+              .filter(Boolean)
+              .slice(0, 6),
+            acs: str(q.acs, 30),
+            conf: Number.isFinite(q.conf) ? Math.max(0, Math.min(1, q.conf)) : null,
+            errorType: str(q.errorType, 20),
+            note: str(q.note, 500),
+            seconds: int(q.seconds),
+          })),
+        importedAt: +x.importedAt || 0,
+        ...(typeof x.sig === 'string' ? { sig: x.sig.slice(0, 20) } : {}),
+      }))
+      .slice(-300);
+  }
   function normalize(o) {
     if (o && typeof o === 'object' && Array.isArray(o.statuses) && o.statuses.length < TOPICS.length) {
       const n = o.statuses.length;
@@ -39,17 +103,29 @@ const AppState = (() => {
             TOPICS[e.topic] &&
             ['study', 'review', 'move'].includes(e.kind)
         )
-        .map(e => ({
-          id: e.id || uid(),
-          date: e.date,
-          topic: e.topic,
-          kind: e.kind,
-          from: e.from || null,
-          to: e.kind === 'move' ? e.to || e.status || null : null,
-          score: cl(e.score),
-          partial: !!e.partial,
-          demo: !!e.demo,
-        })),
+        .map(e => {
+          const r = {
+            id: e.id || uid(),
+            date: e.date,
+            topic: e.topic,
+            kind: e.kind,
+            from: e.from || null,
+            to: e.kind === 'move' ? e.to || e.status || null : null,
+            score: cl(e.score),
+            partial: !!e.partial,
+            demo: !!e.demo,
+          };
+          /* a session's sample (right answers of how many questions) and kind of attempt, when they were recorded —
+             records without them keep an unknown sample (nothing is invented) */
+          const n = Math.round(+e.total),
+            k = Math.round(+e.right);
+          if (e.kind !== 'move' && Number.isFinite(n) && n > 0 && Number.isFinite(k) && k >= 0 && k <= n) {
+            r.total = n;
+            r.right = k;
+          }
+          if (e.kind !== 'move' && ATTEMPTS.includes(e.attempt)) r.attempt = e.attempt;
+          return r;
+        }),
       settings:
         o.settings && typeof o.settings === 'object'
           ? {
@@ -73,8 +149,19 @@ const AppState = (() => {
       tests: Array.isArray(o.tests)
         ? o.tests
             .filter(x => x && ok(x.date))
-            .map(x => ({ id: x.id || uid(), date: x.date, q: +x.q || 60, score: cl(x.score) }))
+            .filter(x => !x.proj)
+            .map(x => ({
+              id: x.id || uid(),
+              date: x.date,
+              q: +x.q || 60,
+              score: cl(x.score),
+              /* a test imported from a file: the id of its record in exams, and its right answers */
+              ...(typeof x.exam === 'string' && x.exam ? { exam: x.exam.slice(0, 80) } : {}),
+              ...(Number.isInteger(x.right) && x.right >= 0 && x.right <= (+x.q || 60) ? { right: x.right } : {}),
+            }))
         : [],
+      /* practice tests imported from a file (see ExamImport): their topic results and misses, as evidence */
+      exams: normExams(o.exams),
       deadline: ok(o.deadline) ? o.deadline : '2026-11-30',
       /* error notebook: what you got wrong in a topic (topic -1 = practice test), shown again when it comes back */
       notes: (Array.isArray(o.notes) ? o.notes : [])
@@ -106,6 +193,8 @@ const AppState = (() => {
           min: +x.min,
           est: +x.est,
           src: x.src === 'focus' ? 'focus' : 'tick',
+          /* what the estimate covered: answering only, or answering and review (older ones: unknown, not used) */
+          ...(x.basis === 'answer' || x.basis === 'all' ? { basis: x.basis } : {}),
         }))
         .slice(-400),
       /* Kanban cards ticked "done today": card key (topic number or your card's id) → the date it was ticked */
@@ -220,6 +309,23 @@ const AppState = (() => {
             .map(x => ({ i: x.i, m: Math.max(0, Math.round(+x.m)) }))
             .slice(0, 8);
         if (it.kind === 'reflect' && typeof it.of === 'string') o.of = it.of.slice(0, 40);
+        /* why the planner chose a topic block (shown under it): the activity and the main reasons, as planned */
+        if (it.kind === 'topic' && WHY_ACTIVITIES.includes(it.activity)) o.activity = it.activity;
+        if (it.kind === 'topic' && ['low', 'medium', 'high'].includes(it.conf)) o.conf = it.conf;
+        if (it.kind === 'topic' && Array.isArray(it.why))
+          o.why = it.why
+            .filter(w => w && WHY_KEYS.includes(w.k))
+            .slice(0, 10)
+            .map(w =>
+              Object.fromEntries(
+                Object.entries(w)
+                  .filter(([k, v]) => k.length <= 8 && (typeof v !== 'object' || (Array.isArray(v) && v.length <= 3)))
+                  .map(([k, v]) => [
+                    k,
+                    Array.isArray(v) ? v.map(x => String(x).slice(0, 40)) : typeof v === 'string' ? v.slice(0, 20) : v,
+                  ])
+              )
+            );
         if (it.custom) o.custom = true;
         if (it.check) o.check = true;
         if (it.check && Number.isFinite(+it.checkedAt) && +it.checkedAt > 0) o.checkedAt = +it.checkedAt;
@@ -337,6 +443,7 @@ const AppState = (() => {
         ...(state.plans || []),
         ...(state.cards || []),
         ...(state.notes || []),
+        ...(state.exams || []),
       ].map(x => x.id)
     );
     state.deleted ??= {};
@@ -350,6 +457,7 @@ const AppState = (() => {
     prevIds = now;
   }
   function save(stamp = true) {
+    if (typeof clearModels === 'function') clearModels();
     trackDeletes();
     if (stamp) state.updatedAt = Date.now();
     try {

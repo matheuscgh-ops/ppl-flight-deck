@@ -107,7 +107,7 @@
     </section>
     <div class="statduo top">
     <section class="panel tshero">
-      <div class="srhead"><div><h2 class="section" data-t="tabTestsLong"></h2><div class="muted" data-t="tsSub"></div></div><button type="button" class="primary" id="tsAdd" data-t="tsAdd"></button></div>
+      <div class="srhead"><div><h2 class="section" data-t="tabTestsLong"></h2><div class="muted" data-t="tsSub"></div></div><div class="tsbtns"><button type="button" id="tsImport" data-t="exOpen"></button><button type="button" class="primary" id="tsAdd" data-t="tsAdd"></button></div></div>
       <div class="fckpis tskpis" id="tsKpis"></div>
       <div class="tstrend" id="tsTrendTxt"></div>
       <button type="button" class="linkbtn callink" data-t="calLink"></button>
@@ -230,6 +230,7 @@
       <div class="field"><span class="flabel" data-t="rightField"></span><div class="rightof"><input type="number" id="mRight" min="0" step="1" inputmode="numeric" aria-label="Right answers"><span data-t="ofWord"></span><input type="number" id="mOf" min="1" step="1" inputmode="numeric" aria-label="Questions"></div></div>
       <label class="field"><span class="flabel" data-t="scoreField"></span><input type="number" id="mScore" min="0" max="100" step="1" inputmode="numeric" data-ph="blankInProgress"></label>
     </div>
+    <label class="field"><span class="flabel" data-t="attemptField"></span><select id="mAttempt"><option value="first" data-t="att_first"></option><option value="repeat" data-t="att_repeat"></option><option value="after" data-t="att_after"></option></select></label>
     <div class="row2">
       <label class="field"><span class="flabel" data-t="status"></span><select id="mStatus"></select></label>
       <label class="field"><span class="flabel" data-t="date"></span><input type="date" id="mDate"></label>
@@ -290,6 +291,15 @@
     <p class="muted calhelp" data-t="calHelp"></p>
   </div>
 </div>
+<div class="modalbg" id="exbg" hidden>
+  <div class="modal exmodal" role="dialog" aria-modal="true" aria-labelledby="exTitle">
+    <div class="mhead"><div><h3 id="exTitle" data-t="exTitle"></h3><div class="muted" data-t="exSub"></div></div><button class="x" id="exClose" aria-label="Close">×</button></div>
+    <div class="exsrc"><button type="button" id="exPrompt" data-t="exCopyPrompt"></button><label class="exfile"><span data-t="exPickFile"></span><input type="file" id="exFile" accept=".json,.txt,application/json,text/plain"></label></div>
+    <textarea id="exIn" rows="6" spellcheck="false" data-ph="exPastePh"></textarea>
+    <div id="exPrev"></div>
+    <div class="mbtns"><button type="button" class="primary" id="exOk" data-t="exConfirm" disabled></button><button type="button" id="exCancel" data-t="cancel"></button></div>
+  </div>
+</div>
 <div class="modalbg" id="ptbg" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ptTitle">
     <div class="mhead"><div><h3 id="ptTitle" data-t="practiceTest"></h3><div class="muted" id="ptDesc"></div></div><button class="x" id="ptClose" aria-label="Close">×</button></div>
@@ -330,6 +340,7 @@
       <h2 id="focusName"></h2>
       <div class="muted focusmeta" id="focusMeta"></div>
       <div class="asaline focusasa" id="focusAsa" hidden></div>
+      <div class="focuswhy" id="focusWhy" hidden></div>
       <div class="focusring" id="focusRing"><div><b id="focusClock">0:00</b><small id="focusPlanned"></small></div></div>
       <div class="focusbtns"><button type="button" id="focusPause"></button><button type="button" class="primary" id="focusDone"></button></div>
       <button type="button" class="linkbtn" id="focusNotes" hidden></button>

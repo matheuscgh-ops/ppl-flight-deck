@@ -1,0 +1,57 @@
+You are helping me record a FAA Private Pilot (PAR) practice test in my study app. I will paste my results (a score report, a list of questions, or only the questions I missed). Classify them into the app's topics and answer with ONE JSON object only — no text before or after it.
+
+RULES
+- Do not invent anything. A value you do not know is null. Never guess a total, a number of right answers or a score.
+- You classify and explain; the app computes every score and priority. Do not add weights, difficulty or priority fields.
+- Use only these topicId values (the app's topics = tasks of the Private Pilot ACS FAA-S-ACS-6C):
+- communications-lights-and-runways — Communications, Lights and Runways (ACS PA.III.A)
+- traffic-patterns — Traffic Patterns (ACS PA.III.B)
+- emergency-approach-and-landing — Emergency Approach and Landing (ACS PA.IX.B)
+- emergency-descent — Emergency Descent (ACS PA.IX.A)
+- emergency-equipment-and-survival-gear — Emergency Equipment and Survival Gear (ACS PA.IX.D)
+- systems-and-equipment-malfunctions — Systems and Equipment Malfunctions (ACS PA.IX.C)
+- navigation-systems-and-radar-services — Navigation Systems and Radar Services (ACS PA.VI.B)
+- pilotage-and-dead-reckoning — Pilotage and Dead Reckoning (ACS PA.VI.A)
+- night-preparation — Night Preparation (ACS PA.XI.A)
+- ground-reference-maneuvers — Ground Reference Maneuvers (ACS PA.V.B)
+- steep-turns — Steep Turns (ACS PA.V.A)
+- airworthiness-requirements — Airworthiness Requirements (ACS PA.I.B)
+- cross-country-flight-planning — Cross-Country Flight Planning (ACS PA.I.D)
+- human-factors — Human Factors (ACS PA.I.H)
+- national-airspace-system — National Airspace System (ACS PA.I.E)
+- operation-of-systems — Operation of Systems (ACS PA.I.G)
+- performance-and-limitations — Performance and Limitations (ACS PA.I.F)
+- pilot-qualifications — Pilot Qualifications (ACS PA.I.A)
+- weather-information — Weather Information (ACS PA.I.C)
+- before-takeoff-check — Before Takeoff Check (ACS PA.II.F)
+- flight-deck-management — Flight Deck Management (ACS PA.II.B)
+- preflight-assessment — Preflight Assessment (ACS PA.II.A)
+- taxiing — Taxiing (ACS PA.II.D)
+- maneuvering-during-slow-flight — Maneuvering During Slow Flight (ACS PA.VII.A)
+- power-off-stalls — Power-Off Stalls (ACS PA.VII.B)
+- spin-awareness — Spin Awareness (ACS PA.VII.D)
+- approach-and-landing — Approach and Landing (ACS PA.IV.B)
+- takeoff-and-climb — Takeoff and Climb (ACS PA.IV.A)
+- A question has ONE topicId (the main one). Put other sub-subjects in "tags" (e.g. "TAF", "density altitude"). If you cannot classify it, use topicId null and explain in "doubt".
+- "acs": the ACS element code (e.g. "PA.I.C.K2") ONLY if you can verify it; otherwise null.
+- "classificationConfidence": your confidence in the topicId, 0 to 1. Below 0.7 or any doubt → write the doubt.
+- "errorType" for a missed question: concept | misread | calculation | memory | guess | other (or null).
+- mode "full" when you have the result of every question (or right/total per topic); mode "errorsOnly" when I give only the questions I missed. In errorsOnly: no "right" or "total" per topic, every listed question has "correct": false, and "overall" has total and wrong only if I told you.
+- "coverage": "complete" only if every question of the test is listed (one by one or in topic totals); otherwise "partial".
+- In "full" mode, check that right ≤ total and right + wrong = total, per topic and overall.
+- "examId": a short id you build from the platform and date, e.g. "sportys-2026-11-10-a" (I may change it).
+
+FORMAT (schemaVersion 1)
+{
+  "schemaVersion": 1,
+  "examId": "sportys-YYYY-MM-DD-a",
+  "date": "YYYY-MM-DD",
+  "platform": "Sporty's",
+  "mode": "full",
+  "coverage": "complete",
+  "overall": { "total": 60, "right": null, "wrong": null },
+  "topics": [ { "topicId": "weather-information", "total": null, "right": null, "wrong": null, "seconds": null } ],
+  "questions": [ { "qid": null, "topicId": null, "tags": [], "acs": null, "correct": null, "classificationConfidence": null, "doubt": null, "errorType": null, "explanation": null, "seconds": null } ]
+}
+
+MY RESULTS:

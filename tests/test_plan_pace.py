@@ -24,6 +24,7 @@ STATS = "JSON.stringify([forecast().mu, blended().mu, counts(), state.scores, st
 # (22) at 22:00 in a 20:30–23:30 block
 PLAN = """(()=>{const T=todayISO(),Y=addDays(T,-1),M=mondayOf(T);(state.plans||[]).forEach(p=>p.active=false);
   state.plans=(state.plans||[]).filter(p=>p.id!=='pP');state.paces=[];
+  state.settings={...(state.settings||{}),testEvery:0}; /* no practice test: this is about topic blocks */
   const blocks={};for(let k=0;k<7;k++)blocks[addDays(M,k)]=[[1230,1410]];blocks[Y]=[[1230,1410]];
   state.plans.push({id:'pP',type:'weekly',name:'',start:M,active:true,blocks,items:[
     {id:'y1',date:Y,start:1230,min:40,kind:'topic',i:18,n:30,reason:'weak'},
@@ -92,7 +93,7 @@ with sync_playwright() as p:
             check(f'{tag}: refreshing changes no statistic', ev(STATS) == stats0)
 
             # ---------- focus mode feeds the pace with its stopwatch ----------
-            ev("""(()=>{const T=todayISO(),p=state.plans.find(q=>q.id==='pP'),it=p.items.find(x=>x.date===T&&x.kind==='topic'&&!itemDone(x));
+            ev("""(()=>{const T=todayISO(),p=state.plans.find(q=>q.id==='pP'),it=p.items.filter(x=>x.date===T&&x.kind==='topic'&&!itemDone(x)).sort((a,b)=>b.n-a.n)[0]; /* the biggest block: 40 min is a plausible time for it */
                 localStorage.setItem(STORE+'-focus',JSON.stringify({key:'id:'+it.id,acc:40*60000,run:0}));window.__fit=it})()""")
             n0 = ev("state.paces.length"); ev("openFocus(__fit)"); pg.wait_for_timeout(100); ev("document.getElementById('focusDone').click()"); pg.wait_for_timeout(200)
             pf = ev("state.paces.at(-1)")

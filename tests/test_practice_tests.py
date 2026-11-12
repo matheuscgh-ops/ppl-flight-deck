@@ -202,13 +202,14 @@ with sync_playwright() as p:
                 r = ev("[...document.querySelectorAll('#statTests .statduo > section')].map(x=>Math.round(x.getBoundingClientRect().top))")
                 check(f'{tag}: tablet/phone: trend and histogram stacked', len(r) == 2 and r[1] > r[0], r)
             # ---------- plan: cadence ----------
-            ev("state.tests=[{id:'a',date:addDays(todayISO(),-3),q:60,score:75}];state.settings.testEvery=3;save();render()")
+            ev("state.tests=[{id:'a',date:addDays(todayISO(),-3),q:60,score:75}];state.settings.testEvery=3;state.deadline=addDays(todayISO(),60);save();render()")  # far from the exam: the plain cadence
             check(f'{tag}: test every 3 days, last one 3 days ago → test in today\'s plan', ev("buildPlan().items.some(x=>x.kind==='test'&&x.n===60)"))
             tap('.tabs button[data-view="plan"]'); pg.wait_for_timeout(250)
             tap('#setOpen'); pg.wait_for_timeout(200)
             check(f'{tag}: Settings read "Practice test every" and show 3 days', 'Practice test every' in pg.inner_text('#setbg') and pg.input_value('#setTestsSel') == '3')
             pg.select_option('#setTestsSel', '7'); pg.wait_for_timeout(250); tap('#setClose'); pg.wait_for_timeout(150)
-            check(f'{tag}: every 7 days → no test today', ev('settings().testEvery') == 7 and not ev("buildPlan().items.some(x=>x.kind==='test')"))
+            # (a test can still come early for other reasons — days without study, many reviews due — but not for the cadence)
+            check(f'{tag}: every 7 days → the cadence does not ask for a test today', ev('settings().testEvery') == 7 and ev("testWhy().reason") not in ('test', 'testStretch', 'testFinal'), ev("testWhy().reason"))
             pg.reload(); pg.wait_for_timeout(400)
             check(f'{tag}: the setting survives a reload', ev('settings().testEvery') == 7)
             ev("state.settings.testEvery=3;save();render()")

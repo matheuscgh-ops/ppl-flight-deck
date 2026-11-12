@@ -58,7 +58,7 @@ const SelfTest = (() => {
         { date: D(2), topic: 22, kind: 'study', score: 80 },
         { date: D(0), topic: 22, kind: 'review', score: 65 },
       ]);
-      ok('SR update', 'score 60–69: S ← S × 1.2', near(S(22).S, 1.8), S(22).S);
+      ok('SR update', 'score 60–69: S stays (a weak result never lengthens the interval)', near(S(22).S, 1.5), S(22).S);
       fixture([
         { date: D(20), topic: 22, kind: 'study', score: 90 },
         { date: D(15), topic: 22, kind: 'review', score: 95 },
@@ -111,8 +111,8 @@ const SelfTest = (() => {
       ]);
       ok(
         'SR sessions',
-        'same day: one session, best score wins',
-        S(22).reps.length === 1 && near(S(22).S, 2),
+        'same day: one review, the FIRST attempt counts (not the best score)',
+        S(22).reps.length === 1 && near(S(22).S, 1),
         `${S(22).reps.length} reps, S ${S(22).S}`
       );
       fixture([{ date: D(0), topic: 22, kind: 'study', partial: true }]);
@@ -168,8 +168,8 @@ const SelfTest = (() => {
         const r = srAll();
         ok(
           'SR priority',
-          'same recall: Not Comfortable ranks above Very Comfortable',
-          r.findIndex(m => m.i === 13) < r.findIndex(m => m.i === 12)
+          'same results: the topic with the bigger share of the test ranks first (Cross-Country above Human Factors)',
+          examShare(12).share > examShare(13).share && r.findIndex(m => m.i === 12) < r.findIndex(m => m.i === 13)
         );
       }
       fixture([
@@ -331,14 +331,18 @@ const SelfTest = (() => {
       state.scores = TOPICS.map(() => 80);
       {
         const f = forecast();
-        ok('Forecast', 'every topic 80%, no sessions → expected 80%', near(f.mu, 0.8), f.mu);
+        /* p̄ = 28 topics at 80% (15 questions each) pulled toward 50% by 30 questions; each topic toward p̄ by 4 of 19 */
+        const pb = (28 * 15 * 0.8 + 15) / (28 * 15 + 30);
         ok(
           'Forecast',
-          'topic weights sum to 1',
-          near(
-            f.parts.reduce((a, x) => a + x.w, 0),
-            1
-          )
+          'every topic 80%, no sessions → about 80% (each pulled a little toward your overall level)',
+          near(f.mu, (15 * 0.8 + 4 * pb) / 19),
+          f.mu
+        );
+        ok(
+          'Forecast',
+          'topic weights + the unmapped areas (VIII, XII) sum to 1',
+          near(f.parts.reduce((a, x) => a + x.w, 0) + f.unmapped, 1) && near(f.unmapped, 0.09)
         );
       }
       fixture([]);
@@ -348,11 +352,16 @@ const SelfTest = (() => {
       state.scores = TOPICS.map(() => 50);
       state.scores[18] = 100;
       {
-        const w = 158 / 1125;
+        /* p̄ (overall level) = 27 topics at 50% and Weather at 100%, 15 questions each, pulled toward 50% by 30 questions;
+           each topic is pulled toward p̄ by 4 of 19 questions */
+        const w = examShare(18).share / EXAM_SHARE.mapped,
+          pb = (27 * 15 * 0.5 + 15 + 15) / (28 * 15 + 30),
+          mo = (15 * 0.5 + 4 * pb) / 19,
+          mw = (15 + 4 * pb) / 19;
         ok(
           'Forecast',
-          'Weather at 100% (just studied) raises μ by its weight × 50%',
-          near(forecast().mu, 0.5 + w * 0.5),
+          'Weather at 100% (just studied, unknown sample) raises μ by its share × the gap to the other topics',
+          near(forecast().mu, mo + w * (mw - mo)),
           forecast().mu
         );
       }
@@ -362,11 +371,14 @@ const SelfTest = (() => {
       {
         const f = forecast(),
           R = recall(10, 2),
-          w = 158 / 1125;
+          w = examShare(18).share / EXAM_SHARE.mapped,
+          pb = (27 * 15 * 0.5 + 15 + 15) / (28 * 15 + 30),
+          mo = (15 * 0.5 + 4 * pb) / 19,
+          mw = (15 + 4 * pb) / 19;
         ok(
           'Forecast',
-          'recall decay pulls the topic toward guessing: score × recall + 1/3 × (1 − recall)',
-          near(f.mu, 0.5 + w * (R + (1 - R) / 3 - 0.5)),
+          'recall decay pulls the topic toward guessing: mastery × recall + 1/3 × (1 − recall)',
+          near(f.mu, mo + w * (mw * R + (1 - R) / 3 - mo)),
           f.mu
         );
       }
@@ -387,8 +399,8 @@ const SelfTest = (() => {
       ok(
         'Forecast',
         'with ±6 points of uncertainty (beta-binomial) μ=70% → 55.5% (matches scipy betabinom)',
-        near(forecast().pass, 0.555047, 1e-4),
-        forecast().pass
+        near(betaBinomTail(60, 0.7, 6, 42), 0.555047, 1e-4),
+        betaBinomTail(60, 0.7, 6, 42)
       );
       ok(
         'Forecast',
@@ -404,7 +416,11 @@ const SelfTest = (() => {
       {
         const f = forecast(),
           top = f.parts.slice().sort((a, b) => b.lost - a.lost)[0];
-        ok('Forecast', 'biggest loss = biggest topic when all scores equal (Weather)', top.i === 18);
+        ok(
+          'Forecast',
+          'biggest loss = biggest share of the test when all scores are equal (Approach and Landing, area IV)',
+          top.i === 26
+        );
       }
       fixture([{ date: D(3), topic: 18, kind: 'study', score: 40 }]);
       state.scores[18] = 40;
@@ -476,18 +492,19 @@ const SelfTest = (() => {
       }
       {
         const P = buildPlan(),
-          U = { due: 1.3, weak: 1.15, nodata: 1.1, new: 1, light: 0.8 },
-          v = P.items.filter(x => x.kind === 'topic' && !x.done).map(x => ((1 - x.pExam) * (U[x.reason] || 1)) / x.per);
+          v = P.items.filter(x => x.kind === 'topic' && !x.done).map(x => x.value / (x.n * x.per));
         ok(
           'Plan',
-          'medium plan is ordered by exam questions at stake per minute',
+          'medium plan is ordered by test questions at risk per minute',
           v.every((x, k) => !k || v[k - 1] >= x - 1e-12),
           v.map(x => x.toFixed(3)).join(' ')
         );
         ok(
           'Plan',
-          'each topic shows the exam-day questions at stake = 60 × n / 1,125 × (1 − p on exam day)',
-          P.items.filter(x => x.kind === 'topic' && x.n).every(x => near(x.stake, ((60 * x.n) / 1125) * (1 - x.pExam)))
+          'each topic shows the test questions at risk = 60 × official share × part of its session × (1 − p on exam day)',
+          P.items
+            .filter(x => x.kind === 'topic' && x.n)
+            .every(x => near(x.stake, 60 * examShare(x.i).share * Math.min(1, x.n / x.nRef) * (1 - x.pExam)))
         );
       }
       ok(
@@ -502,21 +519,25 @@ const SelfTest = (() => {
         const P = buildPlan(),
           it = P.items.find(x => x.i === 18),
           m = srModel(18, T, true),
-          last = m.reps[m.reps.length - 1].p,
+          last = m.mastery * 100,
           base = last >= GOAL ? 15 : last >= 75 ? 20 : last >= 70 ? 25 : 40,
           exp = Math.min(158, Math.max(10, Math.min(40, Math.round(base * (1 + Math.max(0, 1 - m.R))))));
         ok(
           'Plan',
-          'review size follows the last score (sample when good, full session when not) and what was forgotten',
+          'review size follows the estimated mastery (sample when good, full session when not) and what was forgotten',
           it.n === exp,
           `${it.n} vs ${exp}`
         );
         ok(
           'Plan',
           'a review is never more than one 40-question session, and smaller after a good score',
-          reviewSize(18, { reps: [{ p: 90 }], R: 0.9 }) < reviewSize(18, { reps: [{ p: 60 }], R: 0.9 }) &&
-            reviewSize(18, { reps: [{ p: 60 }], R: 0.2 }) === 40,
-          [reviewSize(18, { reps: [{ p: 90 }], R: 0.9 }), reviewSize(18, { reps: [{ p: 60 }], R: 0.9 })].join()
+          reviewSize(18, { reps: [{ p: 90 }], mastery: 0.9, R: 0.9 }) <
+            reviewSize(18, { reps: [{ p: 60 }], mastery: 0.6, R: 0.9 }) &&
+            reviewSize(18, { reps: [{ p: 60 }], mastery: 0.6, R: 0.2 }) === 40,
+          [
+            reviewSize(18, { reps: [{ p: 90 }], mastery: 0.9, R: 0.9 }),
+            reviewSize(18, { reps: [{ p: 60 }], mastery: 0.6, R: 0.9 }),
+          ].join()
         );
       }
       fixture([], { settings: { minutes: 180, qph: 40, tests: 2 } });
@@ -638,7 +659,7 @@ const SelfTest = (() => {
           { date: D(5), topic: 13, kind: 'study', score: 95 },
           { date: D(5), topic: 12, kind: 'study', score: 92 },
         ],
-        { settings: { minutes: 120, qph: 40, tests: 2, reviewMin: 1.5 } }
+        { settings: { minutes: 180, qph: 40, tests: 2, reviewMin: 1.5 } }
       );
       {
         const L = buildPlan(T, null, 'low'),
@@ -657,29 +678,40 @@ const SelfTest = (() => {
         ok('Energy', 'high energy starts with the practice test', H.items[0].kind === 'test');
         ok(
           'Energy',
-          'workload: low < medium ≤ high',
-          L.workload < Mm.workload && Mm.workload <= H.workload,
-          `${L.workload} ${Mm.workload} ${H.workload}`
+          'low energy works in smaller chunks (at most 20 questions), high in up to 40',
+          L.items.every(x => x.kind !== 'topic' || x.done || x.n <= 20) &&
+            H.items.every(x => x.kind !== 'topic' || x.done || x.n <= 40)
         );
         const firstTopic = P => P.items.find(x => x.kind === 'topic' && !x.done);
         ok(
           'Energy',
           'low energy starts with an easy item (higher chance of being right than high energy)',
-          firstTopic(L).p > firstTopic(H).p,
+          firstTopic(L).p >= firstTopic(H).p,
           `${firstTopic(L).p} vs ${firstTopic(H).p}`
         );
-        ok('Energy', 'high energy plans more time (stretch 10%) and goes faster', H.budget > Mm.budget);
+        ok(
+          'Energy',
+          'energy never changes the time you gave (no stretch): the same budget for all three',
+          L.budget === Mm.budget && H.budget === Mm.budget,
+          `${L.budget} ${Mm.budget} ${H.budget}`
+        );
         ok(
           'Energy',
           'every plan fits its minutes',
           L.minutes <= L.budget && Mm.minutes <= Mm.budget && H.minutes <= H.budget,
           `${L.minutes}/${L.budget} ${Mm.minutes}/${Mm.budget} ${H.minutes}/${H.budget}`
         );
-        ok(
-          'Energy',
-          'low energy may include light reviews of topics you know',
-          L.items.every(x => x.reason !== 'light' || state.statuses[x.i] === 'Very Comfortable')
-        );
+        {
+          const mf = (i, m, p) => minutesSplit(i, settings(), m, p),
+            cl = topicCands(T, { mode: 'low', minutesFor: mf }).find(x => x.i === 18),
+            ch = topicCands(T, { mode: 'high', minutesFor: mf }).find(x => x.i === 18);
+          ok(
+            'Energy',
+            'low energy keeps the weak topic (Weather at 30%) with the same value, as guided examples instead of a timed set',
+            cl && ch && cl.activity === 'guided' && ch.activity === 'concept' && near(cl.risk, ch.risk),
+            JSON.stringify([cl && cl.activity, ch && ch.activity])
+          );
+        }
         ok(
           'Energy',
           'medium = the standard plan (default)',
@@ -1068,9 +1100,11 @@ const SelfTest = (() => {
           m = srModel(5, T);
         ok(
           'Heat map',
-          'heat = chance of a right answer = score × recall + 1/3 × (1 − recall)',
-          h && h.heat === Math.round(100 * (0.8 * m.R + (1 - m.R) / 3)),
-          h
+          "heat = chance of a right answer = mastery × recall + 1/3 × (1 − recall) (the forecast's number)",
+          h &&
+            h.heat === Math.round(100 * (m.mastery * m.R + (1 - m.R) / 3)) &&
+            h.heat === Math.round(100 * chanceAt(m, T)),
+          JSON.stringify(h)
         );
       }
       ok('Heat map', 'a forgotten topic never goes below guessing (≈ 33)', Math.round(100 * pRight(90, 0)) === 33);

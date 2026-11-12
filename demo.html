@@ -1151,6 +1151,21 @@ body.dragging * {
   margin-top: 6px;
   font-size: 14px;
 }
+/* why a topic is suggested (activity and main reasons): a quiet line under the plan row */
+.qwhy {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.focuswhy {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+}
 
 /* modal */
 .modalbg {
@@ -3393,6 +3408,10 @@ html {
   background: #3f301e;
   color: #f1bc85;
 }
+.rchip.coverage {
+  background: #253338;
+  color: #a0d5e5;
+}
 .rchip.nodata {
   background: #312d42;
   color: #b8aaf6;
@@ -4307,6 +4326,130 @@ svg[data-hmode] {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+}
+/* importing a practice test analysed by an AI */
+.tsbtns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.modal.exmodal {
+  width: min(760px, 100%);
+}
+.exsrc {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+.exfile {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line2);
+  cursor: pointer;
+  font-size: 13px;
+}
+.exfile input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+#exIn {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  background: var(--panel2);
+  color: var(--ink);
+  border: 1px solid var(--line2);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font:
+    12.5px/1.4 ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
+}
+#exPrev {
+  margin: 10px 0;
+  max-height: 46vh;
+  overflow: auto;
+  font-size: 13px;
+}
+.exhead {
+  margin-bottom: 6px;
+}
+.exmsg {
+  margin: 6px 0;
+  padding-left: 18px;
+}
+.exmsg.err {
+  color: #f39c96;
+}
+.exmsg.warn {
+  color: #e7c079;
+}
+.extab {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 6px 0;
+}
+.extab th,
+.extab td {
+  text-align: left;
+  padding: 3px 4px;
+  border-bottom: 1px solid var(--line2);
+}
+.extab input {
+  width: 4.5em;
+}
+.extab select,
+.exq select {
+  max-width: 100%;
+  min-width: 0;
+}
+.exqhead {
+  margin: 8px 0 4px;
+  font-weight: 520;
+}
+.exunsure-k {
+  color: #e7c079;
+}
+.exqs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.exq {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--panel2);
+}
+.exq.unsure {
+  outline: 1px solid #e7c079;
+}
+.exq small {
+  color: var(--muted);
+}
+.exq .exdoubt {
+  color: #e7c079;
+  flex-basis: 100%;
+}
+.exqn {
+  min-width: 3em;
+  font-weight: 520;
+}
+.exqr {
+  width: 1.2em;
+  text-align: center;
 }
 
 /* ===== Statistics → Question bank layout =====
@@ -8526,7 +8669,7 @@ svg.tick {
     </section>
     <div class="statduo top">
     <section class="panel tshero">
-      <div class="srhead"><div><h2 class="section" data-t="tabTestsLong"></h2><div class="muted" data-t="tsSub"></div></div><button type="button" class="primary" id="tsAdd" data-t="tsAdd"></button></div>
+      <div class="srhead"><div><h2 class="section" data-t="tabTestsLong"></h2><div class="muted" data-t="tsSub"></div></div><div class="tsbtns"><button type="button" id="tsImport" data-t="exOpen"></button><button type="button" class="primary" id="tsAdd" data-t="tsAdd"></button></div></div>
       <div class="fckpis tskpis" id="tsKpis"></div>
       <div class="tstrend" id="tsTrendTxt"></div>
       <button type="button" class="linkbtn callink" data-t="calLink"></button>
@@ -8649,6 +8792,7 @@ svg.tick {
       <div class="field"><span class="flabel" data-t="rightField"></span><div class="rightof"><input type="number" id="mRight" min="0" step="1" inputmode="numeric" aria-label="Right answers"><span data-t="ofWord"></span><input type="number" id="mOf" min="1" step="1" inputmode="numeric" aria-label="Questions"></div></div>
       <label class="field"><span class="flabel" data-t="scoreField"></span><input type="number" id="mScore" min="0" max="100" step="1" inputmode="numeric" data-ph="blankInProgress"></label>
     </div>
+    <label class="field"><span class="flabel" data-t="attemptField"></span><select id="mAttempt"><option value="first" data-t="att_first"></option><option value="repeat" data-t="att_repeat"></option><option value="after" data-t="att_after"></option></select></label>
     <div class="row2">
       <label class="field"><span class="flabel" data-t="status"></span><select id="mStatus"></select></label>
       <label class="field"><span class="flabel" data-t="date"></span><input type="date" id="mDate"></label>
@@ -8709,6 +8853,15 @@ svg.tick {
     <p class="muted calhelp" data-t="calHelp"></p>
   </div>
 </div>
+<div class="modalbg" id="exbg" hidden>
+  <div class="modal exmodal" role="dialog" aria-modal="true" aria-labelledby="exTitle">
+    <div class="mhead"><div><h3 id="exTitle" data-t="exTitle"></h3><div class="muted" data-t="exSub"></div></div><button class="x" id="exClose" aria-label="Close">×</button></div>
+    <div class="exsrc"><button type="button" id="exPrompt" data-t="exCopyPrompt"></button><label class="exfile"><span data-t="exPickFile"></span><input type="file" id="exFile" accept=".json,.txt,application/json,text/plain"></label></div>
+    <textarea id="exIn" rows="6" spellcheck="false" data-ph="exPastePh"></textarea>
+    <div id="exPrev"></div>
+    <div class="mbtns"><button type="button" class="primary" id="exOk" data-t="exConfirm" disabled></button><button type="button" id="exCancel" data-t="cancel"></button></div>
+  </div>
+</div>
 <div class="modalbg" id="ptbg" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ptTitle">
     <div class="mhead"><div><h3 id="ptTitle" data-t="practiceTest"></h3><div class="muted" id="ptDesc"></div></div><button class="x" id="ptClose" aria-label="Close">×</button></div>
@@ -8749,6 +8902,7 @@ svg.tick {
       <h2 id="focusName"></h2>
       <div class="muted focusmeta" id="focusMeta"></div>
       <div class="asaline focusasa" id="focusAsa" hidden></div>
+      <div class="focuswhy" id="focusWhy" hidden></div>
       <div class="focusring" id="focusRing"><div><b id="focusClock">0:00</b><small id="focusPlanned"></small></div></div>
       <div class="focusbtns"><button type="button" id="focusPause"></button><button type="button" class="primary" id="focusDone"></button></div>
       <button type="button" class="linkbtn" id="focusNotes" hidden></button>
@@ -8851,7 +9005,7 @@ function expose(vars) {
 
 /* ===== module Config (js/core/config.js) =====
    public: TEMPLATE, STORE, fitMQ, fitH, TOPICS, STATUS, COLORS, DEF_SET0, PREF_DEF, LOCALE, DOCS_URL, docsUrl, ASA_CHAPTERS,
-           asaOf
+           asaOf, topicById, ACS_SOURCE, ACS_AREAS, ACS_TASK, EXAM_SHARE, examShare
    live values (getters on window, they follow your Settings): GOAL */
 const Config = (() => {
   const TEMPLATE = '<!doctype html>\n' + document.documentElement.outerHTML;
@@ -8948,6 +9102,106 @@ const Config = (() => {
     const c = ASA_OF[i];
     return c ? { main: ASA_CHAPTERS[c[0]].name, also: c.slice(1).map(k => ASA_CHAPTERS[k].name) } : null;
   };
+  /* stable id of each topic (used by imported files instead of positions): the English name in lowercase with dashes,
+     "Weather Information" → "weather-information" */
+  TOPICS.forEach(
+    x =>
+      (x.id = x.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, ''))
+  );
+  const topicById = id => TOPICS.findIndex(x => x.id === id);
+
+  /* ================= SHARE OF THE FAA TEST (official, by ACS area) =================
+     The PAR test (Private Pilot Airplane, 60 scored questions) draws its questions by Area of Operation of the Private
+     Pilot ACS. ACS_AREAS holds the official share of each area; ACS_SOURCE says where it comes from and when it was
+     checked. The Sporty's topics are the ACS tasks themselves (Weather Information = I.C, Approach and Landing = IV …),
+     so each topic belongs to exactly one area (ACS_TASK).
+       share of topic i = share of its area × (bank questions of i ÷ bank questions of the area's topics)
+     The split inside an area by the size of the Sporty's bank is an APPROXIMATION (the bulletin gives areas, not tasks).
+     Areas VIII (Basic Instrument Maneuvers) and XII (Postflight Procedures) have no Sporty's topic: their 9% is kept as
+     "unmapped" — the forecast scores it with the average of the mapped topics (the same as spreading it over them) and
+     no plan can target it. The shares add up to 100% and each one is used once: as the probability that a question of
+     the test comes from that topic (never also multiplied by a number of questions). share × 60 is only a rough
+     reference for how many questions of a test may come from a topic, not a count any test guarantees. */
+  const ACS_SOURCE = {
+    shares: 'PSI, FAA Airman Knowledge Test — PAR Information Bulletin (© March 2024)',
+    sharesUrl: 'https://media.psiexams.com/faa/PAR_Information_Bulletin.pdf',
+    acs: 'FAA-S-ACS-6C, Private Pilot for Airplane Category ACS (November 2023)',
+    acsUrl: 'https://www.faa.gov/training_testing/testing/acs/private_airplane_acs_6.pdf',
+    test: 'FAA Airman Knowledge Testing Matrix (September 25, 2026): PAR, 60 questions, passing score 70',
+    checked: '2026-11-11',
+    note: 'The PSI bulletin could not be read directly (its site refuses automated access); the shares were corroborated by an independent guide updated 2026-09-26 and the area and task names by the FAA ACS document.',
+  };
+  const ACS_AREAS = [
+    { code: 'PA.I', name: 'Preflight Preparation', share: 22 },
+    { code: 'PA.II', name: 'Preflight Procedures', share: 13 },
+    { code: 'PA.III', name: 'Airport and Seaplane Base Operations', share: 7 },
+    { code: 'PA.IV', name: 'Takeoffs, Landings, and Go-Arounds', share: 20 },
+    { code: 'PA.V', name: 'Performance and Ground Reference Maneuvers', share: 3 },
+    { code: 'PA.VI', name: 'Navigation', share: 8 },
+    { code: 'PA.VII', name: 'Slow Flight and Stalls', share: 8 },
+    { code: 'PA.VIII', name: 'Basic Instrument Maneuvers', share: 7 },
+    { code: 'PA.IX', name: 'Emergency Operations', share: 7 },
+    { code: 'PA.XI', name: 'Night Operations', share: 3 },
+    { code: 'PA.XII', name: 'Postflight Procedures', share: 2 },
+  ];
+  /* the ACS task of each topic (same order as TOPICS) */
+  const ACS_TASK = [
+    'PA.III.A', // Communications, Lights and Runways — Communications, Light Signals, and Runway Lighting Systems
+    'PA.III.B', // Traffic Patterns
+    'PA.IX.B', // Emergency Approach and Landing (Simulated)
+    'PA.IX.A', // Emergency Descent
+    'PA.IX.D', // Emergency Equipment and Survival Gear
+    'PA.IX.C', // Systems and Equipment Malfunctions
+    'PA.VI.B', // Navigation Systems and Radar Services
+    'PA.VI.A', // Pilotage and Dead Reckoning
+    'PA.XI.A', // Night Preparation — Night Operations
+    'PA.V.B', // Ground Reference Maneuvers
+    'PA.V.A', // Steep Turns
+    'PA.I.B', // Airworthiness Requirements
+    'PA.I.D', // Cross-Country Flight Planning
+    'PA.I.H', // Human Factors
+    'PA.I.E', // National Airspace System
+    'PA.I.G', // Operation of Systems
+    'PA.I.F', // Performance and Limitations
+    'PA.I.A', // Pilot Qualifications
+    'PA.I.C', // Weather Information
+    'PA.II.F', // Before Takeoff Check
+    'PA.II.B', // Flight Deck Management
+    'PA.II.A', // Preflight Assessment
+    'PA.II.D', // Taxiing
+    'PA.VII.A', // Maneuvering During Slow Flight
+    'PA.VII.B', // Power-Off Stalls
+    'PA.VII.D', // Spin Awareness
+    'PA.IV.B', // Approach and Landing — Normal Approach and Landing
+    'PA.IV.A', // Takeoff and Climb — Normal Takeoff and Climb
+  ];
+  const areaOf = i => ACS_TASK[i].split('.').slice(0, 2).join('.');
+  const EXAM_SHARE = (() => {
+    const areaQ = {};
+    TOPICS.forEach((x, i) => (areaQ[areaOf(i)] = (areaQ[areaOf(i)] || 0) + x.q));
+    const topic = TOPICS.map(
+      (x, i) => (ACS_AREAS.find(a => a.code === areaOf(i)).share / 100) * (x.q / areaQ[areaOf(i)])
+    );
+    const mapped = topic.reduce((a, x) => a + x, 0);
+    return { topic, mapped, unmapped: 1 - mapped };
+  })();
+  /* { area, task, areaName, share (0–1, of the whole test), areaShare (0–1), estimated: true when the area holds
+     several topics (the split inside it is estimated) } */
+  const examShare = i => {
+    const code = areaOf(i),
+      a = ACS_AREAS.find(x => x.code === code);
+    return {
+      area: code,
+      task: ACS_TASK[i],
+      areaName: a.name,
+      share: EXAM_SHARE.topic[i],
+      areaShare: a.share / 100,
+      estimated: TOPICS.filter((_, k) => areaOf(k) === code).length > 1,
+    };
+  };
   const STATUS = ['Todo', 'Doing', 'Not Comfortable', 'Very Comfortable', 'To review'];
   const COLORS = ['#8791a0', '#68a0ee', '#e0a039', '#58c195', '#a295e5'];
   /* darker variants for tags drawn on the light "active day" background */
@@ -8993,6 +9247,12 @@ const Config = (() => {
     docsUrl,
     ASA_CHAPTERS,
     asaOf,
+    topicById,
+    ACS_SOURCE,
+    ACS_AREAS,
+    ACS_TASK,
+    EXAM_SHARE,
+    examShare,
   };
 })();
 const {
@@ -9010,6 +9270,12 @@ const {
   docsUrl,
   ASA_CHAPTERS,
   asaOf,
+  topicById,
+  ACS_SOURCE,
+  ACS_AREAS,
+  ACS_TASK,
+  EXAM_SHARE,
+  examShare,
 } = Config;
 
 /* ===== module Translations (i18n/translations.js) =====
@@ -11134,6 +11400,299 @@ const Translations = (() => {
   Object.assign(I18N.en, { last7: 'Last 7 days', dayByDay: 'Day by day' });
   Object.assign(I18N.pt, { last7: 'Últimos 7 dias', dayByDay: 'Dia a dia' });
   Object.assign(I18N.ja, { last7: '過去7日間', dayByDay: '日ごと' });
+  /* planner v2: kinds of attempt, why a topic is suggested, the activity, and importing a practice test analysed by an AI */
+  Object.assign(I18N.en, {
+    attemptField: 'Attempt',
+    att_first: 'First try / new questions',
+    att_repeat: 'Repeat of the same questions',
+    att_after: 'After seeing the answers',
+    rs_coverage: 'coverage',
+    reason_coverage: 'Not studied for a while: coverage keeps every topic coming back',
+    reason_weak: 'Estimated mastery below 70% (below your goal in the final stretch)',
+    act_newQ: 'New questions',
+    act_concept: 'Review the concept, then new questions',
+    act_guided: 'Guided examples',
+    act_retrieval: 'Recall without notes',
+    act_fluency: 'Fluency drill (timed)',
+    act_diagnostic: 'Short diagnostic',
+    why_last: '{r}/{n} last session',
+    why_lastExam: '{r}/{n} in the last practice test',
+    why_lastPct: '{p}% last session (sample unknown)',
+    why_lastExamPct: '{p}% in the last practice test',
+    why_sportys: "Sporty's score {p}% (sample unknown)",
+    why_examMisses: '{n} missed in an imported test',
+    why_tags: 'mostly {t}',
+    why_missTags: 'recent misses in {t}',
+    why_due: 'review due',
+    why_dueOver: 'review {d} d overdue',
+    why_mastery: 'estimated mastery {p}%',
+    why_understanding: 'missed while still remembered (understanding)',
+    why_forgetting: 'missed after a long gap (forgetting)',
+    why_pending: 'left undone in your plan',
+    why_idle: 'not studied for {d} days',
+    why_newMat: 'new material',
+    why_share: '{s}% of the test (ACS {a})',
+    why_shareEst: '≈{s}% of the test (ACS {a}, estimated inside the area)',
+    why_conf_low: 'little evidence yet',
+    why_conf_medium: 'some evidence',
+    why_conf_high: 'solid evidence',
+    exOpen: 'Import AI results',
+    exTitle: 'Import a practice test analysed by an AI',
+    exSub: 'Paste the JSON the AI gave you (or pick the file). Nothing changes until you confirm.',
+    exCopyPrompt: 'Copy the prompt for the AI',
+    exPickFile: 'Pick a .json / .txt file',
+    exPastePh: 'Paste the JSON here',
+    exConfirm: 'Import',
+    exModeFull: 'full result',
+    exModeErrors: 'misses only',
+    exCovComplete: 'every question listed',
+    exCovPartial: 'part of the test',
+    exWrongOnly: '{n} wrong (no overall score)',
+    exNoOverall: 'no overall score',
+    exTopic: 'Topic',
+    exRight: 'Right',
+    exTotal: 'Questions',
+    exErrorsNote:
+      'Misses only: no topic score is computed, topics not listed are not taken as known, and the topics with misses come up for review.',
+    exQuestions: '{n} questions',
+    exUnsureN: '{n} uncertain (check the topic)',
+    exUnclassified: '— not classified —',
+    exFailed: 'The import could not be applied; nothing was changed',
+    exDone: 'Practice test {id} imported',
+    exPromptCopied: 'Prompt copied: paste it in the AI with your results',
+    exPromptShown: 'The prompt is in the box: copy it from there',
+    exEmpty: 'Paste the JSON or pick a file',
+    exNotJson: 'This is not valid JSON',
+    exVersion: 'Unknown schemaVersion ({v}); this app reads version 1',
+    exNoId: 'examId is missing',
+    exBadDate: 'date is missing or not YYYY-MM-DD',
+    exFuture: 'The date is in the future',
+    exBadMode: 'mode must be "full" or "errorsOnly"',
+    exCoverageAssumed: 'coverage not given: taken as partial',
+    exBadCount: '{f}: counts must be whole numbers, 0 or more (or null)',
+    exRightOver: '{f}: more right answers than questions',
+    exSum: '{f}: right + wrong is not the total',
+    exBadQuestion: 'Question {n} is not valid',
+    exDupQuestion: 'Question {q} appears twice',
+    exUnknownTopic: 'Unknown topic "{id}": choose one in the preview',
+    exErrorType: 'Unknown errorType "{v}" (ignored)',
+    exUnclassifiedN: '{n} questions without a topic: they count in the overall score only',
+    exBadTopicRow: 'Topic row {n} is not valid',
+    exDupTopic: '{t} appears twice in the topic results',
+    exMismatch: '{t}: the topic result does not match its questions',
+    exUnknownResult: '{n} questions without a result (right or wrong): not counted',
+    exTotalMismatch: 'The topics add up to {a} questions, the overall total says {b}',
+    exNothing: 'No result to import',
+    exTopicNoScore: '{t}: no total or right answers, so no score for this topic',
+    exErrorsNoScore: '{t}: "misses only" cannot carry right answers or totals per topic',
+    exErrorsRight: '"misses only" cannot list right answers',
+    exMoreMisses: '{a} misses listed but the overall says {b} wrong',
+    exFewerMisses: '{a} of {b} misses listed: the rest stay unclassified',
+    exDupExam: 'Test {id} was already imported: nothing to add',
+    exDupContent: 'The same results were already imported as {id}',
+    exNot60: 'This test has {n} questions (the FAA test has 60)',
+  });
+  Object.assign(I18N.pt, {
+    attemptField: 'Tentativa',
+    att_first: 'Primeira tentativa / questões novas',
+    att_repeat: 'Repetição das mesmas questões',
+    att_after: 'Depois de ver as respostas',
+    rs_coverage: 'cobertura',
+    reason_coverage: 'Sem estudar há um tempo: a cobertura traz todo tópico de volta',
+    reason_weak: 'Domínio estimado abaixo de 70% (abaixo da sua meta na reta final)',
+    act_newQ: 'Questões novas',
+    act_concept: 'Rever o conceito e responder questões novas',
+    act_guided: 'Exemplos guiados',
+    act_retrieval: 'Recuperação sem consulta',
+    act_fluency: 'Prática de fluência (cronometrada)',
+    act_diagnostic: 'Diagnóstico curto',
+    why_last: '{r}/{n} na última sessão',
+    why_lastExam: '{r}/{n} no último simulado',
+    why_lastPct: '{p}% na última sessão (amostra desconhecida)',
+    why_lastExamPct: '{p}% no último simulado',
+    why_sportys: "nota Sporty's {p}% (amostra desconhecida)",
+    why_examMisses: '{n} erros num simulado importado',
+    why_tags: 'concentrados em {t}',
+    why_missTags: 'erros recentes em {t}',
+    why_due: 'revisão vencida',
+    why_dueOver: 'revisão vencida há {d} d',
+    why_mastery: 'domínio estimado {p}%',
+    why_understanding: 'errou ainda lembrando (compreensão)',
+    why_forgetting: 'errou depois de muito tempo (esquecimento)',
+    why_pending: 'ficou pendente no seu plano',
+    why_idle: 'sem estudar há {d} dias',
+    why_newMat: 'matéria nova',
+    why_share: '{s}% da prova (ACS {a})',
+    why_shareEst: '≈{s}% da prova (ACS {a}, estimado dentro da área)',
+    why_conf_low: 'pouca evidência ainda',
+    why_conf_medium: 'alguma evidência',
+    why_conf_high: 'evidência sólida',
+    exOpen: 'Importar resultado da IA',
+    exTitle: 'Importar simulado analisado por IA',
+    exSub: 'Cole o JSON que a IA gerou (ou escolha o arquivo). Nada muda até você confirmar.',
+    exCopyPrompt: 'Copiar o prompt para a IA',
+    exPickFile: 'Escolher arquivo .json / .txt',
+    exPastePh: 'Cole o JSON aqui',
+    exConfirm: 'Importar',
+    exModeFull: 'resultado completo',
+    exModeErrors: 'somente erros',
+    exCovComplete: 'todas as questões listadas',
+    exCovPartial: 'parte do simulado',
+    exWrongOnly: '{n} erradas (sem nota geral)',
+    exNoOverall: 'sem nota geral',
+    exTopic: 'Tópico',
+    exRight: 'Acertos',
+    exTotal: 'Questões',
+    exErrorsNote:
+      'Somente erros: nenhuma nota por tópico é calculada, tópicos ausentes não contam como dominados e os tópicos com erros entram para revisão.',
+    exQuestions: '{n} questões',
+    exUnsureN: '{n} incertas (confira o tópico)',
+    exUnclassified: '— sem classificação —',
+    exFailed: 'Não foi possível aplicar a importação; nada foi alterado',
+    exDone: 'Simulado {id} importado',
+    exPromptCopied: 'Prompt copiado: cole na IA junto com seus resultados',
+    exPromptShown: 'O prompt está na caixa: copie de lá',
+    exEmpty: 'Cole o JSON ou escolha um arquivo',
+    exNotJson: 'Isto não é um JSON válido',
+    exVersion: 'schemaVersion desconhecida ({v}); este app lê a versão 1',
+    exNoId: 'Falta o examId',
+    exBadDate: 'date ausente ou fora do formato AAAA-MM-DD',
+    exFuture: 'A data está no futuro',
+    exBadMode: 'mode deve ser "full" ou "errorsOnly"',
+    exCoverageAssumed: 'coverage não informado: considerado parcial',
+    exBadCount: '{f}: contagens devem ser inteiras, 0 ou mais (ou null)',
+    exRightOver: '{f}: mais acertos que questões',
+    exSum: '{f}: acertos + erros não dá o total',
+    exBadQuestion: 'A questão {n} não é válida',
+    exDupQuestion: 'A questão {q} aparece duas vezes',
+    exUnknownTopic: 'Tópico desconhecido "{id}": escolha um na prévia',
+    exErrorType: 'errorType desconhecido "{v}" (ignorado)',
+    exUnclassifiedN: '{n} questões sem tópico: contam só na nota geral',
+    exBadTopicRow: 'A linha de tópico {n} não é válida',
+    exDupTopic: '{t} aparece duas vezes nos resultados por tópico',
+    exMismatch: '{t}: o resultado do tópico não bate com as questões',
+    exUnknownResult: '{n} questões sem resultado (certo ou errado): não contam',
+    exTotalMismatch: 'Os tópicos somam {a} questões, o total geral diz {b}',
+    exNothing: 'Nenhum resultado para importar',
+    exTopicNoScore: '{t}: sem total ou acertos, então sem nota para este tópico',
+    exErrorsNoScore: '{t}: "somente erros" não pode trazer acertos ou totais por tópico',
+    exErrorsRight: '"somente erros" não pode listar acertos',
+    exMoreMisses: '{a} erros listados, mas o geral diz {b} errados',
+    exFewerMisses: '{a} de {b} erros listados: o resto fica sem classificação',
+    exDupExam: 'O simulado {id} já foi importado: nada a acrescentar',
+    exDupContent: 'Os mesmos resultados já foram importados como {id}',
+    exNot60: 'Este simulado tem {n} questões (a prova da FAA tem 60)',
+  });
+  Object.assign(I18N.ja, {
+    attemptField: '取り組み',
+    att_first: '初回／新しい問題',
+    att_repeat: '同じ問題の繰り返し',
+    att_after: '答えを見た後',
+    rs_coverage: '網羅',
+    reason_coverage: 'しばらく未学習：すべてのトピックが巡ってくるように',
+    reason_weak: '推定習熟度が70%未満（最終段階では目標未満）',
+    act_newQ: '新しい問題',
+    act_concept: '概念を復習してから新しい問題',
+    act_guided: 'ガイド付きの例題',
+    act_retrieval: '何も見ずに想起',
+    act_fluency: 'スピード練習（時間計測）',
+    act_diagnostic: '短い診断',
+    why_last: '前回のセッション {r}/{n}',
+    why_lastExam: '前回の模試 {r}/{n}',
+    why_lastPct: '前回のセッション {p}%（問題数不明）',
+    why_lastExamPct: '前回の模試 {p}%',
+    why_sportys: "Sporty'sのスコア {p}%（問題数不明）",
+    why_examMisses: 'インポートした模試で{n}問ミス',
+    why_tags: '主に{t}',
+    why_missTags: '最近のミス：{t}',
+    why_due: '復習期限',
+    why_dueOver: '復習が{d}日超過',
+    why_mastery: '推定習熟度 {p}%',
+    why_understanding: '覚えているうちのミス（理解）',
+    why_forgetting: '間が空いてからのミス（忘却）',
+    why_pending: 'プランで未完了',
+    why_idle: '{d}日間未学習',
+    why_newMat: '新しい内容',
+    why_share: '試験の{s}%（ACS {a}）',
+    why_shareEst: '試験の約{s}%（ACS {a}、エリア内は推定）',
+    why_conf_low: 'まだ根拠が少ない',
+    why_conf_medium: 'ある程度の根拠',
+    why_conf_high: '十分な根拠',
+    exOpen: 'AIの結果をインポート',
+    exTitle: 'AIが分析した模試をインポート',
+    exSub: 'AIが出したJSONを貼り付けるか、ファイルを選んでください。確定するまで何も変わりません。',
+    exCopyPrompt: 'AI用のプロンプトをコピー',
+    exPickFile: '.json / .txt ファイルを選ぶ',
+    exPastePh: 'ここにJSONを貼り付け',
+    exConfirm: 'インポート',
+    exModeFull: '全結果',
+    exModeErrors: 'ミスのみ',
+    exCovComplete: '全問を記載',
+    exCovPartial: '模試の一部',
+    exWrongOnly: '{n}問不正解（全体スコアなし）',
+    exNoOverall: '全体スコアなし',
+    exTopic: 'トピック',
+    exRight: '正解',
+    exTotal: '問題数',
+    exErrorsNote:
+      'ミスのみ：トピックのスコアは計算せず、記載のないトピックを習得済みとはみなさず、ミスのあったトピックを復習に回します。',
+    exQuestions: '{n}問',
+    exUnsureN: '{n}問が不確か（トピックを確認）',
+    exUnclassified: '— 未分類 —',
+    exFailed: 'インポートを適用できませんでした。何も変更していません',
+    exDone: '模試 {id} をインポートしました',
+    exPromptCopied: 'プロンプトをコピーしました：結果と一緒にAIに貼り付けてください',
+    exPromptShown: 'プロンプトはボックスにあります：そこからコピーしてください',
+    exEmpty: 'JSONを貼り付けるかファイルを選んでください',
+    exNotJson: '有効なJSONではありません',
+    exVersion: '不明なschemaVersion（{v}）。このアプリはバージョン1を読み込みます',
+    exNoId: 'examIdがありません',
+    exBadDate: 'dateがないか、YYYY-MM-DD形式ではありません',
+    exFuture: '日付が未来です',
+    exBadMode: 'modeは "full" か "errorsOnly" です',
+    exCoverageAssumed: 'coverageの指定なし：部分として扱います',
+    exBadCount: '{f}：件数は0以上の整数（またはnull）です',
+    exRightOver: '{f}：正解が問題数より多い',
+    exSum: '{f}：正解＋不正解が合計になりません',
+    exBadQuestion: '問題{n}が無効です',
+    exDupQuestion: '問題{q}が2回あります',
+    exUnknownTopic: '不明なトピック「{id}」：プレビューで選んでください',
+    exErrorType: '不明なerrorType「{v}」（無視します）',
+    exUnclassifiedN: 'トピックのない問題が{n}問：全体スコアにのみ数えます',
+    exBadTopicRow: 'トピック行{n}が無効です',
+    exDupTopic: '{t}がトピック結果に2回あります',
+    exMismatch: '{t}：トピックの結果が問題と一致しません',
+    exUnknownResult: '結果（正誤）のない問題が{n}問：数えません',
+    exTotalMismatch: 'トピックの合計は{a}問、全体の合計は{b}問です',
+    exNothing: 'インポートする結果がありません',
+    exTopicNoScore: '{t}：問題数か正解数がないため、このトピックのスコアはありません',
+    exErrorsNoScore: '{t}：「ミスのみ」ではトピックごとの正解数や問題数は使えません',
+    exErrorsRight: '「ミスのみ」では正解を記載できません',
+    exMoreMisses: 'ミスが{a}問記載されていますが、全体では{b}問不正解です',
+    exFewerMisses: '{b}問中{a}問のミスを記載：残りは未分類のままです',
+    exDupExam: '模試{id}はすでにインポート済み：追加なし',
+    exDupContent: '同じ結果が{id}としてすでにインポートされています',
+    exNot60: 'この模試は{n}問です（FAAの試験は60問）',
+  });
+  /* planner v2: the "How it is calculated" texts follow the new model */
+  Object.assign(I18N.en, {
+    formula:
+      "<p>A simplified model inspired by FSRS / SM-2. It keeps four things apart: the <b>observed result</b> (right / total), the estimated <b>mastery</b>, the <b>confidence</b> in it and the estimated <b>recall</b> today — a model, not a measurement of your memory. Moving a card is not a session.</p><pre>Evidence:   each result p with its sample n (a % alone: unknown → weighs as 15)\n            first try ×1 · repeat of the same questions ×0.3 · after seeing the answers ×0\nMastery:    first result (n·p + 4·p̄) / (n + 4), p̄ = your overall level; then a damped trend of your\n            results day by day (Holt: α 0.85 × sample, β 0.5, φ 0.8)\nConfidence: effective questions: low &lt; 10 · medium &lt; 30 · high ≥ 30\n\nRecall after t days:     R(t) = 1 / (1 + t / (9·S))\nFirst review:            S = 1 day (&lt; 70%) · 1.5 (70–84%) · 2 (≥ 85%)\nLater review (the day's FIRST attempt, recall R then):\n  p ≥ 70%   →  target S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  target S              (a weak result never lengthens the interval)\n  p &lt; 60%   →  target max(1, 0.4 × S)\n  S moves toward the target by min(1, n/15) × attempt weight\nUnder 8 questions (or the whole topic if smaller) is evidence, not a review.\n\nNext review = when R falls to {RV}% (Settings): last review + 9·S·(1/r − 1) days,\n              at most 30% of the days left to the exam\nOrder of the lists = test questions at risk now: 60 × share × (1 − p), × 1.2 when due</pre><p>Reviewing a little later, once recall has dropped, grows S more than reviewing right away — the spacing effect. The white line is the recall you would still have on exam day if you stopped reviewing.</p>",
+    fcFormula:
+      "p(topic) = mastery × recall + 1/3 × (1 − recall)      (no result yet → your overall level)\nshare(topic) = its ACS area's official share, split inside the area by bank size\nunmapped areas (VIII, XII: 9%) → the average of the others\nexpected score μ = Σ share × p + 9% × average\nright answers X ~ BetaBinomial(60, μ, ± model error)\nchance to pass = P(X ≥ 42)   ·   chance of {G}% = P(X ≥ {GN})\nLost questions (topic) = 60 × share × (1 − p)",
+  });
+  Object.assign(I18N.pt, {
+    formula:
+      '<p>Modelo simplificado inspirado em FSRS / SM-2. Separa quatro coisas: o <b>resultado observado</b> (acertos / total), o <b>domínio</b> estimado, a <b>confiança</b> nele e a <b>retenção</b> estimada hoje — um modelo, não uma medição da sua memória. Mover um card não é sessão.</p><pre>Evidência:  cada resultado p com a amostra n (só %: desconhecida → pesa como 15)\n            primeira tentativa ×1 · repetição das mesmas questões ×0,3 · depois de ver as respostas ×0\nDomínio:    primeiro resultado (n·p + 4·p̄) / (n + 4), p̄ = seu nível geral; depois uma tendência\n            amortecida dos seus resultados dia a dia (Holt: α 0,85 × amostra, β 0,5, φ 0,8)\nConfiança:  questões efetivas: baixa &lt; 10 · média &lt; 30 · alta ≥ 30\n\nRetenção após t dias:    R(t) = 1 / (1 + t / (9·S))\nPrimeira revisão:        S = 1 dia (&lt; 70%) · 1,5 (70–84%) · 2 (≥ 85%)\nRevisão seguinte (a PRIMEIRA tentativa do dia, retenção R naquele momento):\n  p ≥ 70%   →  alvo S × (1 + 1,2 × p/100 × (1,5 − R))\n  60–69%    →  alvo S                (resultado fraco nunca aumenta o intervalo)\n  p &lt; 60%   →  alvo max(1; 0,4 × S)\n  S anda até o alvo na proporção min(1; n/15) × peso da tentativa\nMenos de 8 questões (ou o tópico inteiro, se menor) é evidência, não revisão.\n\nPróxima revisão = quando R cai para {RV}% (Ajustes): última revisão + 9·S·(1/r − 1) dias,\n                  no máximo 30% dos dias até a prova\nOrdem das listas = questões da prova em risco agora: 60 × peso × (1 − p), × 1,2 se vencida</pre><p>Revisar um pouco depois, quando a retenção já caiu, aumenta mais o S do que revisar logo em seguida — o efeito de espaçamento. A linha branca é a retenção que você ainda teria no dia da prova se parasse de revisar.</p>',
+    fcFormula:
+      'p(tópico) = domínio × retenção + 1/3 × (1 − retenção)      (sem resultado → seu nível geral)\npeso(tópico) = % oficial da área ACS, dividido dentro da área pelo tamanho do banco\náreas sem tópico (VIII, XII: 9%) → média dos outros\nnota esperada μ = Σ peso × p + 9% × média\nacertos X ~ BetaBinomial(60, μ, ± erro do modelo)\nchance de passar = P(X ≥ 42)   ·   chance de {G}% = P(X ≥ {GN})\nQuestões perdidas (tópico) = 60 × peso × (1 − p)',
+  });
+  Object.assign(I18N.ja, {
+    formula:
+      '<p>FSRS／SM-2を参考にした簡易モデルです。4つを区別します：<b>観測した結果</b>（正解数／問題数）、推定<b>習熟度</b>、その<b>信頼度</b>、今日の推定<b>保持率</b> — 記憶の測定ではなくモデルです。カードの移動はセッションに数えません。</p><pre>根拠:     各結果 p と問題数 n（%のみ：不明 → 15として扱う）\n          初回 ×1 · 同じ問題の繰り返し ×0.3 · 答えを見た後 ×0\n習熟度:   最初の結果 (n·p + 4·p̄) / (n + 4)、p̄ = 全体の水準；以降は日ごとの結果の\n          減衰付き傾向（ホルト：α 0.85 × 問題数、β 0.5、φ 0.8）\n信頼度:   実効問題数：低 &lt; 10 · 中 &lt; 30 · 高 ≥ 30\n\nt日後の保持率:   R(t) = 1 / (1 + t / (9·S))\n初回の復習:      S = 1日（70%未満）· 1.5（70–84%）· 2（85%以上）\n2回目以降（その日の最初の取り組み、その時点の保持率R）:\n  p ≥ 70%   →  目標 S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  目標 S              （弱い結果で間隔は延びない）\n  p &lt; 60%   →  目標 max(1, 0.4 × S)\n  Sは min(1, n/15) × 取り組みの重み の割合で目標へ動く\n8問未満（トピック全体がそれより少なければ全体）は根拠であって復習ではない。\n\n次の復習 = Rが{RV}%まで下がる時点（設定）：最終復習 + 9·S·(1/r − 1)日、\n           試験までの日数の30%以内\nリストの順序 = 今落としそうな試験問題：60 × 比重 × (1 − p)、期限なら × 1.2</pre><p>少し忘れかけた頃に復習すると、すぐに復習するよりSが大きく伸びます（間隔効果）。白い線は、復習をやめた場合の試験当日の保持率です。</p>',
+    fcFormula:
+      'p(トピック) = 習熟度 × 保持率 + 1/3 × (1 − 保持率)      （結果なし → 全体の水準）\n比重 = ACSエリアの公式比率をエリア内で問題バンクの大きさで分割\nトピックのないエリア（VIII、XII：9%）→ 他の平均\n予想正答率 μ = Σ 比重 × p + 9% × 平均\n正解数 X ~ ベータ二項分布(60, μ, ± モデル誤差)\n合格確率 = P(X ≥ 42) · {G}%以上 = P(X ≥ {GN})\n失点（トピック）= 60 × 比重 × (1 − p)',
+  });
   return { I18N };
 })();
 const { I18N } = Translations;
@@ -11520,6 +12079,70 @@ const AppState = (() => {
     Array.isArray(arr) && arr.length >= OLD_TOPIC_COUNT && arr.length < TOPICS.length
       ? arr.concat(TOPICS.slice(arr.length).map(fill))
       : arr;
+  const ATTEMPTS = ['first', 'new', 'repeat', 'after'];
+  const WHY_ACTIVITIES = ['newQ', 'concept', 'guided', 'retrieval', 'fluency', 'diagnostic'];
+  const WHY_KEYS = [
+    'last',
+    'lastPct',
+    'sportys',
+    'examMisses',
+    'missTags',
+    'due',
+    'mastery',
+    'understanding',
+    'forgetting',
+    'pending',
+    'idle',
+    'newMat',
+    'share',
+  ];
+  /* an imported practice test as stored: unknown values stay unknown (null), never filled in */
+  function normExams(list) {
+    const ok = s => /^\d{4}-\d{2}-\d{2}$/.test(s || ''),
+      int = v => (Number.isInteger(v) && v >= 0 ? v : null),
+      str = (v, n) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, n) : null);
+    return (Array.isArray(list) ? list : [])
+      .filter(x => x && ok(x.date) && str(x.examId, 80) && (x.mode === 'full' || x.mode === 'errors'))
+      .map(x => ({
+        id: String(x.id || uid()).slice(0, 40),
+        examId: str(x.examId, 80),
+        date: x.date,
+        platform: str(x.platform, 60),
+        mode: x.mode,
+        coverage: x.coverage === 'complete' ? 'complete' : 'partial',
+        total: int(x.total),
+        right: int(x.right),
+        wrong: int(x.wrong),
+        topics: (Array.isArray(x.topics) ? x.topics : [])
+          .filter(t => t && Number.isInteger(t.i) && TOPICS[t.i])
+          .map(t => ({
+            i: t.i,
+            total: int(t.total),
+            right: int(t.right),
+            wrong: int(t.wrong),
+            seconds: int(t.seconds),
+          })),
+        misses: (Array.isArray(x.misses) ? x.misses : [])
+          .filter(q => q && Number.isInteger(q.i) && TOPICS[q.i])
+          .slice(0, 300)
+          .map(q => ({
+            i: q.i,
+            qid: str(q.qid, 80),
+            tags: (Array.isArray(q.tags) ? q.tags : [])
+              .map(tg => str(tg, 40))
+              .filter(Boolean)
+              .slice(0, 6),
+            acs: str(q.acs, 30),
+            conf: Number.isFinite(q.conf) ? Math.max(0, Math.min(1, q.conf)) : null,
+            errorType: str(q.errorType, 20),
+            note: str(q.note, 500),
+            seconds: int(q.seconds),
+          })),
+        importedAt: +x.importedAt || 0,
+        ...(typeof x.sig === 'string' ? { sig: x.sig.slice(0, 20) } : {}),
+      }))
+      .slice(-300);
+  }
   function normalize(o) {
     if (o && typeof o === 'object' && Array.isArray(o.statuses) && o.statuses.length < TOPICS.length) {
       const n = o.statuses.length;
@@ -11550,17 +12173,29 @@ const AppState = (() => {
             TOPICS[e.topic] &&
             ['study', 'review', 'move'].includes(e.kind)
         )
-        .map(e => ({
-          id: e.id || uid(),
-          date: e.date,
-          topic: e.topic,
-          kind: e.kind,
-          from: e.from || null,
-          to: e.kind === 'move' ? e.to || e.status || null : null,
-          score: cl(e.score),
-          partial: !!e.partial,
-          demo: !!e.demo,
-        })),
+        .map(e => {
+          const r = {
+            id: e.id || uid(),
+            date: e.date,
+            topic: e.topic,
+            kind: e.kind,
+            from: e.from || null,
+            to: e.kind === 'move' ? e.to || e.status || null : null,
+            score: cl(e.score),
+            partial: !!e.partial,
+            demo: !!e.demo,
+          };
+          /* a session's sample (right answers of how many questions) and kind of attempt, when they were recorded —
+             records without them keep an unknown sample (nothing is invented) */
+          const n = Math.round(+e.total),
+            k = Math.round(+e.right);
+          if (e.kind !== 'move' && Number.isFinite(n) && n > 0 && Number.isFinite(k) && k >= 0 && k <= n) {
+            r.total = n;
+            r.right = k;
+          }
+          if (e.kind !== 'move' && ATTEMPTS.includes(e.attempt)) r.attempt = e.attempt;
+          return r;
+        }),
       settings:
         o.settings && typeof o.settings === 'object'
           ? {
@@ -11584,8 +12219,19 @@ const AppState = (() => {
       tests: Array.isArray(o.tests)
         ? o.tests
             .filter(x => x && ok(x.date))
-            .map(x => ({ id: x.id || uid(), date: x.date, q: +x.q || 60, score: cl(x.score) }))
+            .filter(x => !x.proj)
+            .map(x => ({
+              id: x.id || uid(),
+              date: x.date,
+              q: +x.q || 60,
+              score: cl(x.score),
+              /* a test imported from a file: the id of its record in exams, and its right answers */
+              ...(typeof x.exam === 'string' && x.exam ? { exam: x.exam.slice(0, 80) } : {}),
+              ...(Number.isInteger(x.right) && x.right >= 0 && x.right <= (+x.q || 60) ? { right: x.right } : {}),
+            }))
         : [],
+      /* practice tests imported from a file (see ExamImport): their topic results and misses, as evidence */
+      exams: normExams(o.exams),
       deadline: ok(o.deadline) ? o.deadline : '2026-11-30',
       /* error notebook: what you got wrong in a topic (topic -1 = practice test), shown again when it comes back */
       notes: (Array.isArray(o.notes) ? o.notes : [])
@@ -11617,6 +12263,8 @@ const AppState = (() => {
           min: +x.min,
           est: +x.est,
           src: x.src === 'focus' ? 'focus' : 'tick',
+          /* what the estimate covered: answering only, or answering and review (older ones: unknown, not used) */
+          ...(x.basis === 'answer' || x.basis === 'all' ? { basis: x.basis } : {}),
         }))
         .slice(-400),
       /* Kanban cards ticked "done today": card key (topic number or your card's id) → the date it was ticked */
@@ -11731,6 +12379,23 @@ const AppState = (() => {
             .map(x => ({ i: x.i, m: Math.max(0, Math.round(+x.m)) }))
             .slice(0, 8);
         if (it.kind === 'reflect' && typeof it.of === 'string') o.of = it.of.slice(0, 40);
+        /* why the planner chose a topic block (shown under it): the activity and the main reasons, as planned */
+        if (it.kind === 'topic' && WHY_ACTIVITIES.includes(it.activity)) o.activity = it.activity;
+        if (it.kind === 'topic' && ['low', 'medium', 'high'].includes(it.conf)) o.conf = it.conf;
+        if (it.kind === 'topic' && Array.isArray(it.why))
+          o.why = it.why
+            .filter(w => w && WHY_KEYS.includes(w.k))
+            .slice(0, 10)
+            .map(w =>
+              Object.fromEntries(
+                Object.entries(w)
+                  .filter(([k, v]) => k.length <= 8 && (typeof v !== 'object' || (Array.isArray(v) && v.length <= 3)))
+                  .map(([k, v]) => [
+                    k,
+                    Array.isArray(v) ? v.map(x => String(x).slice(0, 40)) : typeof v === 'string' ? v.slice(0, 20) : v,
+                  ])
+              )
+            );
         if (it.custom) o.custom = true;
         if (it.check) o.check = true;
         if (it.check && Number.isFinite(+it.checkedAt) && +it.checkedAt > 0) o.checkedAt = +it.checkedAt;
@@ -11848,6 +12513,7 @@ const AppState = (() => {
         ...(state.plans || []),
         ...(state.cards || []),
         ...(state.notes || []),
+        ...(state.exams || []),
       ].map(x => x.id)
     );
     state.deleted ??= {};
@@ -11861,6 +12527,7 @@ const AppState = (() => {
     prevIds = now;
   }
   function save(stamp = true) {
+    if (typeof clearModels === 'function') clearModels();
     trackDeletes();
     if (stamp) state.updatedAt = Date.now();
     try {
@@ -12366,6 +13033,7 @@ const Dashboard = (() => {
   }
   /* only the visible tab is redrawn; the dashboard is redrawn when you come back to it */
   function render() {
+    clearModels();
     energyMode = planDay().energy;
     updateTexts();
     if (!$('#viewDash').hidden) renderDash();
@@ -12701,21 +13369,72 @@ const {
 } = Dashboard;
 
 /* ===== module SpacedRepetition (js/model/spaced-repetition.js) =====
-   public: recall, addDays, isTracked, srModel, srAll, scoreAt */
+   public: recall, addDays, isTracked, srModel, srAll, scoreAt, evidenceOf, chanceAt, retentionScale, clearModels, UNKNOWN_N,
+           REP_MIN_N */
 const SpacedRepetition = (() => {
-  /* ================= SPACED REPETITION (DEMO MODEL) =================
-   R(t) = 1 / (1 + t / (9·S))      recall t days after the last session; S = days until recall falls to 90%
-   first session:   S = 1 (score < 70) · 1.5 (70–84) · 2 (≥ 85)
-   later session with score p, when recall had fallen to R:
-     p ≥ 70  →  S ← S · (1 + 1.2 · p/100 · (1.5 − R))
-     60–69   →  S ← S · 1.2
-     p < 60  →  S ← max(1, 0.4 · S)
-   next review = when recall falls to the review threshold r (Settings, default 90 %):
-                 last session + 9·S·(1/r − 1) days  (r = 90 % gives exactly S days)
-   priority = (1 − R_now + 0.05 · min(days overdue, 10)) · √questions · list weight · (1 + max(0, 85 − score)/100)
-*/
+  /* ================= WHAT THE APP KNOWS ABOUT A TOPIC =================
+   Four separate things, never mixed:
+     observed result  what a session or a test showed: right / total (or only a %, for records saved before counts
+                      were kept — their number of questions stays UNKNOWN, it is never invented)
+     mastery          estimated share of the topic's questions you can answer, from all your results
+     confidence       how much evidence that estimate rests on (effective number of questions)
+     retention        ESTIMATED share of it still in memory today — a model, not a measurement of your memory
+
+   EVIDENCE. Every scored session (Kanban log, plan tick with a score) and every topic result of an imported practice
+   test is one observation: score p, sample n (questions; unknown → weighs as UNKNOWN_N = 15, the app's usual session)
+   and the kind of attempt:
+       first / new questions            weight 1     what you know
+       repeat (the same questions)      weight 0.3   partly remembering the answers
+       after seeing the answer          weight 0     no evidence (you just read it) — not a review either
+   Records without a kind: the first of a day counts as a first attempt, a later one the same day as a repeat (a retake
+   of the same set), so the BEST score of a day never replaces the first one.
+
+   MASTERY  a trend of your results day by day (Holt's method, see MASTERY AS A TREND below): the first result is
+            shrunk toward p̄ by its sample, m = (n·p + K·p̄) / (n + K), K = 4; later ones move the level by up to 85%
+            (less for a small sample or a repeat) and a damped trend follows steady progress. Out of sample it beat
+            repeating the last score; a 45-day average lagged 7 points behind (backtest of 2026-11-11).
+            Confidence still uses Σ w·n with w = attempt weight × 0.15^(sessions of the topic since).
+            p̄ = your overall level: the same weighted average over ALL topics, pulled toward 50% by 30 questions (50%
+            when there is nothing at all) — a topic with little evidence is assumed to be like the rest of your work,
+            not like a guess. With p̄ = 50%:
+            2/2 → 67%, 40/40 → 95%; 50% then 100% on the same questions → 60%. A topic with no evidence at all gets p̄,
+            marked as an assumption (low confidence).
+   CONFIDENCE  N = Σ w·n effective questions: low under 10, medium under 30, high from 30 — and never "high" when
+            every result behind it has an unknown sample (a % without a count).
+
+   SPACED REPETITION (a review = a day with at least one retrieval of REP_MIN_N = 8 questions or more (or the whole
+   topic, when it is smaller), or of unknown size; smaller samples count toward mastery but do not reset the review clock, so a few right answers in a practice
+   test never postpone the review of a whole topic)
+     R(t) = 1 / (1 + t / (9·S))      estimated recall t days after the last review; S = days until it falls to 90%
+     first review:   S = 1 (score < 70) · 1.5 (70–84) · 2 (≥ 85)
+     later review with score p (the day's first attempt), when recall had fallen to R:
+         target  p ≥ 70  →  S · (1 + 1.2 · p/100 · (1.5 − R))
+                 60–69   →  S                    (a weak result never lengthens the interval)
+                 p < 60  →  max(1, 0.4 · S)
+         S moves toward the target by λ = attempt weight × min(1, n / 15): a 40-question session moves it fully,
+         4 questions barely; a record of unknown size moves it fully (as before counts were kept).
+     a low score is ONE event: it lowers S once here and lowers mastery once — nothing else multiplies it again.
+     Why it was low (explains the suggested activity, changes no number): recall was still ≥ 85% when you got it wrong
+     → understanding; otherwise → forgetting.
+   next review = when R falls to the review threshold r (Settings, default 90 %): last review + 9·S·(1/r − 1) days,
+                 never more than 30% of the days left until the exam (Cepeda et al. 2008: the best gap for a test weeks
+                 away is 20–40% of the time left; a gap past the exam date is useless)
+   RETENTION FOR THE FORECAST  the chance of a right answer uses R with the time scaled by c, fitted to YOUR history:
+                 among c = 1, 1.5, 2, 3, 5, 8, 13, 21, the one that best predicts your next session's score from the one
+                 before (least squares over the last 200 pairs of sessions BEFORE the date forecast, so a past date
+                 never sees what came after it; 20 needed, else c = 1). c > 1 means you
+                 forget more slowly than the default curve; scheduling keeps c = 1 (reviews stay on the safe side).
+   An imported "errors only" test with misses in a topic after its last review makes the topic due now.
+   need (the order of the "needs recall" lists) = expected misses now × exam share × 60, × 1.2 when due.            */
+  const UNKNOWN_N = 15,
+    REP_MIN_N = 8,
+    PRIOR_K = 4,
+    POOL_K = 30,
+    PRIOR_P = 0.5,
+    DECAY_SESSION = 0.15 /* weight kept by a session for each later session of the same topic */,
+    GAP_SHARE = 0.3 /* longest interval: 30% of the days left until the exam */,
+    ATTEMPT_W = { first: 1, new: 1, repeat: 0.3, after: 0 };
   const SR_LISTS = ['Very Comfortable', 'Not Comfortable', 'To review'];
-  const LISTW = { 'Not Comfortable': 1.4, 'To review': 1.3, 'Very Comfortable': 1 };
   const recall = (dt, S) => 1 / (1 + Math.max(0, dt) / (9 * S));
   const addDays = (s, n) => {
     const d = parse(s);
@@ -12730,46 +13449,346 @@ const SpacedRepetition = (() => {
       )
     );
   }
-  function srModel(i, asOf, before) {
-    const today = asOf || todayISO(),
-      by = {};
-    state.events.forEach(e => {
-      if (
-        e.topic === i &&
-        (e.kind === 'study' || e.kind === 'review') &&
-        !e.partial &&
-        (before ? e.date < today : e.date <= today)
-      )
-        (by[e.date] ??= []).push(e);
+  /* the observations of topic i up to a date: sessions (with their attempt kind) and imported test results.
+     Projected sessions of a weekly plan (proj) are reviews for the schedule but never evidence of mastery. */
+  /* sessions grouped by topic, rebuilt when the list of events changes */
+  let _byTopic = null;
+  function sessionsOf(i) {
+    const ev = state.events,
+      key = ev.length + '|' + (ev.at(-1) || {}).id + '|' + (ev[0] || {}).id;
+    if (!_byTopic || _byTopic.k !== key || _byTopic.ev !== ev) {
+      const m = new Map();
+      ev.forEach(e => {
+        if (e.kind !== 'study' && e.kind !== 'review') return;
+        if (!m.has(e.topic)) m.set(e.topic, []);
+        m.get(e.topic).push(e);
+      });
+      _byTopic = { k: key, ev, m };
+    }
+    return _byTopic.m.get(i) || [];
+  }
+  function evidenceOf(i, today, before) {
+    const inRange = d => (before ? d < today : d <= today),
+      out = [],
+      seen = {};
+    sessionsOf(i).forEach(e => {
+      if (e.partial || !inRange(e.date)) return;
+      const first = !seen[e.date];
+      seen[e.date] = true;
+      const attempt = e.attempt || (first ? 'first' : 'repeat');
+      out.push({
+        date: e.date,
+        p: e.score,
+        right: e.right ?? null,
+        total: e.total ?? null,
+        attempt,
+        src: e.proj ? 'proj' : 'log',
+        id: e.id,
+      });
     });
+    (state.exams || []).forEach(x => {
+      if (!inRange(x.date)) return;
+      const r = (x.topics || []).find(t => t.i === i && t.total > 0 && t.right != null);
+      if (r)
+        out.push({
+          date: x.date,
+          p: Math.round((100 * r.right) / r.total),
+          right: r.right,
+          total: r.total,
+          attempt: 'new',
+          src: 'exam',
+          exam: x.examId,
+          id: x.id,
+        });
+    });
+    return out.sort((a, b) => a.date.localeCompare(b.date));
+  }
+  const nOf = o => (o.total > 0 ? o.total : UNKNOWN_N);
+  /* weighted evidence of a topic (no prior): { num, den, known (has a count), unknownN }; each result weighs its
+     attempt × its sample × 0.15 per later session (day) of the same topic */
+  function weigh(ev, today) {
+    let num = 0,
+      den = 0,
+      unknownN = false,
+      known = false;
+    const days = [...new Set(ev.map(o => o.date))].sort(),
+      after = d => days.length - 1 - days.indexOf(d);
+    ev.forEach(o => {
+      const w = ATTEMPT_W[o.attempt] * Math.pow(DECAY_SESSION, after(o.date)),
+        n = nOf(o);
+      if (o.total > 0) known = true;
+      else unknownN = true;
+      num += w * n * (o.p / 100);
+      den += w * n;
+    });
+    return { num, den, known, unknownN };
+  }
+  /* MASTERY AS A TREND (Holt's linear method with a damped trend, per day of the topic):
+       each day = the weighted mean of its results (attempt × sample), its weight w = Σ attempt × min(1, n / 15)
+       first day   level = (n·p + K·p̄) / (n + K)   (the sample shrinkage: 2/2 is not 40/40), trend = 0
+       later days  α' = α × min(1, w)   level ← α'·p + (1 − α')·(level + φ·trend)
+                   trend ← β·(level − previous level) + (1 − β)·φ·trend
+       mastery = level + φ·trend, between 0 and 1        α = 0.85, β = 0.5, φ = 0.8
+     Chosen out of sample: fitted on the sessions up to 2026-10-20 of the personal backup, it predicted the next session
+     of each topic after that date better than repeating the last score (3.7 vs 4.0 points, 34 sessions). */
+  const HOLT = { a: 0.85, b: 0.5, phi: 0.8 };
+  function holtMastery(meas, pbar) {
+    const byDay = new Map();
+    meas.forEach(o => {
+      const w = ATTEMPT_W[o.attempt],
+        n = nOf(o),
+        d = byDay.get(o.date) || { num: 0, den: 0, w: 0 };
+      d.num += w * n * (o.p / 100);
+      d.den += w * n;
+      d.w += w * Math.min(1, n / UNKNOWN_N);
+      byDay.set(o.date, d);
+    });
+    let level = null,
+      trend = 0;
+    [...byDay.keys()].sort().forEach(k => {
+      const d = byDay.get(k),
+        p = d.num / d.den;
+      if (level == null) {
+        level = (d.den * p + PRIOR_K * pbar) / (d.den + PRIOR_K);
+        return;
+      }
+      const a = HOLT.a * Math.min(1, d.w),
+        prev = level;
+      level = a * p + (1 - a) * (level + HOLT.phi * trend);
+      trend = HOLT.b * (level - prev) + (1 - HOLT.b) * HOLT.phi * trend;
+    });
+    return Math.max(0, Math.min(1, level + HOLT.phi * trend));
+  }
+  const measured = ev => ev.filter(o => o.src !== 'proj' && o.p != null && ATTEMPT_W[o.attempt] > 0);
+  /* p̄: your overall level on a date, from every topic's evidence (or its Sporty's score when it has none) */
+  let _pool = null;
+  function poolMean(today, before, skip) {
+    const key = [
+      today,
+      before,
+      skip ? [...skip].join() : '',
+      state.events.length,
+      (state.events.at(-1) || {}).id,
+      (state.exams || []).length,
+      state.scores.join(),
+    ].join('|');
+    if (_pool && _pool.k === key) return _pool.v;
+    let num = 0,
+      den = 0;
+    TOPICS.forEach((_, i) => {
+      let ev = measured(evidenceOf(i, today, before));
+      if (skip && skip.size) ev = ev.filter(o => !(o.src === 'exam' && skip.has(o.exam)));
+      const w = weigh(ev, today);
+      if (w.den) {
+        num += w.num;
+        den += w.den;
+      } else {
+        const b = today !== todayISO() ? scoreAt(i, today) : state.scores[i];
+        if (b != null) {
+          num += UNKNOWN_N * (b / 100);
+          den += UNKNOWN_N;
+        }
+      }
+    });
+    /* itself pulled toward 50% by 30 questions, so one topic's few results never become "your level" */
+    const v = (num + POOL_K * PRIOR_P) / (den + POOL_K);
+    _pool = { k: key, v };
+    return v;
+  }
+  /* the models of the current data are kept until the data changes (a session added or removed, a score, a list, the
+     exam date, the review threshold) or the screen is drawn again — the planner asks for the same topic many times */
+  const _models = new Map();
+  let _sig = '';
+  const clearModels = () => {
+    _models.clear();
+    _sig = '';
+  };
+  function srModel(i, asOf, before, skip) {
+    const sig = [
+      state.events.length,
+      (state.events.at(-1) || {}).id,
+      (state.exams || []).length,
+      state.deadline,
+      state.scores.join(),
+      state.statuses.join(),
+      pref('reviewAt'),
+      todayISO(),
+    ].join('|');
+    if (sig !== _sig) {
+      _models.clear();
+      _sig = sig;
+    }
+    const key = i + '|' + (asOf || '') + '|' + (before ? 1 : 0) + '|' + (skip && skip.size ? [...skip].join() : '');
+    let m = _models.get(key);
+    if (!m) {
+      m = srModelCalc(i, asOf, before, skip);
+      _models.set(key, m);
+    }
+    return m;
+  }
+  /* skip: exam ids whose topic results must be left out (the blended forecast already counts their overall score) */
+  function srModelCalc(i, asOf, before, skip) {
+    const today = asOf || todayISO();
+    let ev = evidenceOf(i, today, before);
+    if (skip && skip.size) ev = ev.filter(o => !(o.src === 'exam' && skip.has(o.exam)));
+    /* --- mastery and confidence (projections and "after the answer" excluded) --- */
+    const meas = measured(ev),
+      W = weigh(meas, today);
+    let { num, den, unknownN, known } = W;
+    /* no scored session yet: the topic's Sporty's score (or the one known on that date), of unknown size */
+    let base = null;
+    if (!meas.length) {
+      base = asOf && asOf !== todayISO() ? scoreAt(i, today) : state.scores[i];
+      if (base != null) {
+        num += UNKNOWN_N * (base / 100);
+        den += UNKNOWN_N;
+        unknownN = true;
+      }
+    }
+    const pbar = poolMean(today, before, skip),
+      prior = !den,
+      mastery = meas.length ? holtMastery(meas, pbar) : (num + PRIOR_K * pbar) / (den + PRIOR_K);
+    /* --- reviews (one per day: the day's first attempt that is a retrieval) --- */
+    const days = {};
+    ev.forEach(o => {
+      if (o.attempt === 'after') return;
+      if (o.total > 0 && o.total < Math.min(REP_MIN_N, TOPICS[i].q)) return;
+      if (!days[o.date]) days[o.date] = o;
+    });
+    /* sessions logged without a score still count as reviews (score: the one known then) */
     const reps = [];
     let S = 0,
-      prev = null;
-    Object.keys(by)
+      prev = null,
+      diag = null;
+    Object.keys(days)
       .sort()
       .forEach(d => {
-        const sc = by[d].map(e => e.score).filter(v => v != null),
-          p = sc.length ? Math.max(...sc) : ((asOf ? scoreAt(i, d) : state.scores[i]) ?? 70);
+        const o = days[d],
+          p = o.p ?? (asOf ? scoreAt(i, d) : state.scores[i]) ?? 70,
+          lam = (ATTEMPT_W[o.attempt] ?? 1) * Math.min(1, nOf(o) / UNKNOWN_N);
         let Rb = null;
-        if (prev == null) S = p >= 85 ? 2 : p >= 70 ? 1.5 : 1;
-        else {
+        if (prev == null) {
+          S = p >= 85 ? 2 : p >= 70 ? 1.5 : 1;
+          diag = p < 60 ? 'understanding' : null;
+        } else {
           Rb = recall(diffDays(prev, d), S);
-          S = p >= 70 ? S * (1 + 1.2 * (p / 100) * (1.5 - Rb)) : p >= 60 ? S * 1.2 : Math.max(1, 0.4 * S);
+          const target = p >= 70 ? S * (1 + 1.2 * (p / 100) * (1.5 - Rb)) : p >= 60 ? S : Math.max(1, 0.4 * S);
+          S = Math.max(1, S + lam * (target - S));
+          diag = p < 70 ? (Rb >= 0.85 ? 'understanding' : 'forgetting') : null;
         }
-        reps.push({ date: d, p, Rb, S });
+        reps.push({ date: d, p, Rb, S, n: o.total ?? null, src: o.src, attempt: o.attempt });
         prev = d;
       });
-    const m = { i, reps, tracked: isTracked(i), R: null, S: null, over: null, p: state.scores[i] };
+    const last = meas[meas.length - 1] || null;
+    const m = {
+      i,
+      reps,
+      tracked: isTracked(i),
+      R: null,
+      S: null,
+      over: null,
+      /* observed: the last result (score, and right/total when known) */
+      p: last ? last.p : base,
+      obs: last ? { p: last.p, right: last.right, total: last.total, date: last.date, src: last.src } : null,
+      mastery,
+      prior /* nothing known about the topic: mastery = your overall level, an assumption */,
+      nEff: den,
+      conf: den / (den + 20),
+      confLevel: den < 10 ? 'low' : den < 30 || !known ? 'medium' : 'high',
+      unknownN,
+      diag,
+    };
     if (reps.length) {
       const l = reps[reps.length - 1],
         tn = diffDays(l.date, today),
-        iv = Math.max(1, Math.round(9 * l.S * (1 / pref('reviewAt') - 1)));
-      Object.assign(m, { R: recall(tn, l.S), S: l.S, last: l.date, p: l.p, next: addDays(l.date, iv), over: tn - iv });
+        left = state.deadline ? diffDays(l.date, state.deadline) : -1,
+        iv0 = Math.max(1, Math.round(9 * l.S * (1 / pref('reviewAt') - 1))),
+        iv = left > 0 ? Math.min(iv0, Math.max(1, Math.round(GAP_SHARE * left))) : iv0;
+      Object.assign(m, { R: recall(tn, l.S), S: l.S, last: l.date, next: addDays(l.date, iv), over: tn - iv });
     }
-    const w = LISTW[state.statuses[i]] || 0.8,
-      gap = 1 + Math.max(0, GOAL - (m.p ?? 70)) / 100;
-    m.pr = (reps.length ? 1 - m.R + 0.05 * Math.min(Math.max(m.over, 0), 10) : 0.45) * Math.sqrt(TOPICS[i].q) * w * gap;
+    /* misses imported from an "errors only" test after the last review: due now */
+    const miss = (state.exams || [])
+      .filter(x => x.mode === 'errors' && (before ? x.date < today : x.date <= today) && (!m.last || x.date >= m.last))
+      .map(x => ({ date: x.date, n: (x.misses || []).filter(q => q.i === i).length, exam: x.examId }))
+      .filter(x => x.n > 0);
+    if (miss.length) {
+      m.examMisses = miss[miss.length - 1];
+      if (reps.length) m.over = Math.max(m.over, 0);
+    }
+    const share = typeof examShare === 'function' ? examShare(i).share : TOPICS[i].q / TOTAL;
+    m.pr = 60 * share * (1 - chanceAt(m, today)) * (m.over != null && m.over >= 0 ? 1.2 : 1);
     return m;
+  }
+  /* chance of answering a question of the topic right on a date: mastery × recall + 1/3 × (1 − recall)
+     (unknown mastery → 50%) */
+  function chanceAt(m, date) {
+    /* (a topic with no evidence uses your overall level p̄, see mastery; recall with your fitted time scale) */
+    const asOf = date < todayISO() ? date : todayISO(),
+      R = m.reps.length ? recall(diffDays(m.last, date) / retentionScale(asOf), m.S) : 1;
+    return pRight(m.mastery * 100, R);
+  }
+  /* c: how much slower than the default curve you forget, fitted to your sessions (see RETENTION FOR THE FORECAST).
+     Each pair = a scored session and the topic's model the day before it; the guess is mastery × R(gap / c) + 1/3 ×
+     (1 − R). Cached per day and data. */
+  const SCALES = [1, 1.5, 2, 3, 5, 8, 13, 21];
+  let _fitting = false;
+  /* upTo: only sessions BEFORE this date are used, so a forecast for a past date never sees what came after it */
+  const _scales = new Map();
+  let _scaleKey = '';
+  function retentionScale(upTo) {
+    if (_fitting) return 1;
+    upTo = upTo || todayISO();
+    /* keyed on your real sessions only: the projected sessions of a weekly plan never refit it */
+    const real = state.events.filter(e => !e.proj),
+      key = [todayISO(), real.length, (real.at(-1) || {}).id, (state.exams || []).length].join('|');
+    if (key !== _scaleKey) {
+      _scales.clear();
+      _scaleKey = key;
+    }
+    if (_scales.has(upTo)) return _scales.get(upTo);
+    _fitting = true;
+    let v = 1;
+    try {
+      /* the first scored session of each topic per day, the most recent 200 of them (enough, and fast on a long
+         history); each paired with the topic's model the day before */
+      const cand = [];
+      TOPICS.forEach((_, i) => {
+        const seen = new Set();
+        sessionsOf(i)
+          .filter(e => !e.partial && !e.proj && e.score != null && e.date < upTo)
+          .sort((a, b) => a.date.localeCompare(b.date))
+          .forEach(e => {
+            if (seen.has(e.date)) return;
+            seen.add(e.date);
+            cand.push({ i, e });
+          });
+      });
+      const pairs = [];
+      cand
+        .sort((a, b) => a.e.date.localeCompare(b.e.date))
+        .slice(-200)
+        .forEach(({ i, e }) => {
+          const m = srModel(i, e.date, true);
+          if (m.reps.length) pairs.push({ m: m.mastery, S: m.S, gap: diffDays(m.last, e.date), obs: e.score / 100 });
+        });
+      if (pairs.length >= 20) {
+        let best = Infinity;
+        SCALES.forEach(c => {
+          const sse = pairs.reduce((a, q) => {
+            const R = recall(q.gap / c, q.S);
+            return a + (q.m * R + (1 - R) / 3 - q.obs) ** 2;
+          }, 0);
+          if (sse < best - 1e-12) {
+            best = sse;
+            v = c;
+          }
+        });
+      }
+    } finally {
+      _fitting = false;
+    }
+    _scales.set(upTo, v);
+    return v;
   }
   function srAll(asOf, before) {
     return TOPICS.map((_, i) => srModel(i, asOf, before))
@@ -12781,29 +13800,59 @@ const SpacedRepetition = (() => {
     let best = null,
       bd = '';
     state.events.forEach(e => {
-      if (e.topic === i && e.score != null && e.date <= d && e.date >= bd) {
+      if (e.topic === i && e.score != null && !e.proj && e.date <= d && e.date >= bd) {
         best = e.score;
         bd = e.date;
       }
     });
     return best != null ? best : TOPICS[i].score;
   }
-  return { recall, addDays, isTracked, srModel, srAll, scoreAt };
+  return {
+    recall,
+    addDays,
+    isTracked,
+    srModel,
+    srAll,
+    scoreAt,
+    evidenceOf,
+    chanceAt,
+    retentionScale,
+    clearModels,
+    UNKNOWN_N,
+    REP_MIN_N,
+  };
 })();
-const { recall, addDays, isTracked, srModel, srAll, scoreAt } = SpacedRepetition;
+const {
+  recall,
+  addDays,
+  isTracked,
+  srModel,
+  srAll,
+  scoreAt,
+  evidenceOf,
+  chanceAt,
+  retentionScale,
+  clearModels,
+  UNKNOWN_N,
+  REP_MIN_N,
+} = SpacedRepetition;
 
 /* ===== module Forecast (js/model/forecast.js) =====
    live value (getter): GOAL_N = right answers needed for your goal (85% → 51 of 60)
    public: EXAM_Q, PASS_N, betaBinomTail, binomTail, pRight, forecastMu, forecast */
 const Forecast = (() => {
   /* ================= EXAM FORECAST (mechanical) =================
-   p_i  = chance of answering a question of topic i right
-        = last score_i × recall_i + 1/3 × (1 − recall_i)         (unknown score → 50%; 1/3 = guessing among 3 options)
-   The FAA test draws 60 questions; here each one comes from topic i with probability w_i = q_i / (all questions, 1,125).
-   μ    = Σ w_i · p_i                         expected score
+   p_i  = chance of answering a question of topic i right on that day
+        = mastery_i × recall_i + 1/3 × (1 − recall_i)            (unknown mastery → 50%; 1/3 = guessing among 3 options)
+          mastery and recall are ESTIMATES (see SpacedRepetition): the forecast is a model, not a measurement
+   The FAA test draws 60 questions; each comes from topic i with probability w_i = its official share of the test
+   (ACS area share split inside the area by bank size — see Config.examShare). The 9% of areas with no Sporty's topic
+   (Basic Instrument Maneuvers, Postflight Procedures) is scored with the average of the mapped topics.
+   μ    = Σ w_i · p_i + unmapped · (Σ w_i · p_i / Σ w_i)      expected score
    X    ~ Binomial(60, μ)                     number of right answers
    P(pass) = P(X ≥ 42) (70%),  P(goal) = P(X ≥ 51) (85%)
-   The chances use a beta-binomial: μ itself is uncertain by ±sd points (the model's error against your practice tests).                                   */
+   The chances use a beta-binomial: μ itself is uncertain by ±sd points (the model's error against your practice tests).
+   skip: imported tests whose topic results are left out (the blended forecast counts their overall score instead). */
   const EXAM_Q = 60,
     PASS_N = 42,
     _goalN = () => Math.ceil((EXAM_Q * GOAL) / 100 - 1e-9);
@@ -12854,21 +13903,21 @@ const Forecast = (() => {
   const GUESS = 1 / 3,
     MODEL_SD0 = 6;
   const pRight = (sc, R) => (sc == null ? 0.5 : Math.max(0, Math.min(1, (R * sc) / 100 + (1 - R) * GUESS)));
-  function forecastMu(asOf, at) {
+  function forecastMu(asOf, at, skip) {
     asOf = asOf || todayISO();
     at = at || asOf;
     let mu = 0;
     const parts = [];
     TOPICS.forEach((x, i) => {
-      const m = srModel(i, asOf),
-        w = x.q / TOTAL;
-      const sc = m.reps.length ? m.reps[m.reps.length - 1].p : asOf === todayISO() ? state.scores[i] : scoreAt(i, asOf);
-      const R = m.reps.length ? recall(diffDays(m.reps[m.reps.length - 1].date, at), m.reps[m.reps.length - 1].S) : 1;
-      const p = pRight(sc, R);
+      const m = srModel(i, asOf, false, skip),
+        w = examShare(i).share,
+        p = chanceAt(m, at);
       mu += w * p;
-      parts.push({ i, w, p, known: sc != null, lost: EXAM_Q * w * (1 - p) });
+      parts.push({ i, w, p, known: !m.prior, lost: EXAM_Q * w * (1 - p) });
     });
-    return { mu, parts };
+    const mapped = EXAM_SHARE.mapped;
+    mu += EXAM_SHARE.unmapped * (mu / mapped);
+    return { mu, parts, unmapped: EXAM_SHARE.unmapped };
   }
   /* uncertainty of the model (percentage points): its typical error against your last 5 practice tests
    (root-mean-square, 4–12), or 6 until there are 3 tests */
@@ -12884,16 +13933,18 @@ const Forecast = (() => {
         '|' +
         (state.events.at(-1) || {}).id +
         '|' +
+        (state.exams || []).length +
+        '|' +
         state.scores.join();
     if (_msd && _msd.k === key) return _msd.v;
-    const r = tests.map(x => x.score - forecastMu(x.date).mu * 100);
+    const r = tests.map(x => x.score - forecastMu(x.date, null, x.exam ? new Set([x.exam]) : null).mu * 100);
     const v =
       r.length >= 3 ? Math.max(4, Math.min(12, Math.sqrt(r.reduce((a, x) => a + x * x, 0) / r.length))) : MODEL_SD0;
     _msd = { k: key, v };
     return v;
   }
-  function forecast(asOf, at) {
-    const f = forecastMu(asOf, at),
+  function forecast(asOf, at, skip) {
+    const f = forecastMu(asOf, at, skip),
       sd = modelSD();
     return { ...f, sd, pass: betaBinomTail(EXAM_Q, f.mu, sd, PASS_N), goal: betaBinomTail(EXAM_Q, f.mu, sd, GOAL_N) };
   }
@@ -12907,6 +13958,7 @@ const { EXAM_Q, PASS_N, betaBinomTail, binomTail, pRight, forecastMu, forecast }
 const PracticeTestModel = (() => {
   /* ===== practice tests: blended score, regression, calibration, cadence =====
    blended score = (1 − w) × question-bank model + w × age-weighted average of the last 3 scored practice tests
+                   (the model part leaves out the topic results of those same tests when they were imported)
                    test weight 0.5^(age / half-life), half-life from Settings (default 10 days),  W = sum of the weights,  w = W / (W + 2)
    pass / 85% chances: beta-binomial around the blended score (model error and test spread combined).
    trend         = least-squares line  score = a + b × day   (R² = 1 − SSres / SStot), shown from 4 scored tests
@@ -12916,7 +13968,7 @@ const PracticeTestModel = (() => {
   const TEST_Q = 60;
   function scoredTests(upTo) {
     return (state.tests || [])
-      .filter(x => x.score != null && (!upTo || x.date <= upTo))
+      .filter(x => x.score != null && !x.proj && (!upTo || x.date <= upTo))
       .slice()
       .sort((a, b) => a.date.localeCompare(b.date));
   }
@@ -12935,9 +13987,12 @@ const PracticeTestModel = (() => {
   };
   function blended(asOf) {
     asOf = asOf || todayISO();
-    const f = forecast(asOf),
-      last = scoredTests(asOf).slice(-3),
-      n = last.length;
+    const last = scoredTests(asOf).slice(-3),
+      n = last.length,
+      /* an imported test feeds both its overall score and the topic results: here only the overall score counts (the
+         model part leaves out the topic results of the tests averaged below), so one test is never two observations */
+      skip = new Set(last.filter(x => x.exam).map(x => x.exam)),
+      f = forecast(asOf, null, skip);
     if (!n) return { ...f, model: f.mu, testsAvg: null, n: 0, w: 0, W: 0 };
     /* each of the last 3 tests weighs 0.5^(age in days / 10): yesterday ≈ 0.93, three weeks ago ≈ 0.23 */
     const om = last.map(x => Math.pow(0.5, Math.max(0, diffDays(x.date, asOf)) / pref('halfLife'))),
@@ -13020,7 +14075,7 @@ const PracticeTestModel = (() => {
     return { n: pts.length, pts, reg, base, from, cross, exam, list, proj };
   }
   function calibration() {
-    const pts = scoredTests().map(x => [forecastMu(x.date).mu * 100, x.score]);
+    const pts = scoredTests().map(x => [forecastMu(x.date, null, x.exam ? new Set([x.exam]) : null).mu * 100, x.score]);
     const reg = pts.length >= 2 ? linReg(pts) : null,
       bias = pts.length ? pts.reduce((a, p) => a + (p[1] - p[0]), 0) / pts.length : null;
     const l5 = pts.slice(-5),
@@ -13045,7 +14100,18 @@ const PracticeTestModel = (() => {
   let _rec = null;
   function forecastRecord() {
     const all = scoredTests(),
-      key = todayISO() + '|' + JSON.stringify(all) + '|' + state.events.length + '|' + state.scores.join() + '|' + GOAL;
+      key =
+        todayISO() +
+        '|' +
+        JSON.stringify(all) +
+        '|' +
+        state.events.length +
+        '|' +
+        state.scores.join() +
+        '|' +
+        (state.exams || []).length +
+        '|' +
+        GOAL;
     if (_rec && _rec.k === key) return _rec.v;
     const rows = all.map(x => {
       const b = blended(addDays(x.date, -1));
@@ -13231,22 +14297,22 @@ const { fcCls, renderFcMini, renderForecast } = ForecastView;
 
 /* ===== module PlanModel (js/model/plan.js) =====
    public: settings, easeOf, minutesPerQ, buildPlan, planDay, setEnergy, fmtMin, planRowName, reviewSize, examPhase,
-           STRETCH_DAYS, LASTDAY_MAX
+           STRETCH_DAYS, LASTDAY_MAX, paceFactor, paceTable, notePace, baseMinutesPerQ, minutesSplit, diffOf
    shared state (getter/setter): energyMode */
 const PlanModel = (() => {
   /* ================= DAILY PLAN (mechanical, time-based) =================
-   Budget = your minutes per night.
-   Minutes for one question of topic i:
-       answer  = (60 / questions-per-hour) × difficulty_i × ease_i
-       review  = (1 − p_i) × review-minutes-per-wrong-answer × difficulty_i      (you study every miss)
-       minutes = answer + review
-   p_i          = chance you get it right now = last score × recall (as in the exam forecast; unknown → 50%)
+   Budget = your minutes per night — a hard limit: the list never adds up to more.
+   Minutes for one question of topic i (one unit: minutes, one pace factor for all of them):
+       answer  = (60 / questions-per-hour) × difficulty_i × ease_i × pace_i
+       review  = (1 − p_i) × review-minutes-per-wrong-answer × difficulty_i × pace_i      (you study every miss)
+       daily list: minutes = answer + review (one row) · plan with times: answer in the topic block, review in its own
+       "error review" block right after — the same two numbers, laid out differently
+   p_i          = chance you get it right now (mastery × recall, as in the exam forecast; unknown → 50%)
    difficulty_i = 2.0 calculation topics (E6B, cross-country, performance charts), 1.6 navigation / weather charts,
-                  1.3 chart-reading topics, 1.0 everything else
+                  1.3 chart-reading topics, 0.8 plain recall, 1.0 everything else
    ease_i       = from spaced-repetition stability S: 1.15 (no data) … 0.75 (S ≥ 30 days) — well-known topics go faster
-   Order: 1) practice test when due  2) reviews due today  3) topics never scored, weak topics (< 70%)
-          4) new material (skipped in the last 7 days). Each item is cut to what still fits in the remaining minutes.
-   Topics left undone in a saved plan during the last 7 days get a 25% priority boost (see Schedule). */
+   pace_i       = how long YOU take against these estimates (see "Your pace"); it changes durations only, never a score
+   What goes in and in which order: Policy (the same rules as the plan with times and the weekly plan). */
   /* ================= EXAM PHASES (days left until the exam date) =================
    normal   > 21 days   the standard plan
    stretch  8–21 days   final stretch: "weak" means below your goal (not below 70%), new material counts 20% less,
@@ -13303,17 +14369,28 @@ const PlanModel = (() => {
   };
   const diffOf = i => DIFF[i] || 1;
   const easeOf = m => (!m || !m.reps.length ? 1.15 : Math.max(0.75, Math.min(1.15, 1.15 - 0.12 * Math.log2(1 + m.S))));
-  /* the estimate before your own pace is applied (what a pace observation is compared with) */
+  /* the estimates before your own pace is applied (what a pace observation is compared with) */
+  const answerBase = (i, st, m) => (60 / st.qph) * diffOf(i) * easeOf(m);
+  const reviewBase = (i, st, p) => (1 - p) * st.reviewMin * diffOf(i);
   function baseMinutesPerQ(i, st, m, p) {
-    return (60 / st.qph) * diffOf(i) * easeOf(m) + (1 - p) * st.reviewMin * diffOf(i);
+    return answerBase(i, st, m) + reviewBase(i, st, p);
   }
   function minutesPerQ(i, st, m, p) {
     return baseMinutesPerQ(i, st, m, p) * paceFactor(i);
   }
+  /* { answer, review } minutes per question of topic i, with your pace */
+  function minutesSplit(i, st, m, p) {
+    const f = paceFactor(i);
+    return { answer: answerBase(i, st, m) * f, review: reviewBase(i, st, p) * f };
+  }
 
   /* ================= YOUR PACE (learned from your check marks and focus mode) =================
      Every time a topic block of today's plan is ticked (or finished in focus mode) the time it took is compared with
-     the estimate: r = minutes it took ÷ minutes estimated. The time is the focus-mode stopwatch when there is one;
+     the estimate OF THE SAME WORK: r = minutes it took ÷ minutes estimated. A block of a plan with times holds only the
+     answering (its error review is another block), so it is compared with the answering estimate; a row of the
+     suggested daily list holds answering and review, so it is compared with both (basis 'answer' or 'all').
+     Observations saved before the basis was recorded compared a block of answering with answering + review (different
+     units), so they are kept in your data but not used. The time is the focus-mode stopwatch when there is one;
      otherwise from your previous tick today (or the block's planned start for the first one) to this tick. A ratio
      outside 0.25–4 is ignored (a forgotten tick, a break).
        weight of an observation  w = 0.5^(age in days / 30)
@@ -13336,7 +14413,7 @@ const PlanModel = (() => {
       S = 0;
     const per = {};
     obs.forEach(o => {
-      if (!(o.est > 0 && o.min > 0)) return;
+      if (!(o.est > 0 && o.min > 0) || !o.basis) return;
       const ww = w(o),
         l = lr(o);
       W += ww;
@@ -13347,7 +14424,7 @@ const PlanModel = (() => {
       x.n++;
     });
     const lg = S / (W + PACE_K_ALL),
-      v = { all: Math.exp(lg), n: obs.length, topic: {} };
+      v = { all: Math.exp(lg), n: obs.filter(o => o.basis && o.est > 0 && o.min > 0).length, topic: {} };
     Object.entries(per).forEach(([i, x]) => {
       v.topic[i] = { f: Math.exp((x.S + PACE_K_TOPIC * lg) / (x.W + PACE_K_TOPIC)), n: x.n };
     });
@@ -13359,199 +14436,100 @@ const PlanModel = (() => {
       f = P.topic[i] ? P.topic[i].f : P.all;
     return Math.max(0.35, Math.min(2.5, f));
   }
-  /* record how long n questions of topic i took (minutes); est = the estimate without your pace */
-  function notePace(i, n, min, src) {
+  /* record how long n questions of topic i took (minutes); est = the estimate of the same work without your pace:
+     basis 'answer' (a topic block of a plan with times) or 'all' (a row of the suggested list: answering and review) */
+  function notePace(i, n, min, src, basis) {
     if (!(n > 0) || !(min > 0) || !TOPICS[i]) return false;
+    basis = basis === 'all' ? 'all' : 'answer';
     const m = srModel(i, todayISO(), true),
-      est = n * baseMinutesPerQ(i, settings(), m, topicPNow(i, m));
+      st = settings(),
+      est = n * (basis === 'all' ? baseMinutesPerQ(i, st, m, topicPNow(i, m)) : answerBase(i, st, m));
     const r = min / est;
     if (r < 0.25 || r > 4) return false;
     state.paces = [
       ...(state.paces || []),
-      { id: uid(), topic: i, date: todayISO(), n, min: Math.round(min * 10) / 10, est: Math.round(est * 10) / 10, src },
+      {
+        id: uid(),
+        topic: i,
+        date: todayISO(),
+        n,
+        min: Math.round(min * 10) / 10,
+        est: Math.round(est * 10) / 10,
+        src,
+        basis,
+      },
     ].slice(-400);
     return true;
   }
-  function topicPNow(i, m) {
-    const sc = m && m.reps.length ? m.reps[m.reps.length - 1].p : state.scores[i];
-    return pRight(sc, m && m.reps.length ? m.R : 1);
-  }
-  /* ENERGY MODES (v1)
-   low   : skips the practice test, picks the easiest/fastest items first (high chance of being right, known topics),
-           and assumes you go 15% slower.
-   medium: the standard order (test → reviews due → no data → weak → new).
-   high  : practice test first, then the hardest work (most expected misses × difficulty), assumes you go 10% faster
-           and stretches the evening 10%.
-   Workload (1–10) = average of (chance of missing × difficulty) over the planned questions, scaled.            */
-  const ENERGY = {
-    low: { speed: 1.15, stretch: 1, test: false, order: 'easy' },
-    medium: { speed: 1, stretch: 1, test: true, order: 'standard' },
-    high: { speed: 0.9, stretch: 1.1, test: true, order: 'hard' },
-  };
+  const topicPNow = (i, m) => chanceAt(m || srModel(i, todayISO(), true), todayISO());
   /* how many questions a session takes, the way the question bank is used: a category is studied in sessions of up to
      SESSION questions (Weather, 158 q, is 40 at a time). A review is sized by how well you know the topic: a sample when
-     your last score was good, a full session when it was not, a bit more the more you have forgotten since.
-       last score ≥ goal → 15 · ≥ 75% → 20 · ≥ 70% → 25 · below → 40   × (1 + forgotten share), between 10 and 40 */
+     your estimated mastery is good, a full session when it is not, a bit more the more you have forgotten since.
+       mastery ≥ goal → 15 · ≥ 75% → 20 · ≥ 70% → 25 · below → 40   × (1 + forgotten share), between 10 and 40 */
   const SESSION = 40;
   function reviewSize(i, m) {
     const q = TOPICS[i].q,
-      last = m.reps.length ? m.reps[m.reps.length - 1].p : 0 /* last session score, in % */,
+      last = m.mastery != null ? m.mastery * 100 : 0,
       base = last >= GOAL ? 15 : last >= 75 ? 20 : last >= 70 ? 25 : SESSION,
       n = Math.round(base * (1 + Math.max(0, 1 - (m.R ?? 1))));
     return Math.min(q, Math.max(10, Math.min(SESSION, n)));
   }
   function buildPlan(asOf, over, mode, carry) {
     asOf = asOf || todayISO();
-    const st0 = over || settings(),
-      E = ENERGY[mode || 'medium'],
-      st = { ...st0, minutes: st0.minutes * E.stretch },
+    mode = ENERGY[mode] ? mode : 'medium';
+    const st = { ...(over || settings()) },
       daysLeft = Math.max(1, diffDays(asOf, state.deadline)),
       phase = examPhase(asOf),
       final = daysLeft <= 7,
-      lastDay = phase === 'lastday',
-      weakBelow = phase === 'normal' || phase === 'after' ? 70 : GOAL;
+      lastDay = phase === 'lastday';
     if (lastDay) st.minutes = Math.min(st.minutes, LASTDAY_MAX);
     const cap = Math.max(10, Math.round((st.minutes * st.qph) / 60)); /* questions/night with no review (reference) */
-    const doneT = new Set(
-      state.events.filter(e => e.date === asOf && (e.kind === 'study' || e.kind === 'review')).map(e => e.topic)
-    );
-    /* a topic block of a saved plan ticked that day counts as done too (no need to log the session first) */
-    (state.plans || []).forEach(p =>
-      (p.items || []).forEach(it => {
-        if (it.date === asOf && it.kind === 'topic' && it.check) doneT.add(it.i);
-      })
-    );
-    const testsToday = (state.tests || []).filter(x => x.date === asOf).length,
-      items = [],
-      used = new Set(),
-      planned = new Set();
-    let left = st.minutes;
-    const models = {};
-    const M = i => (models[i] ??= srModel(i, asOf, true));
-    const push = it => {
-      const per = it.per,
-        want = it.n;
-      if (!it.done) {
-        if (left < per * Math.min(5, want) - 1e-9) return false;
-        it.n = Math.max(1, Math.min(want, Math.floor((left + 1e-9) / per)));
-      }
-      it.min = Math.round(it.n * per);
-      left -= it.n * per;
-      if (it.kind === 'topic' && it.pExam != null) it.stake = ((EXAM_Q * it.n) / TOTAL) * (1 - it.pExam);
-      items.push(it);
-      if (it.kind === 'topic') planned.add(it.i);
-      return true;
-    };
-    const xDay = state.deadline > asOf ? state.deadline : asOf;
-    /* pExam = chance of getting a question of the topic right ON EXAM DAY if you do not study it again (memory keeps decaying) */
-    const topicItem = (i, n, reason) => {
-      const m = M(i),
-        p = topicPNow(i, m),
-        pExam = m.reps.length
-          ? pRight(
-              m.reps[m.reps.length - 1].p,
-              recall(diffDays(m.reps[m.reps.length - 1].date, xDay), m.reps[m.reps.length - 1].S)
-            )
-          : p;
-      return {
-        kind: 'topic',
-        i,
-        n,
-        reason,
-        done: doneT.has(i),
-        per: minutesPerQ(i, st, m, p) * E.speed,
-        diff: diffOf(i),
-        p,
-        pExam,
-      };
-    };
-    const cands = [];
-    const add = it => cands.push(it);
-    const tw = testWhy(asOf, st0),
-      man = asOf === todayISO() && manualTest(asOf);
-    if (testsToday || (tw.due && !lastDay) || man) {
-      const mu = blended(asOf).mu;
-      if (E.test || testsToday || tw.overdue >= 2 || man)
-        add({
-          kind: 'test',
-          forced: man || (!E.test && tw.overdue >= 2),
-          n: TEST_Q,
-          reason: tw.due ? tw.reason : man ? 'testManual' : 'test',
-          done: !!testsToday,
-          per: ((60 / st.qph) * 1.1 + (1 - mu) * st.reviewMin) * E.speed,
-          diff: 1.1,
-          p: mu,
-        });
-    }
-    /* topics left undone on earlier days and moved here by "Refresh plan" (before reviews due: they were due already) */
-    (carry ? [...carry] : [])
-      .filter(i => TOPICS[i] && !used.has(i))
-      .forEach(i => {
-        used.add(i);
-        add(topicItem(i, Math.min(TOPICS[i].q, 40), 'carried'));
-      });
-    const ms = srAll(asOf, true);
-    ms.filter(m => m.reps.length && m.over >= 0 && !used.has(m.i)).forEach(m => {
-      used.add(m.i);
-      add(topicItem(m.i, lastDay ? Math.min(20, reviewSize(m.i, m)) : reviewSize(m.i, m), 'due'));
-    });
-    ms.filter(m => !lastDay && !m.reps.length && !used.has(m.i)).forEach(m => {
-      used.add(m.i);
-      add(topicItem(m.i, Math.min(TOPICS[m.i].q, 40), 'nodata'));
-    });
-    TOPICS.map((x, i) => i)
-      .filter(
-        i =>
-          !used.has(i) &&
-          ['Not Comfortable', 'To review'].includes(state.statuses[i]) &&
-          (state.scores[i] ?? 0) < weakBelow
-      )
-      .sort((a, b) => TOPICS[b].q - TOPICS[a].q)
-      .forEach(i => {
-        used.add(i);
-        add(topicItem(i, Math.min(TOPICS[i].q, lastDay ? 20 : 40), 'weak'));
-      });
-    const newOnes = [];
-    if (!final)
-      TOPICS.map((x, i) => i)
-        .filter(i => !used.has(i) && ['Todo', 'Doing'].includes(state.statuses[i]))
-        .sort((a, b) => (state.statuses[b] === 'Doing') - (state.statuses[a] === 'Doing') || TOPICS[b].q - TOPICS[a].q)
-        .forEach(i => {
-          used.add(i);
-          newOnes.push(topicItem(i, Math.min(TOPICS[i].q, 40), 'new'));
-        });
-    /* low energy: easiest first — also topics you already know (Very Comfortable, recently reviewed) as light reviews */
-    if (E.order === 'easy')
-      TOPICS.map((x, i) => i)
-        .filter(i => !used.has(i) && state.statuses[i] === 'Very Comfortable')
-        .forEach(i => {
-          used.add(i);
-          const it = topicItem(i, Math.min(TOPICS[i].q, 20), 'light');
-          if (it.p >= 0.6) add(it);
-        });
-    cands.push(...newOnes);
+    /* a session logged that day, or a topic block of a saved plan ticked that day (no need to log it first) */
+    const doneT = doneOn(asOf);
+    /* the candidates and their values: Policy, the same as the plan with times */
+    const minutesFor = (i, m, p) => minutesSplit(i, st, m, p),
+      cands = topicCands(asOf, {
+        mode,
+        carry: carry ? new Set(carry) : null,
+        done: doneT,
+        minutesFor,
+        withReview: true,
+      }),
+      tc = testCand(asOf, mode, st, true);
+    if (tc) cands.unshift(tc);
+    /* what you already did today keeps its place (and its minutes); the rest of the time goes by value per minute */
     const done = cands.filter(x => x.done),
-      todo = cands.filter(x => !x.done);
-    const tRank = x => (x.kind !== 'test' ? 1 : x.forced ? 0 : 2);
-    if (E.order === 'easy') todo.sort((a, b) => tRank(a) - tRank(b) || a.per - b.per || b.p - a.p);
-    /* standard: practice test first, then the most exam questions at stake per minute of study:
-     (1 − pExam) × urgency ÷ minutes per question — every bank question is equally likely on the exam, so this is the
-     expected exam-day questions protected per minute (urgency: overdue review 1.3, weak 1.15, no data 1.1, new 1.0) */
-    const URG = {
-        due: 1.3,
-        weak: 1.15,
-        nodata: 1.1,
-        new: phase === 'normal' || phase === 'after' ? 1 : 0.8,
-        light: 0.8,
-      },
-      missed = typeof missedTopics === 'function' ? missedTopics(asOf) : new Set(),
-      val = x => ((1 - x.pExam) * (URG[x.reason] || 1) * (missed.has(x.i) ? 1.25 : 1)) / x.per;
-    if (E.order === 'standard') todo.sort((a, b) => (b.kind === 'test') - (a.kind === 'test') || val(b) - val(a));
-    if (E.order === 'hard')
-      todo.sort((a, b) => (b.kind === 'test') - (a.kind === 'test') || (1 - b.p) * b.diff - (1 - a.p) * a.diff);
-    [...done, ...todo].forEach(push);
+      budget = st.minutes;
+    let left = budget;
+    const items = [];
+    done.forEach(c => {
+      /* what was done: the questions logged today when the count is known, otherwise a review-sized session (not a
+         whole 40-question chunk the app never saw) */
+      const logged = state.events
+          .filter(e => e.date === asOf && e.topic === c.i && e.total > 0)
+          .reduce((a, e) => a + e.total, 0),
+        n0 = c.kind === 'test' ? c.n : logged || Math.min(c.n, reviewSize(c.i, srModel(c.i, asOf, true))),
+        n = c.kind === 'test' ? c.n : Math.max(1, Math.min(n0, Math.floor((left + 1e-9) / c.per)));
+      const min = Math.min(Math.max(0, left), Math.ceil(n * c.per - 1e-9));
+      items.push({ ...c, n, min });
+      left -= min;
+    });
+    const pick = orderCands(
+      selectCands(
+        cands.filter(x => !x.done),
+        Math.max(0, left),
+        5
+      ),
+      mode
+    );
+    pick.forEach(c => items.push({ ...c, min: Math.ceil(c.n * c.per - 1e-9) }));
+    items.forEach(it => {
+      if (it.kind === 'topic') it.stake = 60 * examShare(it.i).share * Math.min(1, it.n / it.nRef) * (1 - it.pExam);
+    });
+    const planned = new Set(items.filter(x => x.kind === 'topic').map(x => x.i));
     doneT.forEach(i => {
-      if (!planned.has(i)) items.push({ kind: 'topic', i, n: 0, min: 0, reason: 'extra', done: true, diff: diffOf(i) });
+      if (!planned.has(i))
+        items.push({ kind: 'topic', i, n: 0, min: 0, reason: 'extra', done: true, diff: diffOf(i), why: [] });
     });
     const remaining = TOPICS.reduce((a, x, i) => a + (state.statuses[i] === 'Very Comfortable' ? 0 : x.q), 0);
     const sum = (arr, k) => arr.reduce((a, x) => a + (x[k] || 0), 0);
@@ -13562,9 +14540,9 @@ const PlanModel = (() => {
     return {
       items,
       cap,
-      mode: mode || 'medium',
+      mode,
       workload,
-      budget: Math.round(st.minutes),
+      budget: Math.round(budget),
       total: sum(items, 'n'),
       minutes: sum(items, 'min'),
       done: sum(
@@ -13625,6 +14603,8 @@ const PlanModel = (() => {
     paceTable,
     notePace,
     baseMinutesPerQ,
+    minutesSplit,
+    diffOf,
   };
 })();
 const {
@@ -13644,7 +14624,673 @@ const {
   paceTable,
   notePace,
   baseMinutesPerQ,
+  minutesSplit,
+  diffOf,
 } = PlanModel;
+
+/* ===== module Policy (js/model/policy.js) =====
+   public: ENERGY, energyOf, doneOn, topicCands, testCand, selectCands, orderCands, hardnessOf, minChunk, COVER_DAYS
+   The ONE place that decides what is worth studying. The daily suggestion (buildPlan), the plan with times (packDay),
+   the weekly plan (suggestDays) and Refresh plan all take their candidates and values from here; only how the chosen
+   work is laid out differs (one list vs time blocks).
+
+   ================= WHAT A TOPIC IS WORTH TODAY =================
+     risk_i  = 60 × share_i × (1 − p_exam_i)
+               questions of the FAA test LIKELY MISSED from topic i if you do not study it again: share_i = its official
+               share of the test (Config.examShare), p_exam_i = chance of a right answer on exam day (mastery × recall,
+               recall still falling until then). It is NOT an expected score gain: the app does not model how much a
+               session teaches — only where misses are likely. Mastery already carries every low score and recent miss,
+               so nothing else adds a "weak" or "difficult" penalty on top.
+     value of a chunk of n questions = risk_i × min(1, n / n_ref) × timing
+       n_ref = the session the topic needs now (a review sample sized by mastery, a 10-question diagnostic, or one
+       40-question session): doing it addresses the topic's risk for now; a smaller chunk counts in proportion
+       timing (each from a different fact, never the same evidence twice):
+         × 1.2   review due by spaced repetition (or misses imported in an "errors only" test)
+         × 1.25  left undone in a plan during the last 7 days (or moved by Refresh plan)
+         × 0.8   new material in the final stretch (8–21 days); none at all in the last week
+     coverage: each day the 2 topics untouched longest (14 days or more, or never; the highest risk first among
+       equals) are raised to at least the day's median value per minute, so small, rarely tested or hard topics keep
+       coming back instead of waiting forever — 2 a day, so they rotate in without crowding out the reviews due.
+     area floor (a week): fair share of area a = its official share × (1 − its average p); an area whose minutes so far
+       are under half its fair share of the week's minutes gets its best topic raised to the median value per minute;
+       the two areas furthest below their share have that topic placed first that day.
+     The choice is by value per minute (a fractional knapsack: values are linear in n, so taking the densest first and
+     cutting the last one to fit is the best use of the time), never past the time you gave.
+
+   ================= ENERGY (same rules in the daily list and the calendar) =================
+     low     no practice test (unless one is overdue by 2+ days or you added it); chunks of at most 20 questions;
+             easiest first; hard topics stay in, as guided examples or a concept review instead of a timed set
+     medium  chunks of at most 40 questions (one question-bank session); most valuable first
+     high    chunks of at most 40 questions; hardest first, while you are fresh
+     Energy never changes the time you gave, the minutes per question or the value of a topic.
+
+   ================= ACTIVITY (how to study the chunk) =================
+     newQ        new questions                     new material, or practice with enough evidence
+     concept     review the concept, then new q    mastery under 60% or a miss while recall was high (understanding)
+     guided      guided examples                   the same as concept, on low energy
+     retrieval   recall without notes              a review due, or a miss after a long gap (forgetting)
+     fluency     fluency drill (timed)             mastery at or above your goal, but slower than your usual pace
+     diagnostic  a short diagnostic (10 q)         a score with no sample (or under 10 questions) behind it      */
+const Policy = (() => {
+  const SESSION = 40,
+    COVER_DAYS = 14,
+    COVER_PER_DAY = 2,
+    T_DUE = 1.2,
+    T_PENDING = 1.25,
+    T_NEW_STRETCH = 0.8,
+    TEST_VALUE = 60;
+  const ENERGY = {
+    low: { test: false, chunk: 20, order: 'easy' },
+    medium: { test: true, chunk: 40, order: 'value' },
+    high: { test: true, chunk: 40, order: 'hard' },
+  };
+  const energyOf = mode => ENERGY[mode] || ENERGY.medium;
+  /* topics already done on a date: a session logged that day, or a topic block of a plan ticked that day */
+  function doneOn(date) {
+    const s = new Set(
+      state.events
+        .filter(e => e.date === date && (e.kind === 'study' || e.kind === 'review') && !e.proj)
+        .map(e => e.topic)
+    );
+    (state.plans || []).forEach(p =>
+      (p.items || []).forEach(it => {
+        if (it.date === date && it.kind === 'topic' && it.check) s.add(it.i);
+      })
+    );
+    return s;
+  }
+  /* the last day you touched a topic: a review, a scored result, a ticked plan block or the Kanban "done today" */
+  function lastTouch(i, date, m) {
+    let d = m.last || (m.obs && m.obs.date) || '';
+    (state.plans || []).forEach(p =>
+      (p.items || []).forEach(it => {
+        if (it.kind === 'topic' && it.i === i && it.check && it.date < date && it.date > d) d = it.date;
+      })
+    );
+    const ck = (state.cardChecks || {})[i];
+    if (ck && ck < date && ck > d) d = ck;
+    return d || null;
+  }
+  /* the most frequent tags of the misses imported in the last 30 days (e.g. "TAF"), at most 2 */
+  function missTags(i, date) {
+    const from = addDays(date, -30),
+      c = {};
+    (state.exams || []).forEach(x => {
+      if (x.date < from || x.date > date) return;
+      (x.misses || []).forEach(q => {
+        if (q.i === i) (q.tags || []).forEach(tg => (c[tg] = (c[tg] || 0) + 1));
+      });
+    });
+    return Object.entries(c)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 2)
+      .map(x => x[0]);
+  }
+  const hardnessOf = c => (c.kind === 'test' ? 99 : (1 - (c.p ?? 0.5)) * (c.diff || 1));
+  /* the smallest chunk worth doing: minQ questions or 10 minutes (the whole topic when it is smaller); a practice test
+     is done whole — only one you added yourself may be cut to what fits (never under 5 questions) */
+  const minChunk = (c, minQ) =>
+    c.kind === 'test' ? (c.manual ? Math.min(c.n, 5) : c.n) : Math.min(c.full, Math.max(minQ, Math.ceil(10 / c.per)));
+  function activityOf(m, reason, E, i, status) {
+    const mast = m.mastery;
+    if (reason === 'new' && !m.obs && !m.reps.length) return E.order === 'easy' ? 'concept' : 'newQ';
+    if (m.confLevel === 'low' && (m.obs || m.p != null) && reason !== 'new') return 'diagnostic';
+    if ((!m.prior && mast < 0.6) || m.diag === 'understanding') return E.order === 'easy' ? 'guided' : 'concept';
+    if (reason === 'due' || m.diag === 'forgetting') return 'retrieval';
+    if (!m.prior && mast * 100 >= GOAL && paceFactor(i) > 1.2) return 'fluency';
+    return 'newQ';
+  }
+  /* every topic worth a place on date, with its chunk size, minutes and value.
+     opts: mode (energy), carry (topics moved by Refresh), done (topics already done that day), minutesFor (i, m, p) →
+     { answer, review } minutes per question, withReview (minutes per question include the review of misses) */
+  function topicCands(date, opts) {
+    const E = energyOf(opts.mode),
+      phase = examPhase(date),
+      final = ['week', 'lastday'].includes(phase),
+      lastDay = phase === 'lastday',
+      weakBelow = phase === 'normal' || phase === 'after' ? 70 : GOAL,
+      xDay = state.deadline > date ? state.deadline : date,
+      missed = typeof missedTopics === 'function' ? missedTopics(date) : new Set(),
+      carry = opts.carry || new Set(),
+      out = [];
+    TOPICS.forEach((x, i) => {
+      const m = srModel(i, date, true),
+        status = state.statuses[i],
+        isNew = ['Todo', 'Doing'].includes(status),
+        due = m.reps.length && m.over != null && m.over >= 0,
+        weak = !m.prior && !isNew && m.mastery * 100 < weakBelow,
+        seenNew = (opts.seen && opts.seen[i]) || 0,
+        last = lastTouch(i, date, m),
+        /* studied today counts as touched today */
+        idle = opts.done && opts.done.has(i) ? 0 : last ? diffDays(last, date) : Infinity;
+      let reason = carry.has(i)
+        ? 'carried'
+        : due
+          ? 'due'
+          : weak
+            ? 'weak'
+            : m.tracked && !m.reps.length && !m.obs
+              ? 'nodata'
+              : isNew && seenNew < x.q && !(m.last && diffDays(m.last, date) < 2)
+                ? 'new'
+                : idle >= COVER_DAYS
+                  ? 'coverage'
+                  : /* an area of the test left behind this week brings back its topics not studied in the last 2 days */
+                    opts.areaShort && opts.areaShort.includes(examShare(i).area) && idle >= 2
+                    ? 'coverage'
+                    : null;
+      if (!reason) return;
+      if (final && reason === 'new' && !m.obs && !m.reps.length) return;
+      if (lastDay && reason === 'nodata') return;
+      const pNow = chanceAt(m, date),
+        pExam = chanceAt(m, xDay),
+        sh = examShare(i),
+        risk = 60 * sh.share * (1 - pExam),
+        activity = activityOf(m, reason, E, i, status);
+      /* nRef = the session this topic needs (a review sample, a diagnostic, or one 40-question session); energy and the
+         last day may make the chunk smaller */
+      const nRef = Math.max(
+          1,
+          Math.min(
+            x.q,
+            reason === 'due' || reason === 'carried'
+              ? reviewSize(i, m)
+              : activity === 'diagnostic'
+                ? 10
+                : reason === 'new'
+                  ? Math.min(SESSION, x.q - seenNew)
+                  : SESSION
+          )
+        ),
+        n = Math.max(1, Math.min(nRef, E.chunk, lastDay ? 20 : SESSION));
+      const timing =
+        (due || m.examMisses ? T_DUE : 1) *
+        (missed.has(i) || reason === 'carried' ? T_PENDING : 1) *
+        (reason === 'new' && phase === 'stretch' ? T_NEW_STRETCH : 1);
+      const t = opts.minutesFor(i, m, pNow),
+        per = opts.withReview ? t.answer + t.review : t.answer;
+      /* why: the main reasons, each backed by data that exists */
+      const why = [];
+      if (m.obs)
+        why.push(
+          m.obs.total > 0
+            ? { k: 'last', right: m.obs.right, total: m.obs.total, src: m.obs.src }
+            : { k: 'lastPct', p: m.obs.p, src: m.obs.src }
+        );
+      else if (m.p != null) why.push({ k: 'sportys', p: m.p });
+      if (m.examMisses) why.push({ k: 'examMisses', n: m.examMisses.n, tags: missTags(i, date) });
+      else {
+        const tg = missTags(i, date);
+        if (tg.length) why.push({ k: 'missTags', tags: tg });
+      }
+      if (due && !m.examMisses) why.push({ k: 'due', d: m.over });
+      if (!m.prior && (weak || m.mastery < 0.6)) why.push({ k: 'mastery', p: Math.round(m.mastery * 100) });
+      if (m.diag) why.push({ k: m.diag });
+      if (missed.has(i) || reason === 'carried') why.push({ k: 'pending' });
+      if (reason === 'coverage' || (idle >= COVER_DAYS && idle !== Infinity)) why.push({ k: 'idle', d: idle });
+      if (reason === 'new' && !m.obs) why.push({ k: 'newMat' });
+      why.push({ k: 'share', s: sh.share, est: sh.estimated, area: sh.area });
+      out.push({
+        kind: 'topic',
+        i,
+        n,
+        full: x.q,
+        reason,
+        /* left undone on an earlier day and moved by Refresh plan: placed before anything else */
+        forced: reason === 'carried',
+        activity,
+        done: !!(opts.done && opts.done.has(i)),
+        per,
+        review: t.review,
+        answer: t.answer,
+        diff: diffOf(i),
+        p: pNow,
+        pExam,
+        risk,
+        timing,
+        idle,
+        nRef,
+        value: risk * Math.min(1, n / nRef) * timing,
+        why,
+        conf: m.confLevel,
+        unknownN: m.unknownN,
+        date,
+      });
+    });
+    /* coverage: the 2 topics idle longest (14+ days, or never studied — the highest risk first) are worth at least
+       the median value per minute of the day; 2 a day, so they rotate in without crowding out the reviews due.
+       (measured on the full minutes, answering + review, so the daily list and the calendar lift the same topics) */
+    const full = c => c.n * (c.answer + c.review),
+      dens = out.map(c => c.value / full(c)).sort((a, b) => a - b),
+      med = dens.length ? dens[Math.floor(dens.length / 2)] : 0;
+    out
+      .filter(c => c.idle >= COVER_DAYS && c.value / full(c) < med)
+      .sort((a, b) => b.idle - a.idle || b.risk - a.risk || a.i - b.i)
+      .slice(0, COVER_PER_DAY)
+      .forEach(c => {
+        c.value = med * full(c);
+        c.covered = true;
+      });
+    /* area floor (weekly plans): an ACS area that got less than half its fair share of the week's time so far has its
+       most valuable topic lifted to the median too, so no area of the test is left out for a whole week */
+    let forcedAreas = 0;
+    (opts.areaShort || []).forEach(a => {
+      const c = out
+        .filter(x => examShare(x.i).area === a && !x.done)
+        .sort((x, y) => y.value / full(y) - x.value / full(x))[0];
+      if (!c) return;
+      if (c.value / full(c) < med) c.value = med * full(c);
+      c.floor = true;
+      /* the two areas furthest below their share (that have a topic to study) are placed first that day */
+      if (forcedAreas < 2) {
+        c.forced = true;
+        forcedAreas++;
+      }
+    });
+    return out;
+  }
+  /* the practice test of the day, when one is due (or added by hand), as a candidate; null otherwise */
+  function testCand(date, mode, st, withReview) {
+    const E = energyOf(mode),
+      lastDay = examPhase(date) === 'lastday',
+      testsToday = (state.tests || []).filter(x => x.date === date).length,
+      tw = testWhy(date, st),
+      man = date === todayISO() && typeof manualTest === 'function' && manualTest(date);
+    if (!(testsToday || (tw.due && !lastDay) || man)) return null;
+    if (!(E.test || testsToday || tw.overdue >= 2 || man)) return null;
+    const mu = blended(date).mu,
+      answer = (60 / st.qph) * 1.1,
+      review = (1 - mu) * st.reviewMin;
+    return {
+      kind: 'test',
+      forced: man || (!E.test && tw.overdue >= 2),
+      manual: !!man,
+      n: TEST_Q,
+      full: TEST_Q,
+      reason: tw.due ? tw.reason : man ? 'testManual' : 'test',
+      activity: 'test',
+      done: !!testsToday,
+      per: withReview ? answer + review : answer,
+      review,
+      answer,
+      diff: 1.1,
+      p: mu,
+      value: TEST_VALUE,
+      why: [],
+      date,
+    };
+  }
+  /* choose within cap minutes: densest value per minute first, each chunk cut to what still fits (never under its
+     smallest chunk); minQ = smallest chunk in questions. Returns copies with n set. */
+  function selectCands(cands, cap, minQ) {
+    const pick = [];
+    let left = cap;
+    cands
+      .slice()
+      .sort((a, b) => (b.forced ? 1 : 0) - (a.forced ? 1 : 0) || b.value / (b.n * b.per) - a.value / (a.n * a.per))
+      .forEach(c => {
+        const fit = Math.floor((left + 1e-9) / c.per),
+          n = Math.min(c.n, fit);
+        if (!n || n < minChunk(c, minQ)) return;
+        const used = Math.ceil(n * c.per - 1e-9);
+        if (used > left) return;
+        pick.push({ ...c, n, value: (c.value * n) / c.n });
+        left -= used;
+      });
+    return pick;
+  }
+  /* the order inside a day or a block, by energy: low → easiest first (a warm-up), medium → most valuable per minute
+     first, high → hardest first; a practice test always opens the session (it is the most tiring) */
+  function orderCands(list, mode) {
+    const o = energyOf(mode).order,
+      key = c =>
+        o === 'easy'
+          ? -hardnessOf(c)
+          : o === 'hard'
+            ? hardnessOf(c)
+            : c.value / Math.max(0.1, (c.n || 1) * (c.per || 1));
+    return list.slice().sort((a, b) => (b.kind === 'test') - (a.kind === 'test') || key(b) - key(a));
+  }
+  return { ENERGY, energyOf, doneOn, topicCands, testCand, selectCands, orderCands, hardnessOf, minChunk, COVER_DAYS };
+})();
+const { ENERGY, energyOf, doneOn, topicCands, testCand, selectCands, orderCands, hardnessOf, minChunk, COVER_DAYS } =
+  Policy;
+
+/* ===== module ExamImport (js/model/exam-import.js) =====
+   public: EXAM_SCHEMA_VERSION, parseExamText, checkExam, applyExam, examPrompt, ERROR_TYPES
+   A practice test analysed by an AI (ChatGPT or another) comes in as JSON: the AI only CLASSIFIES and explains; every
+   number the app uses (scores, mastery, priorities) is computed here, deterministically. No weight, difficulty or
+   priority from the file is ever read.
+
+   ================= SCHEMA (schemaVersion 1) =================
+   {
+     "schemaVersion": 1,
+     "examId": "sportys-2026-11-10-a",        required · your own stable id for this test (same test → same id)
+     "date": "2026-11-10",                     required · the day you took it (not in the future)
+     "platform": "Sporty's",                   optional
+     "mode": "full" | "errorsOnly",            required
+     "coverage": "complete" | "partial",       complete = every question of the test is listed (by topic or one by one)
+     "overall": { "total": 60, "right": 48, "wrong": 12 },     each may be null when unknown
+     "topics": [ { "topicId": "weather-information", "total": 9, "right": 6, "wrong": 3, "seconds": null } ],
+     "questions": [ {
+         "qid": "Q17",                         optional, unique in the file
+         "topicId": "weather-information",     the app's topic (null = could not classify)
+         "tags": ["TAF"],                      optional sub-topics, free text — a question counts ONCE whatever its tags
+         "acs": "PA.I.C.K2",                   optional, only when the ACS code can be verified
+         "correct": false,                     true / false / null (unknown)
+         "classificationConfidence": 0.8,      0–1, optional
+         "doubt": "could also be NAS",         optional
+         "errorType": "concept",               concept | misread | calculation | memory | guess | other | null
+         "explanation": "…",                   optional
+         "seconds": 75                         optional
+     } ]
+   }
+   mode "full": topic results come from "topics" or are counted from "questions" (correct true/false); when both are
+     given and the questions are the whole test they must agree (otherwise the questions are details, e.g. the misses). Each topic with a total gets a score; the overall score is "overall" or the sum of the topics
+     (only when coverage is complete).
+   mode "errorsOnly": only misses. No topic score is computed (no denominator), a topic not listed is NOT taken as known
+     and none is taken as zero right; the overall score is recorded only when the overall total and wrong are known.
+   Unknown values stay unknown (null) — the app never fills them in. */
+const ExamImport = (() => {
+  const EXAM_SCHEMA_VERSION = 1,
+    ERROR_TYPES = ['concept', 'misread', 'calculation', 'memory', 'guess', 'other'],
+    LOW_CONF = 0.7;
+  /* JSON from a .json or .txt file or pasted text: the text itself, or the first {…} block inside it */
+  function parseExamText(text) {
+    const s = String(text || '').trim();
+    if (!s) return { error: 'exEmpty' };
+    const tryParse = x => {
+      try {
+        return JSON.parse(x);
+      } catch (e) {
+        return undefined;
+      }
+    };
+    let o = tryParse(s);
+    if (o === undefined) {
+      const a = s.indexOf('{'),
+        b = s.lastIndexOf('}');
+      if (a >= 0 && b > a) o = tryParse(s.slice(a, b + 1));
+    }
+    if (!o || typeof o !== 'object' || Array.isArray(o)) return { error: 'exNotJson' };
+    return { data: o };
+  }
+  const isCount = v => v === null || v === undefined || (Number.isInteger(v) && v >= 0);
+  const cnt = v => (Number.isInteger(v) && v >= 0 ? v : null);
+  const hash = s => {
+    let h = 2166136261;
+    for (let k = 0; k < s.length; k++) {
+      h ^= s.charCodeAt(k);
+      h = Math.imul(h, 16777619);
+    }
+    return (h >>> 0).toString(36);
+  };
+  /* resolve a topic: its id ("weather-information") or, as a courtesy, its exact English name */
+  const topicOf = v => {
+    if (typeof v !== 'string') return -1;
+    const k = topicById(v.trim());
+    if (k >= 0) return k;
+    return TOPICS.findIndex(x => x.name.toLowerCase() === v.trim().toLowerCase());
+  };
+  /* validate and normalise a parsed file. Returns { errors, warnings, exam } — exam is what would be stored (null when
+     there is an error). errors / warnings are [code, params] pairs (translated by the dialog). */
+  function checkExam(o) {
+    const E = [],
+      W = [],
+      err = (c, p) => E.push([c, p || {}]),
+      warn = (c, p) => W.push([c, p || {}]);
+    if (o.schemaVersion !== EXAM_SCHEMA_VERSION) err('exVersion', { v: o.schemaVersion });
+    const examId = typeof o.examId === 'string' ? o.examId.trim().slice(0, 80) : '';
+    if (!examId) err('exNoId');
+    const date = typeof o.date === 'string' ? o.date.trim() : '';
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(parse(date))) err('exBadDate');
+    else if (date > todayISO()) err('exFuture');
+    const mode = o.mode === 'full' ? 'full' : o.mode === 'errorsOnly' || o.mode === 'errors' ? 'errors' : null;
+    if (!mode) err('exBadMode');
+    const coverage = o.coverage === 'complete' ? 'complete' : 'partial';
+    if (o.coverage !== 'complete' && o.coverage !== 'partial') warn('exCoverageAssumed');
+    const ov = o.overall && typeof o.overall === 'object' ? o.overall : {};
+    ['total', 'right', 'wrong'].forEach(k => {
+      if (!isCount(ov[k])) err('exBadCount', { f: 'overall.' + k });
+    });
+    let total = cnt(ov.total),
+      right = cnt(ov.right),
+      wrong = cnt(ov.wrong);
+    if (total != null && right != null && right > total) err('exRightOver', { f: 'overall' });
+    if (total != null && right != null && wrong != null && right + wrong !== total) err('exSum', { f: 'overall' });
+    /* questions */
+    const qs = Array.isArray(o.questions) ? o.questions : [],
+      seenQ = new Set(),
+      questions = [];
+    qs.forEach((q, k) => {
+      if (!q || typeof q !== 'object') return err('exBadQuestion', { n: k + 1 });
+      const qid = typeof q.qid === 'string' || Number.isInteger(q.qid) ? String(q.qid).slice(0, 80) : null;
+      if (qid != null) {
+        if (seenQ.has(qid)) err('exDupQuestion', { q: qid });
+        seenQ.add(qid);
+      }
+      let i = -1;
+      if (q.topicId != null) {
+        i = topicOf(q.topicId);
+        if (i < 0) err('exUnknownTopic', { id: String(q.topicId).slice(0, 60) });
+      }
+      const conf = Number.isFinite(q.classificationConfidence)
+        ? Math.max(0, Math.min(1, q.classificationConfidence))
+        : null;
+      if (q.correct !== true && q.correct !== false && q.correct != null) err('exBadQuestion', { n: k + 1 });
+      if (q.errorType != null && !ERROR_TYPES.includes(q.errorType)) warn('exErrorType', { v: String(q.errorType) });
+      if (!isCount(q.seconds)) err('exBadCount', { f: `questions[${k + 1}].seconds` });
+      questions.push({
+        n: k + 1,
+        qid,
+        i,
+        rawTopic: q.topicId ?? null,
+        tags: (Array.isArray(q.tags) ? q.tags : [])
+          .filter(x => typeof x === 'string' && x.trim())
+          .map(x => x.trim().slice(0, 40))
+          .slice(0, 6),
+        acs: typeof q.acs === 'string' && q.acs.trim() ? q.acs.trim().slice(0, 30) : null,
+        correct: q.correct === true ? true : q.correct === false ? false : null,
+        conf,
+        doubt: typeof q.doubt === 'string' && q.doubt.trim() ? q.doubt.trim().slice(0, 300) : null,
+        errorType: ERROR_TYPES.includes(q.errorType) ? q.errorType : null,
+        note: typeof q.explanation === 'string' && q.explanation.trim() ? q.explanation.trim().slice(0, 500) : null,
+        seconds: cnt(q.seconds),
+        unsure:
+          (conf != null && conf < LOW_CONF) || !!(typeof q.doubt === 'string' && q.doubt.trim()) || q.topicId == null,
+      });
+    });
+    const unclassified = questions.filter(q => q.i < 0).length;
+    if (unclassified) warn('exUnclassifiedN', { n: unclassified });
+    /* topic summary rows */
+    const rows = Array.isArray(o.topics) ? o.topics : [],
+      byTopic = new Map();
+    rows.forEach((r, k) => {
+      if (!r || typeof r !== 'object') return err('exBadTopicRow', { n: k + 1 });
+      const i = topicOf(r.topicId);
+      if (i < 0) return err('exUnknownTopic', { id: String(r.topicId ?? '').slice(0, 60) });
+      if (byTopic.has(i)) return err('exDupTopic', { t: TOPICS[i].name });
+      ['total', 'right', 'wrong', 'seconds'].forEach(f => {
+        if (!isCount(r[f])) err('exBadCount', { f: `${TOPICS[i].name}.${f}` });
+      });
+      const t = { i, total: cnt(r.total), right: cnt(r.right), wrong: cnt(r.wrong), seconds: cnt(r.seconds) };
+      if (t.total != null && t.right != null && t.right > t.total) err('exRightOver', { f: TOPICS[i].name });
+      if (t.total != null && t.wrong != null && t.wrong > t.total) err('exRightOver', { f: TOPICS[i].name });
+      if (t.total != null && t.right != null && t.wrong != null && t.right + t.wrong !== t.total)
+        err('exSum', { f: TOPICS[i].name });
+      if (t.total != null && t.right == null && t.wrong != null) t.right = t.total - t.wrong;
+      if (t.total != null && t.wrong == null && t.right != null) t.wrong = t.total - t.right;
+      byTopic.set(i, t);
+    });
+    let topics = [],
+      misses = [];
+    if (mode === 'full') {
+      /* counted from the questions with a known result */
+      const fromQ = new Map();
+      questions.forEach(q => {
+        if (q.i < 0 || q.correct == null) return;
+        const t = fromQ.get(q.i) || { i: q.i, total: 0, right: 0, wrong: 0, seconds: null };
+        t.total++;
+        if (q.correct) t.right++;
+        else t.wrong++;
+        fromQ.set(q.i, t);
+      });
+      const ids = new Set([...byTopic.keys(), ...fromQ.keys()]),
+        allQs = total != null && questions.filter(q => q.correct != null).length === total;
+      ids.forEach(i => {
+        const a = byTopic.get(i),
+          b = fromQ.get(i);
+        /* the questions are checked against the topic rows only when they are the whole test (otherwise they are the
+           details of some questions, e.g. the misses) */
+        if (a && b && allQs && a.total != null && (a.total !== b.total || a.right !== b.right))
+          err('exMismatch', { t: TOPICS[i].name });
+        topics.push(a && a.total != null ? a : byTopic.size && !allQs ? a : b || a);
+      });
+      topics = topics.filter(Boolean).sort((x, y) => x.i - y.i);
+      const nq = questions.filter(q => q.correct != null).length;
+      if (questions.some(q => q.correct == null))
+        warn('exUnknownResult', { n: questions.filter(q => q.correct == null).length });
+      /* the overall result: given, or the sum of the topics when every question is accounted for */
+      const sumT =
+          topics.reduce((a, t) => a + (t.total || 0), 0) +
+          (byTopic.size ? 0 : questions.filter(q => q.i < 0 && q.correct != null).length),
+        sumR =
+          topics.reduce((a, t) => a + (t.right || 0), 0) +
+          (byTopic.size ? 0 : questions.filter(q => q.i < 0 && q.correct).length);
+      if (coverage === 'complete' && topics.every(t => t.total != null)) {
+        if (total == null && sumT) {
+          total = sumT;
+          right = sumR;
+          wrong = sumT - sumR;
+        } else if (total != null && sumT !== total && !(unclassified && sumT < total))
+          err('exTotalMismatch', { a: sumT, b: total });
+      }
+      if (total != null && right == null && wrong != null) right = total - wrong;
+      if (total != null && wrong == null && right != null) wrong = total - right;
+      if (!topics.length && !nq && total == null) err('exNothing');
+      topics.forEach(t => {
+        if (t.total == null || t.right == null) warn('exTopicNoScore', { t: TOPICS[t.i].name });
+      });
+      misses = questions.filter(q => q.correct === false && q.i >= 0);
+    } else if (mode === 'errors') {
+      /* errors only: no topic denominators; a topic row may only say how many were missed */
+      byTopic.forEach(t => {
+        if (t.right != null || t.total != null) err('exErrorsNoScore', { t: TOPICS[t.i].name });
+      });
+      if (questions.some(q => q.correct === true)) err('exErrorsRight');
+      misses = questions.filter(q => q.i >= 0);
+      const listed = questions.length;
+      if (wrong != null && listed > wrong) err('exMoreMisses', { a: listed, b: wrong });
+      if (wrong != null && listed < wrong) warn('exFewerMisses', { a: listed, b: wrong });
+      if (total != null && wrong != null) right = total - wrong;
+      else right = null;
+      if (right != null && right < 0) err('exSum', { f: 'overall' });
+      topics = [];
+      if (!listed && !byTopic.size) err('exNothing');
+    }
+    if (total != null && right != null && right > total) err('exRightOver', { f: 'overall' });
+    /* duplicates: the same test already imported (same id, or the same content under another id) */
+    const sig = hash(
+      JSON.stringify([
+        date,
+        mode,
+        total,
+        right,
+        topics.map(t => [t.i, t.total, t.right]),
+        questions.map(q => [q.qid, q.i, q.correct]),
+      ])
+    );
+    const dup = (state.exams || []).find(x => x.examId === examId || (x.sig && x.sig === sig));
+    if (dup) err(dup.examId === examId ? 'exDupExam' : 'exDupContent', { id: dup.examId });
+    if (total != null && total !== TEST_Q) warn('exNot60', { n: total });
+    const exam = {
+      id: uid(),
+      examId,
+      date,
+      platform: typeof o.platform === 'string' && o.platform.trim() ? o.platform.trim().slice(0, 60) : null,
+      mode,
+      coverage,
+      total,
+      right,
+      wrong,
+      topics,
+      misses: misses.map(q => ({
+        i: q.i,
+        qid: q.qid,
+        tags: q.tags,
+        acs: q.acs,
+        conf: q.conf,
+        errorType: q.errorType,
+        note: q.note,
+        seconds: q.seconds,
+      })),
+      sig,
+      importedAt: Date.now(),
+    };
+    return { errors: E, warnings: W, exam: E.length ? null : exam, questions, draft: exam };
+  }
+  /* the state after the import, or null: built on a copy and checked whole (normalize) before anything is replaced,
+     so a failure never leaves half an import behind */
+  function applyExam(exam) {
+    if (!exam) return null;
+    const next = JSON.parse(JSON.stringify(state));
+    next.exams = [...(next.exams || []), exam];
+    if (exam.total > 0 && exam.right != null)
+      next.tests = [
+        ...(next.tests || []),
+        {
+          id: uid(),
+          date: exam.date,
+          q: exam.total,
+          score: Math.round((100 * exam.right) / exam.total),
+          right: exam.right,
+          exam: exam.examId,
+        },
+      ];
+    const n = normalize(next);
+    if (!n || !n.exams.some(x => x.examId === exam.examId)) return null;
+    n.exams.find(x => x.examId === exam.examId).sig = exam.sig;
+    return n;
+  }
+  /* the prompt to give an AI with your results: the app's real topics, the schema and the rules (in English, as the AI
+     reads it; it answers with JSON only) */
+  function examPrompt() {
+    const list = TOPICS.map(x => `- ${x.id} — ${x.name} (ACS ${ACS_TASK[TOPICS.indexOf(x)]})`).join('\n');
+    return `You are helping me record a FAA Private Pilot (PAR) practice test in my study app. I will paste my results (a score report, a list of questions, or only the questions I missed). Classify them into the app's topics and answer with ONE JSON object only — no text before or after it.
+
+RULES
+- Do not invent anything. A value you do not know is null. Never guess a total, a number of right answers or a score.
+- You classify and explain; the app computes every score and priority. Do not add weights, difficulty or priority fields.
+- Use only these topicId values (the app's topics = tasks of the Private Pilot ACS FAA-S-ACS-6C):
+${list}
+- A question has ONE topicId (the main one). Put other sub-subjects in "tags" (e.g. "TAF", "density altitude"). If you cannot classify it, use topicId null and explain in "doubt".
+- "acs": the ACS element code (e.g. "PA.I.C.K2") ONLY if you can verify it; otherwise null.
+- "classificationConfidence": your confidence in the topicId, 0 to 1. Below 0.7 or any doubt → write the doubt.
+- "errorType" for a missed question: concept | misread | calculation | memory | guess | other (or null).
+- mode "full" when you have the result of every question (or right/total per topic); mode "errorsOnly" when I give only the questions I missed. In errorsOnly: no "right" or "total" per topic, every listed question has "correct": false, and "overall" has total and wrong only if I told you.
+- "coverage": "complete" only if every question of the test is listed (one by one or in topic totals); otherwise "partial".
+- In "full" mode, check that right ≤ total and right + wrong = total, per topic and overall.
+- "examId": a short id you build from the platform and date, e.g. "sportys-2026-11-10-a" (I may change it).
+
+FORMAT (schemaVersion 1)
+{
+  "schemaVersion": 1,
+  "examId": "sportys-YYYY-MM-DD-a",
+  "date": "YYYY-MM-DD",
+  "platform": "Sporty's",
+  "mode": "full",
+  "coverage": "complete",
+  "overall": { "total": 60, "right": null, "wrong": null },
+  "topics": [ { "topicId": "weather-information", "total": null, "right": null, "wrong": null, "seconds": null } ],
+  "questions": [ { "qid": null, "topicId": null, "tags": [], "acs": null, "correct": null, "classificationConfidence": null, "doubt": null, "errorType": null, "explanation": null, "seconds": null } ]
+}
+
+MY RESULTS:
+`;
+  }
+  return { EXAM_SCHEMA_VERSION, parseExamText, checkExam, applyExam, examPrompt, ERROR_TYPES };
+})();
+const { EXAM_SCHEMA_VERSION, parseExamText, checkExam, applyExam, examPrompt, ERROR_TYPES } = ExamImport;
 
 /* ===== module Schedule (js/model/schedule.js) =====
    live values (getters): DAY_START, DAY_END (the plan grid: the hour chosen in Settings to the same hour next morning)
@@ -13663,24 +15309,23 @@ const {
    built from your statistics (buildPlan).
 
    Filling the time (suggestDays):
-     1. candidates = buildPlan for that day with the day's blocked minutes as the budget (same scoring as the daily
-        plan: overdue reviews, topics without data, weak topics, new material; minutes per question from your speed,
-        the topic's difficulty and the review time for misses). Topics missed in a plan during the last 7 days get
-        a 25% priority boost.
-     2. each continuous block is a knapsack: pick the chunks that protect the most exam-day questions
-        (n × (1 − p on exam day) × urgency) within the block's minutes (dynamic programming, 1-minute steps); any
-        time left is filled with part of the best remaining topic (at least 5 questions).
-        Deep work (Cal Newport): few context switches, so a block holds at most one topic per ~45 minutes (Settings); the
-        topics kept grow into the freed time (up to the topic's question count).
-     3. inside a block the hardest work goes first, while you are fresh: practice test, then
-        (1 − p now) × difficulty, plus a boost for overdue reviews and for topics not seen in a long time.
-     4. for a week, the days are filled in order and each day assumes the earlier days were done (simulated sessions),
-        so a topic reviewed on Monday is not due again on Tuesday. A topic appears at most once per day. */
+     1. candidates and their values come from Policy — the same rules as the daily suggestion (questions likely missed
+        on the test × timing, coverage of idle topics, energy). Here each topic chunk holds only the answering; the
+        review of its misses is its own block right after (same minutes as in the daily list, laid out in time).
+     2. each continuous block is filled by value per minute (Policy.selectCands); the smallest chunk of a topic is 20
+        questions or 10 minutes. Deep work (Cal Newport): few context switches, so a block holds at most one topic per
+        ~45 minutes (Settings); the topics kept grow into the freed time (up to one 40-question session).
+     3. inside a block the order follows the day's energy (Policy.orderCands): low → easiest first, medium → most
+        valuable first, high → hardest first; a practice test opens the block.
+     4. for a week, the days are filled in order and each day assumes the earlier days' sessions happen — PROJECTED, never
+        evidence: a projected session repeats your CURRENT estimated mastery (no score floor, no learning assumed), so a
+        topic reviewed on Monday is not due again on Tuesday, a weak one (under 70%) does not get a longer interval, and
+        nothing projected ever reaches your statistics or makes a topic "known". A topic appears at most once per day.
+        Refresh plan re-plans the days ahead from your real results (done work and your own activities stay). */
 const Schedule = (() => {
   const SLOT = 15,
     MIN_CHUNK_Q = 20 /* the smallest session of a big topic (Weather 158 q is studied 40 at a time, never 12) */,
-    MISSED_BOOST = 1.25,
-    URGENCY = { due: 1.3, carried: 2, weak: 1.15, nodata: 1.1, new: 1, light: 0.8, test: 1.4, testDue: 1.4, custom: 1 };
+    MAX_SESSION = 40;
 
   const plans = () => state.plans || (state.plans = []);
   function mondayOf(date) {
@@ -13764,12 +15409,10 @@ const Schedule = (() => {
     return n > 0 ? Math.min(n, TOPICS[i].q) : null;
   }
   /* minutes for one question of topic i on a date (same formula as the daily plan) */
-  function perQ(i, date, energy) {
+  function perQ(i, date) {
     const m = srModel(i, date, true),
-      sc = m.reps.length ? m.reps[m.reps.length - 1].p : state.scores[i],
-      p = pRight(sc, m.reps.length ? m.R : 1),
-      speed = { low: 1.15, medium: 1, high: 0.9 }[energy || 'medium'];
-    return { per: minutesPerQ(i, settings(), m, p) * speed, p };
+      p = chanceAt(m, date);
+    return { per: minutesPerQ(i, settings(), m, p), p };
   }
 
   /* 0/1 knapsack over whole chunks, then fill what is left with part of the best remaining splittable chunk */
@@ -13805,13 +15448,8 @@ const Schedule = (() => {
     return pick;
   }
 
-  const hardness = c => {
-    if (c.kind === 'test') return 99;
-    const m = srModel(c.i, c.date, true),
-      last = m.reps.length ? m.reps[m.reps.length - 1].date : null,
-      idle = last ? Math.min(0.5, diffDays(last, c.date) / 60) : 0.3;
-    return (1 - c.p) * (c.diff || 1) + (c.reason === 'due' ? 0.3 : 0) + idle;
-  };
+  /* trimming to make room: the least valuable per minute goes first */
+  const density = c => (c.kind === 'test' || c.forced ? Infinity : c.value / Math.max(0.1, c.n * c.per));
 
   /* ---------- error review (reflection) ----------
      Expected misses of a topic chunk = questions × (1 − p) × difficulty (a test counts 60 × (1 − p)).
@@ -13887,35 +15525,23 @@ const Schedule = (() => {
     const total = rangesTotal(ranges);
     if (!total) return [];
     const st = settings(),
-      speed = { low: 1.15, medium: 1, high: 0.9 }[energy || 'medium'],
-      boost = missedTopics(date),
-      /* candidates from a generous budget, so a long practice test never crowds out the topics that fit a short block */
-      P = buildPlan(date, { ...st, minutes: Math.max(total * 4, 480) }, energy || 'medium', carryNow);
-    /* the review of misses is its own item, so each question here counts only the time to answer it */
-    let cands = P.items
-      .filter(x => !x.done && x.n > 0 && (x.kind === 'test' || x.kind === 'topic'))
-      .map((x, k) => {
-        const n = x.kind === 'test' ? TEST_Q : x.n,
-          review = (1 - (x.p ?? 0.5)) * st.reviewMin * (x.kind === 'test' ? 1 : x.diff || 1) * speed;
-        return {
-          key: x.kind + (x.i ?? 't') + '_' + k,
-          kind: x.kind,
-          i: x.i,
-          n,
-          full: x.kind === 'test' ? TEST_Q : TOPICS[x.i].q,
-          per: Math.max(0.2, x.per - review),
-          p: x.p,
-          diff: x.diff,
-          reason: x.reason,
-          date,
-          value:
-            (x.kind === 'test' ? TEST_Q * 1.5 : n * (1 - (x.pExam ?? x.p ?? 0.5))) *
-            (URGENCY[x.reason] || 1) *
-            (x.reason === 'new' && !['normal', 'after'].includes(examPhase(date)) ? 0.8 : 1) *
-            (x.kind === 'topic' && boost.has(x.i) ? MISSED_BOOST : 1),
-        };
-      })
-      .filter(c => c.per > 0);
+      mode = energy || 'medium',
+      minutesFor = (i, m, p) => minutesSplit(i, st, m, p),
+      done = doneOn(date);
+    /* the candidates of the day: Policy, the same as the daily suggestion; each chunk counts only the time to answer
+       it (the review of its misses is its own item) */
+    let cands = topicCands(date, {
+      mode,
+      carry: carryNow,
+      done,
+      minutesFor,
+      withReview: false,
+      seen: simSeen,
+      areaShort: simAreas ? shortAreas(date) : null,
+    }).filter(c => !c.done);
+    const tc = testCand(date, mode, st, false);
+    if (tc && !tc.done) cands.unshift(tc);
+    cands = cands.map((c, k) => ({ ...c, key: c.kind + (c.i ?? 't') + '_' + k }));
     const out = [];
     let carry = null;
     ranges.forEach(([s, e], bi) => {
@@ -13946,17 +15572,20 @@ const Schedule = (() => {
         carry = null;
       }
       if (!cands.length || capT < MIN_ITEM) return;
-      let pick = knapsack(cands, capT);
+      let pick = selectCands(cands, capT, MIN_CHUNK_Q);
       /* deep work: few topic switches — at most one topic per ~45 min; the kept topics grow into the freed time */
       const deep = pref('deepMin'),
         maxTopics = deep ? Math.max(1, Math.round(cap / deep)) : Infinity;
       if (pick.length > maxTopics) {
-        pick = pick.sort((a, b) => b.value - a.value).slice(0, maxTopics);
+        pick = pick.sort((a, b) => density(b) - density(a)).slice(0, maxTopics);
         let left = capT - usedBy(pick);
         pick.forEach(c => {
           if (c.kind !== 'topic') return;
           /* never past one session of the question bank (40 questions) */
-          const more = Math.min(Math.min(c.full, 40) - c.n, Math.floor((left + 1e-9) / c.per));
+          const more = Math.min(
+            Math.min(c.full, MAX_SESSION, energyOf(mode).chunk) - c.n,
+            Math.floor((left + 1e-9) / c.per)
+          );
           if (more > 0) {
             c.n += more;
             left -= Math.ceil(more * c.per);
@@ -13968,7 +15597,7 @@ const Schedule = (() => {
       if (leftAfter() >= LEFTOVER_TOPIC) {
         const next = cands
           .filter(x => x.kind === 'topic' && !pick.some(p => p.kind === x.kind && p.i === x.i))
-          .sort((a, b) => b.value / b.n - a.value / a.n)
+          .sort((a, b) => density(b) - density(a))
           .find(x => Math.floor(leftAfter() / x.per) >= minN(x));
         if (next) {
           const fit = Math.floor((leftAfter() - 5) / next.per),
@@ -13980,7 +15609,7 @@ const Schedule = (() => {
           for (let guard = 0; usedBy(trial) + RT.min > capT && guard < 400; guard++) {
             const c = trial
               .slice()
-              .sort((a, b) => hardness(a) - hardness(b))
+              .sort((a, b) => density(a) - density(b))
               .find(x => x.kind === 'topic' && x.n > minN(x));
             if (!c) break;
             c.n -= 1;
@@ -13989,27 +15618,28 @@ const Schedule = (() => {
           if (usedBy(trial) + RT.min <= capT) pick.push(add);
         }
       }
-      /* room for the review in the same block: trim the easiest topics first, never under their smallest chunk */
-      pick.sort((a, b) => hardness(b) - hardness(a));
+      /* room for the review in the same block: trim the least valuable topics first, never under their smallest chunk */
       let R = reflectFor(pick, cap);
       for (let guard = 0; usedBy(pick) + R.min > capT && guard < 400; guard++) {
         const c = pick
           .slice()
-          .reverse()
+          .sort((a, b) => density(a) - density(b))
           .find(x => x.kind === 'topic' && x.n > minN(x));
         if (!c) break;
         c.n -= 1;
         R = reflectFor(pick, cap);
       }
-      /* still no room: drop the easiest topic (it comes back on another day) rather than lose the reviews */
+      /* still no room: drop the least valuable topic (it comes back on another day) rather than lose the reviews */
       while (usedBy(pick) + R.min > capT && pick.filter(x => x.kind === 'topic').length > 1) {
         const c = pick
           .slice()
-          .reverse()
+          .sort((a, b) => density(a) - density(b))
           .find(x => x.kind === 'topic');
         pick = pick.filter(x => x !== c);
         R = reflectFor(pick, cap);
       }
+      /* the order of the block follows the day's energy */
+      pick = orderCands(pick, mode);
       const fits = usedBy(pick) + R.min <= capT,
         hasNext = bi < ranges.length - 1,
         share = fits ? splitReflect(R, pick) : pick.map(() => 0);
@@ -14025,6 +15655,7 @@ const Schedule = (() => {
           i: c.kind === 'topic' ? c.i : null,
           n: c.n,
           reason: c.reason,
+          ...(c.kind === 'topic' ? { activity: c.activity, why: c.why, conf: c.conf } : {}),
         });
         t0 += min;
         if (share[k]) {
@@ -14069,46 +15700,55 @@ const Schedule = (() => {
 
   /* fill several days in order, simulating the earlier days as done; returns { date: items } */
   function suggestDays(days, blocks, energies) {
-    const saved = { events: state.events, tests: state.tests, statuses: state.statuses },
+    const saved = { events: state.events, tests: state.tests },
       out = {};
+    simSeen = {};
+    simAreas = {};
     try {
       state.events = state.events.slice();
       state.tests = (state.tests || []).slice();
-      state.statuses = state.statuses.slice();
       days
         .slice()
         .sort()
         .forEach(d => {
           const items = d < todayISO() ? [] : packDay(d, blocks[d] || [], (energies || {})[d]);
+          /* new material projected on earlier days is not new again: the next days continue through the bank */
+          items.forEach(it => {
+            if (it.kind === 'topic' && it.reason === 'new') simSeen[it.i] = (simSeen[it.i] || 0) + it.n;
+            if (it.kind === 'topic') simAreas[examShare(it.i).area] = (simAreas[examShare(it.i).area] || 0) + it.min;
+          });
           out[d] = items;
           /* a topic moved forward is placed once, on the first day it fits */
           if (carryNow) items.forEach(it => it.kind === 'topic' && carryNow.delete(it.i));
           items.forEach(it => {
             if (it.kind === 'reflect' || it.kind === 'notes') return;
+            /* projected, never evidence: a test keeps the cadence (no score), a session repeats your current estimated
+               mastery as its score (no floor) and is marked proj, so mastery, statistics and lists ignore it */
             if (it.kind === 'test')
-              state.tests.push({ id: 'sim' + it.id, date: d, q: TEST_Q, score: Math.round(blended(d).mu * 100) });
+              state.tests.push({ id: 'sim' + it.id, date: d, q: TEST_Q, score: null, proj: true });
             else {
               const m = srModel(it.i, d, true),
-                last = m.reps.length ? m.reps[m.reps.length - 1].p : 0;
+                mp = Math.round(m.mastery * 100);
               state.events.push({
                 id: 'sim' + it.id,
                 date: d,
                 topic: it.i,
                 kind: m.reps.length ? 'review' : 'study',
-                score: Math.min(95, Math.max(70, last)),
+                score: mp,
+                total: it.n,
+                attempt: 'new',
+                proj: true,
                 partial: false,
                 demo: false,
               });
-              /* a new topic studied whole is not new any more on the next days (it comes back as a review) */
-              if (it.n >= TOPICS[it.i].q && ['Todo', 'Doing'].includes(state.statuses[it.i]))
-                state.statuses[it.i] = 'Very Comfortable';
             }
           });
         });
     } finally {
       state.events = saved.events;
       state.tests = saved.tests;
-      state.statuses = saved.statuses;
+      simSeen = null;
+      simAreas = null;
     }
     return out;
   }
@@ -14256,6 +15896,27 @@ const Schedule = (() => {
   }
   /* topics moved forward by "Refresh plan" from earlier days, while it re-plans (see refreshPlans) */
   let carryNow = null;
+  /* new questions of each topic already placed on earlier days of the week being planned (see suggestDays) */
+  let simSeen = null;
+  /* minutes of topic work placed per ACS area on the earlier days of the week being planned */
+  let simAreas = null;
+  /* areas under half their fair share so far: fair share = official share × (1 − average chance of a right answer
+     in the area), as a part of all the minutes placed (none before the first day is filled) */
+  function shortAreas(date) {
+    const total = Object.values(simAreas).reduce((a, x) => a + x, 0);
+    if (!total) return [];
+    const need = {};
+    TOPICS.forEach((_, i) => {
+      const sh = examShare(i);
+      need[sh.area] = (need[sh.area] || 0) + sh.share * (1 - chanceAt(srModel(i, date, true), date));
+    });
+    const N = Object.values(need).reduce((a, x) => a + x, 0);
+    /* furthest below its share first; among equals, the biggest fair share first */
+    const gap = a => (simAreas[a] || 0) / total / (need[a] / N);
+    return Object.keys(need)
+      .filter(a => gap(a) < 0.5)
+      .sort((a, b) => gap(a) - gap(b) || need[b] - need[a]);
+  }
   /* minutes from midnight → today's timestamp, and back */
   const clockMs = (date, min) => {
     const d = parse(date);
@@ -14273,7 +15934,7 @@ const Schedule = (() => {
         .reduce((a, x) => Math.max(a, x.checkedAt), 0),
       start = prev && now - prev < 4 * 3600e3 ? prev : clockMs(it.date, it.start);
     const min = (now - start) / 60000;
-    if (min >= 2) notePace(it.i, it.n, min, 'tick');
+    if (min >= 2) notePace(it.i, it.n, min, 'tick', 'answer');
   }
   function refreshPlans() {
     const today = todayISO(),
@@ -14440,7 +16101,7 @@ const {
 } = Schedule;
 
 /* ===== module PlanView (js/views/plan.js) =====
-   public: renderPlanMini, renderPlanPage, renderPlanPt, manualTest, setManualTest */
+   public: whyText, renderPlanMini, renderPlanPage, renderPlanPt, manualTest, setManualTest */
 const PlanView = (() => {
   /* totals of today's list, whatever drives it (a saved plan or the suggestion) */
   function todayList() {
@@ -14470,6 +16131,43 @@ const PlanView = (() => {
         : it.kind === 'custom' || it.kind === 'reflect'
           ? `data-cid="${esc(it.id)}"`
           : `data-q="${it.i}"`;
+  /* why a topic is suggested: the activity, then the main reasons — only what the data supports (a % of unknown
+     sample is never shown as right/total, a share inside an ACS area is marked as estimated).
+     short = the line under the row; full = the tooltip and focus mode (adds the share of the test and the evidence) */
+  function whyParts(it) {
+    if (it.kind !== 'topic' || !it.why) return null;
+    const pct = x => Math.round(x * 100) + '%',
+      R = [];
+    let share = null;
+    it.why.forEach(w => {
+      const f = (k, o) => Object.entries(o || {}).reduce((s, [a, b]) => s.replace('{' + a + '}', b), t(k));
+      if (w.k === 'last') R.push(f(w.src === 'exam' ? 'why_lastExam' : 'why_last', { r: w.right, n: w.total }));
+      else if (w.k === 'lastPct') R.push(f(w.src === 'exam' ? 'why_lastExamPct' : 'why_lastPct', { p: w.p }));
+      else if (w.k === 'sportys') R.push(f('why_sportys', { p: w.p }));
+      else if (w.k === 'examMisses')
+        R.push(
+          f('why_examMisses', { n: w.n }) +
+            (w.tags && w.tags.length ? ' — ' + f('why_tags', { t: w.tags.join(', ') }) : '')
+        );
+      else if (w.k === 'missTags') R.push(f('why_missTags', { t: w.tags.join(', ') }));
+      else if (w.k === 'due') R.push(w.d > 0 ? f('why_dueOver', { d: w.d }) : t('why_due'));
+      else if (w.k === 'mastery') R.push(f('why_mastery', { p: w.p }));
+      else if (w.k === 'idle') R.push(f('why_idle', { d: w.d }));
+      else if (w.k === 'share')
+        share = f(w.est ? 'why_shareEst' : 'why_share', { s: (w.s * 100).toFixed(1).replace(/\.0$/, ''), a: w.area });
+      else R.push(t('why_' + w.k));
+    });
+    const act = it.activity ? t('act_' + it.activity) : '',
+      conf = it.conf ? t('why_conf_' + it.conf) : '';
+    return { act, reasons: R, share, conf };
+  }
+  function whyText(it, full) {
+    const w = whyParts(it);
+    if (!w) return '';
+    const dur = it.min ? fmtMin(it.min) + ' — ' : '',
+      main = dur + (w.act ? w.act + (w.reasons.length ? ': ' : '') : '') + w.reasons.slice(0, full ? 8 : 3).join(', ');
+    return full ? [main, w.share, w.conf].filter(Boolean).join(' · ') : main;
+  }
   const rowName = it => (it.kind === 'topic' || it.kind === 'test' ? planRowName(it) : itemTitle(it));
   const checkBtn = it =>
     it.id
@@ -14499,7 +16197,7 @@ const PlanView = (() => {
       ? P.items
           .map(
             it =>
-              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}${noteBtn(it)}${it.kind === 'topic' && asaShort(it.i) ? `<small class="qasa">${esc(asaShort(it.i))}</small>` : ''}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' || it.kind === 'reflect' || it.kind === 'notes' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
+              `<div class="qrow${it.done ? ' done' : ''}" ${rowAttr(it)} title="${esc(whyText(it, true) || t('reason_' + it.reason))}">${checkBtn(it)}<span class="qt">${it.start != null ? `<small class="qtime">${clockOf(it.start)}</small>` : ''}${esc(rowName(it))}${noteBtn(it)}${it.kind === 'topic' && asaShort(it.i) ? `<small class="qasa">${esc(asaShort(it.i))}</small>` : ''}${it.kind === 'topic' && !it.done && whyText(it) ? `<small class="qwhy">${esc(whyText(it))}</small>` : ''}</span><span class="pq">${it.n ? it.n + ' q' : it.kind === 'custom' || it.kind === 'reflect' || it.kind === 'notes' ? fmtMin(it.min) : ''}</span><span class="rchip ${it.reason}">${esc(t('rs_' + it.reason))}</span></div>`
           )
           .join('')
       : `<div class="muted">${esc(t(fromPlan ? 'planRestDay' : 'allClear'))}</div>`;
@@ -14648,9 +16346,9 @@ const PlanView = (() => {
     closeFcTop();
     goView('sr', 'fc');
   };
-  return { renderPlanMini, renderPlanPage, renderPlanPt, manualTest, setManualTest };
+  return { whyText, renderPlanMini, renderPlanPage, renderPlanPt, manualTest, setManualTest };
 })();
-const { renderPlanMini, renderPlanPage, renderPlanPt, manualTest, setManualTest } = PlanView;
+const { whyText, renderPlanMini, renderPlanPage, renderPlanPt, manualTest, setManualTest } = PlanView;
 
 /* ===== module Charts (js/ui/charts.js) =====
    public: dueText, pct, wavg, hv, SRDAYS, setSrRange, paintSrRange, topicChart, avgChart, legendHTML
@@ -15628,7 +17326,7 @@ const Dialogs = (() => {
       ? list
           .map(
             e =>
-              `<div class="hrow"><span class="k" style="background:${kc(e)}"></span><span>${esc(df.format(parse(e.date)))} · ${esc(t(e.kind))}${e.kind === 'move' && e.to ? ' → ' + esc(label(e.to)) : ''}${e.score != null ? ' · ' + e.score + '%' : ''}${e.partial ? ' · ' + esc(t('inProgress')) : ''}</span>${e.demo ? `<span class="ex">${esc(t('example'))}</span>` : ''}<button type="button" data-del="${e.id}" aria-label="${esc(t('del'))}">×</button></div>`
+              `<div class="hrow"><span class="k" style="background:${kc(e)}"></span><span>${esc(df.format(parse(e.date)))} · ${esc(t(e.kind))}${e.kind === 'move' && e.to ? ' → ' + esc(label(e.to)) : ''}${e.score != null ? ' · ' + e.score + '%' : ''}${e.total ? ` (${e.right}/${e.total})` : ''}${e.attempt && e.attempt !== 'first' ? ' · ' + esc(t('att_' + e.attempt)) : ''}${e.partial ? ' · ' + esc(t('inProgress')) : ''}</span>${e.demo ? `<span class="ex">${esc(t('example'))}</span>` : ''}<button type="button" data-del="${e.id}" aria-label="${esc(t('del'))}">×</button></div>`
           )
           .join('')
       : `<div class="muted">${esc(t('inactive'))}</div>`;
@@ -15646,6 +17344,7 @@ const Dialogs = (() => {
     /* right answers of the questions planned today (editable); typing them fills the score */
     $('#mRight').value = '';
     $('#mOf').value = plannedToday(i) ?? '';
+    $('#mAttempt').value = 'first';
     $('#mScore').placeholder = t('blankInProgress');
     $('#mStatus').innerHTML = STATUS.map(s => `<option value="${esc(s)}">${esc(label(s))}</option>`).join('');
     $('#mStatus').value = state.statuses[i];
@@ -15693,6 +17392,12 @@ const Dialogs = (() => {
     const moving = to !== state.statuses[i];
     const sv = $('#mScore').value.trim(),
       score = sv === '' ? null : Math.max(0, Math.min(100, Math.round(+sv)));
+    /* the sample behind the score, when you typed right answers of N questions (a typed % keeps it unknown) */
+    const rv = $('#mRight').value.trim(),
+      of = Math.round(+$('#mOf').value),
+      counts =
+        score != null && rv !== '' && of > 0 && +rv >= 0 && +rv <= of ? { right: Math.round(+rv), total: of } : {},
+      attempt = $('#mAttempt').value;
     const scoreChanged = score != null && score !== state.scores[i];
     if (mKind === 'none' && !moving && !scoreChanged) {
       toast(t('nothing'));
@@ -15710,8 +17415,11 @@ const Dialogs = (() => {
           score,
           partial: score == null,
           demo: false,
+          ...counts,
+          ...(score != null && ['first', 'repeat', 'after'].includes(attempt) ? { attempt } : {}),
         });
-      if (score != null) state.scores[i] = score;
+      /* the card's score follows a new result, not a retake of the same questions or one after seeing the answers */
+      if (score != null && (attempt === 'first' || mKind === 'none')) state.scores[i] = score;
       if (moving) {
         state.events.push({ id: uid(), date, topic: i, kind: 'move', from: state.statuses[i], to, demo: false });
         state.statuses[i] = to;
@@ -16580,6 +18288,8 @@ const Focus = (() => {
     /* where to find this topic in the other app (ASA Prepware), when that is on in Settings */
     $('#focusAsa').textContent = isTopic ? asaLong(it.i) : '';
     $('#focusAsa').hidden = !$('#focusAsa').textContent;
+    $('#focusWhy').textContent = isTopic ? whyText(it, true) : '';
+    $('#focusWhy').hidden = !$('#focusWhy').textContent;
     $('#focusNotes').hidden = !isTopic;
     if (isTopic) $('#focusNotes').textContent = '📝 ' + t('notesOpen').replace('{n}', notesOf(it.i).length);
     $('#focusDone').textContent = t(isTopic || it.kind === 'test' ? 'focusDone' : 'focusDoneTask');
@@ -16617,7 +18327,9 @@ const Focus = (() => {
     if (!it) return;
     /* the stopwatch is the most exact measure of your pace */
     const min = elapsed() / 60000;
-    if (it.kind === 'topic' && it.n && min >= 2) commit(() => notePace(it.i, it.n, min, 'focus'), t('paceNoted'));
+    /* a block of a plan with times holds the answering only; a row of the suggested list also its review */
+    if (it.kind === 'topic' && it.n && min >= 2)
+      commit(() => notePace(it.i, it.n, min, 'focus', it.id ? 'answer' : 'all'), t('paceNoted'));
     closeFocus(false);
     if (it.kind === 'topic') {
       const m = srModel(it.i);
@@ -17373,6 +19085,165 @@ const PracticeTestsView = (() => {
 })();
 const { scCol, testKpis, renderTsStrip, renderTestsPage, setStat, renderStatTests, renderCal } = PracticeTestsView;
 
+/* ===== module ExamImportView (js/views/exam-import.js) =====
+   public: openExamImport
+   The dialog that brings in a practice test analysed by an AI: paste the JSON (or pick a .json / .txt file), check the
+   preview — every topic can be changed, uncertain classifications are highlighted — and confirm. Nothing changes until
+   you confirm; the import is applied whole or not at all, and the toast offers Undo. */
+const ExamImportView = (() => {
+  const dlg = modal('#exbg', { close: '#exClose' });
+  let raw = null; /* the parsed file, edited in place by the preview */
+  const msg = ([c, p]) =>
+    Object.entries(p || {}).reduce((s, [k, v]) => s.replace('{' + k + '}', esc(String(v))), esc(t(c)));
+  const topicSelect = (val, attrs) =>
+    `<select ${attrs}><option value="">${esc(t('exUnclassified'))}</option>${TOPICS.map(
+      (x, k) => `<option value="${x.id}"${k === val ? ' selected' : ''}>${esc(x.name)}</option>`
+    ).join('')}</select>`;
+  function render() {
+    const box = $('#exPrev');
+    $('#exOk').disabled = true;
+    if (!raw) {
+      box.innerHTML = '';
+      return;
+    }
+    const r = checkExam(raw),
+      d = r.draft,
+      df = new Intl.DateTimeFormat(LOCALE[lang], { year: 'numeric', month: 'short', day: 'numeric' });
+    const head = [
+      d.examId ? `<b>${esc(d.examId)}</b>` : '',
+      d.date && !isNaN(parse(d.date)) ? esc(df.format(parse(d.date))) : '',
+      d.platform ? esc(d.platform) : '',
+      d.mode ? esc(t(d.mode === 'full' ? 'exModeFull' : 'exModeErrors')) : '',
+      esc(t(d.coverage === 'complete' ? 'exCovComplete' : 'exCovPartial')),
+      d.total != null && d.right != null
+        ? `${d.right}/${d.total} (${Math.round((100 * d.right) / d.total)}%)`
+        : d.wrong != null
+          ? esc(t('exWrongOnly').replace('{n}', d.wrong))
+          : esc(t('exNoOverall')),
+    ]
+      .filter(Boolean)
+      .join(' · ');
+    const list = (arr, cls) =>
+      arr.length ? `<ul class="exmsg ${cls}">${arr.map(x => `<li>${msg(x)}</li>`).join('')}</ul>` : '';
+    /* topic results (full mode): from the file's topic rows (editable) or counted from the questions */
+    const rows = Array.isArray(raw.topics) ? raw.topics : [];
+    const topicTable =
+      d.mode === 'full' && (d.topics.length || rows.length)
+        ? `<table class="extab"><thead><tr><th>${esc(t('exTopic'))}</th><th>${esc(t('exRight'))}</th><th>${esc(t('exTotal'))}</th><th>%</th></tr></thead><tbody>${
+            rows.length
+              ? rows
+                  .map((x, k) => {
+                    const i = TOPICS.findIndex(y => y.id === x.topicId || y.name === x.topicId),
+                      pct =
+                        Number.isInteger(x.total) && x.total > 0 && Number.isInteger(x.right)
+                          ? Math.round((100 * x.right) / x.total) + '%'
+                          : '—';
+                    return `<tr><td>${topicSelect(i, `data-row="${k}"`)}</td><td><input type="number" min="0" step="1" data-rk="${k}" data-f="right" value="${x.right ?? ''}"></td><td><input type="number" min="0" step="1" data-rk="${k}" data-f="total" value="${x.total ?? ''}"></td><td>${pct}</td></tr>`;
+                  })
+                  .join('')
+              : d.topics
+                  .map(
+                    x =>
+                      `<tr><td>${esc(TOPICS[x.i].name)}</td><td>${x.right ?? '—'}</td><td>${x.total ?? '—'}</td><td>${x.total ? Math.round((100 * x.right) / x.total) + '%' : '—'}</td></tr>`
+                  )
+                  .join('')
+          }</tbody></table>`
+        : d.mode === 'errors'
+          ? `<p class="muted">${esc(t('exErrorsNote'))}</p>`
+          : '';
+    /* questions: every one can be re-classified; uncertain ones are highlighted */
+    const qs = Array.isArray(raw.questions) ? raw.questions : [];
+    const qTable = qs.length
+      ? `<div class="exqhead">${esc(t('exQuestions').replace('{n}', qs.length))}${r.questions.some(q => q.unsure) ? ` · <span class="exunsure-k">${esc(t('exUnsureN').replace('{n}', r.questions.filter(q => q.unsure).length))}</span>` : ''}</div><div class="exqs">${r.questions
+          .map(
+            (q, k) =>
+              `<div class="exq${q.unsure ? ' unsure' : ''}${q.correct === false ? ' miss' : ''}"><span class="exqn">${esc(q.qid || '#' + q.n)}</span>${topicSelect(q.i, `data-q="${k}"`)}<span class="exqr">${q.correct === true ? '✓' : q.correct === false ? '✗' : '?'}</span>${q.tags.length ? `<small>${esc(q.tags.join(', '))}</small>` : ''}${q.conf != null ? `<small>${Math.round(q.conf * 100)}%</small>` : ''}${q.doubt ? `<small class="exdoubt">${esc(q.doubt)}</small>` : ''}</div>`
+          )
+          .join('')}</div>`
+      : '';
+    box.innerHTML = `<div class="exhead">${head}</div>${list(r.errors, 'err')}${list(r.warnings, 'warn')}${topicTable}${qTable}`;
+    $('#exOk').disabled = !r.exam;
+  }
+  function load(text) {
+    const p = parseExamText(text);
+    raw = p.data || null;
+    if (!raw) {
+      $('#exPrev').innerHTML = p.error ? `<ul class="exmsg err"><li>${esc(t(p.error))}</li></ul>` : '';
+      $('#exOk').disabled = true;
+      return;
+    }
+    render();
+  }
+  function openExamImport() {
+    raw = null;
+    $('#exIn').value = '';
+    $('#exIn').placeholder = t('exPastePh');
+    $('#exFile').value = '';
+    $('#exPrev').innerHTML = '';
+    $('#exOk').disabled = true;
+    dlg.open('#exIn');
+  }
+  $('#exIn').addEventListener('input', () => load($('#exIn').value));
+  $('#exFile').addEventListener('change', () => {
+    const f = $('#exFile').files[0];
+    if (!f) return;
+    f.text().then(txt => {
+      $('#exIn').value = txt;
+      load(txt);
+    });
+  });
+  /* edits in the preview go back into the parsed file, then everything is checked again */
+  $('#exPrev').addEventListener('change', e => {
+    const el = e.target;
+    if (!raw) return;
+    if (el.dataset.q != null) {
+      const q = raw.questions[+el.dataset.q];
+      q.topicId = el.value || null;
+      if (el.value) q.classificationConfidence = 1; /* you chose it */
+      q.doubt = el.value ? null : q.doubt;
+    } else if (el.dataset.row != null) raw.topics[+el.dataset.row].topicId = el.value || null;
+    else if (el.dataset.rk != null) {
+      const v = el.value.trim();
+      raw.topics[+el.dataset.rk][el.dataset.f] = v === '' ? null : Math.round(+v);
+      const row = raw.topics[+el.dataset.rk];
+      if (Number.isInteger(row.total) && Number.isInteger(row.right)) row.wrong = row.total - row.right;
+    }
+    $('#exIn').value = JSON.stringify(raw, null, 2);
+    render();
+  });
+  $('#exOk').onclick = () => {
+    const r = raw && checkExam(raw),
+      next = r && r.exam && applyExam(r.exam);
+    if (!next) {
+      toast(t('exFailed'));
+      return;
+    }
+    dlg.close();
+    commit(
+      () => {
+        state = next;
+      },
+      t('exDone').replace('{id}', r.exam.examId)
+    );
+  };
+  $('#exCancel').onclick = () => dlg.close();
+  $('#exPrompt').onclick = async () => {
+    const txt = examPrompt();
+    try {
+      await navigator.clipboard.writeText(txt);
+      toast(t('exPromptCopied'));
+    } catch (e) {
+      /* no clipboard (file:// in some browsers): show it in the box to copy by hand */
+      $('#exIn').value = txt;
+      $('#exIn').select();
+      toast(t('exPromptShown'));
+    }
+  };
+  $('#tsImport').onclick = () => openExamImport();
+  return { openExamImport };
+})();
+const { openExamImport } = ExamImportView;
+
 /* ===== module HeatMap (js/views/heatmap.js) =====
    public: heatAt, heatData, heatColor, renderHeat, openHeat, closeHeat
    shared state (getter/setter): heatRange */
@@ -17400,9 +19271,10 @@ const HeatMap = (() => {
   function heatAt(i, d) {
     const m = srModel(i, d);
     if (!m.reps.length) return null;
+    /* the same chance as the forecast: estimated mastery × recall + 1/3 × (1 − recall); score = the last result */
     const R = m.R,
       sc = m.reps[m.reps.length - 1].p;
-    return { heat: Math.round(100 * pRight(sc, R)), R, score: sc };
+    return { heat: Math.round(100 * chanceAt(m, d)), R, score: sc };
   }
   function heatData(range) {
     const H = HEAT_R[range || heatRange],
@@ -19804,7 +21676,7 @@ const SelfTest = (() => {
         { date: D(2), topic: 22, kind: 'study', score: 80 },
         { date: D(0), topic: 22, kind: 'review', score: 65 },
       ]);
-      ok('SR update', 'score 60–69: S ← S × 1.2', near(S(22).S, 1.8), S(22).S);
+      ok('SR update', 'score 60–69: S stays (a weak result never lengthens the interval)', near(S(22).S, 1.5), S(22).S);
       fixture([
         { date: D(20), topic: 22, kind: 'study', score: 90 },
         { date: D(15), topic: 22, kind: 'review', score: 95 },
@@ -19857,8 +21729,8 @@ const SelfTest = (() => {
       ]);
       ok(
         'SR sessions',
-        'same day: one session, best score wins',
-        S(22).reps.length === 1 && near(S(22).S, 2),
+        'same day: one review, the FIRST attempt counts (not the best score)',
+        S(22).reps.length === 1 && near(S(22).S, 1),
         `${S(22).reps.length} reps, S ${S(22).S}`
       );
       fixture([{ date: D(0), topic: 22, kind: 'study', partial: true }]);
@@ -19914,8 +21786,8 @@ const SelfTest = (() => {
         const r = srAll();
         ok(
           'SR priority',
-          'same recall: Not Comfortable ranks above Very Comfortable',
-          r.findIndex(m => m.i === 13) < r.findIndex(m => m.i === 12)
+          'same results: the topic with the bigger share of the test ranks first (Cross-Country above Human Factors)',
+          examShare(12).share > examShare(13).share && r.findIndex(m => m.i === 12) < r.findIndex(m => m.i === 13)
         );
       }
       fixture([
@@ -20077,14 +21949,18 @@ const SelfTest = (() => {
       state.scores = TOPICS.map(() => 80);
       {
         const f = forecast();
-        ok('Forecast', 'every topic 80%, no sessions → expected 80%', near(f.mu, 0.8), f.mu);
+        /* p̄ = 28 topics at 80% (15 questions each) pulled toward 50% by 30 questions; each topic toward p̄ by 4 of 19 */
+        const pb = (28 * 15 * 0.8 + 15) / (28 * 15 + 30);
         ok(
           'Forecast',
-          'topic weights sum to 1',
-          near(
-            f.parts.reduce((a, x) => a + x.w, 0),
-            1
-          )
+          'every topic 80%, no sessions → about 80% (each pulled a little toward your overall level)',
+          near(f.mu, (15 * 0.8 + 4 * pb) / 19),
+          f.mu
+        );
+        ok(
+          'Forecast',
+          'topic weights + the unmapped areas (VIII, XII) sum to 1',
+          near(f.parts.reduce((a, x) => a + x.w, 0) + f.unmapped, 1) && near(f.unmapped, 0.09)
         );
       }
       fixture([]);
@@ -20094,11 +21970,16 @@ const SelfTest = (() => {
       state.scores = TOPICS.map(() => 50);
       state.scores[18] = 100;
       {
-        const w = 158 / 1125;
+        /* p̄ (overall level) = 27 topics at 50% and Weather at 100%, 15 questions each, pulled toward 50% by 30 questions;
+           each topic is pulled toward p̄ by 4 of 19 questions */
+        const w = examShare(18).share / EXAM_SHARE.mapped,
+          pb = (27 * 15 * 0.5 + 15 + 15) / (28 * 15 + 30),
+          mo = (15 * 0.5 + 4 * pb) / 19,
+          mw = (15 + 4 * pb) / 19;
         ok(
           'Forecast',
-          'Weather at 100% (just studied) raises μ by its weight × 50%',
-          near(forecast().mu, 0.5 + w * 0.5),
+          'Weather at 100% (just studied, unknown sample) raises μ by its share × the gap to the other topics',
+          near(forecast().mu, mo + w * (mw - mo)),
           forecast().mu
         );
       }
@@ -20108,11 +21989,14 @@ const SelfTest = (() => {
       {
         const f = forecast(),
           R = recall(10, 2),
-          w = 158 / 1125;
+          w = examShare(18).share / EXAM_SHARE.mapped,
+          pb = (27 * 15 * 0.5 + 15 + 15) / (28 * 15 + 30),
+          mo = (15 * 0.5 + 4 * pb) / 19,
+          mw = (15 + 4 * pb) / 19;
         ok(
           'Forecast',
-          'recall decay pulls the topic toward guessing: score × recall + 1/3 × (1 − recall)',
-          near(f.mu, 0.5 + w * (R + (1 - R) / 3 - 0.5)),
+          'recall decay pulls the topic toward guessing: mastery × recall + 1/3 × (1 − recall)',
+          near(f.mu, mo + w * (mw * R + (1 - R) / 3 - mo)),
           f.mu
         );
       }
@@ -20133,8 +22017,8 @@ const SelfTest = (() => {
       ok(
         'Forecast',
         'with ±6 points of uncertainty (beta-binomial) μ=70% → 55.5% (matches scipy betabinom)',
-        near(forecast().pass, 0.555047, 1e-4),
-        forecast().pass
+        near(betaBinomTail(60, 0.7, 6, 42), 0.555047, 1e-4),
+        betaBinomTail(60, 0.7, 6, 42)
       );
       ok(
         'Forecast',
@@ -20150,7 +22034,11 @@ const SelfTest = (() => {
       {
         const f = forecast(),
           top = f.parts.slice().sort((a, b) => b.lost - a.lost)[0];
-        ok('Forecast', 'biggest loss = biggest topic when all scores equal (Weather)', top.i === 18);
+        ok(
+          'Forecast',
+          'biggest loss = biggest share of the test when all scores are equal (Approach and Landing, area IV)',
+          top.i === 26
+        );
       }
       fixture([{ date: D(3), topic: 18, kind: 'study', score: 40 }]);
       state.scores[18] = 40;
@@ -20222,18 +22110,19 @@ const SelfTest = (() => {
       }
       {
         const P = buildPlan(),
-          U = { due: 1.3, weak: 1.15, nodata: 1.1, new: 1, light: 0.8 },
-          v = P.items.filter(x => x.kind === 'topic' && !x.done).map(x => ((1 - x.pExam) * (U[x.reason] || 1)) / x.per);
+          v = P.items.filter(x => x.kind === 'topic' && !x.done).map(x => x.value / (x.n * x.per));
         ok(
           'Plan',
-          'medium plan is ordered by exam questions at stake per minute',
+          'medium plan is ordered by test questions at risk per minute',
           v.every((x, k) => !k || v[k - 1] >= x - 1e-12),
           v.map(x => x.toFixed(3)).join(' ')
         );
         ok(
           'Plan',
-          'each topic shows the exam-day questions at stake = 60 × n / 1,125 × (1 − p on exam day)',
-          P.items.filter(x => x.kind === 'topic' && x.n).every(x => near(x.stake, ((60 * x.n) / 1125) * (1 - x.pExam)))
+          'each topic shows the test questions at risk = 60 × official share × part of its session × (1 − p on exam day)',
+          P.items
+            .filter(x => x.kind === 'topic' && x.n)
+            .every(x => near(x.stake, 60 * examShare(x.i).share * Math.min(1, x.n / x.nRef) * (1 - x.pExam)))
         );
       }
       ok(
@@ -20248,21 +22137,25 @@ const SelfTest = (() => {
         const P = buildPlan(),
           it = P.items.find(x => x.i === 18),
           m = srModel(18, T, true),
-          last = m.reps[m.reps.length - 1].p,
+          last = m.mastery * 100,
           base = last >= GOAL ? 15 : last >= 75 ? 20 : last >= 70 ? 25 : 40,
           exp = Math.min(158, Math.max(10, Math.min(40, Math.round(base * (1 + Math.max(0, 1 - m.R))))));
         ok(
           'Plan',
-          'review size follows the last score (sample when good, full session when not) and what was forgotten',
+          'review size follows the estimated mastery (sample when good, full session when not) and what was forgotten',
           it.n === exp,
           `${it.n} vs ${exp}`
         );
         ok(
           'Plan',
           'a review is never more than one 40-question session, and smaller after a good score',
-          reviewSize(18, { reps: [{ p: 90 }], R: 0.9 }) < reviewSize(18, { reps: [{ p: 60 }], R: 0.9 }) &&
-            reviewSize(18, { reps: [{ p: 60 }], R: 0.2 }) === 40,
-          [reviewSize(18, { reps: [{ p: 90 }], R: 0.9 }), reviewSize(18, { reps: [{ p: 60 }], R: 0.9 })].join()
+          reviewSize(18, { reps: [{ p: 90 }], mastery: 0.9, R: 0.9 }) <
+            reviewSize(18, { reps: [{ p: 60 }], mastery: 0.6, R: 0.9 }) &&
+            reviewSize(18, { reps: [{ p: 60 }], mastery: 0.6, R: 0.2 }) === 40,
+          [
+            reviewSize(18, { reps: [{ p: 90 }], mastery: 0.9, R: 0.9 }),
+            reviewSize(18, { reps: [{ p: 60 }], mastery: 0.6, R: 0.9 }),
+          ].join()
         );
       }
       fixture([], { settings: { minutes: 180, qph: 40, tests: 2 } });
@@ -20384,7 +22277,7 @@ const SelfTest = (() => {
           { date: D(5), topic: 13, kind: 'study', score: 95 },
           { date: D(5), topic: 12, kind: 'study', score: 92 },
         ],
-        { settings: { minutes: 120, qph: 40, tests: 2, reviewMin: 1.5 } }
+        { settings: { minutes: 180, qph: 40, tests: 2, reviewMin: 1.5 } }
       );
       {
         const L = buildPlan(T, null, 'low'),
@@ -20403,29 +22296,40 @@ const SelfTest = (() => {
         ok('Energy', 'high energy starts with the practice test', H.items[0].kind === 'test');
         ok(
           'Energy',
-          'workload: low < medium ≤ high',
-          L.workload < Mm.workload && Mm.workload <= H.workload,
-          `${L.workload} ${Mm.workload} ${H.workload}`
+          'low energy works in smaller chunks (at most 20 questions), high in up to 40',
+          L.items.every(x => x.kind !== 'topic' || x.done || x.n <= 20) &&
+            H.items.every(x => x.kind !== 'topic' || x.done || x.n <= 40)
         );
         const firstTopic = P => P.items.find(x => x.kind === 'topic' && !x.done);
         ok(
           'Energy',
           'low energy starts with an easy item (higher chance of being right than high energy)',
-          firstTopic(L).p > firstTopic(H).p,
+          firstTopic(L).p >= firstTopic(H).p,
           `${firstTopic(L).p} vs ${firstTopic(H).p}`
         );
-        ok('Energy', 'high energy plans more time (stretch 10%) and goes faster', H.budget > Mm.budget);
+        ok(
+          'Energy',
+          'energy never changes the time you gave (no stretch): the same budget for all three',
+          L.budget === Mm.budget && H.budget === Mm.budget,
+          `${L.budget} ${Mm.budget} ${H.budget}`
+        );
         ok(
           'Energy',
           'every plan fits its minutes',
           L.minutes <= L.budget && Mm.minutes <= Mm.budget && H.minutes <= H.budget,
           `${L.minutes}/${L.budget} ${Mm.minutes}/${Mm.budget} ${H.minutes}/${H.budget}`
         );
-        ok(
-          'Energy',
-          'low energy may include light reviews of topics you know',
-          L.items.every(x => x.reason !== 'light' || state.statuses[x.i] === 'Very Comfortable')
-        );
+        {
+          const mf = (i, m, p) => minutesSplit(i, settings(), m, p),
+            cl = topicCands(T, { mode: 'low', minutesFor: mf }).find(x => x.i === 18),
+            ch = topicCands(T, { mode: 'high', minutesFor: mf }).find(x => x.i === 18);
+          ok(
+            'Energy',
+            'low energy keeps the weak topic (Weather at 30%) with the same value, as guided examples instead of a timed set',
+            cl && ch && cl.activity === 'guided' && ch.activity === 'concept' && near(cl.risk, ch.risk),
+            JSON.stringify([cl && cl.activity, ch && ch.activity])
+          );
+        }
         ok(
           'Energy',
           'medium = the standard plan (default)',
@@ -20814,9 +22718,11 @@ const SelfTest = (() => {
           m = srModel(5, T);
         ok(
           'Heat map',
-          'heat = chance of a right answer = score × recall + 1/3 × (1 − recall)',
-          h && h.heat === Math.round(100 * (0.8 * m.R + (1 - m.R) / 3)),
-          h
+          "heat = chance of a right answer = mastery × recall + 1/3 × (1 − recall) (the forecast's number)",
+          h &&
+            h.heat === Math.round(100 * (m.mastery * m.R + (1 - m.R) / 3)) &&
+            h.heat === Math.round(100 * chanceAt(m, T)),
+          JSON.stringify(h)
         );
       }
       ok('Heat map', 'a forgotten topic never goes below guessing (≈ 33)', Math.round(100 * pRight(90, 0)) === 33);
@@ -21319,7 +23225,7 @@ const GistSync = (() => {
             : 'error'
     );
   }
-  /* merge two copies: events, tests, plans, your own cards and error notes are united by id (the newer copy wins for the same id, deleted ids stay deleted);
+  /* merge two copies: events, tests, plans, your own cards, error notes and imported tests are united by id (the newer copy wins for the same id, deleted ids stay deleted);
    everything else (lists, scores, settings, exam date, plan of the day) comes from the newer copy */
   function mergeStates(a, b) {
     const [n, o] = a.updatedAt >= b.updatedAt ? [a, b] : [b, a],
@@ -21340,6 +23246,7 @@ const GistSync = (() => {
       cards: un(n.cards || [], o.cards || []),
       notes: un(n.notes || [], o.notes || []),
       paces: un(n.paces || [], o.paces || []),
+      exams: un(n.exams || [], o.exams || []),
       deleted: del,
       updatedAt: Math.max(a.updatedAt, b.updatedAt),
     });

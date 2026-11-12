@@ -4,6 +4,7 @@
 const PracticeTestModel = (() => {
   /* ===== practice tests: blended score, regression, calibration, cadence =====
    blended score = (1 − w) × question-bank model + w × age-weighted average of the last 3 scored practice tests
+                   (the model part leaves out the topic results of those same tests when they were imported)
                    test weight 0.5^(age / half-life), half-life from Settings (default 10 days),  W = sum of the weights,  w = W / (W + 2)
    pass / 85% chances: beta-binomial around the blended score (model error and test spread combined).
    trend         = least-squares line  score = a + b × day   (R² = 1 − SSres / SStot), shown from 4 scored tests
@@ -13,7 +14,7 @@ const PracticeTestModel = (() => {
   const TEST_Q = 60;
   function scoredTests(upTo) {
     return (state.tests || [])
-      .filter(x => x.score != null && (!upTo || x.date <= upTo))
+      .filter(x => x.score != null && !x.proj && (!upTo || x.date <= upTo))
       .slice()
       .sort((a, b) => a.date.localeCompare(b.date));
   }
@@ -32,9 +33,12 @@ const PracticeTestModel = (() => {
   };
   function blended(asOf) {
     asOf = asOf || todayISO();
-    const f = forecast(asOf),
-      last = scoredTests(asOf).slice(-3),
-      n = last.length;
+    const last = scoredTests(asOf).slice(-3),
+      n = last.length,
+      /* an imported test feeds both its overall score and the topic results: here only the overall score counts (the
+         model part leaves out the topic results of the tests averaged below), so one test is never two observations */
+      skip = new Set(last.filter(x => x.exam).map(x => x.exam)),
+      f = forecast(asOf, null, skip);
     if (!n) return { ...f, model: f.mu, testsAvg: null, n: 0, w: 0, W: 0 };
     /* each of the last 3 tests weighs 0.5^(age in days / 10): yesterday ≈ 0.93, three weeks ago ≈ 0.23 */
     const om = last.map(x => Math.pow(0.5, Math.max(0, diffDays(x.date, asOf)) / pref('halfLife'))),
@@ -117,7 +121,7 @@ const PracticeTestModel = (() => {
     return { n: pts.length, pts, reg, base, from, cross, exam, list, proj };
   }
   function calibration() {
-    const pts = scoredTests().map(x => [forecastMu(x.date).mu * 100, x.score]);
+    const pts = scoredTests().map(x => [forecastMu(x.date, null, x.exam ? new Set([x.exam]) : null).mu * 100, x.score]);
     const reg = pts.length >= 2 ? linReg(pts) : null,
       bias = pts.length ? pts.reduce((a, p) => a + (p[1] - p[0]), 0) / pts.length : null;
     const l5 = pts.slice(-5),
@@ -142,7 +146,18 @@ const PracticeTestModel = (() => {
   let _rec = null;
   function forecastRecord() {
     const all = scoredTests(),
-      key = todayISO() + '|' + JSON.stringify(all) + '|' + state.events.length + '|' + state.scores.join() + '|' + GOAL;
+      key =
+        todayISO() +
+        '|' +
+        JSON.stringify(all) +
+        '|' +
+        state.events.length +
+        '|' +
+        state.scores.join() +
+        '|' +
+        (state.exams || []).length +
+        '|' +
+        GOAL;
     if (_rec && _rec.k === key) return _rec.v;
     const rows = all.map(x => {
       const b = blended(addDays(x.date, -1));

@@ -407,3 +407,127 @@
     text-overflow: ellipsis;
   }
 }
+/* importing a practice test analysed by an AI */
+.tsbtns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.modal.exmodal {
+  width: min(760px, 100%);
+}
+.exsrc {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+.exfile {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line2);
+  cursor: pointer;
+  font-size: 13px;
+}
+.exfile input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+#exIn {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  background: var(--panel2);
+  color: var(--ink);
+  border: 1px solid var(--line2);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font:
+    12.5px/1.4 ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
+}
+#exPrev {
+  margin: 10px 0;
+  max-height: 46vh;
+  overflow: auto;
+  font-size: 13px;
+}
+.exhead {
+  margin-bottom: 6px;
+}
+.exmsg {
+  margin: 6px 0;
+  padding-left: 18px;
+}
+.exmsg.err {
+  color: #ff9c95;
+}
+.exmsg.warn {
+  color: #f5c46b;
+}
+.extab {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 6px 0;
+}
+.extab th,
+.extab td {
+  text-align: left;
+  padding: 3px 4px;
+  border-bottom: 1px solid var(--line2);
+}
+.extab input {
+  width: 4.5em;
+}
+.extab select,
+.exq select {
+  max-width: 100%;
+  min-width: 0;
+}
+.exqhead {
+  margin: 8px 0 4px;
+  font-weight: 600;
+}
+.exunsure-k {
+  color: #f5c46b;
+}
+.exqs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.exq {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--panel2);
+}
+.exq.unsure {
+  outline: 1px solid #f5c46b;
+}
+.exq small {
+  color: var(--muted);
+}
+.exq .exdoubt {
+  color: #f5c46b;
+  flex-basis: 100%;
+}
+.exqn {
+  min-width: 3em;
+  font-weight: 600;
+}
+.exqr {
+  width: 1.2em;
+  text-align: center;
+}
