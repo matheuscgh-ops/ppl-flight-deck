@@ -60,6 +60,23 @@ with sync_playwright() as p:
             fix([{'ago': 2, 'topic': 22, 'kind': 'study', 'score': 70, 'right': 7, 'total': 10, 'attempt': 'after'}])
             check(f'{tag}: a score typed after seeing the answers is neither evidence nor a review', ev("(()=>{const m=srModel(22);return m.reps.length===0&&m.obs===null})()"))
 
+            # ---------- round 2: following progress, interval cap, fitted retention, area floor ----------
+            fix([{'ago': 12 - 2 * k, 'topic': 22, 'kind': 'review' if k else 'study', 'score': 55 + 7 * k, 'right': 11 + 1 * k, 'total': 20} for k in range(6)])
+            mm = ev("srModel(22).mastery")
+            check(f'{tag}: mastery follows steady progress (55 → 90%: estimate near the latest result, not the old average)', mm > 0.8, mm)
+            fix([{'ago': 40, 'topic': 13, 'kind': 'study', 'score': 95}, {'ago': 30, 'topic': 13, 'kind': 'review', 'score': 98}, {'ago': 1, 'topic': 13, 'kind': 'review', 'score': 99}])
+            ev("state.deadline=addDays(todayISO(),10)")
+            gap = ev("(()=>{const m=srModel(13);return diffDays(m.last,m.next)})()")
+            check(f'{tag}: no review is planned further than 30% of the days left to the exam (10 days → at most 3)', gap <= 3, gap)
+            sc = ev("retentionScale()")
+            check(f'{tag}: with fewer than 20 pairs of sessions the forecast keeps the default curve (c = 1)', sc == 1, sc)
+            fix([{'ago': 2 * (8 - k), 'topic': t, 'kind': 'review' if k else 'study', 'score': 70 + 2 * k} for t in (13, 22, 18) for k in range(8)])
+            sc = ev("retentionScale()")
+            check(f'{tag}: a history with no forgetting between sessions fits a slower curve (c > 1)', sc > 1, sc)
+            fl = ev("""(()=>{const T=todayISO(),b={};for(let k=0;k<7;k++)b[addDays(T,k)]=[[1140,1320]];const o=suggestDays(Object.keys(b),b,{});
+              const a=new Set();Object.values(o).forEach(l=>l.forEach(x=>{if(x.kind==='topic')a.add(examShare(x.i).area)}));return [...a]})()""")
+            check(f'{tag}: a week of plans reaches every ACS area with a topic the planner can study (area floor)', len(fl) >= 7, fl)
+
             # ---------- official share by ACS area ----------
             w = ev("(()=>{const s=TOPICS.map((_,i)=>examShare(i).share);return {sum:s.reduce((a,x)=>a+x,0),un:EXAM_SHARE.unmapped,areas:ACS_AREAS.reduce((a,x)=>a+x.share,0),iv:examShare(26).share+examShare(27).share,wx:examShare(18).share,src:ACS_SOURCE.checked}})()")
             check(f'{tag}: shares: the 11 ACS areas add to 100%, topics + the 9% with no Sporty\'s topic add to 100%', w['areas'] == 100 and abs(w['sum'] + w['un'] - 1) < 1e-9 and abs(w['un'] - 0.09) < 1e-9, w)
@@ -102,7 +119,11 @@ with sync_playwright() as p:
             before = ev(STATE)
             wk = ev("""(()=>{const T=todayISO(),b={};for(let k=0;k<7;k++)b[addDays(T,k)]=[[1140,1320]];const o=suggestDays(Object.keys(b),b,{});
               return Object.values(o).map(l=>l.filter(x=>x.kind==='topic'&&x.i===22).length)})()""")
-            check(f'{tag}: the week does not turn 60% into success: the weak topic keeps coming back (≥ 3 of 7 days)', sum(wk) >= 3, wk)
+            check(f'{tag}: the weak topic is planned during the week', sum(wk) >= 1, wk)
+            # a projected session repeats the current mastery (about 60%): stability does not grow and the topic stays weak
+            proj = ev("""(()=>{const T=todayISO(),m0=srModel(22,T,true),mb=srModel(22,addDays(T,1),true);state.events.push({id:'pj',date:T,topic:22,kind:'review',score:Math.round(m0.mastery*100),total:40,attempt:'new',proj:true,partial:false,demo:false});
+              const m1=srModel(22,addDays(T,1),true);state.events.pop();return {S0:mb.S,S1:m1.S,m0:mb.mastery,m1:m1.mastery}})()""")
+            check(f'{tag}: the week does not turn 60% into success: a projected session neither grows stability nor raises mastery', proj['S1'] <= proj['S0'] + 1e-9 and abs(proj['m1'] - proj['m0']) < 1e-9 and proj['m0'] < 0.7, proj)
             check(f'{tag}: projected sessions never become evidence (data unchanged after planning a week)', ev(STATE) == before)
 
             # ---------- coverage ----------

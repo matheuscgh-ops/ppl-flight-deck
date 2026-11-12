@@ -11675,19 +11675,19 @@ const Translations = (() => {
   /* planner v2: the "How it is calculated" texts follow the new model */
   Object.assign(I18N.en, {
     formula:
-      "<p>A simplified model inspired by FSRS / SM-2. It keeps four things apart: the <b>observed result</b> (right / total), the estimated <b>mastery</b>, the <b>confidence</b> in it and the estimated <b>recall</b> today — a model, not a measurement of your memory. Moving a card is not a session.</p><pre>Evidence:   each result p with its sample n (a % alone: unknown → weighs as 15)\n            first try ×1 · repeat of the same questions ×0.3 · after seeing the answers ×0\nMastery:    m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4),  w = attempt × 0.5^(age/45 d),  p̄ = your overall level\nConfidence: effective questions: low &lt; 10 · medium &lt; 30 · high ≥ 30\n\nRecall after t days:     R(t) = 1 / (1 + t / (9·S))\nFirst review:            S = 1 day (&lt; 70%) · 1.5 (70–84%) · 2 (≥ 85%)\nLater review (the day's FIRST attempt, recall R then):\n  p ≥ 70%   →  target S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  target S              (a weak result never lengthens the interval)\n  p &lt; 60%   →  target max(1, 0.4 × S)\n  S moves toward the target by min(1, n/15) × attempt weight\nUnder 8 questions (or the whole topic if smaller) is evidence, not a review.\n\nNext review = when R falls to {RV}% (Settings): last review + 9·S·(1/r − 1) days\nOrder of the lists = test questions at risk now: 60 × share × (1 − p), × 1.2 when due</pre><p>Reviewing a little later, once recall has dropped, grows S more than reviewing right away — the spacing effect. The white line is the recall you would still have on exam day if you stopped reviewing.</p>",
+      "<p>A simplified model inspired by FSRS / SM-2. It keeps four things apart: the <b>observed result</b> (right / total), the estimated <b>mastery</b>, the <b>confidence</b> in it and the estimated <b>recall</b> today — a model, not a measurement of your memory. Moving a card is not a session.</p><pre>Evidence:   each result p with its sample n (a % alone: unknown → weighs as 15)\n            first try ×1 · repeat of the same questions ×0.3 · after seeing the answers ×0\nMastery:    m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4),  w = attempt × 0.15^(later sessions),  p̄ = your overall level\nConfidence: effective questions: low &lt; 10 · medium &lt; 30 · high ≥ 30\n\nRecall after t days:     R(t) = 1 / (1 + t / (9·S))\nFirst review:            S = 1 day (&lt; 70%) · 1.5 (70–84%) · 2 (≥ 85%)\nLater review (the day's FIRST attempt, recall R then):\n  p ≥ 70%   →  target S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  target S              (a weak result never lengthens the interval)\n  p &lt; 60%   →  target max(1, 0.4 × S)\n  S moves toward the target by min(1, n/15) × attempt weight\nUnder 8 questions (or the whole topic if smaller) is evidence, not a review.\n\nNext review = when R falls to {RV}% (Settings): last review + 9·S·(1/r − 1) days,\n              at most 30% of the days left to the exam\nOrder of the lists = test questions at risk now: 60 × share × (1 − p), × 1.2 when due</pre><p>Reviewing a little later, once recall has dropped, grows S more than reviewing right away — the spacing effect. The white line is the recall you would still have on exam day if you stopped reviewing.</p>",
     fcFormula:
       "p(topic) = mastery × recall + 1/3 × (1 − recall)      (no result yet → your overall level)\nshare(topic) = its ACS area's official share, split inside the area by bank size\nunmapped areas (VIII, XII: 9%) → the average of the others\nexpected score μ = Σ share × p + 9% × average\nright answers X ~ BetaBinomial(60, μ, ± model error)\nchance to pass = P(X ≥ 42)   ·   chance of {G}% = P(X ≥ {GN})\nLost questions (topic) = 60 × share × (1 − p)",
   });
   Object.assign(I18N.pt, {
     formula:
-      '<p>Modelo simplificado inspirado em FSRS / SM-2. Separa quatro coisas: o <b>resultado observado</b> (acertos / total), o <b>domínio</b> estimado, a <b>confiança</b> nele e a <b>retenção</b> estimada hoje — um modelo, não uma medição da sua memória. Mover um card não é sessão.</p><pre>Evidência:  cada resultado p com a amostra n (só %: desconhecida → pesa como 15)\n            primeira tentativa ×1 · repetição das mesmas questões ×0,3 · depois de ver as respostas ×0\nDomínio:    m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4),  w = tentativa × 0,5^(idade/45 d),  p̄ = seu nível geral\nConfiança:  questões efetivas: baixa &lt; 10 · média &lt; 30 · alta ≥ 30\n\nRetenção após t dias:    R(t) = 1 / (1 + t / (9·S))\nPrimeira revisão:        S = 1 dia (&lt; 70%) · 1,5 (70–84%) · 2 (≥ 85%)\nRevisão seguinte (a PRIMEIRA tentativa do dia, retenção R naquele momento):\n  p ≥ 70%   →  alvo S × (1 + 1,2 × p/100 × (1,5 − R))\n  60–69%    →  alvo S                (resultado fraco nunca aumenta o intervalo)\n  p &lt; 60%   →  alvo max(1; 0,4 × S)\n  S anda até o alvo na proporção min(1; n/15) × peso da tentativa\nMenos de 8 questões (ou o tópico inteiro, se menor) é evidência, não revisão.\n\nPróxima revisão = quando R cai para {RV}% (Ajustes): última revisão + 9·S·(1/r − 1) dias\nOrdem das listas = questões da prova em risco agora: 60 × peso × (1 − p), × 1,2 se vencida</pre><p>Revisar um pouco depois, quando a retenção já caiu, aumenta mais o S do que revisar logo em seguida — o efeito de espaçamento. A linha branca é a retenção que você ainda teria no dia da prova se parasse de revisar.</p>',
+      '<p>Modelo simplificado inspirado em FSRS / SM-2. Separa quatro coisas: o <b>resultado observado</b> (acertos / total), o <b>domínio</b> estimado, a <b>confiança</b> nele e a <b>retenção</b> estimada hoje — um modelo, não uma medição da sua memória. Mover um card não é sessão.</p><pre>Evidência:  cada resultado p com a amostra n (só %: desconhecida → pesa como 15)\n            primeira tentativa ×1 · repetição das mesmas questões ×0,3 · depois de ver as respostas ×0\nDomínio:    m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4),  w = tentativa × 0,15^(sessões posteriores),  p̄ = seu nível geral\nConfiança:  questões efetivas: baixa &lt; 10 · média &lt; 30 · alta ≥ 30\n\nRetenção após t dias:    R(t) = 1 / (1 + t / (9·S))\nPrimeira revisão:        S = 1 dia (&lt; 70%) · 1,5 (70–84%) · 2 (≥ 85%)\nRevisão seguinte (a PRIMEIRA tentativa do dia, retenção R naquele momento):\n  p ≥ 70%   →  alvo S × (1 + 1,2 × p/100 × (1,5 − R))\n  60–69%    →  alvo S                (resultado fraco nunca aumenta o intervalo)\n  p &lt; 60%   →  alvo max(1; 0,4 × S)\n  S anda até o alvo na proporção min(1; n/15) × peso da tentativa\nMenos de 8 questões (ou o tópico inteiro, se menor) é evidência, não revisão.\n\nPróxima revisão = quando R cai para {RV}% (Ajustes): última revisão + 9·S·(1/r − 1) dias,\n                  no máximo 30% dos dias até a prova\nOrdem das listas = questões da prova em risco agora: 60 × peso × (1 − p), × 1,2 se vencida</pre><p>Revisar um pouco depois, quando a retenção já caiu, aumenta mais o S do que revisar logo em seguida — o efeito de espaçamento. A linha branca é a retenção que você ainda teria no dia da prova se parasse de revisar.</p>',
     fcFormula:
       'p(tópico) = domínio × retenção + 1/3 × (1 − retenção)      (sem resultado → seu nível geral)\npeso(tópico) = % oficial da área ACS, dividido dentro da área pelo tamanho do banco\náreas sem tópico (VIII, XII: 9%) → média dos outros\nnota esperada μ = Σ peso × p + 9% × média\nacertos X ~ BetaBinomial(60, μ, ± erro do modelo)\nchance de passar = P(X ≥ 42)   ·   chance de {G}% = P(X ≥ {GN})\nQuestões perdidas (tópico) = 60 × peso × (1 − p)',
   });
   Object.assign(I18N.ja, {
     formula:
-      '<p>FSRS／SM-2を参考にした簡易モデルです。4つを区別します：<b>観測した結果</b>（正解数／問題数）、推定<b>習熟度</b>、その<b>信頼度</b>、今日の推定<b>保持率</b> — 記憶の測定ではなくモデルです。カードの移動はセッションに数えません。</p><pre>根拠:     各結果 p と問題数 n（%のみ：不明 → 15として扱う）\n          初回 ×1 · 同じ問題の繰り返し ×0.3 · 答えを見た後 ×0\n習熟度:   m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4),  w = 取り組み × 0.5^(経過/45日),  p̄ = 全体の水準\n信頼度:   実効問題数：低 &lt; 10 · 中 &lt; 30 · 高 ≥ 30\n\nt日後の保持率:   R(t) = 1 / (1 + t / (9·S))\n初回の復習:      S = 1日（70%未満）· 1.5（70–84%）· 2（85%以上）\n2回目以降（その日の最初の取り組み、その時点の保持率R）:\n  p ≥ 70%   →  目標 S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  目標 S              （弱い結果で間隔は延びない）\n  p &lt; 60%   →  目標 max(1, 0.4 × S)\n  Sは min(1, n/15) × 取り組みの重み の割合で目標へ動く\n8問未満（トピック全体がそれより少なければ全体）は根拠であって復習ではない。\n\n次の復習 = Rが{RV}%まで下がる時点（設定）：最終復習 + 9·S·(1/r − 1)日\nリストの順序 = 今落としそうな試験問題：60 × 比重 × (1 − p)、期限なら × 1.2</pre><p>少し忘れかけた頃に復習すると、すぐに復習するよりSが大きく伸びます（間隔効果）。白い線は、復習をやめた場合の試験当日の保持率です。</p>',
+      '<p>FSRS／SM-2を参考にした簡易モデルです。4つを区別します：<b>観測した結果</b>（正解数／問題数）、推定<b>習熟度</b>、その<b>信頼度</b>、今日の推定<b>保持率</b> — 記憶の測定ではなくモデルです。カードの移動はセッションに数えません。</p><pre>根拠:     各結果 p と問題数 n（%のみ：不明 → 15として扱う）\n          初回 ×1 · 同じ問題の繰り返し ×0.3 · 答えを見た後 ×0\n習熟度:   m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4),  w = 取り組み × 0.15^(以降のセッション数),  p̄ = 全体の水準\n信頼度:   実効問題数：低 &lt; 10 · 中 &lt; 30 · 高 ≥ 30\n\nt日後の保持率:   R(t) = 1 / (1 + t / (9·S))\n初回の復習:      S = 1日（70%未満）· 1.5（70–84%）· 2（85%以上）\n2回目以降（その日の最初の取り組み、その時点の保持率R）:\n  p ≥ 70%   →  目標 S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  目標 S              （弱い結果で間隔は延びない）\n  p &lt; 60%   →  目標 max(1, 0.4 × S)\n  Sは min(1, n/15) × 取り組みの重み の割合で目標へ動く\n8問未満（トピック全体がそれより少なければ全体）は根拠であって復習ではない。\n\n次の復習 = Rが{RV}%まで下がる時点（設定）：最終復習 + 9·S·(1/r − 1)日、\n           試験までの日数の30%以内\nリストの順序 = 今落としそうな試験問題：60 × 比重 × (1 − p)、期限なら × 1.2</pre><p>少し忘れかけた頃に復習すると、すぐに復習するよりSが大きく伸びます（間隔効果）。白い線は、復習をやめた場合の試験当日の保持率です。</p>',
     fcFormula:
       'p(トピック) = 習熟度 × 保持率 + 1/3 × (1 − 保持率)      （結果なし → 全体の水準）\n比重 = ACSエリアの公式比率をエリア内で問題バンクの大きさで分割\nトピックのないエリア（VIII、XII：9%）→ 他の平均\n予想正答率 μ = Σ 比重 × p + 9% × 平均\n正解数 X ~ ベータ二項分布(60, μ, ± モデル誤差)\n合格確率 = P(X ≥ 42) · {G}%以上 = P(X ≥ {GN})\n失点（トピック）= 60 × 比重 × (1 − p)',
   });
@@ -12330,6 +12330,7 @@ const AppState = (() => {
     prevIds = now;
   }
   function save(stamp = true) {
+    if (typeof clearModels === 'function') clearModels();
     trackDeletes();
     if (stamp) state.updatedAt = Date.now();
     try {
@@ -12835,6 +12836,7 @@ const Dashboard = (() => {
   }
   /* only the visible tab is redrawn; the dashboard is redrawn when you come back to it */
   function render() {
+    clearModels();
     energyMode = planDay().energy;
     updateTexts();
     if (!$('#viewDash').hidden) renderDash();
@@ -13170,7 +13172,8 @@ const {
 } = Dashboard;
 
 /* ===== module SpacedRepetition (js/model/spaced-repetition.js) =====
-   public: recall, addDays, isTracked, srModel, srAll, scoreAt, evidenceOf, chanceAt, UNKNOWN_N, REP_MIN_N */
+   public: recall, addDays, isTracked, srModel, srAll, scoreAt, evidenceOf, chanceAt, retentionScale, clearModels, UNKNOWN_N,
+           REP_MIN_N */
 const SpacedRepetition = (() => {
   /* ================= WHAT THE APP KNOWS ABOUT A TOPIC =================
    Four separate things, never mixed:
@@ -13189,7 +13192,10 @@ const SpacedRepetition = (() => {
    Records without a kind: the first of a day counts as a first attempt, a later one the same day as a repeat (a retake
    of the same set), so the BEST score of a day never replaces the first one.
 
-   MASTERY  m = (Σ w·n·p + K·p̄) / (Σ w·n + K),   K = 4,   w = attempt weight × 0.5^(age in days / 45)
+   MASTERY  m = (Σ w·n·p + K·p̄) / (Σ w·n + K),   K = 4,   w = attempt weight × 0.15^(sessions of the topic since)
+            — a per-session exponential average (85% on the latest session): a learner who improves session after
+            session is followed, not averaged with last month (a 45-day average lagged 7 points behind the real
+            results in the backtest of 2026-11-11)
             p̄ = your overall level: the same weighted average over ALL topics, pulled toward 50% by 30 questions (50%
             when there is nothing at all) — a topic with little evidence is assumed to be like the rest of your work,
             not like a guess. With p̄ = 50%:
@@ -13212,7 +13218,13 @@ const SpacedRepetition = (() => {
      a low score is ONE event: it lowers S once here and lowers mastery once — nothing else multiplies it again.
      Why it was low (explains the suggested activity, changes no number): recall was still ≥ 85% when you got it wrong
      → understanding; otherwise → forgetting.
-   next review = when R falls to the review threshold r (Settings, default 90 %): last review + 9·S·(1/r − 1) days.
+   next review = when R falls to the review threshold r (Settings, default 90 %): last review + 9·S·(1/r − 1) days,
+                 never more than 30% of the days left until the exam (Cepeda et al. 2008: the best gap for a test weeks
+                 away is 20–40% of the time left; a gap past the exam date is useless)
+   RETENTION FOR THE FORECAST  the chance of a right answer uses R with the time scaled by c, fitted to YOUR history:
+                 among c = 1, 1.5, 2, 3, 5, 8, 13, 21, the one that best predicts your next session's score from the one
+                 before (least squares over the last 200 pairs of sessions; 20 needed, else c = 1). c > 1 means you
+                 forget more slowly than the default curve; scheduling keeps c = 1 (reviews stay on the safe side).
    An imported "errors only" test with misses in a topic after its last review makes the topic due now.
    need (the order of the "needs recall" lists) = expected misses now × exam share × 60, × 1.2 when due.            */
   const UNKNOWN_N = 15,
@@ -13220,7 +13232,8 @@ const SpacedRepetition = (() => {
     PRIOR_K = 4,
     POOL_K = 30,
     PRIOR_P = 0.5,
-    MASTERY_HALF = 45,
+    DECAY_SESSION = 0.15 /* weight kept by a session for each later session of the same topic */,
+    GAP_SHARE = 0.3 /* longest interval: 30% of the days left until the exam */,
     ATTEMPT_W = { first: 1, new: 1, repeat: 0.3, after: 0 };
   const SR_LISTS = ['Very Comfortable', 'Not Comfortable', 'To review'];
   const recall = (dt, S) => 1 / (1 + Math.max(0, dt) / (9 * S));
@@ -13239,12 +13252,28 @@ const SpacedRepetition = (() => {
   }
   /* the observations of topic i up to a date: sessions (with their attempt kind) and imported test results.
      Projected sessions of a weekly plan (proj) are reviews for the schedule but never evidence of mastery. */
+  /* sessions grouped by topic, rebuilt when the list of events changes */
+  let _byTopic = null;
+  function sessionsOf(i) {
+    const ev = state.events,
+      key = ev.length + '|' + (ev.at(-1) || {}).id + '|' + (ev[0] || {}).id;
+    if (!_byTopic || _byTopic.k !== key || _byTopic.ev !== ev) {
+      const m = new Map();
+      ev.forEach(e => {
+        if (e.kind !== 'study' && e.kind !== 'review') return;
+        if (!m.has(e.topic)) m.set(e.topic, []);
+        m.get(e.topic).push(e);
+      });
+      _byTopic = { k: key, ev, m };
+    }
+    return _byTopic.m.get(i) || [];
+  }
   function evidenceOf(i, today, before) {
     const inRange = d => (before ? d < today : d <= today),
       out = [],
       seen = {};
-    state.events.forEach(e => {
-      if (e.topic !== i || (e.kind !== 'study' && e.kind !== 'review') || e.partial || !inRange(e.date)) return;
+    sessionsOf(i).forEach(e => {
+      if (e.partial || !inRange(e.date)) return;
       const first = !seen[e.date];
       seen[e.date] = true;
       const attempt = e.attempt || (first ? 'first' : 'repeat');
@@ -13276,14 +13305,17 @@ const SpacedRepetition = (() => {
     return out.sort((a, b) => a.date.localeCompare(b.date));
   }
   const nOf = o => (o.total > 0 ? o.total : UNKNOWN_N);
-  /* weighted evidence of a topic (no prior): { num, den, known (has a count), unknownN } */
+  /* weighted evidence of a topic (no prior): { num, den, known (has a count), unknownN }; each result weighs its
+     attempt × its sample × 0.15 per later session (day) of the same topic */
   function weigh(ev, today) {
     let num = 0,
       den = 0,
       unknownN = false,
       known = false;
+    const days = [...new Set(ev.map(o => o.date))].sort(),
+      after = d => days.length - 1 - days.indexOf(d);
     ev.forEach(o => {
-      const w = ATTEMPT_W[o.attempt] * Math.pow(0.5, Math.max(0, diffDays(o.date, today)) / MASTERY_HALF),
+      const w = ATTEMPT_W[o.attempt] * Math.pow(DECAY_SESSION, after(o.date)),
         n = nOf(o);
       if (o.total > 0) known = true;
       else unknownN = true;
@@ -13328,8 +13360,39 @@ const SpacedRepetition = (() => {
     _pool = { k: key, v };
     return v;
   }
-  /* skip: exam ids whose topic results must be left out (the blended forecast already counts their overall score) */
+  /* the models of the current data are kept until the data changes (a session added or removed, a score, a list, the
+     exam date, the review threshold) or the screen is drawn again — the planner asks for the same topic many times */
+  const _models = new Map();
+  let _sig = '';
+  const clearModels = () => {
+    _models.clear();
+    _sig = '';
+  };
   function srModel(i, asOf, before, skip) {
+    const sig = [
+      state.events.length,
+      (state.events.at(-1) || {}).id,
+      (state.exams || []).length,
+      state.deadline,
+      state.scores.join(),
+      state.statuses.join(),
+      pref('reviewAt'),
+      todayISO(),
+    ].join('|');
+    if (sig !== _sig) {
+      _models.clear();
+      _sig = sig;
+    }
+    const key = i + '|' + (asOf || '') + '|' + (before ? 1 : 0) + '|' + (skip && skip.size ? [...skip].join() : '');
+    let m = _models.get(key);
+    if (!m) {
+      m = srModelCalc(i, asOf, before, skip);
+      _models.set(key, m);
+    }
+    return m;
+  }
+  /* skip: exam ids whose topic results must be left out (the blended forecast already counts their overall score) */
+  function srModelCalc(i, asOf, before, skip) {
     const today = asOf || todayISO();
     let ev = evidenceOf(i, today, before);
     if (skip && skip.size) ev = ev.filter(o => !(o.src === 'exam' && skip.has(o.exam)));
@@ -13403,7 +13466,9 @@ const SpacedRepetition = (() => {
     if (reps.length) {
       const l = reps[reps.length - 1],
         tn = diffDays(l.date, today),
-        iv = Math.max(1, Math.round(9 * l.S * (1 / pref('reviewAt') - 1)));
+        left = state.deadline ? diffDays(l.date, state.deadline) : -1,
+        iv0 = Math.max(1, Math.round(9 * l.S * (1 / pref('reviewAt') - 1))),
+        iv = left > 0 ? Math.min(iv0, Math.max(1, Math.round(GAP_SHARE * left))) : iv0;
       Object.assign(m, { R: recall(tn, l.S), S: l.S, last: l.date, next: addDays(l.date, iv), over: tn - iv });
     }
     /* misses imported from an "errors only" test after the last review: due now */
@@ -13422,9 +13487,65 @@ const SpacedRepetition = (() => {
   /* chance of answering a question of the topic right on a date: mastery × recall + 1/3 × (1 − recall)
      (unknown mastery → 50%) */
   function chanceAt(m, date) {
-    /* (a topic with no evidence uses your overall level p̄, see mastery) */
-    const R = m.reps.length ? recall(diffDays(m.last, date), m.S) : 1;
+    /* (a topic with no evidence uses your overall level p̄, see mastery; recall with your fitted time scale) */
+    const R = m.reps.length ? recall(diffDays(m.last, date) / retentionScale(), m.S) : 1;
     return pRight(m.mastery * 100, R);
+  }
+  /* c: how much slower than the default curve you forget, fitted to your sessions (see RETENTION FOR THE FORECAST).
+     Each pair = a scored session and the topic's model the day before it; the guess is mastery × R(gap / c) + 1/3 ×
+     (1 − R). Cached per day and data. */
+  const SCALES = [1, 1.5, 2, 3, 5, 8, 13, 21];
+  let _scale = null,
+    _fitting = false;
+  function retentionScale() {
+    if (_fitting) return 1;
+    /* keyed on your real sessions only: the projected sessions of a weekly plan never refit it */
+    const real = state.events.filter(e => !e.proj),
+      key = [todayISO(), real.length, (real.at(-1) || {}).id, (state.exams || []).length].join('|');
+    if (_scale && _scale.k === key) return _scale.v;
+    _fitting = true;
+    let v = 1;
+    try {
+      /* the first scored session of each topic per day, the most recent 200 of them (enough, and fast on a long
+         history); each paired with the topic's model the day before */
+      const cand = [];
+      TOPICS.forEach((_, i) => {
+        const seen = new Set();
+        sessionsOf(i)
+          .filter(e => !e.partial && !e.proj && e.score != null)
+          .sort((a, b) => a.date.localeCompare(b.date))
+          .forEach(e => {
+            if (seen.has(e.date)) return;
+            seen.add(e.date);
+            cand.push({ i, e });
+          });
+      });
+      const pairs = [];
+      cand
+        .sort((a, b) => a.e.date.localeCompare(b.e.date))
+        .slice(-200)
+        .forEach(({ i, e }) => {
+          const m = srModel(i, e.date, true);
+          if (m.reps.length) pairs.push({ m: m.mastery, S: m.S, gap: diffDays(m.last, e.date), obs: e.score / 100 });
+        });
+      if (pairs.length >= 20) {
+        let best = Infinity;
+        SCALES.forEach(c => {
+          const sse = pairs.reduce((a, q) => {
+            const R = recall(q.gap / c, q.S);
+            return a + (q.m * R + (1 - R) / 3 - q.obs) ** 2;
+          }, 0);
+          if (sse < best - 1e-12) {
+            best = sse;
+            v = c;
+          }
+        });
+      }
+    } finally {
+      _fitting = false;
+    }
+    _scale = { k: key, v };
+    return v;
   }
   function srAll(asOf, before) {
     return TOPICS.map((_, i) => srModel(i, asOf, before))
@@ -13443,10 +13564,35 @@ const SpacedRepetition = (() => {
     });
     return best != null ? best : TOPICS[i].score;
   }
-  return { recall, addDays, isTracked, srModel, srAll, scoreAt, evidenceOf, chanceAt, UNKNOWN_N, REP_MIN_N };
+  return {
+    recall,
+    addDays,
+    isTracked,
+    srModel,
+    srAll,
+    scoreAt,
+    evidenceOf,
+    chanceAt,
+    retentionScale,
+    clearModels,
+    UNKNOWN_N,
+    REP_MIN_N,
+  };
 })();
-const { recall, addDays, isTracked, srModel, srAll, scoreAt, evidenceOf, chanceAt, UNKNOWN_N, REP_MIN_N } =
-  SpacedRepetition;
+const {
+  recall,
+  addDays,
+  isTracked,
+  srModel,
+  srAll,
+  scoreAt,
+  evidenceOf,
+  chanceAt,
+  retentionScale,
+  clearModels,
+  UNKNOWN_N,
+  REP_MIN_N,
+} = SpacedRepetition;
 
 /* ===== module Forecast (js/model/forecast.js) =====
    live value (getter): GOAL_N = right answers needed for your goal (85% → 51 of 60)
@@ -14259,9 +14405,12 @@ const {
          × 1.2   review due by spaced repetition (or misses imported in an "errors only" test)
          × 1.25  left undone in a plan during the last 7 days (or moved by Refresh plan)
          × 0.8   new material in the final stretch (8–21 days); none at all in the last week
-     coverage: each day the 2 topics untouched longest (14 days or more, or never; the smallest share first among
+     coverage: each day the 2 topics untouched longest (14 days or more, or never; the highest risk first among
        equals) are raised to at least the day's median value per minute, so small, rarely tested or hard topics keep
        coming back instead of waiting forever — 2 a day, so they rotate in without crowding out the reviews due.
+     area floor (a week): fair share of area a = its official share × (1 − its average p); an area whose minutes so far
+       are under half its fair share of the week's minutes gets its best topic raised to the median value per minute;
+       the area furthest below its share has that topic placed first that day.
      The choice is by value per minute (a fractional knapsack: values are linear in n, so taking the densest first and
      cutting the last one to fit is the best use of the time), never past the time you gave.
 
@@ -14462,7 +14611,7 @@ const Policy = (() => {
         date,
       });
     });
-    /* coverage: the 2 topics idle longest (14+ days, or never studied — the smallest share first) are worth at least
+    /* coverage: the 2 topics idle longest (14+ days, or never studied — the highest risk first) are worth at least
        the median value per minute of the day; 2 a day, so they rotate in without crowding out the reviews due.
        (measured on the full minutes, answering + review, so the daily list and the calendar lift the same topics) */
     const full = c => c.n * (c.answer + c.review),
@@ -14470,12 +14619,24 @@ const Policy = (() => {
       med = dens.length ? dens[Math.floor(dens.length / 2)] : 0;
     out
       .filter(c => c.idle >= COVER_DAYS && c.value / full(c) < med)
-      .sort((a, b) => b.idle - a.idle || a.risk - b.risk || a.i - b.i)
+      .sort((a, b) => b.idle - a.idle || b.risk - a.risk || a.i - b.i)
       .slice(0, COVER_PER_DAY)
       .forEach(c => {
         c.value = med * full(c);
         c.covered = true;
       });
+    /* area floor (weekly plans): an ACS area that got less than half its fair share of the week's time so far has its
+       most valuable topic lifted to the median too, so no area of the test is left out for a whole week */
+    (opts.areaShort || []).forEach((a, k) => {
+      const c = out
+        .filter(x => examShare(x.i).area === a && !x.done)
+        .sort((x, y) => y.value / full(y) - x.value / full(x))[0];
+      if (!c) return;
+      if (c.value / full(c) < med) c.value = med * full(c);
+      c.floor = true;
+      /* the area furthest below its share is placed first that day */
+      if (k === 0) c.forced = true;
+    });
     return out;
   }
   /* the practice test of the day, when one is due (or added by hand), as a candidate; null otherwise */
@@ -15118,9 +15279,15 @@ const Schedule = (() => {
       done = doneOn(date);
     /* the candidates of the day: Policy, the same as the daily suggestion; each chunk counts only the time to answer
        it (the review of its misses is its own item) */
-    let cands = topicCands(date, { mode, carry: carryNow, done, minutesFor, withReview: false, seen: simSeen }).filter(
-      c => !c.done
-    );
+    let cands = topicCands(date, {
+      mode,
+      carry: carryNow,
+      done,
+      minutesFor,
+      withReview: false,
+      seen: simSeen,
+      areaShort: simAreas ? shortAreas(date) : null,
+    }).filter(c => !c.done);
     const tc = testCand(date, mode, st, false);
     if (tc && !tc.done) cands.unshift(tc);
     cands = cands.map((c, k) => ({ ...c, key: c.kind + (c.i ?? 't') + '_' + k }));
@@ -15285,6 +15452,7 @@ const Schedule = (() => {
     const saved = { events: state.events, tests: state.tests },
       out = {};
     simSeen = {};
+    simAreas = {};
     try {
       state.events = state.events.slice();
       state.tests = (state.tests || []).slice();
@@ -15296,6 +15464,7 @@ const Schedule = (() => {
           /* new material projected on earlier days is not new again: the next days continue through the bank */
           items.forEach(it => {
             if (it.kind === 'topic' && it.reason === 'new') simSeen[it.i] = (simSeen[it.i] || 0) + it.n;
+            if (it.kind === 'topic') simAreas[examShare(it.i).area] = (simAreas[examShare(it.i).area] || 0) + it.min;
           });
           out[d] = items;
           /* a topic moved forward is placed once, on the first day it fits */
@@ -15328,6 +15497,7 @@ const Schedule = (() => {
       state.events = saved.events;
       state.tests = saved.tests;
       simSeen = null;
+      simAreas = null;
     }
     return out;
   }
@@ -15477,6 +15647,25 @@ const Schedule = (() => {
   let carryNow = null;
   /* new questions of each topic already placed on earlier days of the week being planned (see suggestDays) */
   let simSeen = null;
+  /* minutes of topic work placed per ACS area on the earlier days of the week being planned */
+  let simAreas = null;
+  /* areas under half their fair share so far: fair share = official share × (1 − average chance of a right answer
+     in the area), as a part of all the minutes placed (none before the first day is filled) */
+  function shortAreas(date) {
+    const total = Object.values(simAreas).reduce((a, x) => a + x, 0);
+    if (!total) return [];
+    const need = {};
+    TOPICS.forEach((_, i) => {
+      const sh = examShare(i);
+      need[sh.area] = (need[sh.area] || 0) + sh.share * (1 - chanceAt(srModel(i, date, true), date));
+    });
+    const N = Object.values(need).reduce((a, x) => a + x, 0);
+    /* furthest below its share first */
+    const gap = a => (simAreas[a] || 0) / total / (need[a] / N);
+    return Object.keys(need)
+      .filter(a => gap(a) < 0.5)
+      .sort((a, b) => gap(a) - gap(b));
+  }
   /* minutes from midnight → today's timestamp, and back */
   const clockMs = (date, min) => {
     const d = parse(date);

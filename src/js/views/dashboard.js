@@ -414,6 +414,7 @@ const Dashboard = (() => {
   }
   /* only the visible tab is redrawn; the dashboard is redrawn when you come back to it */
   function render() {
+    clearModels();
     energyMode = planDay().energy;
     updateTexts();
     if (!$('#viewDash').hidden) renderDash();

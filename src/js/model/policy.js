@@ -18,9 +18,12 @@
          × 1.2   review due by spaced repetition (or misses imported in an "errors only" test)
          × 1.25  left undone in a plan during the last 7 days (or moved by Refresh plan)
          × 0.8   new material in the final stretch (8–21 days); none at all in the last week
-     coverage: each day the 2 topics untouched longest (14 days or more, or never; the smallest share first among
+     coverage: each day the 2 topics untouched longest (14 days or more, or never; the highest risk first among
        equals) are raised to at least the day's median value per minute, so small, rarely tested or hard topics keep
        coming back instead of waiting forever — 2 a day, so they rotate in without crowding out the reviews due.
+     area floor (a week): fair share of area a = its official share × (1 − its average p); an area whose minutes so far
+       are under half its fair share of the week's minutes gets its best topic raised to the median value per minute;
+       the area furthest below its share has that topic placed first that day.
      The choice is by value per minute (a fractional knapsack: values are linear in n, so taking the densest first and
      cutting the last one to fit is the best use of the time), never past the time you gave.
 
@@ -221,7 +224,7 @@ const Policy = (() => {
         date,
       });
     });
-    /* coverage: the 2 topics idle longest (14+ days, or never studied — the smallest share first) are worth at least
+    /* coverage: the 2 topics idle longest (14+ days, or never studied — the highest risk first) are worth at least
        the median value per minute of the day; 2 a day, so they rotate in without crowding out the reviews due.
        (measured on the full minutes, answering + review, so the daily list and the calendar lift the same topics) */
     const full = c => c.n * (c.answer + c.review),
@@ -229,12 +232,24 @@ const Policy = (() => {
       med = dens.length ? dens[Math.floor(dens.length / 2)] : 0;
     out
       .filter(c => c.idle >= COVER_DAYS && c.value / full(c) < med)
-      .sort((a, b) => b.idle - a.idle || a.risk - b.risk || a.i - b.i)
+      .sort((a, b) => b.idle - a.idle || b.risk - a.risk || a.i - b.i)
       .slice(0, COVER_PER_DAY)
       .forEach(c => {
         c.value = med * full(c);
         c.covered = true;
       });
+    /* area floor (weekly plans): an ACS area that got less than half its fair share of the week's time so far has its
+       most valuable topic lifted to the median too, so no area of the test is left out for a whole week */
+    (opts.areaShort || []).forEach((a, k) => {
+      const c = out
+        .filter(x => examShare(x.i).area === a && !x.done)
+        .sort((x, y) => y.value / full(y) - x.value / full(x))[0];
+      if (!c) return;
+      if (c.value / full(c) < med) c.value = med * full(c);
+      c.floor = true;
+      /* the area furthest below its share is placed first that day */
+      if (k === 0) c.forced = true;
+    });
     return out;
   }
   /* the practice test of the day, when one is due (or added by hand), as a candidate; null otherwise */

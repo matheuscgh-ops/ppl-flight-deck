@@ -389,11 +389,13 @@ unknown → null (never guessed) · a question has one topic and counts once, wh
   <h2><span class="n">09</span>How the numbers are calculated</h2>
   <p class="intro">A single statistics engine feeds every screen, so the same number reads the same everywhere. The "How it is calculated" sections in the app have the full formulas.</p>
 <div class="formula">evidence          each result: score p, sample n (unknown → weighs as 15), attempt (first 1 · repeat 0.3 · after the answers 0)
-mastery           m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4)     w = attempt × 0.5^(age / 45 d),  p̄ = your overall level
+mastery           m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4)     w = attempt × 0.15^(later sessions of the topic),  p̄ = your overall level
 confidence        effective questions: low &lt; 10 · medium &lt; 30 · high ≥ 30 (never high with only unknown samples)
 memory            R(t) = 1 / (1 + t / 9S)  — an estimate, not a measurement
 stability         first: 1 / 1.5 / 2 by score;  later: ≥ 70 grows, 60–69 stays, &lt; 60 × 0.4;  moved by min(1, n/15) × attempt
-next review       when R falls to the review point  (90% → S days); fewer than 8 questions is not a review
+next review       when R falls to the review point  (90% → S days), at most 30% of the days left to the exam;
+                  fewer than 8 questions is not a review
+forecast recall   R(t / c), c fitted to your sessions (1 … 21; c > 1 = you forget more slowly than the default curve)
 right answer      p = m × R + 1/3 × (1 − R)   (forgetting = guessing among 3)
 test share        ACS area share (PSI PAR bulletin) split inside the area by bank size; 9% of areas with no topic
 bank model        μ = Σ share × p + unmapped × average
@@ -401,7 +403,8 @@ forecast          bank μ (without the topic results of those same tests) blende
 pass / goal       beta-binomial over 60 questions: P(X ≥ 42) and P(X ≥ 51)
 risk              60 × share × (1 − p on exam day)  — questions likely missed, not a score gain
 value             risk × (n / session needed) × 1.2 if due × 1.25 if left undone × 0.8 new in the final stretch
-coverage          the 2 topics idle longest (≥ 14 days or never) → at least the day's median value per minute
+coverage          the 2 topics idle longest (≥ 14 days or never; highest risk first) → at least the day's median value per minute
+area floor (week) an ACS area under half its fair share (share × chance of a miss) gets its best topic in; the furthest one first
 choice            densest value per minute first, cut to fit; never past your time
 energy            low: ≤ 20 q, easiest first, no test · medium: ≤ 40 q, most valuable first · high: ≤ 40 q, hardest first
 minutes           (answer + review of misses) × your pace — the same factor for both
@@ -427,11 +430,12 @@ S  stability: how many days it takes for R to fall to 90%</div>
   <p>A higher review point means shorter intervals and more reviews; a lower one means fewer reviews and more forgetting in between.</p>
 
   <h3 id="sci-score">From memory to an expected score</h3>
-  <p><b>What a result is worth.</b> The app keeps four things apart: the <b>observed result</b> (5/10), the estimated <b>mastery</b> of the topic, the <b>confidence</b> in that estimate, and the estimated <b>retention</b> today. A few questions say little, so mastery starts from your overall level and moves toward your results as they add up: 2/2 is not 40/40. Retaking the same questions counts 30% and a score typed after seeing the answers counts nothing, so 50% followed by 100% on the same set stays near 60%. Records saved with only a percentage keep an unknown sample; they weigh like a usual 15-question session and never reach "high" confidence.</p>
+  <p><b>What a result is worth.</b> The app keeps four things apart: the <b>observed result</b> (5/10), the estimated <b>mastery</b> of the topic, the <b>confidence</b> in that estimate, and the estimated <b>retention</b> today. A few questions say little, so mastery starts from your overall level and moves toward your results as they add up: 2/2 is not 40/40. Mastery follows your latest sessions (each later session keeps 15% of an earlier one's weight), so steady progress is not averaged away. Retaking the same questions counts 30% and a score typed after seeing the answers counts nothing, so 50% followed by 100% on the same set stays near 60%. Records saved with only a percentage keep an unknown sample; they weigh like a usual 15-question session and never reach "high" confidence.</p>
 <div class="formula">mastery m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4)</div>
   <p><b>Weak results.</b> A score from 60 to 69% no longer lengthens the interval, and a small sample barely moves it. A miss while recall was still high points to understanding (the plan suggests reviewing the concept); a miss after a long gap points to forgetting (recall without notes). That label only chooses the activity: the low score is counted once.</p>
   <p>FAA questions have 3 options. If you remember a topic you answer at your mastery level; if you have forgotten it, you still get about 1 in 3 right by guessing:</p>
 <div class="formula">p = m × R + 1/3 × (1 − R)</div>
+  <p><b>Calibrated to you.</b> The forecast's recall uses time divided by c, the value (from 1 to 21) that best predicts your next session from the one before across all your history. Scheduling keeps c = 1, so reviews stay on the safe side. And no review is planned further out than 30% of the days left to the exam: for a test weeks away the best gap is 20–40% of the time left (Cepeda et al., 2008).</p>
   <p><b>Share of the test.</b> The FAA draws the 60 questions by ACS area of operation, with official shares (PSI PAR bulletin): Preflight Preparation 22%, Takeoffs, Landings and Go-Arounds 20%, Preflight Procedures 13%, and so on. The Sporty's topics are the ACS tasks themselves, so each belongs to one area; inside an area the share is split by the size of the Sporty's bank, an approximation marked "estimated" in the plan. Basic Instrument Maneuvers (7%) and Postflight Procedures (2%) have no Sporty's topic: the forecast scores them with the average of the others. The shares add up to 100% and are used once — 60 × share is only a rough guide to how many questions may come from a topic.</p>
 <div class="formula">μ = Σ share × p  +  9% × (average of the mapped topics)</div>
   <p><b>Chance to pass.</b> The number of right answers out of 60 follows a binomial distribution if every question has the same chance μ. But μ is itself an estimate, and the app knows how far off it has been: its error against your real practice tests. So it uses a <b>beta-binomial</b> distribution, which spreads the chances by that uncertainty instead of pretending μ is exact. Passing is 42 of 60 (70%), and the default goal is 51 of 60 (85%):</p>

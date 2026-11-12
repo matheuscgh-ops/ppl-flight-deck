@@ -93,7 +93,7 @@ with sync_playwright() as p:
             check(f'{tag}: refreshing changes no statistic', ev(STATS) == stats0)
 
             # ---------- focus mode feeds the pace with its stopwatch ----------
-            ev("""(()=>{const T=todayISO(),p=state.plans.find(q=>q.id==='pP'),it=p.items.find(x=>x.date===T&&x.kind==='topic'&&!itemDone(x));
+            ev("""(()=>{const T=todayISO(),p=state.plans.find(q=>q.id==='pP'),it=p.items.filter(x=>x.date===T&&x.kind==='topic'&&!itemDone(x)).sort((a,b)=>b.n-a.n)[0]; /* the biggest block: 40 min is a plausible time for it */
                 localStorage.setItem(STORE+'-focus',JSON.stringify({key:'id:'+it.id,acc:40*60000,run:0}));window.__fit=it})()""")
             n0 = ev("state.paces.length"); ev("openFocus(__fit)"); pg.wait_for_timeout(100); ev("document.getElementById('focusDone').click()"); pg.wait_for_timeout(200)
             pf = ev("state.paces.at(-1)")

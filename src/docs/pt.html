@@ -389,11 +389,13 @@ desconhecido → null (nunca chutado) · uma questão tem um tópico e conta uma
   <h2><span class="n">09</span>Como os números são calculados</h2>
   <p class="intro">Um único motor de estatísticas alimenta todas as telas, então o mesmo número aparece igual em todo lugar. As seções "How it is calculated" do app trazem as fórmulas completas.</p>
 <div class="formula">evidência         cada resultado: nota p, amostra n (desconhecida → pesa como 15), tentativa (primeira 1 · repetição 0,3 · depois das respostas 0)
-domínio           m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4)     w = tentativa × 0,5^(idade / 45 d),  p̄ = seu nível geral
+domínio           m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4)     w = tentativa × 0,15^(sessões posteriores do tópico),  p̄ = seu nível geral
 confiança         questões efetivas: baixa &lt; 10 · média &lt; 30 · alta ≥ 30 (nunca alta só com amostras desconhecidas)
 memória           R(t) = 1 / (1 + t / 9S)  — uma estimativa, não uma medição
 estabilidade      primeira: 1 / 1,5 / 2 pela nota;  depois: ≥ 70 cresce, 60–69 fica, &lt; 60 × 0,4;  movida por min(1, n/15) × tentativa
-próxima revisão   quando R cai ao ponto de revisão (90% → S dias); menos de 8 questões não é revisão
+próxima revisão   quando R cai ao ponto de revisão (90% → S dias), no máximo 30% dos dias até a prova;
+                  menos de 8 questões não é revisão
+retenção previsão R(t / c), c ajustado às suas sessões (1 … 21; c > 1 = você esquece mais devagar que a curva padrão)
 acerto            p = m × R + 1/3 × (1 − R)   (esquecer = chutar entre 3)
 peso na prova     % da área ACS (boletim PSI PAR) dividido dentro da área pelo tamanho do banco; 9% de áreas sem tópico
 modelo do banco   μ = Σ peso × p + sem tópico × média
@@ -401,7 +403,8 @@ previsão          μ do banco (sem os resultados por tópico desses mesmos simu
 aprovar / meta    beta-binomial em 60 questões: P(X ≥ 42) e P(X ≥ 51)
 risco             60 × peso × (1 − p no dia da prova)  — questões que provavelmente erraria, não ganho de nota
 valor             risco × (n / sessão necessária) × 1,2 se vencida × 1,25 se ficou pendente × 0,8 matéria nova na reta final
-cobertura         os 2 tópicos parados há mais tempo (≥ 14 dias ou nunca) → no mínimo o valor por minuto mediano do dia
+cobertura         os 2 tópicos parados há mais tempo (≥ 14 dias ou nunca; maior risco primeiro) → no mínimo o valor por minuto mediano do dia
+piso por área     área ACS abaixo de metade da sua parte justa (peso × chance de erro) entra com o melhor tópico; a mais atrasada primeiro
 escolha           mais valor por minuto primeiro, cortado para caber; nunca passa do seu tempo
 energia           baixa: ≤ 20 q, mais fácil primeiro, sem simulado · média: ≤ 40 q, mais valioso primeiro · alta: ≤ 40 q, mais difícil primeiro
 minutos           (resposta + revisão dos erros) × seu ritmo — o mesmo fator para os dois
@@ -427,11 +430,12 @@ S  estabilidade: quantos dias leva para R cair a 90%</div>
   <p>Um ponto de revisão maior significa intervalos menores e mais revisões; um menor significa menos revisões e mais esquecimento no meio.</p>
 
   <h3 id="sci-score">Da memória para uma nota esperada</h3>
-  <p><b>Quanto vale um resultado.</b> O app separa quatro coisas: o <b>resultado observado</b> (5/10), o <b>domínio</b> estimado do tópico, a <b>confiança</b> nessa estimativa e a <b>retenção</b> estimada hoje. Poucas questões dizem pouco, então o domínio parte do seu nível geral e vai em direção aos seus resultados conforme eles se acumulam: 2/2 não é 40/40. Refazer as mesmas questões conta 30% e uma nota digitada depois de ver as respostas não conta, então 50% seguido de 100% no mesmo conjunto fica perto de 60%. Registros salvos só com porcentagem ficam com amostra desconhecida; pesam como uma sessão comum de 15 questões e nunca chegam a confiança "alta".</p>
+  <p><b>Quanto vale um resultado.</b> O app separa quatro coisas: o <b>resultado observado</b> (5/10), o <b>domínio</b> estimado do tópico, a <b>confiança</b> nessa estimativa e a <b>retenção</b> estimada hoje. Poucas questões dizem pouco, então o domínio parte do seu nível geral e vai em direção aos seus resultados conforme eles se acumulam: 2/2 não é 40/40. O domínio acompanha as suas sessões mais recentes (cada sessão posterior deixa 15% do peso da anterior), então uma melhora constante não é diluída. Refazer as mesmas questões conta 30% e uma nota digitada depois de ver as respostas não conta, então 50% seguido de 100% no mesmo conjunto fica perto de 60%. Registros salvos só com porcentagem ficam com amostra desconhecida; pesam como uma sessão comum de 15 questões e nunca chegam a confiança "alta".</p>
 <div class="formula">domínio m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4)</div>
   <p><b>Resultados fracos.</b> Uma nota de 60 a 69% não aumenta mais o intervalo, e uma amostra pequena quase não o mexe. Um erro com a memória ainda alta indica compreensão (o plano sugere rever o conceito); um erro depois de muito tempo indica esquecimento (recuperação sem consulta). Esse rótulo só escolhe a atividade: a nota baixa conta uma vez só.</p>
   <p>As questões da FAA têm 3 alternativas. Se você lembra um tópico, acerta no nível do seu domínio; se esqueceu, ainda acerta cerca de 1 em 3 no chute:</p>
 <div class="formula">p = m × R + 1/3 × (1 − R)</div>
+  <p><b>Calibrado para você.</b> A retenção da previsão usa o tempo dividido por c, o valor (de 1 a 21) que melhor prevê a sua próxima sessão a partir da anterior em todo o seu histórico. O agendamento mantém c = 1, para as revisões ficarem do lado seguro. E nenhuma revisão fica mais longe que 30% dos dias até a prova: para um teste a semanas de distância, o melhor intervalo é 20–40% do tempo restante (Cepeda et al., 2008).</p>
   <p><b>Peso na prova.</b> A FAA sorteia as 60 questões por área de operação do ACS, com percentuais oficiais (boletim PSI PAR): Preflight Preparation 22%, Takeoffs, Landings and Go-Arounds 20%, Preflight Procedures 13% e assim por diante. Os tópicos da Sporty's são as próprias tasks do ACS, então cada um pertence a uma área; dentro da área o percentual é dividido pelo tamanho do banco da Sporty's, uma aproximação marcada como "estimado" no plano. Basic Instrument Maneuvers (7%) e Postflight Procedures (2%) não têm tópico na Sporty's: a previsão usa a média dos outros para elas. Os pesos somam 100% e são usados uma vez só — 60 × peso é só uma referência aproximada de quantas questões podem vir de um tópico.</p>
 <div class="formula">μ = Σ peso × p  +  9% × (média dos tópicos mapeados)</div>
   <p><b>Chance de passar.</b> O número de acertos em 60 segue uma distribuição binomial se toda questão tiver a mesma chance μ. Mas μ também é uma estimativa, e o app sabe o quanto ela já errou: o erro dela contra os seus simulados reais. Por isso ele usa uma distribuição <b>beta-binomial</b>, que espalha as chances por essa incerteza em vez de fingir que μ é exato. Passar é 42 de 60 (70%), e a meta padrão é 51 de 60 (85%):</p>

@@ -236,9 +236,15 @@ const Schedule = (() => {
       done = doneOn(date);
     /* the candidates of the day: Policy, the same as the daily suggestion; each chunk counts only the time to answer
        it (the review of its misses is its own item) */
-    let cands = topicCands(date, { mode, carry: carryNow, done, minutesFor, withReview: false, seen: simSeen }).filter(
-      c => !c.done
-    );
+    let cands = topicCands(date, {
+      mode,
+      carry: carryNow,
+      done,
+      minutesFor,
+      withReview: false,
+      seen: simSeen,
+      areaShort: simAreas ? shortAreas(date) : null,
+    }).filter(c => !c.done);
     const tc = testCand(date, mode, st, false);
     if (tc && !tc.done) cands.unshift(tc);
     cands = cands.map((c, k) => ({ ...c, key: c.kind + (c.i ?? 't') + '_' + k }));
@@ -403,6 +409,7 @@ const Schedule = (() => {
     const saved = { events: state.events, tests: state.tests },
       out = {};
     simSeen = {};
+    simAreas = {};
     try {
       state.events = state.events.slice();
       state.tests = (state.tests || []).slice();
@@ -414,6 +421,7 @@ const Schedule = (() => {
           /* new material projected on earlier days is not new again: the next days continue through the bank */
           items.forEach(it => {
             if (it.kind === 'topic' && it.reason === 'new') simSeen[it.i] = (simSeen[it.i] || 0) + it.n;
+            if (it.kind === 'topic') simAreas[examShare(it.i).area] = (simAreas[examShare(it.i).area] || 0) + it.min;
           });
           out[d] = items;
           /* a topic moved forward is placed once, on the first day it fits */
@@ -446,6 +454,7 @@ const Schedule = (() => {
       state.events = saved.events;
       state.tests = saved.tests;
       simSeen = null;
+      simAreas = null;
     }
     return out;
   }
@@ -595,6 +604,25 @@ const Schedule = (() => {
   let carryNow = null;
   /* new questions of each topic already placed on earlier days of the week being planned (see suggestDays) */
   let simSeen = null;
+  /* minutes of topic work placed per ACS area on the earlier days of the week being planned */
+  let simAreas = null;
+  /* areas under half their fair share so far: fair share = official share × (1 − average chance of a right answer
+     in the area), as a part of all the minutes placed (none before the first day is filled) */
+  function shortAreas(date) {
+    const total = Object.values(simAreas).reduce((a, x) => a + x, 0);
+    if (!total) return [];
+    const need = {};
+    TOPICS.forEach((_, i) => {
+      const sh = examShare(i);
+      need[sh.area] = (need[sh.area] || 0) + sh.share * (1 - chanceAt(srModel(i, date, true), date));
+    });
+    const N = Object.values(need).reduce((a, x) => a + x, 0);
+    /* furthest below its share first */
+    const gap = a => (simAreas[a] || 0) / total / (need[a] / N);
+    return Object.keys(need)
+      .filter(a => gap(a) < 0.5)
+      .sort((a, b) => gap(a) - gap(b));
+  }
   /* minutes from midnight → today's timestamp, and back */
   const clockMs = (date, min) => {
     const d = parse(date);

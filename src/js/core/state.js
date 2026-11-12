@@ -457,6 +457,7 @@ const AppState = (() => {
     prevIds = now;
   }
   function save(stamp = true) {
+    if (typeof clearModels === 'function') clearModels();
     trackDeletes();
     if (stamp) state.updatedAt = Date.now();
     try {

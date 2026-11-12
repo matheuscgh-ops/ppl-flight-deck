@@ -1,5 +1,6 @@
 /* ===== module SpacedRepetition (js/model/spaced-repetition.js) =====
-   public: recall, addDays, isTracked, srModel, srAll, scoreAt, evidenceOf, chanceAt, UNKNOWN_N, REP_MIN_N */
+   public: recall, addDays, isTracked, srModel, srAll, scoreAt, evidenceOf, chanceAt, retentionScale, clearModels, UNKNOWN_N,
+           REP_MIN_N */
 const SpacedRepetition = (() => {
   /* ================= WHAT THE APP KNOWS ABOUT A TOPIC =================
    Four separate things, never mixed:
@@ -18,7 +19,10 @@ const SpacedRepetition = (() => {
    Records without a kind: the first of a day counts as a first attempt, a later one the same day as a repeat (a retake
    of the same set), so the BEST score of a day never replaces the first one.
 
-   MASTERY  m = (Σ w·n·p + K·p̄) / (Σ w·n + K),   K = 4,   w = attempt weight × 0.5^(age in days / 45)
+   MASTERY  m = (Σ w·n·p + K·p̄) / (Σ w·n + K),   K = 4,   w = attempt weight × 0.15^(sessions of the topic since)
+            — a per-session exponential average (85% on the latest session): a learner who improves session after
+            session is followed, not averaged with last month (a 45-day average lagged 7 points behind the real
+            results in the backtest of 2026-11-11)
             p̄ = your overall level: the same weighted average over ALL topics, pulled toward 50% by 30 questions (50%
             when there is nothing at all) — a topic with little evidence is assumed to be like the rest of your work,
             not like a guess. With p̄ = 50%:
@@ -41,7 +45,13 @@ const SpacedRepetition = (() => {
      a low score is ONE event: it lowers S once here and lowers mastery once — nothing else multiplies it again.
      Why it was low (explains the suggested activity, changes no number): recall was still ≥ 85% when you got it wrong
      → understanding; otherwise → forgetting.
-   next review = when R falls to the review threshold r (Settings, default 90 %): last review + 9·S·(1/r − 1) days.
+   next review = when R falls to the review threshold r (Settings, default 90 %): last review + 9·S·(1/r − 1) days,
+                 never more than 30% of the days left until the exam (Cepeda et al. 2008: the best gap for a test weeks
+                 away is 20–40% of the time left; a gap past the exam date is useless)
+   RETENTION FOR THE FORECAST  the chance of a right answer uses R with the time scaled by c, fitted to YOUR history:
+                 among c = 1, 1.5, 2, 3, 5, 8, 13, 21, the one that best predicts your next session's score from the one
+                 before (least squares over the last 200 pairs of sessions; 20 needed, else c = 1). c > 1 means you
+                 forget more slowly than the default curve; scheduling keeps c = 1 (reviews stay on the safe side).
    An imported "errors only" test with misses in a topic after its last review makes the topic due now.
    need (the order of the "needs recall" lists) = expected misses now × exam share × 60, × 1.2 when due.            */
   const UNKNOWN_N = 15,
@@ -49,7 +59,8 @@ const SpacedRepetition = (() => {
     PRIOR_K = 4,
     POOL_K = 30,
     PRIOR_P = 0.5,
-    MASTERY_HALF = 45,
+    DECAY_SESSION = 0.15 /* weight kept by a session for each later session of the same topic */,
+    GAP_SHARE = 0.3 /* longest interval: 30% of the days left until the exam */,
     ATTEMPT_W = { first: 1, new: 1, repeat: 0.3, after: 0 };
   const SR_LISTS = ['Very Comfortable', 'Not Comfortable', 'To review'];
   const recall = (dt, S) => 1 / (1 + Math.max(0, dt) / (9 * S));
@@ -68,12 +79,28 @@ const SpacedRepetition = (() => {
   }
   /* the observations of topic i up to a date: sessions (with their attempt kind) and imported test results.
      Projected sessions of a weekly plan (proj) are reviews for the schedule but never evidence of mastery. */
+  /* sessions grouped by topic, rebuilt when the list of events changes */
+  let _byTopic = null;
+  function sessionsOf(i) {
+    const ev = state.events,
+      key = ev.length + '|' + (ev.at(-1) || {}).id + '|' + (ev[0] || {}).id;
+    if (!_byTopic || _byTopic.k !== key || _byTopic.ev !== ev) {
+      const m = new Map();
+      ev.forEach(e => {
+        if (e.kind !== 'study' && e.kind !== 'review') return;
+        if (!m.has(e.topic)) m.set(e.topic, []);
+        m.get(e.topic).push(e);
+      });
+      _byTopic = { k: key, ev, m };
+    }
+    return _byTopic.m.get(i) || [];
+  }
   function evidenceOf(i, today, before) {
     const inRange = d => (before ? d < today : d <= today),
       out = [],
       seen = {};
-    state.events.forEach(e => {
-      if (e.topic !== i || (e.kind !== 'study' && e.kind !== 'review') || e.partial || !inRange(e.date)) return;
+    sessionsOf(i).forEach(e => {
+      if (e.partial || !inRange(e.date)) return;
       const first = !seen[e.date];
       seen[e.date] = true;
       const attempt = e.attempt || (first ? 'first' : 'repeat');
@@ -105,14 +132,17 @@ const SpacedRepetition = (() => {
     return out.sort((a, b) => a.date.localeCompare(b.date));
   }
   const nOf = o => (o.total > 0 ? o.total : UNKNOWN_N);
-  /* weighted evidence of a topic (no prior): { num, den, known (has a count), unknownN } */
+  /* weighted evidence of a topic (no prior): { num, den, known (has a count), unknownN }; each result weighs its
+     attempt × its sample × 0.15 per later session (day) of the same topic */
   function weigh(ev, today) {
     let num = 0,
       den = 0,
       unknownN = false,
       known = false;
+    const days = [...new Set(ev.map(o => o.date))].sort(),
+      after = d => days.length - 1 - days.indexOf(d);
     ev.forEach(o => {
-      const w = ATTEMPT_W[o.attempt] * Math.pow(0.5, Math.max(0, diffDays(o.date, today)) / MASTERY_HALF),
+      const w = ATTEMPT_W[o.attempt] * Math.pow(DECAY_SESSION, after(o.date)),
         n = nOf(o);
       if (o.total > 0) known = true;
       else unknownN = true;
@@ -157,8 +187,39 @@ const SpacedRepetition = (() => {
     _pool = { k: key, v };
     return v;
   }
-  /* skip: exam ids whose topic results must be left out (the blended forecast already counts their overall score) */
+  /* the models of the current data are kept until the data changes (a session added or removed, a score, a list, the
+     exam date, the review threshold) or the screen is drawn again — the planner asks for the same topic many times */
+  const _models = new Map();
+  let _sig = '';
+  const clearModels = () => {
+    _models.clear();
+    _sig = '';
+  };
   function srModel(i, asOf, before, skip) {
+    const sig = [
+      state.events.length,
+      (state.events.at(-1) || {}).id,
+      (state.exams || []).length,
+      state.deadline,
+      state.scores.join(),
+      state.statuses.join(),
+      pref('reviewAt'),
+      todayISO(),
+    ].join('|');
+    if (sig !== _sig) {
+      _models.clear();
+      _sig = sig;
+    }
+    const key = i + '|' + (asOf || '') + '|' + (before ? 1 : 0) + '|' + (skip && skip.size ? [...skip].join() : '');
+    let m = _models.get(key);
+    if (!m) {
+      m = srModelCalc(i, asOf, before, skip);
+      _models.set(key, m);
+    }
+    return m;
+  }
+  /* skip: exam ids whose topic results must be left out (the blended forecast already counts their overall score) */
+  function srModelCalc(i, asOf, before, skip) {
     const today = asOf || todayISO();
     let ev = evidenceOf(i, today, before);
     if (skip && skip.size) ev = ev.filter(o => !(o.src === 'exam' && skip.has(o.exam)));
@@ -232,7 +293,9 @@ const SpacedRepetition = (() => {
     if (reps.length) {
       const l = reps[reps.length - 1],
         tn = diffDays(l.date, today),
-        iv = Math.max(1, Math.round(9 * l.S * (1 / pref('reviewAt') - 1)));
+        left = state.deadline ? diffDays(l.date, state.deadline) : -1,
+        iv0 = Math.max(1, Math.round(9 * l.S * (1 / pref('reviewAt') - 1))),
+        iv = left > 0 ? Math.min(iv0, Math.max(1, Math.round(GAP_SHARE * left))) : iv0;
       Object.assign(m, { R: recall(tn, l.S), S: l.S, last: l.date, next: addDays(l.date, iv), over: tn - iv });
     }
     /* misses imported from an "errors only" test after the last review: due now */
@@ -251,9 +314,65 @@ const SpacedRepetition = (() => {
   /* chance of answering a question of the topic right on a date: mastery × recall + 1/3 × (1 − recall)
      (unknown mastery → 50%) */
   function chanceAt(m, date) {
-    /* (a topic with no evidence uses your overall level p̄, see mastery) */
-    const R = m.reps.length ? recall(diffDays(m.last, date), m.S) : 1;
+    /* (a topic with no evidence uses your overall level p̄, see mastery; recall with your fitted time scale) */
+    const R = m.reps.length ? recall(diffDays(m.last, date) / retentionScale(), m.S) : 1;
     return pRight(m.mastery * 100, R);
+  }
+  /* c: how much slower than the default curve you forget, fitted to your sessions (see RETENTION FOR THE FORECAST).
+     Each pair = a scored session and the topic's model the day before it; the guess is mastery × R(gap / c) + 1/3 ×
+     (1 − R). Cached per day and data. */
+  const SCALES = [1, 1.5, 2, 3, 5, 8, 13, 21];
+  let _scale = null,
+    _fitting = false;
+  function retentionScale() {
+    if (_fitting) return 1;
+    /* keyed on your real sessions only: the projected sessions of a weekly plan never refit it */
+    const real = state.events.filter(e => !e.proj),
+      key = [todayISO(), real.length, (real.at(-1) || {}).id, (state.exams || []).length].join('|');
+    if (_scale && _scale.k === key) return _scale.v;
+    _fitting = true;
+    let v = 1;
+    try {
+      /* the first scored session of each topic per day, the most recent 200 of them (enough, and fast on a long
+         history); each paired with the topic's model the day before */
+      const cand = [];
+      TOPICS.forEach((_, i) => {
+        const seen = new Set();
+        sessionsOf(i)
+          .filter(e => !e.partial && !e.proj && e.score != null)
+          .sort((a, b) => a.date.localeCompare(b.date))
+          .forEach(e => {
+            if (seen.has(e.date)) return;
+            seen.add(e.date);
+            cand.push({ i, e });
+          });
+      });
+      const pairs = [];
+      cand
+        .sort((a, b) => a.e.date.localeCompare(b.e.date))
+        .slice(-200)
+        .forEach(({ i, e }) => {
+          const m = srModel(i, e.date, true);
+          if (m.reps.length) pairs.push({ m: m.mastery, S: m.S, gap: diffDays(m.last, e.date), obs: e.score / 100 });
+        });
+      if (pairs.length >= 20) {
+        let best = Infinity;
+        SCALES.forEach(c => {
+          const sse = pairs.reduce((a, q) => {
+            const R = recall(q.gap / c, q.S);
+            return a + (q.m * R + (1 - R) / 3 - q.obs) ** 2;
+          }, 0);
+          if (sse < best - 1e-12) {
+            best = sse;
+            v = c;
+          }
+        });
+      }
+    } finally {
+      _fitting = false;
+    }
+    _scale = { k: key, v };
+    return v;
   }
   function srAll(asOf, before) {
     return TOPICS.map((_, i) => srModel(i, asOf, before))
@@ -272,7 +391,32 @@ const SpacedRepetition = (() => {
     });
     return best != null ? best : TOPICS[i].score;
   }
-  return { recall, addDays, isTracked, srModel, srAll, scoreAt, evidenceOf, chanceAt, UNKNOWN_N, REP_MIN_N };
+  return {
+    recall,
+    addDays,
+    isTracked,
+    srModel,
+    srAll,
+    scoreAt,
+    evidenceOf,
+    chanceAt,
+    retentionScale,
+    clearModels,
+    UNKNOWN_N,
+    REP_MIN_N,
+  };
 })();
-const { recall, addDays, isTracked, srModel, srAll, scoreAt, evidenceOf, chanceAt, UNKNOWN_N, REP_MIN_N } =
-  SpacedRepetition;
+const {
+  recall,
+  addDays,
+  isTracked,
+  srModel,
+  srAll,
+  scoreAt,
+  evidenceOf,
+  chanceAt,
+  retentionScale,
+  clearModels,
+  UNKNOWN_N,
+  REP_MIN_N,
+} = SpacedRepetition;
