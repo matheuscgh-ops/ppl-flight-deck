@@ -23,7 +23,7 @@
        coming back instead of waiting forever — 2 a day, so they rotate in without crowding out the reviews due.
      area floor (a week): fair share of area a = its official share × (1 − its average p); an area whose minutes so far
        are under half its fair share of the week's minutes gets its best topic raised to the median value per minute;
-       the area furthest below its share has that topic placed first that day.
+       the two areas furthest below their share have that topic placed first that day.
      The choice is by value per minute (a fractional knapsack: values are linear in n, so taking the densest first and
      cutting the last one to fit is the best use of the time), never past the time you gave.
 
@@ -98,9 +98,9 @@ const Policy = (() => {
   }
   const hardnessOf = c => (c.kind === 'test' ? 99 : (1 - (c.p ?? 0.5)) * (c.diff || 1));
   /* the smallest chunk worth doing: minQ questions or 10 minutes (the whole topic when it is smaller); a practice test
-     that does not fit whole is done in part, never under 20 questions (5 when you added it yourself) */
+     is done whole — only one you added yourself may be cut to what fits (never under 5 questions) */
   const minChunk = (c, minQ) =>
-    c.kind === 'test' ? Math.min(c.n, c.forced ? 5 : 20) : Math.min(c.full, Math.max(minQ, Math.ceil(10 / c.per)));
+    c.kind === 'test' ? (c.manual ? Math.min(c.n, 5) : c.n) : Math.min(c.full, Math.max(minQ, Math.ceil(10 / c.per)));
   function activityOf(m, reason, E, i, status) {
     const mast = m.mastery;
     if (reason === 'new' && !m.obs && !m.reps.length) return E.order === 'easy' ? 'concept' : 'newQ';
@@ -145,7 +145,10 @@ const Policy = (() => {
                 ? 'new'
                 : idle >= COVER_DAYS
                   ? 'coverage'
-                  : null;
+                  : /* an area of the test left behind this week brings back its topics not studied in the last 2 days */
+                    opts.areaShort && opts.areaShort.includes(examShare(i).area) && idle >= 2
+                    ? 'coverage'
+                    : null;
       if (!reason) return;
       if (final && reason === 'new' && !m.obs && !m.reps.length) return;
       if (lastDay && reason === 'nodata') return;
@@ -240,15 +243,19 @@ const Policy = (() => {
       });
     /* area floor (weekly plans): an ACS area that got less than half its fair share of the week's time so far has its
        most valuable topic lifted to the median too, so no area of the test is left out for a whole week */
-    (opts.areaShort || []).forEach((a, k) => {
+    let forcedAreas = 0;
+    (opts.areaShort || []).forEach(a => {
       const c = out
         .filter(x => examShare(x.i).area === a && !x.done)
         .sort((x, y) => y.value / full(y) - x.value / full(x))[0];
       if (!c) return;
       if (c.value / full(c) < med) c.value = med * full(c);
       c.floor = true;
-      /* the area furthest below its share is placed first that day */
-      if (k === 0) c.forced = true;
+      /* the two areas furthest below their share (that have a topic to study) are placed first that day */
+      if (forcedAreas < 2) {
+        c.forced = true;
+        forcedAreas++;
+      }
     });
     return out;
   }
@@ -267,6 +274,7 @@ const Policy = (() => {
     return {
       kind: 'test',
       forced: man || (!E.test && tw.overdue >= 2),
+      manual: !!man,
       n: TEST_Q,
       full: TEST_Q,
       reason: tw.due ? tw.reason : man ? 'testManual' : 'test',

@@ -73,6 +73,8 @@ with sync_playwright() as p:
             fix([{'ago': 2 * (8 - k), 'topic': t, 'kind': 'review' if k else 'study', 'score': 70 + 2 * k} for t in (13, 22, 18) for k in range(8)])
             sc = ev("retentionScale()")
             check(f'{tag}: a history with no forgetting between sessions fits a slower curve (c > 1)', sc > 1, sc)
+            early = ev("retentionScale(addDays(todayISO(),-15))")
+            check(f'{tag}: the fit only uses sessions before the date forecast (two weeks ago: too few pairs → c = 1)', early == 1, early)
             fl = ev("""(()=>{const T=todayISO(),b={};for(let k=0;k<7;k++)b[addDays(T,k)]=[[1140,1320]];const o=suggestDays(Object.keys(b),b,{});
               const a=new Set();Object.values(o).forEach(l=>l.forEach(x=>{if(x.kind==='topic')a.add(examShare(x.i).area)}));return [...a]})()""")
             check(f'{tag}: a week of plans reaches every ACS area with a topic the planner can study (area floor)', len(fl) >= 7, fl)

@@ -19,10 +19,11 @@ const SpacedRepetition = (() => {
    Records without a kind: the first of a day counts as a first attempt, a later one the same day as a repeat (a retake
    of the same set), so the BEST score of a day never replaces the first one.
 
-   MASTERY  m = (Σ w·n·p + K·p̄) / (Σ w·n + K),   K = 4,   w = attempt weight × 0.15^(sessions of the topic since)
-            — a per-session exponential average (85% on the latest session): a learner who improves session after
-            session is followed, not averaged with last month (a 45-day average lagged 7 points behind the real
-            results in the backtest of 2026-11-11)
+   MASTERY  a trend of your results day by day (Holt's method, see MASTERY AS A TREND below): the first result is
+            shrunk toward p̄ by its sample, m = (n·p + K·p̄) / (n + K), K = 4; later ones move the level by up to 85%
+            (less for a small sample or a repeat) and a damped trend follows steady progress. Out of sample it beat
+            repeating the last score; a 45-day average lagged 7 points behind (backtest of 2026-11-11).
+            Confidence still uses Σ w·n with w = attempt weight × 0.15^(sessions of the topic since).
             p̄ = your overall level: the same weighted average over ALL topics, pulled toward 50% by 30 questions (50%
             when there is nothing at all) — a topic with little evidence is assumed to be like the rest of your work,
             not like a guess. With p̄ = 50%:
@@ -50,7 +51,8 @@ const SpacedRepetition = (() => {
                  away is 20–40% of the time left; a gap past the exam date is useless)
    RETENTION FOR THE FORECAST  the chance of a right answer uses R with the time scaled by c, fitted to YOUR history:
                  among c = 1, 1.5, 2, 3, 5, 8, 13, 21, the one that best predicts your next session's score from the one
-                 before (least squares over the last 200 pairs of sessions; 20 needed, else c = 1). c > 1 means you
+                 before (least squares over the last 200 pairs of sessions BEFORE the date forecast, so a past date
+                 never sees what came after it; 20 needed, else c = 1). c > 1 means you
                  forget more slowly than the default curve; scheduling keeps c = 1 (reviews stay on the safe side).
    An imported "errors only" test with misses in a topic after its last review makes the topic due now.
    need (the order of the "needs recall" lists) = expected misses now × exam share × 60, × 1.2 when due.            */
@@ -151,6 +153,42 @@ const SpacedRepetition = (() => {
     });
     return { num, den, known, unknownN };
   }
+  /* MASTERY AS A TREND (Holt's linear method with a damped trend, per day of the topic):
+       each day = the weighted mean of its results (attempt × sample), its weight w = Σ attempt × min(1, n / 15)
+       first day   level = (n·p + K·p̄) / (n + K)   (the sample shrinkage: 2/2 is not 40/40), trend = 0
+       later days  α' = α × min(1, w)   level ← α'·p + (1 − α')·(level + φ·trend)
+                   trend ← β·(level − previous level) + (1 − β)·φ·trend
+       mastery = level + φ·trend, between 0 and 1        α = 0.85, β = 0.5, φ = 0.8
+     Chosen out of sample: fitted on the sessions up to 2026-10-20 of the personal backup, it predicted the next session
+     of each topic after that date better than repeating the last score (3.7 vs 4.0 points, 34 sessions). */
+  const HOLT = { a: 0.85, b: 0.5, phi: 0.8 };
+  function holtMastery(meas, pbar) {
+    const byDay = new Map();
+    meas.forEach(o => {
+      const w = ATTEMPT_W[o.attempt],
+        n = nOf(o),
+        d = byDay.get(o.date) || { num: 0, den: 0, w: 0 };
+      d.num += w * n * (o.p / 100);
+      d.den += w * n;
+      d.w += w * Math.min(1, n / UNKNOWN_N);
+      byDay.set(o.date, d);
+    });
+    let level = null,
+      trend = 0;
+    [...byDay.keys()].sort().forEach(k => {
+      const d = byDay.get(k),
+        p = d.num / d.den;
+      if (level == null) {
+        level = (d.den * p + PRIOR_K * pbar) / (d.den + PRIOR_K);
+        return;
+      }
+      const a = HOLT.a * Math.min(1, d.w),
+        prev = level;
+      level = a * p + (1 - a) * (level + HOLT.phi * trend);
+      trend = HOLT.b * (level - prev) + (1 - HOLT.b) * HOLT.phi * trend;
+    });
+    return Math.max(0, Math.min(1, level + HOLT.phi * trend));
+  }
   const measured = ev => ev.filter(o => o.src !== 'proj' && o.p != null && ATTEMPT_W[o.attempt] > 0);
   /* p̄: your overall level on a date, from every topic's evidence (or its Sporty's score when it has none) */
   let _pool = null;
@@ -239,7 +277,7 @@ const SpacedRepetition = (() => {
     }
     const pbar = poolMean(today, before, skip),
       prior = !den,
-      mastery = (num + PRIOR_K * pbar) / (den + PRIOR_K);
+      mastery = meas.length ? holtMastery(meas, pbar) : (num + PRIOR_K * pbar) / (den + PRIOR_K);
     /* --- reviews (one per day: the day's first attempt that is a retrieval) --- */
     const days = {};
     ev.forEach(o => {
@@ -315,21 +353,29 @@ const SpacedRepetition = (() => {
      (unknown mastery → 50%) */
   function chanceAt(m, date) {
     /* (a topic with no evidence uses your overall level p̄, see mastery; recall with your fitted time scale) */
-    const R = m.reps.length ? recall(diffDays(m.last, date) / retentionScale(), m.S) : 1;
+    const asOf = date < todayISO() ? date : todayISO(),
+      R = m.reps.length ? recall(diffDays(m.last, date) / retentionScale(asOf), m.S) : 1;
     return pRight(m.mastery * 100, R);
   }
   /* c: how much slower than the default curve you forget, fitted to your sessions (see RETENTION FOR THE FORECAST).
      Each pair = a scored session and the topic's model the day before it; the guess is mastery × R(gap / c) + 1/3 ×
      (1 − R). Cached per day and data. */
   const SCALES = [1, 1.5, 2, 3, 5, 8, 13, 21];
-  let _scale = null,
-    _fitting = false;
-  function retentionScale() {
+  let _fitting = false;
+  /* upTo: only sessions BEFORE this date are used, so a forecast for a past date never sees what came after it */
+  const _scales = new Map();
+  let _scaleKey = '';
+  function retentionScale(upTo) {
     if (_fitting) return 1;
+    upTo = upTo || todayISO();
     /* keyed on your real sessions only: the projected sessions of a weekly plan never refit it */
     const real = state.events.filter(e => !e.proj),
       key = [todayISO(), real.length, (real.at(-1) || {}).id, (state.exams || []).length].join('|');
-    if (_scale && _scale.k === key) return _scale.v;
+    if (key !== _scaleKey) {
+      _scales.clear();
+      _scaleKey = key;
+    }
+    if (_scales.has(upTo)) return _scales.get(upTo);
     _fitting = true;
     let v = 1;
     try {
@@ -339,7 +385,7 @@ const SpacedRepetition = (() => {
       TOPICS.forEach((_, i) => {
         const seen = new Set();
         sessionsOf(i)
-          .filter(e => !e.partial && !e.proj && e.score != null)
+          .filter(e => !e.partial && !e.proj && e.score != null && e.date < upTo)
           .sort((a, b) => a.date.localeCompare(b.date))
           .forEach(e => {
             if (seen.has(e.date)) return;
@@ -371,7 +417,7 @@ const SpacedRepetition = (() => {
     } finally {
       _fitting = false;
     }
-    _scale = { k: key, v };
+    _scales.set(upTo, v);
     return v;
   }
   function srAll(asOf, before) {

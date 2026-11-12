@@ -617,11 +617,11 @@ const Schedule = (() => {
       need[sh.area] = (need[sh.area] || 0) + sh.share * (1 - chanceAt(srModel(i, date, true), date));
     });
     const N = Object.values(need).reduce((a, x) => a + x, 0);
-    /* furthest below its share first */
+    /* furthest below its share first; among equals, the biggest fair share first */
     const gap = a => (simAreas[a] || 0) / total / (need[a] / N);
     return Object.keys(need)
       .filter(a => gap(a) < 0.5)
-      .sort((a, b) => gap(a) - gap(b));
+      .sort((a, b) => gap(a) - gap(b) || need[b] - need[a]);
   }
   /* minutes from midnight → today's timestamp, and back */
   const clockMs = (date, min) => {

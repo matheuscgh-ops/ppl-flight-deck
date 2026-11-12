@@ -11675,19 +11675,19 @@ const Translations = (() => {
   /* planner v2: the "How it is calculated" texts follow the new model */
   Object.assign(I18N.en, {
     formula:
-      "<p>A simplified model inspired by FSRS / SM-2. It keeps four things apart: the <b>observed result</b> (right / total), the estimated <b>mastery</b>, the <b>confidence</b> in it and the estimated <b>recall</b> today — a model, not a measurement of your memory. Moving a card is not a session.</p><pre>Evidence:   each result p with its sample n (a % alone: unknown → weighs as 15)\n            first try ×1 · repeat of the same questions ×0.3 · after seeing the answers ×0\nMastery:    m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4),  w = attempt × 0.15^(later sessions),  p̄ = your overall level\nConfidence: effective questions: low &lt; 10 · medium &lt; 30 · high ≥ 30\n\nRecall after t days:     R(t) = 1 / (1 + t / (9·S))\nFirst review:            S = 1 day (&lt; 70%) · 1.5 (70–84%) · 2 (≥ 85%)\nLater review (the day's FIRST attempt, recall R then):\n  p ≥ 70%   →  target S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  target S              (a weak result never lengthens the interval)\n  p &lt; 60%   →  target max(1, 0.4 × S)\n  S moves toward the target by min(1, n/15) × attempt weight\nUnder 8 questions (or the whole topic if smaller) is evidence, not a review.\n\nNext review = when R falls to {RV}% (Settings): last review + 9·S·(1/r − 1) days,\n              at most 30% of the days left to the exam\nOrder of the lists = test questions at risk now: 60 × share × (1 − p), × 1.2 when due</pre><p>Reviewing a little later, once recall has dropped, grows S more than reviewing right away — the spacing effect. The white line is the recall you would still have on exam day if you stopped reviewing.</p>",
+      "<p>A simplified model inspired by FSRS / SM-2. It keeps four things apart: the <b>observed result</b> (right / total), the estimated <b>mastery</b>, the <b>confidence</b> in it and the estimated <b>recall</b> today — a model, not a measurement of your memory. Moving a card is not a session.</p><pre>Evidence:   each result p with its sample n (a % alone: unknown → weighs as 15)\n            first try ×1 · repeat of the same questions ×0.3 · after seeing the answers ×0\nMastery:    first result (n·p + 4·p̄) / (n + 4), p̄ = your overall level; then a damped trend of your\n            results day by day (Holt: α 0.85 × sample, β 0.5, φ 0.8)\nConfidence: effective questions: low &lt; 10 · medium &lt; 30 · high ≥ 30\n\nRecall after t days:     R(t) = 1 / (1 + t / (9·S))\nFirst review:            S = 1 day (&lt; 70%) · 1.5 (70–84%) · 2 (≥ 85%)\nLater review (the day's FIRST attempt, recall R then):\n  p ≥ 70%   →  target S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  target S              (a weak result never lengthens the interval)\n  p &lt; 60%   →  target max(1, 0.4 × S)\n  S moves toward the target by min(1, n/15) × attempt weight\nUnder 8 questions (or the whole topic if smaller) is evidence, not a review.\n\nNext review = when R falls to {RV}% (Settings): last review + 9·S·(1/r − 1) days,\n              at most 30% of the days left to the exam\nOrder of the lists = test questions at risk now: 60 × share × (1 − p), × 1.2 when due</pre><p>Reviewing a little later, once recall has dropped, grows S more than reviewing right away — the spacing effect. The white line is the recall you would still have on exam day if you stopped reviewing.</p>",
     fcFormula:
       "p(topic) = mastery × recall + 1/3 × (1 − recall)      (no result yet → your overall level)\nshare(topic) = its ACS area's official share, split inside the area by bank size\nunmapped areas (VIII, XII: 9%) → the average of the others\nexpected score μ = Σ share × p + 9% × average\nright answers X ~ BetaBinomial(60, μ, ± model error)\nchance to pass = P(X ≥ 42)   ·   chance of {G}% = P(X ≥ {GN})\nLost questions (topic) = 60 × share × (1 − p)",
   });
   Object.assign(I18N.pt, {
     formula:
-      '<p>Modelo simplificado inspirado em FSRS / SM-2. Separa quatro coisas: o <b>resultado observado</b> (acertos / total), o <b>domínio</b> estimado, a <b>confiança</b> nele e a <b>retenção</b> estimada hoje — um modelo, não uma medição da sua memória. Mover um card não é sessão.</p><pre>Evidência:  cada resultado p com a amostra n (só %: desconhecida → pesa como 15)\n            primeira tentativa ×1 · repetição das mesmas questões ×0,3 · depois de ver as respostas ×0\nDomínio:    m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4),  w = tentativa × 0,15^(sessões posteriores),  p̄ = seu nível geral\nConfiança:  questões efetivas: baixa &lt; 10 · média &lt; 30 · alta ≥ 30\n\nRetenção após t dias:    R(t) = 1 / (1 + t / (9·S))\nPrimeira revisão:        S = 1 dia (&lt; 70%) · 1,5 (70–84%) · 2 (≥ 85%)\nRevisão seguinte (a PRIMEIRA tentativa do dia, retenção R naquele momento):\n  p ≥ 70%   →  alvo S × (1 + 1,2 × p/100 × (1,5 − R))\n  60–69%    →  alvo S                (resultado fraco nunca aumenta o intervalo)\n  p &lt; 60%   →  alvo max(1; 0,4 × S)\n  S anda até o alvo na proporção min(1; n/15) × peso da tentativa\nMenos de 8 questões (ou o tópico inteiro, se menor) é evidência, não revisão.\n\nPróxima revisão = quando R cai para {RV}% (Ajustes): última revisão + 9·S·(1/r − 1) dias,\n                  no máximo 30% dos dias até a prova\nOrdem das listas = questões da prova em risco agora: 60 × peso × (1 − p), × 1,2 se vencida</pre><p>Revisar um pouco depois, quando a retenção já caiu, aumenta mais o S do que revisar logo em seguida — o efeito de espaçamento. A linha branca é a retenção que você ainda teria no dia da prova se parasse de revisar.</p>',
+      '<p>Modelo simplificado inspirado em FSRS / SM-2. Separa quatro coisas: o <b>resultado observado</b> (acertos / total), o <b>domínio</b> estimado, a <b>confiança</b> nele e a <b>retenção</b> estimada hoje — um modelo, não uma medição da sua memória. Mover um card não é sessão.</p><pre>Evidência:  cada resultado p com a amostra n (só %: desconhecida → pesa como 15)\n            primeira tentativa ×1 · repetição das mesmas questões ×0,3 · depois de ver as respostas ×0\nDomínio:    primeiro resultado (n·p + 4·p̄) / (n + 4), p̄ = seu nível geral; depois uma tendência\n            amortecida dos seus resultados dia a dia (Holt: α 0,85 × amostra, β 0,5, φ 0,8)\nConfiança:  questões efetivas: baixa &lt; 10 · média &lt; 30 · alta ≥ 30\n\nRetenção após t dias:    R(t) = 1 / (1 + t / (9·S))\nPrimeira revisão:        S = 1 dia (&lt; 70%) · 1,5 (70–84%) · 2 (≥ 85%)\nRevisão seguinte (a PRIMEIRA tentativa do dia, retenção R naquele momento):\n  p ≥ 70%   →  alvo S × (1 + 1,2 × p/100 × (1,5 − R))\n  60–69%    →  alvo S                (resultado fraco nunca aumenta o intervalo)\n  p &lt; 60%   →  alvo max(1; 0,4 × S)\n  S anda até o alvo na proporção min(1; n/15) × peso da tentativa\nMenos de 8 questões (ou o tópico inteiro, se menor) é evidência, não revisão.\n\nPróxima revisão = quando R cai para {RV}% (Ajustes): última revisão + 9·S·(1/r − 1) dias,\n                  no máximo 30% dos dias até a prova\nOrdem das listas = questões da prova em risco agora: 60 × peso × (1 − p), × 1,2 se vencida</pre><p>Revisar um pouco depois, quando a retenção já caiu, aumenta mais o S do que revisar logo em seguida — o efeito de espaçamento. A linha branca é a retenção que você ainda teria no dia da prova se parasse de revisar.</p>',
     fcFormula:
       'p(tópico) = domínio × retenção + 1/3 × (1 − retenção)      (sem resultado → seu nível geral)\npeso(tópico) = % oficial da área ACS, dividido dentro da área pelo tamanho do banco\náreas sem tópico (VIII, XII: 9%) → média dos outros\nnota esperada μ = Σ peso × p + 9% × média\nacertos X ~ BetaBinomial(60, μ, ± erro do modelo)\nchance de passar = P(X ≥ 42)   ·   chance de {G}% = P(X ≥ {GN})\nQuestões perdidas (tópico) = 60 × peso × (1 − p)',
   });
   Object.assign(I18N.ja, {
     formula:
-      '<p>FSRS／SM-2を参考にした簡易モデルです。4つを区別します：<b>観測した結果</b>（正解数／問題数）、推定<b>習熟度</b>、その<b>信頼度</b>、今日の推定<b>保持率</b> — 記憶の測定ではなくモデルです。カードの移動はセッションに数えません。</p><pre>根拠:     各結果 p と問題数 n（%のみ：不明 → 15として扱う）\n          初回 ×1 · 同じ問題の繰り返し ×0.3 · 答えを見た後 ×0\n習熟度:   m = (Σ w·n·p + 4·p̄) / (Σ w·n + 4),  w = 取り組み × 0.15^(以降のセッション数),  p̄ = 全体の水準\n信頼度:   実効問題数：低 &lt; 10 · 中 &lt; 30 · 高 ≥ 30\n\nt日後の保持率:   R(t) = 1 / (1 + t / (9·S))\n初回の復習:      S = 1日（70%未満）· 1.5（70–84%）· 2（85%以上）\n2回目以降（その日の最初の取り組み、その時点の保持率R）:\n  p ≥ 70%   →  目標 S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  目標 S              （弱い結果で間隔は延びない）\n  p &lt; 60%   →  目標 max(1, 0.4 × S)\n  Sは min(1, n/15) × 取り組みの重み の割合で目標へ動く\n8問未満（トピック全体がそれより少なければ全体）は根拠であって復習ではない。\n\n次の復習 = Rが{RV}%まで下がる時点（設定）：最終復習 + 9·S·(1/r − 1)日、\n           試験までの日数の30%以内\nリストの順序 = 今落としそうな試験問題：60 × 比重 × (1 − p)、期限なら × 1.2</pre><p>少し忘れかけた頃に復習すると、すぐに復習するよりSが大きく伸びます（間隔効果）。白い線は、復習をやめた場合の試験当日の保持率です。</p>',
+      '<p>FSRS／SM-2を参考にした簡易モデルです。4つを区別します：<b>観測した結果</b>（正解数／問題数）、推定<b>習熟度</b>、その<b>信頼度</b>、今日の推定<b>保持率</b> — 記憶の測定ではなくモデルです。カードの移動はセッションに数えません。</p><pre>根拠:     各結果 p と問題数 n（%のみ：不明 → 15として扱う）\n          初回 ×1 · 同じ問題の繰り返し ×0.3 · 答えを見た後 ×0\n習熟度:   最初の結果 (n·p + 4·p̄) / (n + 4)、p̄ = 全体の水準；以降は日ごとの結果の\n          減衰付き傾向（ホルト：α 0.85 × 問題数、β 0.5、φ 0.8）\n信頼度:   実効問題数：低 &lt; 10 · 中 &lt; 30 · 高 ≥ 30\n\nt日後の保持率:   R(t) = 1 / (1 + t / (9·S))\n初回の復習:      S = 1日（70%未満）· 1.5（70–84%）· 2（85%以上）\n2回目以降（その日の最初の取り組み、その時点の保持率R）:\n  p ≥ 70%   →  目標 S × (1 + 1.2 × p/100 × (1.5 − R))\n  60–69%    →  目標 S              （弱い結果で間隔は延びない）\n  p &lt; 60%   →  目標 max(1, 0.4 × S)\n  Sは min(1, n/15) × 取り組みの重み の割合で目標へ動く\n8問未満（トピック全体がそれより少なければ全体）は根拠であって復習ではない。\n\n次の復習 = Rが{RV}%まで下がる時点（設定）：最終復習 + 9·S·(1/r − 1)日、\n           試験までの日数の30%以内\nリストの順序 = 今落としそうな試験問題：60 × 比重 × (1 − p)、期限なら × 1.2</pre><p>少し忘れかけた頃に復習すると、すぐに復習するよりSが大きく伸びます（間隔効果）。白い線は、復習をやめた場合の試験当日の保持率です。</p>',
     fcFormula:
       'p(トピック) = 習熟度 × 保持率 + 1/3 × (1 − 保持率)      （結果なし → 全体の水準）\n比重 = ACSエリアの公式比率をエリア内で問題バンクの大きさで分割\nトピックのないエリア（VIII、XII：9%）→ 他の平均\n予想正答率 μ = Σ 比重 × p + 9% × 平均\n正解数 X ~ ベータ二項分布(60, μ, ± モデル誤差)\n合格確率 = P(X ≥ 42) · {G}%以上 = P(X ≥ {GN})\n失点（トピック）= 60 × 比重 × (1 − p)',
   });
@@ -13192,10 +13192,11 @@ const SpacedRepetition = (() => {
    Records without a kind: the first of a day counts as a first attempt, a later one the same day as a repeat (a retake
    of the same set), so the BEST score of a day never replaces the first one.
 
-   MASTERY  m = (Σ w·n·p + K·p̄) / (Σ w·n + K),   K = 4,   w = attempt weight × 0.15^(sessions of the topic since)
-            — a per-session exponential average (85% on the latest session): a learner who improves session after
-            session is followed, not averaged with last month (a 45-day average lagged 7 points behind the real
-            results in the backtest of 2026-11-11)
+   MASTERY  a trend of your results day by day (Holt's method, see MASTERY AS A TREND below): the first result is
+            shrunk toward p̄ by its sample, m = (n·p + K·p̄) / (n + K), K = 4; later ones move the level by up to 85%
+            (less for a small sample or a repeat) and a damped trend follows steady progress. Out of sample it beat
+            repeating the last score; a 45-day average lagged 7 points behind (backtest of 2026-11-11).
+            Confidence still uses Σ w·n with w = attempt weight × 0.15^(sessions of the topic since).
             p̄ = your overall level: the same weighted average over ALL topics, pulled toward 50% by 30 questions (50%
             when there is nothing at all) — a topic with little evidence is assumed to be like the rest of your work,
             not like a guess. With p̄ = 50%:
@@ -13223,7 +13224,8 @@ const SpacedRepetition = (() => {
                  away is 20–40% of the time left; a gap past the exam date is useless)
    RETENTION FOR THE FORECAST  the chance of a right answer uses R with the time scaled by c, fitted to YOUR history:
                  among c = 1, 1.5, 2, 3, 5, 8, 13, 21, the one that best predicts your next session's score from the one
-                 before (least squares over the last 200 pairs of sessions; 20 needed, else c = 1). c > 1 means you
+                 before (least squares over the last 200 pairs of sessions BEFORE the date forecast, so a past date
+                 never sees what came after it; 20 needed, else c = 1). c > 1 means you
                  forget more slowly than the default curve; scheduling keeps c = 1 (reviews stay on the safe side).
    An imported "errors only" test with misses in a topic after its last review makes the topic due now.
    need (the order of the "needs recall" lists) = expected misses now × exam share × 60, × 1.2 when due.            */
@@ -13324,6 +13326,42 @@ const SpacedRepetition = (() => {
     });
     return { num, den, known, unknownN };
   }
+  /* MASTERY AS A TREND (Holt's linear method with a damped trend, per day of the topic):
+       each day = the weighted mean of its results (attempt × sample), its weight w = Σ attempt × min(1, n / 15)
+       first day   level = (n·p + K·p̄) / (n + K)   (the sample shrinkage: 2/2 is not 40/40), trend = 0
+       later days  α' = α × min(1, w)   level ← α'·p + (1 − α')·(level + φ·trend)
+                   trend ← β·(level − previous level) + (1 − β)·φ·trend
+       mastery = level + φ·trend, between 0 and 1        α = 0.85, β = 0.5, φ = 0.8
+     Chosen out of sample: fitted on the sessions up to 2026-10-20 of the personal backup, it predicted the next session
+     of each topic after that date better than repeating the last score (3.7 vs 4.0 points, 34 sessions). */
+  const HOLT = { a: 0.85, b: 0.5, phi: 0.8 };
+  function holtMastery(meas, pbar) {
+    const byDay = new Map();
+    meas.forEach(o => {
+      const w = ATTEMPT_W[o.attempt],
+        n = nOf(o),
+        d = byDay.get(o.date) || { num: 0, den: 0, w: 0 };
+      d.num += w * n * (o.p / 100);
+      d.den += w * n;
+      d.w += w * Math.min(1, n / UNKNOWN_N);
+      byDay.set(o.date, d);
+    });
+    let level = null,
+      trend = 0;
+    [...byDay.keys()].sort().forEach(k => {
+      const d = byDay.get(k),
+        p = d.num / d.den;
+      if (level == null) {
+        level = (d.den * p + PRIOR_K * pbar) / (d.den + PRIOR_K);
+        return;
+      }
+      const a = HOLT.a * Math.min(1, d.w),
+        prev = level;
+      level = a * p + (1 - a) * (level + HOLT.phi * trend);
+      trend = HOLT.b * (level - prev) + (1 - HOLT.b) * HOLT.phi * trend;
+    });
+    return Math.max(0, Math.min(1, level + HOLT.phi * trend));
+  }
   const measured = ev => ev.filter(o => o.src !== 'proj' && o.p != null && ATTEMPT_W[o.attempt] > 0);
   /* p̄: your overall level on a date, from every topic's evidence (or its Sporty's score when it has none) */
   let _pool = null;
@@ -13412,7 +13450,7 @@ const SpacedRepetition = (() => {
     }
     const pbar = poolMean(today, before, skip),
       prior = !den,
-      mastery = (num + PRIOR_K * pbar) / (den + PRIOR_K);
+      mastery = meas.length ? holtMastery(meas, pbar) : (num + PRIOR_K * pbar) / (den + PRIOR_K);
     /* --- reviews (one per day: the day's first attempt that is a retrieval) --- */
     const days = {};
     ev.forEach(o => {
@@ -13488,21 +13526,29 @@ const SpacedRepetition = (() => {
      (unknown mastery → 50%) */
   function chanceAt(m, date) {
     /* (a topic with no evidence uses your overall level p̄, see mastery; recall with your fitted time scale) */
-    const R = m.reps.length ? recall(diffDays(m.last, date) / retentionScale(), m.S) : 1;
+    const asOf = date < todayISO() ? date : todayISO(),
+      R = m.reps.length ? recall(diffDays(m.last, date) / retentionScale(asOf), m.S) : 1;
     return pRight(m.mastery * 100, R);
   }
   /* c: how much slower than the default curve you forget, fitted to your sessions (see RETENTION FOR THE FORECAST).
      Each pair = a scored session and the topic's model the day before it; the guess is mastery × R(gap / c) + 1/3 ×
      (1 − R). Cached per day and data. */
   const SCALES = [1, 1.5, 2, 3, 5, 8, 13, 21];
-  let _scale = null,
-    _fitting = false;
-  function retentionScale() {
+  let _fitting = false;
+  /* upTo: only sessions BEFORE this date are used, so a forecast for a past date never sees what came after it */
+  const _scales = new Map();
+  let _scaleKey = '';
+  function retentionScale(upTo) {
     if (_fitting) return 1;
+    upTo = upTo || todayISO();
     /* keyed on your real sessions only: the projected sessions of a weekly plan never refit it */
     const real = state.events.filter(e => !e.proj),
       key = [todayISO(), real.length, (real.at(-1) || {}).id, (state.exams || []).length].join('|');
-    if (_scale && _scale.k === key) return _scale.v;
+    if (key !== _scaleKey) {
+      _scales.clear();
+      _scaleKey = key;
+    }
+    if (_scales.has(upTo)) return _scales.get(upTo);
     _fitting = true;
     let v = 1;
     try {
@@ -13512,7 +13558,7 @@ const SpacedRepetition = (() => {
       TOPICS.forEach((_, i) => {
         const seen = new Set();
         sessionsOf(i)
-          .filter(e => !e.partial && !e.proj && e.score != null)
+          .filter(e => !e.partial && !e.proj && e.score != null && e.date < upTo)
           .sort((a, b) => a.date.localeCompare(b.date))
           .forEach(e => {
             if (seen.has(e.date)) return;
@@ -13544,7 +13590,7 @@ const SpacedRepetition = (() => {
     } finally {
       _fitting = false;
     }
-    _scale = { k: key, v };
+    _scales.set(upTo, v);
     return v;
   }
   function srAll(asOf, before) {
@@ -14410,7 +14456,7 @@ const {
        coming back instead of waiting forever — 2 a day, so they rotate in without crowding out the reviews due.
      area floor (a week): fair share of area a = its official share × (1 − its average p); an area whose minutes so far
        are under half its fair share of the week's minutes gets its best topic raised to the median value per minute;
-       the area furthest below its share has that topic placed first that day.
+       the two areas furthest below their share have that topic placed first that day.
      The choice is by value per minute (a fractional knapsack: values are linear in n, so taking the densest first and
      cutting the last one to fit is the best use of the time), never past the time you gave.
 
@@ -14485,9 +14531,9 @@ const Policy = (() => {
   }
   const hardnessOf = c => (c.kind === 'test' ? 99 : (1 - (c.p ?? 0.5)) * (c.diff || 1));
   /* the smallest chunk worth doing: minQ questions or 10 minutes (the whole topic when it is smaller); a practice test
-     that does not fit whole is done in part, never under 20 questions (5 when you added it yourself) */
+     is done whole — only one you added yourself may be cut to what fits (never under 5 questions) */
   const minChunk = (c, minQ) =>
-    c.kind === 'test' ? Math.min(c.n, c.forced ? 5 : 20) : Math.min(c.full, Math.max(minQ, Math.ceil(10 / c.per)));
+    c.kind === 'test' ? (c.manual ? Math.min(c.n, 5) : c.n) : Math.min(c.full, Math.max(minQ, Math.ceil(10 / c.per)));
   function activityOf(m, reason, E, i, status) {
     const mast = m.mastery;
     if (reason === 'new' && !m.obs && !m.reps.length) return E.order === 'easy' ? 'concept' : 'newQ';
@@ -14532,7 +14578,10 @@ const Policy = (() => {
                 ? 'new'
                 : idle >= COVER_DAYS
                   ? 'coverage'
-                  : null;
+                  : /* an area of the test left behind this week brings back its topics not studied in the last 2 days */
+                    opts.areaShort && opts.areaShort.includes(examShare(i).area) && idle >= 2
+                    ? 'coverage'
+                    : null;
       if (!reason) return;
       if (final && reason === 'new' && !m.obs && !m.reps.length) return;
       if (lastDay && reason === 'nodata') return;
@@ -14627,15 +14676,19 @@ const Policy = (() => {
       });
     /* area floor (weekly plans): an ACS area that got less than half its fair share of the week's time so far has its
        most valuable topic lifted to the median too, so no area of the test is left out for a whole week */
-    (opts.areaShort || []).forEach((a, k) => {
+    let forcedAreas = 0;
+    (opts.areaShort || []).forEach(a => {
       const c = out
         .filter(x => examShare(x.i).area === a && !x.done)
         .sort((x, y) => y.value / full(y) - x.value / full(x))[0];
       if (!c) return;
       if (c.value / full(c) < med) c.value = med * full(c);
       c.floor = true;
-      /* the area furthest below its share is placed first that day */
-      if (k === 0) c.forced = true;
+      /* the two areas furthest below their share (that have a topic to study) are placed first that day */
+      if (forcedAreas < 2) {
+        c.forced = true;
+        forcedAreas++;
+      }
     });
     return out;
   }
@@ -14654,6 +14707,7 @@ const Policy = (() => {
     return {
       kind: 'test',
       forced: man || (!E.test && tw.overdue >= 2),
+      manual: !!man,
       n: TEST_Q,
       full: TEST_Q,
       reason: tw.due ? tw.reason : man ? 'testManual' : 'test',
@@ -15660,11 +15714,11 @@ const Schedule = (() => {
       need[sh.area] = (need[sh.area] || 0) + sh.share * (1 - chanceAt(srModel(i, date, true), date));
     });
     const N = Object.values(need).reduce((a, x) => a + x, 0);
-    /* furthest below its share first */
+    /* furthest below its share first; among equals, the biggest fair share first */
     const gap = a => (simAreas[a] || 0) / total / (need[a] / N);
     return Object.keys(need)
       .filter(a => gap(a) < 0.5)
-      .sort((a, b) => gap(a) - gap(b));
+      .sort((a, b) => gap(a) - gap(b) || need[b] - need[a]);
   }
   /* minutes from midnight → today's timestamp, and back */
   const clockMs = (date, min) => {
